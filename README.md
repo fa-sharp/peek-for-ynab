@@ -1,1 +1,0 @@
-# ynab-chrome-widget
