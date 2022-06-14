@@ -1,8 +1,9 @@
 import { createProvider } from "puro"
+import { useStorage } from "@plasmohq/storage"
 import { useContext, useEffect, useState } from "react"
-import { IS_PRODUCTION } from "./utils"
-
 import * as ynab from 'ynab'
+
+import { IS_PRODUCTION } from "./utils"
 import { useAuth } from "./authContext"
 
 const useYNABProvider = () => {
@@ -18,10 +19,8 @@ const useYNABProvider = () => {
       setYnabAPI(null);
   }, [token, authenticated])
 
-  
+
   const [budgets, setBudgets] = useState<null | ynab.BudgetSummary[]>(null)
-  const [selectedBudget, setSelectedBudget] = useState("")
-  const [categories, setCategories] = useState<null | ynab.CategoryGroupWithCategories[]>(null)
 
   /** Fetch budgets */
   useEffect(() => {
@@ -34,6 +33,9 @@ const useYNABProvider = () => {
         })
         .catch(err => console.error("Error fetching budgets", err))
   }, [ynabAPI])
+
+  const [selectedBudget, setSelectedBudget] = useStorage("selectedBudget", "");
+  const [categories, setCategories] = useState<null | ynab.CategoryGroupWithCategories[]>(null)
 
   /** Fetch categories of the selected budget */
   useEffect(() => {
@@ -53,5 +55,6 @@ const useYNABProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useYNABProvider)
 
+/** Hook that provides budget data from YNAB */
 export const useYNAB = () => useContext(BaseContext)
 export const YNABProvider = Provider
