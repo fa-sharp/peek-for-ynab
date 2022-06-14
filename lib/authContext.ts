@@ -9,7 +9,7 @@ const useAuthProvider = () => {
 
     const [token, setToken, { remove: removeToken }] = useStorage<string>("token", "");
 
-    /** Authenticate the YNAB user with their API token (tests if it works by making an API request) */
+    /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
     const login = (token: string) => {
         const api = new ynab.API(token)
         api.user.getUser()

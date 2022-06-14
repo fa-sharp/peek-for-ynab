@@ -1,9 +1,9 @@
 {
   "name": "ynab-chrome-widget",
-  "displayName": "Ynab chrome widget",
-  "version": "0.0.0",
-  "description": "A basic Plasmo extension.",
-  "author": "gitpod",
+  "displayName": "YNAB Chrome Widget",
+  "version": "0.0.1",
+  "description": "A YNAB widget for the Chrome browser",
+  "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "dev": "plasmo dev",
@@ -16,6 +16,7 @@
     "querystring-es3": "^0.2.1",
     "react": "18.1.0",
     "react-dom": "18.1.0",
+    "tabler-icons-react": "^1.48.1",
     "url": "^0.11.0",
     "ynab": "^1.28.0"
   },

@@ -40,6 +40,7 @@ const useYNABProvider = () => {
   /** Fetch categories of the selected budget */
   useEffect(() => {
     if (!selectedBudget || !ynabAPI) return;
+    setCategories(null);
     
     ynabAPI.categories.getCategories(selectedBudget)
       .then(categories => {
