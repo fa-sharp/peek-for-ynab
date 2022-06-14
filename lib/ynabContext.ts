@@ -1,39 +1,52 @@
 import { createProvider } from "puro"
 import { useContext, useEffect, useState } from "react"
-import * as ynab from 'ynab'
+import { IS_PRODUCTION } from "./utils"
 
-const { NODE_ENV, PLASMO_PUBLIC_YNAB_KEY: YNAB_KEY } = process.env
-const isProduction = (NODE_ENV === 'production')
+import * as ynab from 'ynab'
+import { useAuth } from "./authContext"
 
 const useYNABProvider = () => {
-  const ynabAPI = new ynab.API(YNAB_KEY || "");
+ 
+  const { token, authenticated } = useAuth();
+  const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
+  /** Initialize ynabAPI object if authenticated */
+  useEffect(() => {
+    if (token && authenticated)
+      setYnabAPI(new ynab.API(token));
+    else
+      setYnabAPI(null);
+  }, [token, authenticated])
+
+  
   const [budgets, setBudgets] = useState<null | ynab.BudgetSummary[]>(null)
   const [selectedBudget, setSelectedBudget] = useState("")
   const [categories, setCategories] = useState<null | ynab.CategoryGroupWithCategories[]>(null)
 
   /** Fetch budgets */
   useEffect(() => {
+      if (!ynabAPI) return;
+
       ynabAPI.budgets.getBudgets()
         .then(budgets => {
-          if (!isProduction) console.log("Fetched budgets successfully", budgets)
+          if (!IS_PRODUCTION) console.log("Fetched budgets successfully", budgets)
           setBudgets(budgets.data.budgets)
         })
         .catch(err => console.error("Error fetching budgets", err))
-  }, [])
+  }, [ynabAPI])
 
-  /** Fetch budget info/categories */
+  /** Fetch categories of the selected budget */
   useEffect(() => {
-    if (!selectedBudget) return;
+    if (!selectedBudget || !ynabAPI) return;
     
     ynabAPI.categories.getCategories(selectedBudget)
       .then(categories => {
-        if (!isProduction) console.log("Fetched categories successfully", categories)
+        if (!IS_PRODUCTION) console.log("Fetched categories successfully", categories)
         setCategories(categories.data.category_groups)
       })
       .catch(err => console.error("Error fetching categories", err))
 
-  }, [selectedBudget])
+  }, [selectedBudget, ynabAPI])
 
   return { budgets, categories, selectedBudget, setSelectedBudget }
 }
