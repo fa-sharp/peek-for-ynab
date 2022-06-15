@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { formatCurrency } from "~lib/utils"
+import type { SavedCategory } from "~lib/storageContext"
 
 import type { CategoryGroupWithCategories } from "ynab"
-import type { SavedCategory } from "~popup"
 import { CircleMinus } from "tabler-icons-react"
 
 /** View of user's saved categories with balances */

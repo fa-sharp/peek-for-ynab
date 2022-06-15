@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@plasmohq/storage": "^0.5.1",
-    "plasmo": "latest",
+    "plasmo": "^0.42.6",
     "puro": "^0.3.4",
     "querystring-es3": "^0.2.1",
     "react": "18.1.0",

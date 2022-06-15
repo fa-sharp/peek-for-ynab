@@ -6,7 +6,7 @@ specifiers:
   '@types/node': 17.0.42
   '@types/react': 18.0.12
   '@types/react-dom': 18.0.5
-  plasmo: latest
+  plasmo: ^0.42.6
   prettier: 2.6.2
   puro: ^0.3.4
   querystring-es3: ^0.2.1
@@ -19,7 +19,7 @@ specifiers:
 
 dependencies:
   '@plasmohq/storage': 0.5.1_react@18.1.0
-  plasmo: 0.42.3
+  plasmo: 0.42.6
   puro: 0.3.4_react@18.1.0
   querystring-es3: 0.2.1
   react: 18.1.0
@@ -1278,7 +1278,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001352
-      electron-to-chromium: 1.4.152
+      electron-to-chromium: 1.4.155
       escalade: 3.1.1
       node-releases: 2.0.5
       picocolors: 1.0.0
@@ -1652,8 +1652,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /electron-to-chromium/1.4.152:
-    resolution: {integrity: sha512-jk4Ju5SGZAQQJ1iI4Rgru7dDlvkQPLpNPWH9gIZmwCD4YteA5Bbk1xPcPDUf5jUYs3e1e80RXdi8XgKQZaigeg==}
+  /electron-to-chromium/1.4.155:
+    resolution: {integrity: sha512-niPzKBSYPG06gxLKO0c2kEmgdRMTtIbNrBlvD31Ld8Q57b/K0218U4j8u/OOt25XE1eFOn47FcmQVdx9R1qqxA==}
     dev: false
 
   /emoji-regex/8.0.0:
@@ -2660,8 +2660,8 @@ packages:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
     dev: false
 
-  /plasmo/0.42.3:
-    resolution: {integrity: sha512-iZYOylXpwaRCOQP17E0gP+d8+5R0LZIkf0ZcrzQrVR7OQMm1Jkr0/Gj1xmbhOKYfZuiXFD8KcOpIpJj+x6URhA==}
+  /plasmo/0.42.6:
+    resolution: {integrity: sha512-+/pr+wSzdkWBCW13HdFQVejEN6b6ppP1jo3yp9cwSWH3g0PxGpcnnh/rBRm3ECO7wKgbJExyAOaKB3n5Qe+Elg==}
     hasBin: true
     dependencies:
       '@expo/spawn-async': 1.6.0

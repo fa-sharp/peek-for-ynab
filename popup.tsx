@@ -1,26 +1,22 @@
-import { useStorage } from "@plasmohq/storage";
 import { useState } from "react"
 import { CategoryGroupView, SavedCategoriesView } from "~components";
 import { AuthProvider, useAuth } from "~lib/authContext";
+import { SavedCategory, StorageProvider, useStorageContext } from "~lib/storageContext";
 import { useYNAB, YNABProvider } from "~lib/ynabContext"
 
-export interface SavedCategory {
-  budgetId: string
-  categoryGroupId: string
-  categoryId: string
-}
+
 
 function MainView() {
   const { login, logout, authenticated } = useAuth();
-  const { budgets, categories, selectedBudget, setSelectedBudget } = useYNAB();
+  const { budgets, categories } = useYNAB();
+  const { savedCategories, setSavedCategories, selectedBudget, setSelectedBudget } = useStorageContext();
 
-  const [savedCategories, setSavedCategories] = useStorage<SavedCategory[]>("savedCategories", []);
   const saveCategory = (category: SavedCategory) => {
     const duplicate = savedCategories.find(savedCategory => savedCategory.categoryId === category.categoryId)
     if (!duplicate) setSavedCategories([...savedCategories, category])
   }
   const removeCategory = (category: SavedCategory) => {
-    setSavedCategories(savedCategories.filter(savedCategory => 
+    setSavedCategories(savedCategories.filter(savedCategory =>
       savedCategory.categoryId !== category.categoryId));
   }
 
@@ -73,11 +69,13 @@ function MainView() {
 function IndexPopup() {
 
   return (
-    <AuthProvider>
-      <YNABProvider>
-        <MainView />
-      </YNABProvider>
-    </AuthProvider>
+    <StorageProvider>
+      <AuthProvider>
+        <YNABProvider>
+          <MainView />
+        </YNABProvider>
+      </AuthProvider>
+    </StorageProvider>
   )
 }
 

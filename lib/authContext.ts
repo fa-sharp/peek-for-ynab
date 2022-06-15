@@ -1,13 +1,13 @@
-import { useStorage } from "@plasmohq/storage"
 import { createProvider } from "puro"
 import { useContext } from "react"
 import * as ynab from 'ynab'
+import { useStorageContext } from "./storageContext"
 
 import { IS_PRODUCTION } from "./utils"
 
 const useAuthProvider = () => {
 
-    const [token, setToken, { remove: removeToken }] = useStorage<string>("token", "");
+    const { token, setToken, removeAllData } = useStorageContext();
 
     /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
     const login = (token: string) => {
@@ -20,10 +20,10 @@ const useAuthProvider = () => {
             .catch(err => console.error("Login failed: ", err))
     }
 
-    /** Clears the API token */
+    /** Clears all data, including the user's token */
     const logout = () => {
         setToken("");
-        removeToken();
+        removeAllData();
     };
 
     return { login, logout, token, authenticated: (token !== "") }
