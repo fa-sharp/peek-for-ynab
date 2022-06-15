@@ -8,16 +8,16 @@ import { useYNAB, YNABProvider } from "~lib/ynabContext"
 
 function MainView() {
   const { login, logout, authenticated } = useAuth();
-  const { budgets, categories } = useYNAB();
+  const { budgets, categories, categoryGroups } = useYNAB();
   const { savedCategories, setSavedCategories, selectedBudget, setSelectedBudget } = useStorageContext();
 
-  const saveCategory = (category: SavedCategory) => {
-    const duplicate = savedCategories.find(savedCategory => savedCategory.categoryId === category.categoryId)
-    if (!duplicate) setSavedCategories([...savedCategories, category])
+  const saveCategory = (categoryToSave: SavedCategory) => {
+    const foundDuplicate = savedCategories.find(savedCategory => savedCategory.categoryId === categoryToSave.categoryId)
+    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave])
   }
-  const removeCategory = (category: SavedCategory) => {
+  const removeCategory = (categoryToRemove: SavedCategory) => {
     setSavedCategories(savedCategories.filter(savedCategory =>
-      savedCategory.categoryId !== category.categoryId));
+      savedCategory.categoryId !== categoryToRemove.categoryId));
   }
 
   const [tokenInput, setTokenInput] = useState("");
@@ -54,12 +54,12 @@ function MainView() {
             )
           }
           <h3>Categories</h3>
-          {categories &&
-            categories.map((categoryGroup, idx) =>
+          {categoryGroups &&
+            categoryGroups.map((categoryGroup, idx) =>
               idx === 0 ?
                 <div>{categoryGroup.categories[0].name}: {categoryGroup.categories[1].balance}</div>
                 : <CategoryGroupView key={categoryGroup.id} categoryGroup={categoryGroup}
-                  onAddCategory={(id) => saveCategory({ categoryId: id, budgetId: selectedBudget, categoryGroupId: categoryGroup.id })} />
+                  onAddCategory={(id) => saveCategory({ categoryId: id, budgetId: selectedBudget })} />
             )}
         </>}
     </div>

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { formatCurrency } from "~lib/utils"
 import type { SavedCategory } from "~lib/storageContext"
 
-import type { CategoryGroupWithCategories } from "ynab"
+import type { Category, CategoryGroupWithCategories } from "ynab"
 import { CircleMinus } from "tabler-icons-react"
 
 /** View of user's saved categories with balances */
@@ -10,7 +10,8 @@ export function SavedCategoriesView({ savedCategories, categoryData, currentBudg
     savedCategories: SavedCategory[]
     removeCategory: (savedCategory: SavedCategory) => void
     currentBudgetId: string
-    categoryData: CategoryGroupWithCategories[]
+    /** Flattened list of user's categories */
+    categoryData: Category[]
 }) {
     return (
         <section style={{
@@ -19,15 +20,15 @@ export function SavedCategoriesView({ savedCategories, categoryData, currentBudg
             gap: "2px"
         }}>
             {savedCategories.map(savedCategory => {
-                if (savedCategory.budgetId !== currentBudgetId)
-                    return null;
-                
-                const categoryGroup = categoryData.find(categoryGroup => categoryGroup.id === savedCategory.categoryGroupId);
-                const category = categoryGroup?.categories.find(category => category.id === savedCategory.categoryId);
+                // Skip if saved category not in current budget
+                if (savedCategory.budgetId !== currentBudgetId) return null;
 
-                return !category ?
-                    <div>"Category not found!"</div>
-                    : <div key={category.id} style={{
+                // Find the category and render the data
+                const category = categoryData.find(category => category.id === savedCategory.categoryId);
+                if (!category) return null; // skip if category not found
+
+                return (
+                    <div key={category.id} style={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: 'center'
@@ -42,7 +43,7 @@ export function SavedCategoriesView({ savedCategories, categoryData, currentBudg
                             }}>
                             <CircleMinus size={24} color='gray' strokeWidth={1} />
                         </button>
-                    </div>
+                    </div>)
             })}
         </section>
     )

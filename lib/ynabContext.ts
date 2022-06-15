@@ -7,7 +7,7 @@ import { useAuth } from "./authContext"
 import { useStorageContext } from "./storageContext"
 
 const useYNABProvider = () => {
- 
+
   const { token, authenticated } = useAuth();
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
@@ -19,12 +19,12 @@ const useYNABProvider = () => {
       setYnabAPI(null);
   }, [token, authenticated])
 
-
   const [budgets, setBudgets] = useState<null | ynab.BudgetSummary[]>(null)
 
   /** Fetch budgets */
   useEffect(() => {
-      if (!ynabAPI) return;
+      if (!ynabAPI)
+        return;
 
       ynabAPI.budgets.getBudgets()
         .then(budgets => {
@@ -35,23 +35,41 @@ const useYNABProvider = () => {
   }, [ynabAPI])
 
   const { selectedBudget } = useStorageContext();
-  const [categories, setCategories] = useState<null | ynab.CategoryGroupWithCategories[]>(null)
+  const [categoryGroups, setCategoryGroups] = useState<null | ynab.CategoryGroupWithCategories[]>(null)
+  const [categories, setCategories] = useState<null | ynab.Category[]>(null);
 
-  /** Fetch categories of the selected budget */
+  /** Fetch category groups from the selected budget. Re-runs if the user selects another budget */
   useEffect(() => {
-    if (!selectedBudget || !ynabAPI) return;
-    setCategories(null);
+    if (!selectedBudget || !ynabAPI)
+      return;
+    setCategoryGroups(null);
     
     ynabAPI.categories.getCategories(selectedBudget)
       .then(categories => {
         if (!IS_PRODUCTION) console.log("Fetched categories successfully", categories)
-        setCategories(categories.data.category_groups)
+        setCategoryGroups(categories.data.category_groups)
+
+        // Create a flattened category array
+        const flattenedCategories = categories.data.category_groups.reduce<ynab.Category[]>((newArray, categoryGroup) => {
+          for (let category of categoryGroup.categories)
+            newArray.push(category)
+          return newArray
+        }, []);
+        if (!IS_PRODUCTION) console.log("Created flattened category array", flattenedCategories)
+        setCategories(flattenedCategories);
       })
       .catch(err => console.error("Error fetching categories", err))
 
   }, [selectedBudget, ynabAPI])
 
-  return { budgets, categories }
+  return { 
+    /** List of user's budgets */
+    budgets, 
+    /** List of user's category groups, with categories contained in each one */
+    categoryGroups,
+    /** Flattened list of user's categories (without category groups) */
+    categories
+  }
 }
 
 const { BaseContext, Provider } = createProvider(useYNABProvider)

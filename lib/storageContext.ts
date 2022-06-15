@@ -2,10 +2,9 @@ import { useStorage } from "@plasmohq/storage"
 import { createProvider } from "puro"
 import { useContext } from "react"
 
-/** A category saved by the user */
+/** A category saved by the user, stored in the browser */
 export interface SavedCategory {
     budgetId: string
-    categoryGroupId: string
     categoryId: string
 }
 
