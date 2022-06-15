@@ -1,36 +1,36 @@
-import { createProvider } from "puro"
-import { useContext } from "react"
-import * as ynab from 'ynab'
-import { useStorageContext } from "./storageContext"
+import { createProvider } from "puro";
+import { useContext } from "react";
+import * as ynab from "ynab";
 
-import { IS_PRODUCTION } from "./utils"
+import { useStorageContext } from "./storageContext";
+import { IS_PRODUCTION } from "./utils";
 
 const useAuthProvider = () => {
+  const { token, setToken, removeAllData } = useStorageContext();
 
-    const { token, setToken, removeAllData } = useStorageContext();
+  /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
+  const login = (token: string) => {
+    const api = new ynab.API(token);
+    api.user
+      .getUser()
+      .then(({ data }) => {
+        if (!IS_PRODUCTION) console.log("Successfully logged in user: ", data.user.id);
+        setToken(token);
+      })
+      .catch((err) => console.error("Login failed: ", err));
+  };
 
-    /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
-    const login = (token: string) => {
-        const api = new ynab.API(token)
-        api.user.getUser()
-            .then(({ data }) => {
-                if (!IS_PRODUCTION) console.log("Successfully logged in user: ", data.user.id);
-                setToken(token);
-            })
-            .catch(err => console.error("Login failed: ", err))
-    }
+  /** Clears all data, including the user's token */
+  const logout = () => {
+    setToken("");
+    removeAllData();
+  };
 
-    /** Clears all data, including the user's token */
-    const logout = () => {
-        setToken("");
-        removeAllData();
-    };
+  return { login, logout, token, authenticated: token !== "" };
+};
 
-    return { login, logout, token, authenticated: (token !== "") }
-}
-
-const { BaseContext, Provider } = createProvider(useAuthProvider)
+const { BaseContext, Provider } = createProvider(useAuthProvider);
 
 /** Hook to authenticate the YNAB user */
-export const useAuth = () => useContext(BaseContext)
-export const AuthProvider = Provider
+export const useAuth = () => useContext(BaseContext);
+export const AuthProvider = Provider;

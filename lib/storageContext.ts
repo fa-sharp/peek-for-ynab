@@ -1,47 +1,51 @@
-import { useStorage } from "@plasmohq/storage"
-import { createProvider } from "puro"
-import { useContext } from "react"
+import { createProvider } from "puro";
+import { useContext } from "react";
+
+import { useStorage } from "@plasmohq/storage";
 
 /** A category saved by the user, stored in the browser */
 export interface SavedCategory {
-    budgetId: string
-    categoryId: string
+  budgetId: string;
+  categoryId: string;
 }
 
 const useStorageProvider = () => {
+  const [token, setToken, { remove: removeToken }] = useStorage("token", "");
 
-    const [token, setToken, { remove: removeToken }]
-        = useStorage("token", "");
-    const [selectedBudget, setSelectedBudget, { remove: removeSelectedBudget }]
-        = useStorage("selectedBudget", "");
-    const [savedCategories, setSavedCategories, { remove: removeSavedCategories }]
-        = useStorage<SavedCategory[]>("savedCategories", []);
+  const [selectedBudget, setSelectedBudget, { remove: removeSelectedBudget }] =
+    useStorage("selectedBudget", "");
 
-    const removeAllData = () => {
-        setToken("");
-        removeToken();
+  const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
+    useStorage<SavedCategory[]>("savedCategories", []);
 
-        setSelectedBudget("")
-        removeSelectedBudget();
-        
-        setSavedCategories([]);
-        removeSavedCategories();
-    }
+  const removeAllData = () => {
+    setToken("");
+    removeToken();
 
-    return {
-        /** The token used to authenticate the YNAB user */
-        token, setToken, 
-        /** The ID of the budget currently in view */
-        selectedBudget, setSelectedBudget,
-        /** The categories saved by the user */
-        savedCategories, setSavedCategories,
-        /** Clears all values, removes all saved data from browser storage */
-        removeAllData 
-    }
-}
+    setSelectedBudget("");
+    removeSelectedBudget();
 
-const { BaseContext, Provider } = createProvider(useStorageProvider)
+    setSavedCategories([]);
+    removeSavedCategories();
+  };
+
+  return {
+    /** The token used to authenticate the YNAB user */
+    token,
+    setToken,
+    /** The ID of the budget currently in view */
+    selectedBudget,
+    setSelectedBudget,
+    /** The categories saved by the user */
+    savedCategories,
+    setSavedCategories,
+    /** Clears all values, removes all saved data from browser storage */
+    removeAllData
+  };
+};
+
+const { BaseContext, Provider } = createProvider(useStorageProvider);
 
 /** Hook for storing and retrieving data from browser storage */
-export const useStorageContext = () => useContext(BaseContext)
-export const StorageProvider = Provider
+export const useStorageContext = () => useContext(BaseContext);
+export const StorageProvider = Provider;
