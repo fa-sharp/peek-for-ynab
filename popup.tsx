@@ -21,7 +21,7 @@ function MainView() {
   /** Data of saved categories in the currently selected budget */
   const savedCategoryData = useMemo(
     () =>
-      savedCategories.reduce<Category[]>((newArray, savedCategory) => {
+      savedCategories?.reduce<Category[]>((newArray, savedCategory) => {
         if (savedCategory.budgetId === selectedBudget) {
           const categoryData = categories?.find(
             (category) => category.id === savedCategory.categoryId

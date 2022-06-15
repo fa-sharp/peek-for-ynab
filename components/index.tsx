@@ -109,7 +109,10 @@ export function BudgetSelect({
   setSelectedBudget: (budgetId: string) => void;
 }) {
   return (
-    <select value={selectedBudget} onChange={(e) => setSelectedBudget(e.target.value)}>
+    <select
+      value={selectedBudget || "initial"}
+      onChange={(e) => setSelectedBudget(e.target.value)}>
+      {!selectedBudget && <option value="initial">--Select a budget--</option>}
       {budgets.map((budget) => (
         <option key={budget.id} value={budget.id}>
           {budget.name}
