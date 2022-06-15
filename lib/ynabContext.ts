@@ -40,9 +40,9 @@ const useYNABProvider = () => {
 
   /** Fetch category groups from the selected budget. Re-runs if the user selects another budget */
   useEffect(() => {
+    setCategoryGroups(null);
     if (!selectedBudget || !ynabAPI)
       return;
-    setCategoryGroups(null);
     
     ynabAPI.categories.getCategories(selectedBudget)
       .then(categories => {

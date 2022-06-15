@@ -5,7 +5,6 @@ import { SavedCategory, StorageProvider, useStorageContext } from "~lib/storageC
 import { useYNAB, YNABProvider } from "~lib/ynabContext"
 
 
-
 function MainView() {
   const { login, logout, authenticated } = useAuth();
   const { budgets, categories, categoryGroups } = useYNAB();
@@ -28,6 +27,7 @@ function MainView() {
         display: "flex",
         flexDirection: "column",
         padding: 16,
+        minWidth: '240px',
         width: 'max-content'
       }}>
       {!authenticated ?
@@ -55,11 +55,10 @@ function MainView() {
           }
           <h3>Categories</h3>
           {categoryGroups &&
-            categoryGroups.map((categoryGroup, idx) =>
-              idx === 0 ?
-                <div>{categoryGroup.categories[0].name}: {categoryGroup.categories[1].balance}</div>
-                : <CategoryGroupView key={categoryGroup.id} categoryGroup={categoryGroup}
-                  onAddCategory={(id) => saveCategory({ categoryId: id, budgetId: selectedBudget })} />
+            categoryGroups.map((categoryGroup) =>
+              <CategoryGroupView key={categoryGroup.id}
+                categoryGroup={categoryGroup}
+                onAddCategory={(id) => saveCategory({ categoryId: id, budgetId: selectedBudget })} />
             )}
         </>}
     </div>
