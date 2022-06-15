@@ -1,6 +1,6 @@
 import { MouseEventHandler, ReactElement, useState } from "react"
 import { formatCurrency } from "~lib/utils"
-import type { Category, CategoryGroupWithCategories } from "ynab"
+import type { BudgetSummary, Category, CategoryGroupWithCategories } from "ynab"
 import { ChevronDown, ChevronUp, CircleMinus, CirclePlus } from "tabler-icons-react"
 
 /** View of user's saved categories with balances */
@@ -67,6 +67,22 @@ export function CategoryGroupView({ categoryGroup, onAddCategory }: {
                     </div>
                 )}
         </>
+    )
+}
+
+/** Dropdown that lets the user select a budget to view */
+export function BudgetSelect({ budgets, selectedBudget, setSelectedBudget }: {
+    budgets: BudgetSummary[]
+    selectedBudget: string
+    setSelectedBudget: (budgetId: string) => void
+}) {
+    return (
+        <select value={selectedBudget} onChange={e => setSelectedBudget(e.target.value)}>
+            {budgets.map(budget => 
+                <option key={budget.id} value={budget.id}>
+                    {budget.name}
+                </option>)}
+        </select>
     )
 }
 

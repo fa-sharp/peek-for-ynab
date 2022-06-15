@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
-import { ChevronDown, ChevronUp } from "tabler-icons-react";
+import { ChevronDown, ChevronUp, Logout } from "tabler-icons-react";
 import type { Category } from "ynab";
-import { CategoryGroupView, IconButton, SavedCategoriesView } from "~components";
+import { BudgetSelect, CategoryGroupView, IconButton, SavedCategoriesView } from "~components";
 import { AuthProvider, useAuth } from "~lib/authContext";
 import { SavedCategory, StorageProvider, useStorageContext } from "~lib/storageContext";
 import { useYNAB, YNABProvider } from "~lib/ynabContext"
@@ -50,21 +50,24 @@ function MainView() {
         </div>
         :
         <>
-          <button onClick={logout}>Logout</button>
+          <div style={{
+            marginBottom: 8,
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}>
+            {budgets &&
+              <BudgetSelect budgets={budgets} selectedBudget={selectedBudget} setSelectedBudget={setSelectedBudget} />
+            }
+            <IconButton label="Logout" onClick={logout} icon={<Logout />} />
+          </div>
+
           {categories &&
-            <SavedCategoriesView
-              savedCategoryData={savedCategoryData}
-              removeCategory={removeCategory} />
+            <SavedCategoriesView savedCategoryData={savedCategoryData} removeCategory={removeCategory} />
           }
 
-          <h3>Budgets</h3>
-          {!budgets ? "Loading..." :
-            budgets.map(budget =>
-              <div key={budget.id}>{budget.name} <button onClick={() => setSelectedBudget(budget.id)}>Select</button></div>
-            )
-          }
           <h3 style={{
-            marginBlock: 4,
+            marginTop: 8,
+            marginBottom: 4,
             display: "flex",
             justifyContent: "space-between",
             alignItems: 'center'
@@ -87,7 +90,6 @@ function MainView() {
 }
 
 function IndexPopup() {
-
   return (
     <StorageProvider>
       <AuthProvider>
