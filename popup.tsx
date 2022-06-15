@@ -1,5 +1,7 @@
-import { useState } from "react"
-import { CategoryGroupView, SavedCategoriesView } from "~components";
+import { useMemo, useState } from "react"
+import { ChevronDown, ChevronUp } from "tabler-icons-react";
+import type { Category } from "ynab";
+import { CategoryGroupView, IconButton, SavedCategoriesView } from "~components";
 import { AuthProvider, useAuth } from "~lib/authContext";
 import { SavedCategory, StorageProvider, useStorageContext } from "~lib/storageContext";
 import { useYNAB, YNABProvider } from "~lib/ynabContext"
@@ -10,16 +12,26 @@ function MainView() {
   const { budgets, categories, categoryGroups } = useYNAB();
   const { savedCategories, setSavedCategories, selectedBudget, setSelectedBudget } = useStorageContext();
 
+  /** Data of saved categories, in the currently selected budget */
+  const savedCategoryData = useMemo(() => savedCategories.reduce<Category[]>((newArray, savedCategory) => {
+    if (savedCategory.budgetId === selectedBudget) {
+      const categoryData = categories?.find(category => category.id === savedCategory.categoryId);
+      if (categoryData) newArray.push(categoryData)
+    }
+    return newArray;
+  }, []), [categories, savedCategories, selectedBudget]);
+
   const saveCategory = (categoryToSave: SavedCategory) => {
     const foundDuplicate = savedCategories.find(savedCategory => savedCategory.categoryId === categoryToSave.categoryId)
     if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave])
   }
-  const removeCategory = (categoryToRemove: SavedCategory) => {
+  const removeCategory = (categoryIdToRemove: string) => {
     setSavedCategories(savedCategories.filter(savedCategory =>
-      savedCategory.categoryId !== categoryToRemove.categoryId));
+      savedCategory.categoryId !== categoryIdToRemove));
   }
 
   const [tokenInput, setTokenInput] = useState("");
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
   return (
     <div
@@ -41,9 +53,7 @@ function MainView() {
           <button onClick={logout}>Logout</button>
           {categories &&
             <SavedCategoriesView
-              currentBudgetId={selectedBudget}
-              categoryData={categories}
-              savedCategories={savedCategories}
+              savedCategoryData={savedCategoryData}
               removeCategory={removeCategory} />
           }
 
@@ -53,8 +63,19 @@ function MainView() {
               <div key={budget.id}>{budget.name} <button onClick={() => setSelectedBudget(budget.id)}>Select</button></div>
             )
           }
-          <h3>Categories</h3>
-          {categoryGroups &&
+          <h3 style={{
+            marginBlock: 4,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: 'center'
+          }}>
+            All Categories
+            <IconButton label={categoriesExpanded ? "Collapse" : "Expand"}
+              onClick={() => setCategoriesExpanded(!categoriesExpanded)}
+              icon={categoriesExpanded ? <ChevronUp size={24} color='black' strokeWidth={2} />
+                : <ChevronDown size={24} color='black' strokeWidth={2} />} />
+          </h3>
+          {categoriesExpanded && categoryGroups &&
             categoryGroups.map((categoryGroup) =>
               <CategoryGroupView key={categoryGroup.id}
                 categoryGroup={categoryGroup}

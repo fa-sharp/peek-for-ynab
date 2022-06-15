@@ -32,6 +32,7 @@ const useYNABProvider = () => {
           setBudgets(budgets.data.budgets)
         })
         .catch(err => console.error("Error fetching budgets", err))
+
   }, [ynabAPI])
 
   const { selectedBudget } = useStorageContext();
@@ -51,7 +52,7 @@ const useYNABProvider = () => {
 
         // Create a flattened category array
         const flattenedCategories = categories.data.category_groups.reduce<ynab.Category[]>((newArray, categoryGroup) => {
-          for (let category of categoryGroup.categories)
+          for (const category of categoryGroup.categories)
             newArray.push(category)
           return newArray
         }, []);
@@ -74,6 +75,6 @@ const useYNABProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useYNABProvider)
 
-/** Hook that provides budget data from YNAB */
+/** Hook that provides user's budget data from YNAB */
 export const useYNAB = () => useContext(BaseContext)
 export const YNABProvider = Provider

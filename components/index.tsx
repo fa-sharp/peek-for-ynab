@@ -1,42 +1,30 @@
 import { MouseEventHandler, ReactElement, useState } from "react"
 import { formatCurrency } from "~lib/utils"
-import type { SavedCategory } from "~lib/storageContext"
 import type { Category, CategoryGroupWithCategories } from "ynab"
 import { ChevronDown, ChevronUp, CircleMinus, CirclePlus } from "tabler-icons-react"
 
 /** View of user's saved categories with balances */
-export function SavedCategoriesView({ savedCategories, categoryData, currentBudgetId, removeCategory }: {
-    savedCategories: SavedCategory[]
-    removeCategory: (savedCategory: SavedCategory) => void
-    currentBudgetId: string
-    /** Flattened list of user's categories */
-    categoryData: Category[]
+export function SavedCategoriesView({ savedCategoryData, removeCategory }: {
+    savedCategoryData: Category[]
+    removeCategory: (categoryId: string) => void
 }) {
     return (
-        <section style={{
+        <section aria-label="Saved categories" style={{
             display: "flex",
             flexDirection: "column",
             gap: "2px"
         }}>
-            {savedCategories.map(savedCategory => {
-                // Skip if saved category not in current budget
-                if (savedCategory.budgetId !== currentBudgetId) return null;
-
-                // Find the category data
-                const category = categoryData.find(category => category.id === savedCategory.categoryId);
-                if (!category) return null; // skip if category not found
-
-                return (
-                    <div key={category.id} style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: 'center'
-                    }}>
-                        <div>{category.name}: {formatCurrency(category.balance)}</div>
-                        <IconButton label="Remove" onClick={() => removeCategory(savedCategory)} 
-                            icon={<CircleMinus size={24} color='gray' strokeWidth={1} />} />
-                    </div>)
-            })}
+            {savedCategoryData.map(category =>
+                <div key={category.id} style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: 'center'
+                }}>
+                    <div>{category.name}: {formatCurrency(category.balance)}</div>
+                    <IconButton label="Remove" onClick={() => removeCategory(category.id)}
+                        icon={<CircleMinus size={24} color='gray' strokeWidth={1} />} />
+                </div>)
+            }
         </section>
     )
 }
@@ -48,10 +36,9 @@ export function CategoryGroupView({ categoryGroup, onAddCategory }: {
 }) {
     const [expanded, setExpanded] = useState(false)
 
-    // skip Ready to Assign category group
+    // skip Ready to Assign category group <div>{categoryGroup.categories[0].name}: {categoryGroup.categories[1].balance}</div>
     if (categoryGroup.name === "Internal Master Category")
         return null;
-        // <div>{categoryGroup.categories[0].name}: {categoryGroup.categories[1].balance}</div>
 
     return (
         <>
@@ -75,7 +62,7 @@ export function CategoryGroupView({ categoryGroup, onAddCategory }: {
                         alignItems: 'center'
                     }}>
                         {category.name}: {formatCurrency(category.balance)}
-                        <IconButton label="Add" onClick={() => onAddCategory(category.id)} 
+                        <IconButton label="Add" onClick={() => onAddCategory(category.id)}
                             icon={<CirclePlus size={24} color='gray' strokeWidth={1} />} />
                     </div>
                 )}
