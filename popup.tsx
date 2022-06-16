@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Logout } from "tabler-icons-react";
-import type { Category } from "ynab";
 
 import {
   BudgetSelect,
@@ -9,43 +8,15 @@ import {
   SavedCategoriesView
 } from "~components";
 import { AuthProvider, useAuth } from "~lib/authContext";
-import { SavedCategory, StorageProvider, useStorageContext } from "~lib/storageContext";
+import { StorageProvider, useStorageContext } from "~lib/storageContext";
 import { YNABProvider, useYNAB } from "~lib/ynabContext";
 
 function MainView() {
   const { login, logout, authenticated } = useAuth();
-  const { budgets, categories, categoryGroups } = useYNAB();
-  const { savedCategories, setSavedCategories, selectedBudget, setSelectedBudget } =
+  const { budgetsData, categoriesData, categoryGroupsData, savedCategoriesData } =
+    useYNAB();
+  const { saveCategory, removeCategory, selectedBudget, setSelectedBudget } =
     useStorageContext();
-
-  /** Data of saved categories in the currently selected budget */
-  const savedCategoryData = useMemo(
-    () =>
-      savedCategories?.reduce<Category[]>((newArray, savedCategory) => {
-        if (savedCategory.budgetId === selectedBudget) {
-          const categoryData = categories?.find(
-            (category) => category.id === savedCategory.categoryId
-          );
-          if (categoryData) newArray.push(categoryData);
-        }
-        return newArray;
-      }, []),
-    [categories, savedCategories, selectedBudget]
-  );
-
-  const saveCategory = (categoryToSave: SavedCategory) => {
-    const foundDuplicate = savedCategories.find(
-      (savedCategory) => savedCategory.categoryId === categoryToSave.categoryId
-    );
-    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
-  };
-  const removeCategory = (categoryIdToRemove: string) => {
-    setSavedCategories(
-      savedCategories.filter(
-        (savedCategory) => savedCategory.categoryId !== categoryIdToRemove
-      )
-    );
-  };
 
   const [tokenInput, setTokenInput] = useState("");
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
@@ -73,9 +44,9 @@ function MainView() {
               display: "flex",
               justifyContent: "space-between"
             }}>
-            {budgets && (
+            {budgetsData && (
               <BudgetSelect
-                budgets={budgets}
+                budgets={budgetsData}
                 selectedBudget={selectedBudget}
                 setSelectedBudget={setSelectedBudget}
               />
@@ -83,9 +54,9 @@ function MainView() {
             <IconButton label="Logout" onClick={logout} icon={<Logout />} />
           </div>
 
-          {categories && (
+          {categoriesData && (
             <SavedCategoriesView
-              savedCategoryData={savedCategoryData}
+              savedCategoryData={savedCategoriesData}
               removeCategory={removeCategory}
             />
           )}
@@ -98,7 +69,7 @@ function MainView() {
               justifyContent: "space-between",
               alignItems: "center"
             }}>
-            All Categories
+            Categories
             <IconButton
               label={categoriesExpanded ? "Collapse" : "Expand"}
               onClick={() => setCategoriesExpanded(!categoriesExpanded)}
@@ -112,8 +83,8 @@ function MainView() {
             />
           </h3>
           {categoriesExpanded &&
-            categoryGroups &&
-            categoryGroups.map((categoryGroup) => (
+            categoryGroupsData &&
+            categoryGroupsData.map((categoryGroup) => (
               <CategoryGroupView
                 key={categoryGroup.id}
                 categoryGroup={categoryGroup}

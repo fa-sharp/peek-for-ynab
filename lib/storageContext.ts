@@ -18,6 +18,20 @@ const useStorageProvider = () => {
   const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
     useStorage<SavedCategory[]>("savedCategories", []);
 
+  const saveCategory = (categoryToSave: SavedCategory) => {
+    const foundDuplicate = savedCategories.find(
+      (savedCategory) => savedCategory.categoryId === categoryToSave.categoryId
+    );
+    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
+  };
+  const removeCategory = (categoryIdToRemove: string) => {
+    setSavedCategories(
+      savedCategories.filter(
+        (savedCategory) => savedCategory.categoryId !== categoryIdToRemove
+      )
+    );
+  };
+
   const removeAllData = () => {
     setToken("");
     removeToken();
@@ -38,7 +52,10 @@ const useStorageProvider = () => {
     setSelectedBudget,
     /** The categories saved by the user */
     savedCategories,
-    setSavedCategories,
+    /** Save/pin a category */
+    saveCategory,
+    /** Remove/unsave a category  */
+    removeCategory,
     /** Clears all values, removes all saved data from browser storage */
     removeAllData
   };
