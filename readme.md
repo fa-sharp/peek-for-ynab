@@ -1,32 +1,52 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Widget for YNAB
 
-## Getting Started
+A Chrome extension for YNAB that lets users see their category balances at a glance.
 
-First, run the development server:
+## Building and running locally
+
+### Extension
+
+This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). The popup component is located at `src/popup/index.tsx`.
+
+You can run the extension's development server via:
 
 ```bash
-pnpm dev
+pnpm dev:plasmo
 # or
-npm run dev
+npm run dev:plasmo
 ```
 
 Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+### Website
+
+The website is created with [Next.js](https://nextjs.org/). Pages are located in the `src/pages/` folder. You can run the development server via:
+
+```bash
+pnpm dev:next
+# or
+npm run dev:next
+```
 
 ## Making production build
 
-Run the following:
+Extension:
 
 ```bash
-pnpm build
+pnpm build:plasmo
 # or
-npm run build
+npm run build:plasmo
 ```
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+Website:
+
+```bash
+pnpm build:next
+# or
+npm run build:next
+```
 
 ## Submit to the webstores
 
