@@ -61,6 +61,11 @@ const useYNABProvider = () => {
       .catch((err) => console.error("Error fetching categories", err));
   }, [selectedBudget, ynabAPI]);
 
+  const selectedBudgetData = useMemo(() => {
+    if (!selectedBudget) return null;
+    return budgetsData?.find((budget) => budget.id === selectedBudget) || null;
+  }, [budgetsData, selectedBudget]);
+
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData || !savedCategories) return []; // If there's no data, return empty array
 
@@ -84,7 +89,9 @@ const useYNABProvider = () => {
     /** API data: Flattened list of all of user's categories (without category groups) */
     categoriesData,
     /** API data: List of saved categories in the currently selected budget */
-    savedCategoriesData
+    savedCategoriesData,
+    /** API data: Data from currently selected budget (e.g. currency info, date format, etc.) */
+    selectedBudgetData
   };
 };
 

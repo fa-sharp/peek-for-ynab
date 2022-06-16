@@ -13,8 +13,13 @@ import { YNABProvider, useYNAB } from "~lib/ynabContext";
 
 function MainView() {
   const { login, logout, authenticated } = useAuth();
-  const { budgetsData, categoriesData, categoryGroupsData, savedCategoriesData } =
-    useYNAB();
+  const {
+    budgetsData,
+    categoriesData,
+    categoryGroupsData,
+    selectedBudgetData,
+    savedCategoriesData
+  } = useYNAB();
   const { saveCategory, removeCategory, selectedBudget, setSelectedBudget } =
     useStorageContext();
 
@@ -54,9 +59,10 @@ function MainView() {
             <IconButton label="Logout" onClick={logout} icon={<Logout />} />
           </div>
 
-          {categoriesData && (
+          {categoriesData && selectedBudgetData && (
             <SavedCategoriesView
               savedCategoryData={savedCategoriesData}
+              budgetData={selectedBudgetData}
               removeCategory={removeCategory}
             />
           )}
@@ -84,10 +90,12 @@ function MainView() {
           </h3>
           {categoriesExpanded &&
             categoryGroupsData &&
+            selectedBudgetData &&
             categoryGroupsData.map((categoryGroup) => (
               <CategoryGroupView
                 key={categoryGroup.id}
                 categoryGroup={categoryGroup}
+                budgetData={selectedBudgetData}
                 onAddCategory={(id) =>
                   saveCategory({ categoryId: id, budgetId: selectedBudget })
                 }

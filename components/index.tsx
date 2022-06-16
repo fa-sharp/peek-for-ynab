@@ -6,9 +6,11 @@ import { formatCurrency } from "~lib/utils";
 
 /** View of user's saved categories with balances */
 export function SavedCategoriesView({
+  budgetData,
   savedCategoryData,
   removeCategory
 }: {
+  budgetData: BudgetSummary;
   savedCategoryData: Category[];
   removeCategory: (categoryId: string) => void;
 }) {
@@ -29,7 +31,8 @@ export function SavedCategoriesView({
             alignItems: "center"
           }}>
           <div>
-            {category.name}: {formatCurrency(category.balance)}
+            {category.name}:{" "}
+            {formatCurrency(category.balance, budgetData.currency_format || undefined)}
           </div>
           <IconButton
             label="Remove"
@@ -45,9 +48,11 @@ export function SavedCategoriesView({
 /** View of a category group - can expand to show all categories and balances */
 export function CategoryGroupView({
   categoryGroup,
+  budgetData,
   onAddCategory
 }: {
   categoryGroup: CategoryGroupWithCategories;
+  budgetData: BudgetSummary;
   onAddCategory: (categoryId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -86,7 +91,8 @@ export function CategoryGroupView({
               justifyContent: "space-between",
               alignItems: "center"
             }}>
-            {category.name}: {formatCurrency(category.balance)}
+            {category.name}:{" "}
+            {formatCurrency(category.balance, budgetData.currency_format || undefined)}
             <IconButton
               label="Add"
               onClick={() => onAddCategory(category.id)}
