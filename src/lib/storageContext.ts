@@ -50,6 +50,19 @@ const useStorageProvider = () => {
       )
     );
   };
+  /** Toggle whether a budget is shown or not.
+   * TODO This seems much more complicated than it should be...
+   * immutability + JS + React ... *sigh*  */
+  const toggleShowBudget = (budgetId: string) => {
+    if (!cachedBudgets) return;
+    const budgetIndex = cachedBudgets.findIndex((budget) => budget.id === budgetId);
+    const budgetToToggle = cachedBudgets[budgetIndex];
+    if (!budgetToToggle) return;
+
+    const newCachedBudgets = [...cachedBudgets];
+    newCachedBudgets[budgetIndex] = { ...budgetToToggle, show: !budgetToToggle.show };
+    setCachedBudgets(newCachedBudgets);
+  };
 
   const removeAllData = () => {
     setToken("");

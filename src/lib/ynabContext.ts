@@ -8,7 +8,12 @@ import { IS_PRODUCTION } from "./utils";
 
 const useYNABProvider = () => {
   const { token, authenticated } = useAuth();
-  const { selectedBudgetId, savedCategories, setCachedBudgets } = useStorageContext();
+  const {
+    selectedBudgetId,
+    savedCategories,
+    cachedBudgets: currentCachedBudgets,
+    setCachedBudgets
+  } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
@@ -18,25 +23,27 @@ const useYNABProvider = () => {
     else setYnabAPI(null);
   }, [token, authenticated]);
 
-  /** Fetch function to fetch user's budgets and store/refresh the cache */
+  /** Fetch user's budgets and store/refresh the cache. */
   const refreshBudgets = useCallback(async () => {
     if (!ynabAPI) return;
     try {
       const budgetsData = await ynabAPI.budgets.getBudgets();
       if (!IS_PRODUCTION) console.log("Fetched budgets successfully", budgetsData);
-      const cachedBudgets: CachedBudget[] = budgetsData.data.budgets.map(
-        (budgetSummary) => ({
+      const newCachedBudgets: CachedBudget[] = budgetsData.data.budgets.map(
+        (budgetSummary, index) => ({
           id: budgetSummary.id,
           name: budgetSummary.name,
           currencyFormat: budgetSummary.currency_format || undefined,
-          show: true
+          show: !currentCachedBudgets
+            ? index < 5 // if there's no cache (e.g. initial login), show first 5 budgets
+            : currentCachedBudgets.find((b) => b.id === budgetSummary.id)?.show || false // Retain show/hide settings. New budgets are hidden by default
         })
       );
-      setCachedBudgets(cachedBudgets);
+      setCachedBudgets(newCachedBudgets);
     } catch (err) {
       console.error("Error fetching budgets", err);
     }
-  }, [setCachedBudgets, ynabAPI]);
+  }, [currentCachedBudgets, setCachedBudgets, ynabAPI]);
 
   const [categoryGroupsData, setCategoryGroupsData] = useState<
     null | ynab.CategoryGroupWithCategories[]
