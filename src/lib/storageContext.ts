@@ -1,7 +1,17 @@
 import { createProvider } from "puro";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
+import type { CurrencyFormat } from "ynab";
 
 import { useStorage } from "@plasmohq/storage";
+
+/** Cached budget data, stored in the browser */
+export interface CachedBudget {
+  id: string;
+  name: string;
+  currencyFormat?: CurrencyFormat;
+  /** whether the budget is displayed in the main view */
+  show: boolean;
+}
 
 /** A category saved by the user, stored in the browser */
 export interface SavedCategory {
@@ -12,8 +22,17 @@ export interface SavedCategory {
 const useStorageProvider = () => {
   const [token, setToken, { remove: removeToken }] = useStorage("token", "");
 
-  const [selectedBudget, setSelectedBudget, { remove: removeSelectedBudget }] =
-    useStorage("selectedBudget", "");
+  const [cachedBudgets, setCachedBudgets, { remove: removeCachedBudgets }] = useStorage<
+    null | CachedBudget[]
+  >("cachedBudgets", null);
+
+  const [selectedBudgetId, setSelectedBudgetId, { remove: removeSelectedBudget }] =
+    useStorage("selectedBudgetId", "");
+
+  const selectedBudgetData = useMemo(() => {
+    if (!selectedBudgetId) return null;
+    return cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null;
+  }, [cachedBudgets, selectedBudgetId]);
 
   const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
     useStorage<SavedCategory[]>("savedCategories", []);
@@ -36,20 +55,28 @@ const useStorageProvider = () => {
     setToken("");
     removeToken();
 
-    setSelectedBudget("");
+    setSelectedBudgetId("");
     removeSelectedBudget();
 
     setSavedCategories([]);
     removeSavedCategories();
+
+    setCachedBudgets([]);
+    removeCachedBudgets();
   };
 
   return {
     /** The token used to authenticate the YNAB user */
     token,
     setToken,
+    /** Cached API data: List of all user's budgets */
+    cachedBudgets,
+    setCachedBudgets,
     /** The ID of the budget currently in view */
-    selectedBudget,
-    setSelectedBudget,
+    selectedBudgetId,
+    setSelectedBudgetId,
+    /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
+    selectedBudgetData,
     /** The categories saved by the user */
     savedCategories,
     /** Save/pin a category */

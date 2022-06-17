@@ -1,7 +1,8 @@
 import { MouseEventHandler, ReactElement, useState } from "react";
 import { ChevronDown, ChevronUp, CircleMinus, CirclePlus } from "tabler-icons-react";
-import type { BudgetSummary, Category, CategoryGroupWithCategories } from "ynab";
+import type { Category, CategoryGroupWithCategories } from "ynab";
 
+import type { CachedBudget } from "~lib/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 /** View of user's saved categories with balances */
@@ -10,7 +11,7 @@ export function SavedCategoriesView({
   savedCategoryData,
   removeCategory
 }: {
-  budgetData: BudgetSummary;
+  budgetData: CachedBudget;
   savedCategoryData: Category[];
   removeCategory: (categoryId: string) => void;
 }) {
@@ -31,8 +32,7 @@ export function SavedCategoriesView({
             alignItems: "center"
           }}>
           <div>
-            {category.name}:{" "}
-            {formatCurrency(category.balance, budgetData.currency_format || undefined)}
+            {category.name}: {formatCurrency(category.balance, budgetData.currencyFormat)}
           </div>
           <IconButton
             label="Remove"
@@ -52,7 +52,7 @@ export function CategoryGroupView({
   onAddCategory
 }: {
   categoryGroup: CategoryGroupWithCategories;
-  budgetData: BudgetSummary;
+  budgetData: CachedBudget;
   onAddCategory: (categoryId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -91,8 +91,7 @@ export function CategoryGroupView({
               justifyContent: "space-between",
               alignItems: "center"
             }}>
-            {category.name}:{" "}
-            {formatCurrency(category.balance, budgetData.currency_format || undefined)}
+            {category.name}: {formatCurrency(category.balance, budgetData.currencyFormat)}
             <IconButton
               label="Add"
               onClick={() => onAddCategory(category.id)}
@@ -107,23 +106,25 @@ export function CategoryGroupView({
 /** Dropdown that lets the user select a budget to view */
 export function BudgetSelect({
   budgets,
-  selectedBudget,
-  setSelectedBudget
+  selectedBudgetId,
+  setSelectedBudgetId
 }: {
-  budgets: BudgetSummary[];
-  selectedBudget: string;
-  setSelectedBudget: (budgetId: string) => void;
+  budgets: CachedBudget[];
+  selectedBudgetId: string;
+  setSelectedBudgetId: (budgetId: string) => void;
 }) {
   return (
     <select
-      value={selectedBudget || "initial"}
-      onChange={(e) => setSelectedBudget(e.target.value)}>
-      {!selectedBudget && <option value="initial">--Select a budget--</option>}
-      {budgets.map((budget) => (
-        <option key={budget.id} value={budget.id}>
-          {budget.name}
-        </option>
-      ))}
+      value={selectedBudgetId || "initial"}
+      onChange={(e) => setSelectedBudgetId(e.target.value)}>
+      {!selectedBudgetId && <option value="initial">--Select a budget--</option>}
+      {budgets.map((budget) =>
+        budget.show ? (
+          <option key={budget.id} value={budget.id}>
+            {budget.name}
+          </option>
+        ) : null
+      )}
     </select>
   );
 }

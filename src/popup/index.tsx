@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Logout } from "tabler-icons-react";
 
 import {
@@ -13,15 +13,21 @@ import { YNABProvider, useYNAB } from "~lib/ynabContext";
 
 function MainView() {
   const { login, logout, authenticated } = useAuth();
+  const { categoriesData, categoryGroupsData, savedCategoriesData, refreshBudgets } =
+    useYNAB();
   const {
-    budgetsData,
-    categoriesData,
-    categoryGroupsData,
+    cachedBudgets,
+    selectedBudgetId,
+    setSelectedBudgetId,
     selectedBudgetData,
-    savedCategoriesData
-  } = useYNAB();
-  const { saveCategory, removeCategory, selectedBudget, setSelectedBudget } =
-    useStorageContext();
+    saveCategory,
+    removeCategory
+  } = useStorageContext();
+
+  /** Automatically fetch budgets from API if there is no cached data */
+  useEffect(() => {
+    if (authenticated && !cachedBudgets) refreshBudgets();
+  }, [authenticated, cachedBudgets, refreshBudgets]);
 
   const [tokenInput, setTokenInput] = useState("");
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
@@ -49,11 +55,11 @@ function MainView() {
               display: "flex",
               justifyContent: "space-between"
             }}>
-            {budgetsData && (
+            {cachedBudgets && (
               <BudgetSelect
-                budgets={budgetsData}
-                selectedBudget={selectedBudget}
-                setSelectedBudget={setSelectedBudget}
+                budgets={cachedBudgets}
+                selectedBudgetId={selectedBudgetId}
+                setSelectedBudgetId={setSelectedBudgetId}
               />
             )}
             <IconButton label="Logout" onClick={logout} icon={<Logout />} />
@@ -97,7 +103,7 @@ function MainView() {
                 categoryGroup={categoryGroup}
                 budgetData={selectedBudgetData}
                 onAddCategory={(id) =>
-                  saveCategory({ categoryId: id, budgetId: selectedBudget })
+                  saveCategory({ categoryId: id, budgetId: selectedBudgetId })
                 }
               />
             ))}

@@ -1,14 +1,14 @@
 import { createProvider } from "puro";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
 import { useAuth } from "./authContext";
-import { useStorageContext } from "./storageContext";
+import { CachedBudget, useStorageContext } from "./storageContext";
 import { IS_PRODUCTION } from "./utils";
 
 const useYNABProvider = () => {
   const { token, authenticated } = useAuth();
-  const { selectedBudget, savedCategories } = useStorageContext();
+  const { selectedBudgetId, savedCategories, setCachedBudgets } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
@@ -18,33 +18,37 @@ const useYNABProvider = () => {
     else setYnabAPI(null);
   }, [token, authenticated]);
 
-  const [budgetsData, setBudgetsData] = useState<null | ynab.BudgetSummary[]>(null);
-
-  /** Fetch budgets */
-  useEffect(() => {
+  /** Fetch function to fetch user's budgets and store/refresh the cache */
+  const refreshBudgets = useCallback(async () => {
     if (!ynabAPI) return;
-
-    ynabAPI.budgets
-      .getBudgets()
-      .then((budgets) => {
-        if (!IS_PRODUCTION) console.log("Fetched budgets successfully", budgets);
-        setBudgetsData(budgets.data.budgets);
-      })
-      .catch((err) => console.error("Error fetching budgets", err));
-  }, [ynabAPI]);
+    try {
+      const budgetsData = await ynabAPI.budgets.getBudgets();
+      if (!IS_PRODUCTION) console.log("Fetched budgets successfully", budgetsData);
+      const cachedBudgets: CachedBudget[] = budgetsData.data.budgets.map(
+        (budgetSummary) => ({
+          id: budgetSummary.id,
+          name: budgetSummary.name,
+          currencyFormat: budgetSummary.currency_format || undefined,
+          show: true
+        })
+      );
+      setCachedBudgets(cachedBudgets);
+    } catch (err) {
+      console.error("Error fetching budgets", err);
+    }
+  }, [setCachedBudgets, ynabAPI]);
 
   const [categoryGroupsData, setCategoryGroupsData] = useState<
     null | ynab.CategoryGroupWithCategories[]
   >(null);
   const [categoriesData, setCategoriesData] = useState<null | ynab.Category[]>(null);
 
-  /** Fetch category groups from the selected budget. Re-runs if the user selects another budget */
+  /** Fetch categories from API for the selected budget. Re-runs if the user selects another budget */
   useEffect(() => {
-    setCategoryGroupsData(null);
-    if (!selectedBudget || !ynabAPI) return;
+    if (!selectedBudgetId || !ynabAPI) return;
 
     ynabAPI.categories
-      .getCategories(selectedBudget)
+      .getCategories(selectedBudgetId)
       .then((categories) => {
         if (!IS_PRODUCTION) console.log("Fetched categories successfully", categories);
         setCategoryGroupsData(categories.data.category_groups);
@@ -59,19 +63,16 @@ const useYNABProvider = () => {
         setCategoriesData(flattenedCategories);
       })
       .catch((err) => console.error("Error fetching categories", err));
-  }, [selectedBudget, ynabAPI]);
 
-  const selectedBudgetData = useMemo(() => {
-    if (!selectedBudget) return null;
-    return budgetsData?.find((budget) => budget.id === selectedBudget) || null;
-  }, [budgetsData, selectedBudget]);
+    return () => setCategoryGroupsData(null); // cleanup as user switches budgets
+  }, [selectedBudgetId, ynabAPI]);
 
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData || !savedCategories) return []; // If there's no data, return empty array
 
     // For each saved category in the current budget, grab the category data and add to array
     return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {
-      if (savedCategory.budgetId === selectedBudget) {
+      if (savedCategory.budgetId === selectedBudgetId) {
         const categoryData = categoriesData.find(
           (category) => category.id === savedCategory.categoryId
         );
@@ -79,19 +80,17 @@ const useYNABProvider = () => {
       }
       return newArray;
     }, []);
-  }, [categoriesData, savedCategories, selectedBudget]);
+  }, [categoriesData, savedCategories, selectedBudgetId]);
 
   return {
-    /** API data: List of user's budgets */
-    budgetsData,
     /** API data: List of user's category groups, with categories contained in each one */
     categoryGroupsData,
     /** API data: Flattened list of all of user's categories (without category groups) */
     categoriesData,
     /** API data: List of saved categories in the currently selected budget */
     savedCategoriesData,
-    /** API data: Data from currently selected budget (e.g. currency info, date format, etc.) */
-    selectedBudgetData
+    /** Fetch user's budgets from API and store/refresh the cache */
+    refreshBudgets
   };
 };
 
