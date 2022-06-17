@@ -3,15 +3,13 @@ import Link from "next/link";
 
 function IndexPage() {
   return (
-    <body>
+    <main>
       <Head>
         <title>At a Glance for YNAB</title>
       </Head>
-      <main>
-        <h1>Welcome!</h1>
-        <Link href="/privacy">Privacy Policy</Link>
-      </main>
-    </body>
+      <h1>Welcome!</h1>
+      <Link href="/privacy">Privacy Policy</Link>
+    </main>
   );
 }
 

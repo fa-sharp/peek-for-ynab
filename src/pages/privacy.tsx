@@ -27,6 +27,9 @@ function IndexPage() {
         selected budget, and the categories which you choose to save and pin in the
         extension. This data is deleted if you logout of the extension.
       </p>
+      <p>
+        {APP_NAME} does not share data with any third-party and/or analytics services.
+      </p>
     </main>
   );
 }
