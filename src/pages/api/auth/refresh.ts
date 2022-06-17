@@ -1,30 +1,22 @@
 import type { NextApiHandler } from "next";
 import { URL } from "url";
 
-/** The shape of the token data object from YNAB */
-export interface TokenData {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  refresh_token: string;
-  created_at: number;
-}
-export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
-const { YNAB_CLIENT_ID, YNAB_SECRET, REDIRECT_URI } = process.env;
+import { OAUTH_BASE_URL, TokenData } from "./initial";
+
+const { YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
 const handler: NextApiHandler = async (req, res) => {
-  if (!YNAB_CLIENT_ID || !YNAB_SECRET || !REDIRECT_URI)
+  if (!YNAB_CLIENT_ID || !YNAB_SECRET)
     return res.status(500).json({ message: "Server error!" });
 
-  if (typeof req.query.code !== "string")
+  if (typeof req.query.refreshToken !== "string")
     return res.status(400).json({ message: "Invalid!" });
 
   const tokenUrlParams = new URLSearchParams({
     client_id: YNAB_CLIENT_ID,
     client_secret: YNAB_SECRET,
-    redirect_uri: REDIRECT_URI,
-    grant_type: "authorization_code",
-    code: req.query.code
+    grant_type: "refresh_token",
+    refresh_token: req.query.refreshToken
   });
   const tokenUrl = new URL(OAUTH_BASE_URL);
   tokenUrl.search = tokenUrlParams.toString();
@@ -33,7 +25,7 @@ const handler: NextApiHandler = async (req, res) => {
     const response = await fetch(tokenUrl, { method: "POST" });
     if (!response.ok)
       throw {
-        message: "Error getting OAuth token from YNAB",
+        message: "Error refreshing OAuth token from YNAB",
         status: response.status,
         errorData: await response.json()
       };
@@ -48,7 +40,7 @@ const handler: NextApiHandler = async (req, res) => {
       tokenData
     });
   } catch (err) {
-    console.log("Error during initial OAuth token retrieval", err);
+    console.log("Error during OAuth token refresh", err);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

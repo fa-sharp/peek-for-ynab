@@ -61,7 +61,7 @@ const useStorageProvider = () => {
     setSavedCategories([]);
     removeSavedCategories();
 
-    setCachedBudgets([]);
+    setCachedBudgets(null);
     removeCachedBudgets();
   };
 
