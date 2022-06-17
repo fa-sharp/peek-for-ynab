@@ -1,8 +1,8 @@
 {
   "name": "ynab-chrome-widget",
-  "displayName": "Widget for YNAB",
+  "displayName": "At a Glance for YNAB",
   "version": "0.1.0",
-  "description": "A widget that lets you check on your YNAB category balances",
+  "description": "A Chrome widget that lets you check on your YNAB category balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
   "scripts": {
