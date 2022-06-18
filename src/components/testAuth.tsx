@@ -1,27 +1,45 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { StorageProvider } from "~lib/storageContext";
-import type { TokenData } from "~pages/api/auth/initial";
+import { StorageProvider, useStorageContext } from "~lib/storageContext";
 
-function TestAuth() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    if (typeof router.query.code !== "string") router.push("/401");
-
-    console.log("Fetching new OAuth token!");
-    fetch(`/api/auth/initial?code=${router.query.code}`)
-      .then((res) => res.json())
-      .then((tokenData: TokenData) => console.table(tokenData));
-  }, [router]);
-
+function TestAuthWrapper() {
   return (
     <StorageProvider>
-      <div>See console!</div>
+      <TestAuth />
     </StorageProvider>
   );
 }
 
-export default TestAuth;
+function TestAuth() {
+  const router = useRouter();
+  const { setToken } = useStorageContext();
+  const [fetchAttempted, setFetchAttempted] = useState(false);
+
+  useEffect(() => {
+    if (!router.isReady || fetchAttempted) return;
+    if (typeof router.query.code !== "string") {
+      router.push("/401");
+      return;
+    }
+
+    console.log("Fetching new OAuth token!", { code: router.query.code });
+    setFetchAttempted(true);
+    fetch(
+      `/api/auth/initial?code=${router.query.code}&redirectUri=${process.env.NEXT_PUBLIC_TEST_REDIRECT_URI}`
+    )
+      .then((res) => {
+        if (!res.ok) throw { message: "Error fetching token!" };
+        return res.json();
+      })
+      .then((tokenData) => {
+        console.log("Token fetched!", tokenData);
+        setToken(tokenData.accessToken);
+      })
+      .catch((err) => console.error(err));
+  }, [fetchAttempted, router, setToken]);
+
+  return <div>See console!</div>;
+}
+
+export default TestAuthWrapper;

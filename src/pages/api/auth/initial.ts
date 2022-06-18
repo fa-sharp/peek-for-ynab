@@ -10,20 +10,19 @@ export interface TokenData {
   created_at: number;
 }
 export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
-const { YNAB_CLIENT_ID, YNAB_SECRET, REDIRECT_URI } = process.env;
+const { YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
 const handler: NextApiHandler = async (req, res) => {
-  
-  if (!YNAB_CLIENT_ID || !YNAB_SECRET || !REDIRECT_URI)
+  if (!YNAB_CLIENT_ID || !YNAB_SECRET)
     return res.status(500).json({ message: "Server error!" });
 
-  if (typeof req.query.code !== "string")
+  if (typeof req.query.code !== "string" || typeof req.query.redirectUri !== "string")
     return res.status(400).json({ message: "Invalid!" });
 
   const tokenUrlParams = new URLSearchParams({
     client_id: YNAB_CLIENT_ID,
     client_secret: YNAB_SECRET,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: req.query.redirectUri,
     grant_type: "authorization_code",
     code: req.query.code
   });
