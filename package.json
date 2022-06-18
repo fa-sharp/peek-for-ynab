@@ -1,6 +1,6 @@
 {
   "name": "ynab-chrome-widget",
-  "displayName": "At a Glance for YNAB",
+  "displayName": "Peek for YNAB",
   "version": "0.1.0",
   "description": "A Chrome widget that lets you check on your YNAB category balances",
   "author": "fa-sharp",

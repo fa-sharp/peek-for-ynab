@@ -1,13 +1,14 @@
 import Head from "next/head";
 import Link from "next/link";
+import packageJson from 'package.json'
 
-const APP_NAME = "'At a Glance for YNAB'";
+const { displayName: APP_NAME } = packageJson;
 
 function IndexPage() {
   return (
     <main>
       <Head>
-        <title>At a Glance for YNAB - Privacy Policy</title>
+        <title>{APP_NAME} - Privacy Policy</title>
       </Head>
       <h1>Privacy Policy</h1>
       <p>

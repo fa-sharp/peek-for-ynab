@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Logout } from "tabler-icons-react";
+import { ChevronDown, ChevronUp, ExternalLink, Logout } from "tabler-icons-react";
 
 import {
   BudgetSelect,
@@ -60,6 +60,18 @@ function MainView() {
                 budgets={cachedBudgets}
                 selectedBudgetId={selectedBudgetId}
                 setSelectedBudgetId={setSelectedBudgetId}
+              />
+            )}
+            {selectedBudgetId && (
+              <IconButton
+                label="Open budget in YNAB"
+                onClick={() =>
+                  window.open(
+                    `https://app.youneedabudget.com/${selectedBudgetId}/budget`,
+                    "_blank"
+                  )
+                }
+                icon={<ExternalLink />}
               />
             )}
             <IconButton label="Logout" onClick={logout} icon={<Logout />} />

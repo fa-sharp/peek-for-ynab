@@ -115,6 +115,7 @@ export function BudgetSelect({
 }) {
   return (
     <select
+      style={{ flex: 1 }}
       value={selectedBudgetId || "initial"}
       onChange={(e) => setSelectedBudgetId(e.target.value)}>
       {!selectedBudgetId && <option value="initial">--Select a budget--</option>}

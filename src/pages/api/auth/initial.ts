@@ -13,6 +13,7 @@ export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
 const { YNAB_CLIENT_ID, YNAB_SECRET, REDIRECT_URI } = process.env;
 
 const handler: NextApiHandler = async (req, res) => {
+  
   if (!YNAB_CLIENT_ID || !YNAB_SECRET || !REDIRECT_URI)
     return res.status(500).json({ message: "Server error!" });
 
