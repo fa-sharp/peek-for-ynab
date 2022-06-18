@@ -1,0 +1,19 @@
+import dynamic from "next/dynamic";
+
+const LazyPopup = dynamic(() => import("../popup"), {
+  loading: () => <div>Loading...</div>,
+  ssr: false
+});
+
+function TestPage() {
+  return <LazyPopup />;
+}
+
+// Hide page in production
+export const getStaticProps = () => {
+  return process.env.NODE_ENV === "production"
+    ? { notFound: true, props: {} }
+    : { props: {} };
+};
+
+export default TestPage;
