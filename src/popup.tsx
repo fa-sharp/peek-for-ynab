@@ -124,6 +124,7 @@ function PopupView() {
                 key={categoryGroup.id}
                 categoryGroup={categoryGroup}
                 budgetData={selectedBudgetData}
+                savedCategories={savedCategoriesData}
                 onAddCategory={(id) =>
                   saveCategory({ categoryId: id, budgetId: selectedBudgetId })
                 }

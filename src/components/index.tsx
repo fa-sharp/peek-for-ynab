@@ -1,8 +1,16 @@
 import { MouseEventHandler, ReactElement, useState } from "react";
-import { ChevronDown, ChevronUp, CircleMinus, CirclePlus } from "tabler-icons-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  CircleMinus,
+  CirclePlus,
+  Pin,
+  Pinned,
+  PinnedOff
+} from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories } from "ynab";
 
-import type { CachedBudget } from "~lib/storageContext";
+import type { CachedBudget, SavedCategory } from "~lib/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 /** View of user's saved categories with balances */
@@ -37,7 +45,7 @@ export function SavedCategoriesView({
           <IconButton
             label="Remove"
             onClick={() => removeCategory(category.id)}
-            icon={<CircleMinus size={24} color="gray" strokeWidth={1} />}
+            icon={<PinnedOff size={24} color="gray" strokeWidth={1} />}
           />
         </div>
       ))}
@@ -49,10 +57,12 @@ export function SavedCategoriesView({
 export function CategoryGroupView({
   categoryGroup,
   budgetData,
+  savedCategories,
   onAddCategory
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
+  savedCategories: Category[];
   onAddCategory: (categoryId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -92,11 +102,13 @@ export function CategoryGroupView({
               alignItems: "center"
             }}>
             {category.name}: {formatCurrency(category.balance, budgetData.currencyFormat)}
-            <IconButton
-              label="Add"
-              onClick={() => onAddCategory(category.id)}
-              icon={<CirclePlus size={24} color="gray" strokeWidth={1} />}
-            />
+            {!savedCategories.find((c) => c.id === category.id) && (
+              <IconButton
+                label="Add"
+                onClick={() => onAddCategory(category.id)}
+                icon={<Pinned size={24} color="gray" strokeWidth={1} />}
+              />
+            )}
           </div>
         ))}
     </>
