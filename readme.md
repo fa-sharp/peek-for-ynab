@@ -6,7 +6,7 @@ A Chrome extension for YNAB that lets users see their category balances at a gla
 
 ### Extension
 
-This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). The popup component is located at `src/popup/index.tsx`.
+This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). The popup component is located at `src/popup.tsx`.
 
 You can run the extension's development server via:
 

@@ -11,7 +11,17 @@ import { AuthProvider, useAuth } from "~lib/authContext";
 import { StorageProvider, useStorageContext } from "~lib/storageContext";
 import { YNABProvider, useYNAB } from "~lib/ynabContext";
 
-function MainView() {
+const PopupComponent = () => (
+  <StorageProvider>
+    <AuthProvider>
+      <YNABProvider>
+        <PopupView />
+      </YNABProvider>
+    </AuthProvider>
+  </StorageProvider>
+);
+
+function PopupView() {
   const { login, logout, authenticated } = useAuth();
   const { categoriesData, categoryGroupsData, savedCategoriesData, refreshBudgets } =
     useYNAB();
@@ -24,7 +34,7 @@ function MainView() {
     removeCategory
   } = useStorageContext();
 
-  /** Automatically fetch budgets from API if there is no cached data */
+  /** Automatically fetch budgets from API if there is no cached budget data */
   useEffect(() => {
     if (authenticated && !cachedBudgets) refreshBudgets();
   }, [authenticated, cachedBudgets, refreshBudgets]);
@@ -125,16 +135,4 @@ function MainView() {
   );
 }
 
-function IndexPopup() {
-  return (
-    <StorageProvider>
-      <AuthProvider>
-        <YNABProvider>
-          <MainView />
-        </YNABProvider>
-      </AuthProvider>
-    </StorageProvider>
-  );
-}
-
-export default IndexPopup;
+export default PopupComponent;

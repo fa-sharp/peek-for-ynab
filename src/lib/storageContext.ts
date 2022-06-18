@@ -29,10 +29,10 @@ const useStorageProvider = () => {
   const [selectedBudgetId, setSelectedBudgetId, { remove: removeSelectedBudget }] =
     useStorage("selectedBudgetId", "");
 
-  const selectedBudgetData = useMemo(() => {
-    if (!selectedBudgetId) return null;
-    return cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null;
-  }, [cachedBudgets, selectedBudgetId]);
+  const selectedBudgetData = useMemo(
+    () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
+    [cachedBudgets, selectedBudgetId]
+  );
 
   const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
     useStorage<SavedCategory[]>("savedCategories", []);
