@@ -1,13 +1,15 @@
 import dynamic from "next/dynamic";
 
+/** For testing/development: after user logs in to YNAB, they are redirected to this page.
+ * Will only show in development */
+function TestLoginPage() {
+  return <LazyAuth />;
+}
+
 const LazyAuth = dynamic(() => import("../components/testAuth"), {
   loading: () => <div>Loading...</div>,
   ssr: false
 });
-
-function TestLoginPage() {
-  return <LazyAuth />;
-}
 
 // Hide page in production
 export const getStaticProps = () => {

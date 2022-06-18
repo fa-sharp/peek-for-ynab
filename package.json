@@ -6,11 +6,11 @@
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
   "scripts": {
-    "start": "next start",
     "dev:plasmo": "plasmo dev --port 3001",
-    "dev:next": "next dev --port 3000",
     "build:plasmo": "plasmo build",
-    "build:next": "next build"
+    "dev:next": "next dev --port 3000",
+    "build:next": "next build",
+    "start:next": "next start"
   },
   "dependencies": {
     "@plasmohq/storage": "^0.5.1",
