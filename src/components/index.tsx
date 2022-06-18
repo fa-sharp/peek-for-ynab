@@ -1,16 +1,8 @@
 import { MouseEventHandler, ReactElement, useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  CircleMinus,
-  CirclePlus,
-  Pin,
-  Pinned,
-  PinnedOff
-} from "tabler-icons-react";
-import type { Category, CategoryGroupWithCategories } from "ynab";
+import { ChevronDown, ChevronUp, Pinned, PinnedOff } from "tabler-icons-react";
+import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
-import type { CachedBudget, SavedCategory } from "~lib/storageContext";
+import type { CachedBudget } from "~lib/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 /** View of user's saved categories with balances */
@@ -94,26 +86,46 @@ export function CategoryGroupView({
       </h4>
       {expanded &&
         categoryGroup.categories.map((category) => (
-          <div
+          <CategoryView
             key={category.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }}>
-            {category.name}: {formatCurrency(category.balance, budgetData.currencyFormat)}
-            {!savedCategories.find((c) => c.id === category.id) && (
-              <IconButton
-                label="Add"
-                onClick={() => onAddCategory(category.id)}
-                icon={<Pinned size={24} color="gray" strokeWidth={1} />}
-              />
-            )}
-          </div>
+            categoryData={category}
+            isSaved={savedCategories.some((c) => c.id === category.id)}
+            onSaveCategory={onAddCategory}
+            currencyFormat={budgetData.currencyFormat}
+          />
         ))}
     </>
   );
 }
+
+const CategoryView = ({
+  categoryData,
+  isSaved,
+  currencyFormat,
+  onSaveCategory
+}: {
+  categoryData: Category;
+  currencyFormat?: CurrencyFormat;
+  isSaved: boolean;
+  onSaveCategory: (categoryId: string) => void;
+}) => (
+  <div
+    key={categoryData.id}
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }}>
+    {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
+    {!isSaved && (
+      <IconButton
+        label="Add"
+        onClick={() => onSaveCategory(categoryData.id)}
+        icon={<Pinned size={24} color="gray" strokeWidth={1} />}
+      />
+    )}
+  </div>
+);
 
 /** Dropdown that lets the user select a budget to view */
 export function BudgetSelect({
