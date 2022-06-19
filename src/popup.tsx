@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ExternalLink, Logout } from "tabler-icons-react";
 
@@ -18,6 +19,7 @@ const PopupComponent = () => (
 );
 
 function PopupView() {
+  const router = useRouter();
   const { login, logout, authenticated } = useAuth();
   const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNAB();
   const {
@@ -50,7 +52,24 @@ function PopupView() {
         <div>
           <label>Token: </label>
           <input value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />
-          <button onClick={() => login(tokenInput)}>Login</button>
+          <button
+            onClick={() =>
+              login({
+                accessToken: tokenInput,
+                expires: Date.now() + 525000 * 60 * 1000,
+                refreshToken: ""
+              })
+            }>
+            Login
+          </button>
+          <button
+            onClick={() =>
+              router.push(
+                `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_TEST_REDIRECT_URI}&response_type=code`
+              )
+            }>
+            OAuth
+          </button>
         </div>
       ) : (
         <>

@@ -128,14 +128,15 @@ const CategoryView = ({
     style={{
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "center"
+      alignItems: "center",
+      marginBlock: "2px"
     }}>
     {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
     {!isSaved && (
       <IconButton
         label="Add"
         onClick={() => onSaveCategory(categoryData.id)}
-        icon={<Pinned size={24} color="gray" strokeWidth={1} />}
+        icon={<Pinned size={20} color="gray" strokeWidth={1} />}
       />
     )}
   </div>

@@ -7,8 +7,9 @@ import { CachedBudget, useStorageContext } from "./storageContext";
 import { IS_PRODUCTION } from "./utils";
 
 const useYNABProvider = () => {
-  const { token, authenticated } = useAuth();
+  const { authLoading } = useAuth();
   const {
+    tokenData,
     selectedBudgetId,
     savedCategories,
     cachedBudgets: currentCachedBudgets,
@@ -19,9 +20,9 @@ const useYNABProvider = () => {
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
-    if (token && authenticated) setYnabAPI(new ynab.API(token));
+    if (tokenData && !authLoading) setYnabAPI(new ynab.API(tokenData.accessToken));
     else setYnabAPI(null);
-  }, [token, authenticated]);
+  }, [tokenData, authLoading]);
 
   /** Fetch user's budgets and store/refresh the cache. */
   const refreshBudgets = useCallback(async () => {

@@ -4,6 +4,12 @@ import type { CurrencyFormat } from "ynab";
 
 import { useStorage } from "@plasmohq/storage";
 
+export interface TokenData {
+  accessToken: string;
+  refreshToken: string;
+  expires: number;
+}
+
 /** Cached budget data, stored in the browser */
 export interface CachedBudget {
   id: string;
@@ -20,7 +26,10 @@ export interface SavedCategory {
 }
 
 const useStorageProvider = () => {
-  const [token, setToken, { remove: removeToken }] = useStorage("token", "");
+  const [tokenData, setTokenData, { remove: removeToken }] = useStorage<TokenData | null>(
+    "tokenData",
+    null
+  );
 
   const [cachedBudgets, setCachedBudgets, { remove: removeCachedBudgets }] = useStorage<
     null | CachedBudget[]
@@ -63,7 +72,7 @@ const useStorageProvider = () => {
   };
 
   const removeAllData = () => {
-    setToken("");
+    setTokenData(null);
     removeToken();
 
     setSelectedBudgetId("");
@@ -78,8 +87,8 @@ const useStorageProvider = () => {
 
   return {
     /** The token used to authenticate the YNAB user */
-    token,
-    setToken,
+    tokenData,
+    setTokenData,
     /** Cached API data: List of all user's budgets */
     cachedBudgets,
     setCachedBudgets,

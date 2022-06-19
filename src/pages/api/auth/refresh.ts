@@ -1,9 +1,9 @@
 import type { NextApiHandler } from "next";
 import { URL } from "url";
 
-import { OAUTH_BASE_URL, TokenData } from "./initial";
+import { OAUTH_BASE_URL } from "./initial";
 
-const { YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
+const { NEXT_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
 const handler: NextApiHandler = async (req, res) => {
   if (!YNAB_CLIENT_ID || !YNAB_SECRET)
@@ -22,7 +22,7 @@ const handler: NextApiHandler = async (req, res) => {
   tokenUrl.search = tokenUrlParams.toString();
 
   try {
-    const response = await fetch(tokenUrl, { method: "POST" });
+    const response = await fetch(tokenUrl.toString(), { method: "POST" });
     if (!response.ok)
       throw {
         message: "Error refreshing OAuth token from YNAB",
@@ -30,14 +30,13 @@ const handler: NextApiHandler = async (req, res) => {
         errorData: await response.json()
       };
 
-    const tokenData: TokenData = await response.json();
+    const tokenData = await response.json();
 
     return res.json({
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
       createdAt: tokenData.created_at,
-      expiresInSeconds: tokenData.expires_in,
-      tokenData
+      expiresInSeconds: tokenData.expires_in
     });
   } catch (err) {
     console.log("Error during OAuth token refresh", err);

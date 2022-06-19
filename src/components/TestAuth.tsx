@@ -14,14 +14,14 @@ function TestAuthWrapper() {
 
 function TestAuth() {
   const router = useRouter();
-  const { token, setToken } = useStorageContext();
+  const { tokenData, setTokenData } = useStorageContext();
   const [authAttempted, setAuthAttempted] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     if (!router.isReady || authAttempted) return;
 
-    setToken("");
+    setTokenData(null);
     if (typeof router.query.code !== "string") {
       console.error("No auth code found in URL!");
       setAuthLoading(false);
@@ -39,21 +39,25 @@ function TestAuth() {
       })
       .then((tokenData) => {
         console.log("Token fetched!", tokenData);
-        setToken(tokenData.accessToken);
+        setTokenData({
+          accessToken: tokenData.accessToken,
+          refreshToken: tokenData.refreshToken,
+          expires: (tokenData.createdAt + tokenData.expiresInSeconds) * 1000
+        });
         setAuthLoading(false);
       })
       .catch((err) => {
         setAuthLoading(false);
         console.error(err);
       });
-  }, [authAttempted, router, setToken]);
+  }, [authAttempted, router, setTokenData]);
 
   return (
     <main>
       <h2>Login Test</h2>
       {authLoading ? (
         <div>Auth loading...</div>
-      ) : token ? (
+      ) : tokenData ? (
         <div>Login succeeded! See console for more details</div>
       ) : (
         <div>Login failed 😢 See console for more details</div>

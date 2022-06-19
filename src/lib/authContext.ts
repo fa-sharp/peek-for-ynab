@@ -1,32 +1,71 @@
 import { createProvider } from "puro";
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import * as ynab from "ynab";
 
-import { useStorageContext } from "./storageContext";
+import { TokenData, useStorageContext } from "./storageContext";
 import { IS_PRODUCTION } from "./utils";
 
+const { PLASMO_PUBLIC_REFRESH_URL } = process.env;
+
 const useAuthProvider = () => {
-  const { token, setToken, removeAllData } = useStorageContext();
+  const { tokenData, setTokenData, removeAllData } = useStorageContext();
+  const [authLoading, setAuthLoading] = useState(true);
+
+  /** Callback to fetch and refresh the access token */
+  const refresh = useCallback(() => {
+    if (!tokenData) return;
+    if (!IS_PRODUCTION) console.log("Refreshing token!!");
+
+    const baseUrl = PLASMO_PUBLIC_REFRESH_URL || "/api/auth/refresh";
+    fetch(`${baseUrl}?refreshToken=${tokenData.refreshToken}`)
+      .then((res) => {
+        if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
+        return res.json();
+      })
+      .then((newTokenData) => {
+        if (!IS_PRODUCTION) console.log("Got a new token!");
+        setTokenData({
+          accessToken: newTokenData.accessToken,
+          refreshToken: newTokenData.refreshToken,
+          expires: (newTokenData.createdAt + newTokenData.expiresInSeconds) * 1000
+        });
+        setAuthLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setTokenData(null);
+        setAuthLoading(false);
+      });
+  }, [setTokenData, tokenData]);
+
+  /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
+  useEffect(() => {
+    if (tokenData && tokenData.expires < Date.now() + 5 * 60 * 1000) {
+      refresh();
+    } else {
+      setAuthLoading(false);
+    }
+  }, [refresh, tokenData]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
-  const login = (token: string) => {
-    const api = new ynab.API(token);
+  const login = (tokenData: TokenData) => {
+    const api = new ynab.API(tokenData.accessToken);
     api.user
       .getUser()
       .then(({ data }) => {
         if (!IS_PRODUCTION) console.log("Successfully logged in user: ", data.user.id);
-        setToken(token);
+        setTokenData(tokenData);
       })
       .catch((err) => console.error("Login failed: ", err));
   };
 
   /** Clears all data, including the user's token */
   const logout = () => {
-    setToken("");
+    setTokenData(null);
     removeAllData();
   };
 
-  return { login, logout, token, authenticated: token !== "" };
+  return { login, logout, authenticated: tokenData !== null, authLoading };
 };
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);
