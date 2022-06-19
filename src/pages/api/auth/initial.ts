@@ -1,6 +1,8 @@
 import type { NextApiHandler } from "next";
 import { URL } from "url";
 
+import type { TokenData } from "~lib/storageContext";
+
 export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
 const { NEXT_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
@@ -29,15 +31,14 @@ const handler: NextApiHandler = async (req, res) => {
         status: response.status,
         errorData: await response.json()
       };
+    const data = await response.json();
 
-    const tokenData = await response.json();
-
-    return res.json({
-      accessToken: tokenData.access_token,
-      refreshToken: tokenData.refresh_token,
-      createdAt: tokenData.created_at,
-      expiresInSeconds: tokenData.expires_in
-    });
+    const tokenData: TokenData = {
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expires: (data.created_at + data.expires_in) * 1000
+    };
+    return res.json(tokenData);
   } catch (err) {
     console.log("Error during initial OAuth token retrieval", err);
     return res.status(401).json({ message: "Unauthorized" });

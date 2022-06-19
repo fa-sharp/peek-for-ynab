@@ -20,7 +20,7 @@ const PopupComponent = () => (
 
 function PopupView() {
   const router = useRouter();
-  const { login, logout, authenticated } = useAuth();
+  const { login, logout, loggedIn, tokenExpired } = useAuth();
   const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNAB();
   const {
     cachedBudgets,
@@ -34,8 +34,8 @@ function PopupView() {
 
   /** Automatically fetch budgets from API if there is no cached budget data */
   useEffect(() => {
-    if (authenticated && !cachedBudgets) refreshBudgets();
-  }, [authenticated, cachedBudgets, refreshBudgets]);
+    if (loggedIn && !tokenExpired && !cachedBudgets) refreshBudgets();
+  }, [loggedIn, cachedBudgets, refreshBudgets, tokenExpired]);
 
   const [tokenInput, setTokenInput] = useState("");
 
@@ -48,7 +48,7 @@ function PopupView() {
         minWidth: "240px",
         width: "max-content"
       }}>
-      {!authenticated ? (
+      {!loggedIn ? (
         <div>
           <label>Token: </label>
           <input value={tokenInput} onChange={(e) => setTokenInput(e.target.value)} />

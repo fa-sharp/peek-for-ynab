@@ -7,7 +7,7 @@ import { CachedBudget, useStorageContext } from "./storageContext";
 import { IS_PRODUCTION } from "./utils";
 
 const useYNABProvider = () => {
-  const { authLoading } = useAuth();
+  const { tokenExpired } = useAuth();
   const {
     tokenData,
     selectedBudgetId,
@@ -20,9 +20,9 @@ const useYNABProvider = () => {
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
-    if (tokenData && !authLoading) setYnabAPI(new ynab.API(tokenData.accessToken));
+    if (tokenData && !tokenExpired) setYnabAPI(new ynab.API(tokenData.accessToken));
     else setYnabAPI(null);
-  }, [tokenData, authLoading]);
+  }, [tokenData, tokenExpired]);
 
   /** Fetch user's budgets and store/refresh the cache. */
   const refreshBudgets = useCallback(async () => {
@@ -72,7 +72,11 @@ const useYNABProvider = () => {
       })
       .catch((err) => console.error("Error fetching categories", err));
 
-    return () => setCategoryGroupsData(null); // cleanup as user switches budgets
+    return () => {
+      // cleanup as user switches budgets or when they logout
+      setCategoryGroupsData(null);
+      setCategoriesData(null);
+    };
   }, [selectedBudgetId, ynabAPI]);
 
   const savedCategoriesData = useMemo(() => {

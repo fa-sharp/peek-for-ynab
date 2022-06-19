@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
 import { TokenData, useStorageContext } from "./storageContext";
@@ -9,7 +9,9 @@ const { PLASMO_PUBLIC_REFRESH_URL } = process.env;
 
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();
-  const [authLoading, setAuthLoading] = useState(true);
+
+  /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
+  const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
 
   /** Callback to fetch and refresh the access token */
   const refresh = useCallback(() => {
@@ -22,30 +24,22 @@ const useAuthProvider = () => {
         if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
         return res.json();
       })
-      .then((newTokenData) => {
+      .then(async (newTokenData) => {
         if (!IS_PRODUCTION) console.log("Got a new token!");
-        setTokenData({
-          accessToken: newTokenData.accessToken,
-          refreshToken: newTokenData.refreshToken,
-          expires: (newTokenData.createdAt + newTokenData.expiresInSeconds) * 1000
-        });
-        setAuthLoading(false);
+        setTokenData(newTokenData);
       })
       .catch((err) => {
         console.error(err);
         setTokenData(null);
-        setAuthLoading(false);
       });
   }, [setTokenData, tokenData]);
 
   /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
   useEffect(() => {
-    if (tokenData && tokenData.expires < Date.now() + 5 * 60 * 1000) {
+    if (tokenData && tokenExpired) {
       refresh();
-    } else {
-      setAuthLoading(false);
     }
-  }, [refresh, tokenData]);
+  }, [refresh, tokenData, tokenExpired]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
   const login = (tokenData: TokenData) => {
@@ -65,7 +59,7 @@ const useAuthProvider = () => {
     removeAllData();
   };
 
-  return { login, logout, authenticated: tokenData !== null, authLoading };
+  return { login, logout, loggedIn: tokenData !== null, tokenExpired };
 };
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);

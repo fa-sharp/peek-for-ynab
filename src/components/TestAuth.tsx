@@ -39,11 +39,7 @@ function TestAuth() {
       })
       .then((tokenData) => {
         console.log("Token fetched!", tokenData);
-        setTokenData({
-          accessToken: tokenData.accessToken,
-          refreshToken: tokenData.refreshToken,
-          expires: (tokenData.createdAt + tokenData.expiresInSeconds) * 1000
-        });
+        setTokenData(tokenData);
         setAuthLoading(false);
       })
       .catch((err) => {
