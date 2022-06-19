@@ -6,7 +6,7 @@ function TestLoginPage() {
   return <LazyAuth />;
 }
 
-const LazyAuth = dynamic(() => import("../components/testAuth"), {
+const LazyAuth = dynamic(() => import("../components/TestAuth"), {
   loading: () => <div>Loading...</div>,
   ssr: false
 });

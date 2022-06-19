@@ -75,7 +75,7 @@ const useYNABProvider = () => {
   }, [selectedBudgetId, ynabAPI]);
 
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData || !savedCategories) return []; // If there's no data, return empty array
+    if (!categoriesData || !savedCategories) return null; // If there's no data, return empty array
 
     // For each saved category in the current budget, grab the category data and add to array
     return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {

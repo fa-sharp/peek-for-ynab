@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, Logout } from "tabler-icons-react";
+import { ExternalLink, Logout } from "tabler-icons-react";
 
-import {
-  BudgetSelect,
-  CategoryGroupView,
-  IconButton,
-  SavedCategoriesView
-} from "~components";
+import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
+import { CategoriesView } from "~components";
 import { AuthProvider, useAuth } from "~lib/authContext";
 import { StorageProvider, useStorageContext } from "~lib/storageContext";
 import { YNABProvider, useYNAB } from "~lib/ynabContext";
@@ -23,13 +19,13 @@ const PopupComponent = () => (
 
 function PopupView() {
   const { login, logout, authenticated } = useAuth();
-  const { categoriesData, categoryGroupsData, savedCategoriesData, refreshBudgets } =
-    useYNAB();
+  const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNAB();
   const {
     cachedBudgets,
     selectedBudgetId,
     setSelectedBudgetId,
     selectedBudgetData,
+    savedCategories,
     saveCategory,
     removeCategory
   } = useStorageContext();
@@ -40,7 +36,6 @@ function PopupView() {
   }, [authenticated, cachedBudgets, refreshBudgets]);
 
   const [tokenInput, setTokenInput] = useState("");
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
   return (
     <div
@@ -87,7 +82,7 @@ function PopupView() {
             <IconButton label="Logout" onClick={logout} icon={<Logout />} />
           </div>
 
-          {categoriesData && selectedBudgetData && (
+          {selectedBudgetData && savedCategoriesData && (
             <SavedCategoriesView
               savedCategoryData={savedCategoriesData}
               budgetData={selectedBudgetData}
@@ -95,41 +90,14 @@ function PopupView() {
             />
           )}
 
-          <h3
-            style={{
-              marginTop: 8,
-              marginBottom: 4,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center"
-            }}>
-            Categories
-            <IconButton
-              label={categoriesExpanded ? "Collapse" : "Expand"}
-              onClick={() => setCategoriesExpanded(!categoriesExpanded)}
-              icon={
-                categoriesExpanded ? (
-                  <ChevronUp size={24} color="black" strokeWidth={2} />
-                ) : (
-                  <ChevronDown size={24} color="black" strokeWidth={2} />
-                )
-              }
+          {selectedBudgetData && categoryGroupsData && (
+            <CategoriesView
+              categoryGroupsData={categoryGroupsData}
+              savedCategories={savedCategories}
+              selectedBudgetData={selectedBudgetData}
+              saveCategory={saveCategory}
             />
-          </h3>
-          {categoriesExpanded &&
-            categoryGroupsData &&
-            selectedBudgetData &&
-            categoryGroupsData.map((categoryGroup) => (
-              <CategoryGroupView
-                key={categoryGroup.id}
-                categoryGroup={categoryGroup}
-                budgetData={selectedBudgetData}
-                savedCategories={savedCategoriesData}
-                onAddCategory={(id) =>
-                  saveCategory({ categoryId: id, budgetId: selectedBudgetId })
-                }
-              />
-            ))}
+          )}
         </>
       )}
     </div>
