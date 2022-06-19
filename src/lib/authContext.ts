@@ -54,12 +54,12 @@ const useAuthProvider = () => {
   };
 
   /** Clears all data, including the user's token */
-  const logout = () => {
-    setTokenData(null);
+  const logout = async () => {
+    await setTokenData(null);
     removeAllData();
   };
 
-  return { login, logout, loggedIn: tokenData !== null, tokenExpired };
+  return { login, logout, loggedIn: tokenData != null, tokenExpired };
 };
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);

@@ -27,33 +27,30 @@ export interface SavedCategory {
 
 const useStorageProvider = () => {
   const [tokenData, setTokenData, { remove: removeToken }] = useStorage<TokenData | null>(
-    "tokenData",
+    { key: "tokenData", area: "local" },
     null
   );
 
   const [cachedBudgets, setCachedBudgets, { remove: removeCachedBudgets }] = useStorage<
     null | CachedBudget[]
-  >("cachedBudgets", null);
+  >({ key: "cachedBudgets", area: "local" }, null);
 
   const [selectedBudgetId, setSelectedBudgetId, { remove: removeSelectedBudget }] =
-    useStorage("selectedBudgetId", "");
+    useStorage({ key: "selectedBudgetId", area: "local" }, "");
+
+  const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
+    useStorage<SavedCategory[]>({ key: "savedCategories", area: "local" }, []);
 
   const selectedBudgetData = useMemo(
     () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
     [cachedBudgets, selectedBudgetId]
   );
-
-  const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
-    useStorage<SavedCategory[]>("savedCategories", []);
-
-  /** Save/pin a category */
   const saveCategory = (categoryToSave: SavedCategory) => {
     const foundDuplicate = savedCategories.find(
       (savedCategory) => savedCategory.categoryId === categoryToSave.categoryId
     );
     if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
   };
-  /** Remove/unsave a category  */
   const removeCategory = (categoryIdToRemove: string) => {
     setSavedCategories(
       savedCategories.filter(
@@ -61,7 +58,6 @@ const useStorageProvider = () => {
       )
     );
   };
-  /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!cachedBudgets) return;
     const budgetIndex = cachedBudgets.findIndex((budget) => budget.id === budgetId);
@@ -73,18 +69,17 @@ const useStorageProvider = () => {
     setCachedBudgets(newCachedBudgets);
   };
 
-  /** Clears all values, removes all saved data from browser storage */
-  const removeAllData = () => {
-    setTokenData(null);
+  const removeAllData = async () => {
+    await setTokenData(null);
     removeToken();
 
-    setSelectedBudgetId("");
+    await setSelectedBudgetId("");
     removeSelectedBudget();
 
-    setSavedCategories([]);
+    await setSavedCategories([]);
     removeSavedCategories();
 
-    setCachedBudgets(null);
+    await setCachedBudgets(null);
     removeCachedBudgets();
   };
 
@@ -100,10 +95,15 @@ const useStorageProvider = () => {
     setSelectedBudgetId,
     /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
     selectedBudgetData,
+    /** Toggle whether a budget is shown or not. */
+    toggleShowBudget,
     /** The categories saved by the user */
     savedCategories,
+    /** Save/pin a category */
     saveCategory,
+    /** Remove/unsave a category  */
     removeCategory,
+    /** Clears all values, removes all saved data from browser storage */
     removeAllData
   };
 };
