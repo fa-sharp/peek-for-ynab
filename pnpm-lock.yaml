@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@next/eslint-plugin-next': ^12.1.6
-  '@plasmohq/storage': 0.5.1
+  '@plasmohq/storage': 0.6.0
   '@trivago/prettier-plugin-sort-imports': ^3.2.0
   '@types/chrome': 0.0.190
   '@types/node': 17.0.42
@@ -27,7 +27,7 @@ specifiers:
   ynab: ^1.28.0
 
 dependencies:
-  '@plasmohq/storage': 0.5.1_react@18.2.0
+  '@plasmohq/storage': 0.6.0_react@18.2.0
   next: 12.1.6_biqbaboplfbrettd7655fr4n2y
   plasmo: 0.43.3
   puro: 0.3.4_react@18.2.0
@@ -1503,8 +1503,8 @@ packages:
       - '@parcel/core'
     dev: false
 
-  /@plasmohq/storage/0.5.1_react@18.2.0:
-    resolution: {integrity: sha512-n0suU3tdXBaWkGIvEEshJsxGpNxr/d8Byh94BgH96izuaRLFSrmLYJG4FJArwT7iYTMm9gUB8nT+MjjwawYCPg==}
+  /@plasmohq/storage/0.6.0_react@18.2.0:
+    resolution: {integrity: sha512-1xMyHXWiLFjbDJTCs3A9ogLHLOaalO0IMBiL30+nw6VZ9Vxqf9rxQsL9apXlFXa7FquOnJGWx3ZNnhRXxy+zRw==}
     peerDependencies:
       react: ^16.8.6 || ^17 || ^18
     dependencies:

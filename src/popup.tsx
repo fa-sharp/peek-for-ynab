@@ -20,7 +20,7 @@ const PopupComponent = () => (
 
 function PopupView() {
   const router = useRouter();
-  const { login, logout, loggedIn, tokenExpired } = useAuth();
+  const { login, loginWithOAuth, logout, loggedIn, tokenExpired } = useAuth();
   const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNAB();
   const {
     cachedBudgets,
@@ -68,8 +68,9 @@ function PopupView() {
                 `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_TEST_REDIRECT_URI}&response_type=code`
               )
             }>
-            OAuth
+            OAuth - Web
           </button>
+          <button onClick={() => loginWithOAuth()}>OAuth - Extension</button>
         </div>
       ) : (
         <>

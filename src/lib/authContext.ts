@@ -5,7 +5,7 @@ import * as ynab from "ynab";
 import { TokenData, useStorageContext } from "./storageContext";
 import { IS_PRODUCTION } from "./utils";
 
-const { PLASMO_PUBLIC_REFRESH_URL } = process.env;
+const { PLASMO_PUBLIC_MAIN_URL, PLASMO_PUBLIC_YNAB_CLIENT_ID } = process.env;
 
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();
@@ -18,13 +18,13 @@ const useAuthProvider = () => {
     if (!tokenData) return;
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
 
-    const baseUrl = PLASMO_PUBLIC_REFRESH_URL || "/api/auth/refresh";
-    fetch(`${baseUrl}?refreshToken=${tokenData.refreshToken}`)
+    const refreshUrl = `${PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
+    fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`)
       .then((res) => {
         if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
         return res.json();
       })
-      .then(async (newTokenData) => {
+      .then((newTokenData) => {
         if (!IS_PRODUCTION) console.log("Got a new token!");
         setTokenData(newTokenData);
       })
@@ -53,13 +53,51 @@ const useAuthProvider = () => {
       .catch((err) => console.error("Login failed: ", err));
   };
 
+  /** Authenticate the YNAB user through OAuth */
+  const loginWithOAuth = () => {
+    if (!chrome || !chrome.identity) return;
+
+    const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
+    const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/initial`;
+
+    chrome.identity.launchWebAuthFlow(
+      {
+        url: `https://app.youneedabudget.com/oauth/authorize?client_id=${PLASMO_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
+      },
+      (responseUrl) => {
+        try {
+          if (!responseUrl) throw "No response URL!";
+          const oAuthCode = new URL(responseUrl).searchParams.get("code");
+          if (!oAuthCode) throw "No OAuth code found!";
+
+          fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`)
+            .then((res) => {
+              if (!res.ok)
+                throw { message: "Error getting initial token!", status: res.status };
+              return res.json();
+            })
+            .then((newTokenData) => {
+              if (!IS_PRODUCTION) console.log("Got a new token!");
+              setTokenData(newTokenData);
+            })
+            .catch((err) => {
+              console.error("OAuth login failed: ", err);
+              setTokenData(null);
+            });
+        } catch (err) {
+          console.error("OAuth login failed: ", err);
+        }
+      }
+    );
+  };
+
   /** Clears all data, including the user's token */
   const logout = async () => {
     await setTokenData(null);
     removeAllData();
   };
 
-  return { login, logout, loggedIn: tokenData != null, tokenExpired };
+  return { login, loginWithOAuth, logout, loggedIn: tokenData != null, tokenExpired };
 };
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);

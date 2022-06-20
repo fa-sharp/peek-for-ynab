@@ -13,7 +13,7 @@
     "start:next": "next start"
   },
   "dependencies": {
-    "@plasmohq/storage": "0.5.1",
+    "@plasmohq/storage": "0.6.0",
     "next": "^12.1.6",
     "plasmo": "^0.43.3",
     "puro": "^0.3.4",
@@ -41,8 +41,10 @@
     "url": "^0.11.0"
   },
   "manifest": {
+    "permissions": ["identity"],
     "host_permissions": [
       "https://*/*"
-    ]
+    ],
+    "key": "$CRX_PUBLIC_KEY"
   }
 }
