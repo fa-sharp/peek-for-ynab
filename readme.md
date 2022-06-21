@@ -2,13 +2,20 @@
 
 A Chrome extension for YNAB that lets users see their category balances at a glance.
 
+### Project layout
+
+- `src/`
+  - `popup.tsx` Extension - popup component
+  - `options.tsx` Extension - options component
+  - `pages/` Website - pages (Next.js)
+  - `lib/` Various library and utility functions
+  - `components/` View layer components
+
 ## Building and running locally
 
 ### Extension
 
-This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). The popup component is located at `src/popup.tsx`.
-
-You can run the extension's development server via:
+This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). You can run the extension's development server via:
 
 ```bash
 pnpm dev:plasmo

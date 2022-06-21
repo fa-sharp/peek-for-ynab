@@ -2,7 +2,7 @@ import { PinnedOff } from "tabler-icons-react";
 import type { Category } from "ynab";
 
 import { IconButton } from "~components";
-import type { CachedBudget } from "~lib/storageContext";
+import type { CachedBudget } from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 /** View of user's saved categories with balances */
@@ -27,6 +27,10 @@ export default function SavedCategoriesView({
         <div
           key={category.id}
           style={{
+            height: "1.6rem",
+            marginBlock: "2px",
+            paddingBlock: "1px",
+            borderBlockEnd: "solid 1px #ddd",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center"
@@ -37,7 +41,7 @@ export default function SavedCategoriesView({
           <IconButton
             label="Remove"
             onClick={() => removeCategory(category.id)}
-            icon={<PinnedOff size={24} color="gray" strokeWidth={1} />}
+            icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
           />
         </div>
       ))}

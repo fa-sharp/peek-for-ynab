@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { IconButton } from "~components";
-import type { CachedBudget, SavedCategory } from "~lib/storageContext";
+import type { CachedBudget, SavedCategory } from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 /** View of all categories in a budget, grouped by category groups */
@@ -126,10 +126,13 @@ const CategoryView = ({
   <div
     key={categoryData.id}
     style={{
+      height: "1.6rem",
+      marginBlock: "2px",
+      paddingBlock: "1px",
+      borderBlockEnd: "solid 1px #ddd",
       display: "flex",
       justifyContent: "space-between",
-      alignItems: "center",
-      marginBlock: "2px"
+      alignItems: "center"
     }}>
     {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
     {!isSaved && (

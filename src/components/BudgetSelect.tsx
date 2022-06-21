@@ -1,4 +1,4 @@
-import type { CachedBudget } from "~lib/storageContext";
+import type { CachedBudget } from "~lib/context/storageContext";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({

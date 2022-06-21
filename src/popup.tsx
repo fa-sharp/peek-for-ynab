@@ -1,4 +1,4 @@
-import { ExternalLink, Logout } from "tabler-icons-react";
+import { ExternalLink, Logout, Settings } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
 import { CategoriesView } from "~components";
@@ -77,7 +77,11 @@ function PopupView() {
                 icon={<ExternalLink />}
               />
             )}
-            <IconButton label="Logout" onClick={logout} icon={<Logout />} />
+            <IconButton
+              label="Settings"
+              onClick={() => chrome?.runtime.openOptionsPage()}
+              icon={<Settings />}
+            />
           </div>
 
           {selectedBudgetData && savedCategoriesData && (
