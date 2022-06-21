@@ -62,6 +62,7 @@ const useAuthProvider = () => {
 
     chrome.identity.launchWebAuthFlow(
       {
+        interactive: true,
         url: `https://app.youneedabudget.com/oauth/authorize?client_id=${PLASMO_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
       },
       (responseUrl) => {
