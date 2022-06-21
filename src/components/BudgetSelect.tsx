@@ -12,7 +12,7 @@ export default function BudgetSelect({
 }) {
   return (
     <select
-      style={{ flex: 1 }}
+      style={{ flex: 1, width: "100%" }}
       value={selectedBudgetId || "initial"}
       onChange={(e) => setSelectedBudgetId(e.target.value)}>
       {!selectedBudgetId && <option value="initial">--Select a budget--</option>}

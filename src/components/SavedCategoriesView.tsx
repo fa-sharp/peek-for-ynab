@@ -23,9 +23,9 @@ export default function SavedCategoriesView({
         flexDirection: "column",
         gap: "2px"
       }}>
-      {savedCategoryData.map((category) => (
+      {savedCategoryData.map(({ id, budgeted, activity, balance, goal_target, name }) => (
         <div
-          key={category.id}
+          key={id}
           style={{
             height: "1.6rem",
             marginBlock: "2px",
@@ -35,12 +35,19 @@ export default function SavedCategoriesView({
             justifyContent: "space-between",
             alignItems: "center"
           }}>
-          <div>
-            {category.name}: {formatCurrency(category.balance, budgetData.currencyFormat)}
+          <div
+            title={
+              `Budgeted: ${formatCurrency(budgeted, budgetData.currencyFormat)}` +
+              `, Activity: ${formatCurrency(activity, budgetData.currencyFormat)}` +
+              (goal_target
+                ? `, Goal: ${formatCurrency(goal_target, budgetData.currencyFormat)}`
+                : "")
+            }>
+            {name}: {formatCurrency(balance, budgetData.currencyFormat)}
           </div>
           <IconButton
             label="Remove"
-            onClick={() => removeCategory(category.id)}
+            onClick={() => removeCategory(id)}
             icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
           />
         </div>

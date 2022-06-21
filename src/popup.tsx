@@ -1,4 +1,4 @@
-import { ExternalLink, Logout, Settings } from "tabler-icons-react";
+import { ExternalLink, Settings } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
 import { CategoriesView } from "~components";
@@ -18,7 +18,7 @@ function PopupComponent() {
 }
 
 function PopupView() {
-  const { logout, loggedIn, loginWithOAuth } = useAuthContext();
+  const { loggedIn, loginWithOAuth } = useAuthContext();
   const { categoryGroupsData, savedCategoriesData } = useYNABContext();
   const {
     cachedBudgets,
@@ -37,7 +37,8 @@ function PopupView() {
         flexDirection: "column",
         padding: 16,
         minWidth: "240px",
-        width: "max-content"
+        width: "max-content",
+        maxWidth: "330px"
       }}>
       {!loggedIn ? (
         <div>
