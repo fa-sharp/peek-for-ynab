@@ -2,8 +2,8 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
+import { IS_PRODUCTION } from "../utils";
 import { TokenData, useStorageContext } from "./storageContext";
-import { IS_PRODUCTION } from "./utils";
 
 const { PLASMO_PUBLIC_MAIN_URL, PLASMO_PUBLIC_YNAB_CLIENT_ID } = process.env;
 
@@ -104,5 +104,5 @@ const useAuthProvider = () => {
 const { BaseContext, Provider } = createProvider(useAuthProvider);
 
 /** Hook to authenticate the YNAB user */
-export const useAuth = () => useContext(BaseContext);
+export const useAuthContext = () => useContext(BaseContext);
 export const AuthProvider = Provider;

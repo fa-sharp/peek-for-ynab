@@ -67,6 +67,7 @@ const useStorageProvider = () => {
     const newCachedBudgets = [...cachedBudgets];
     newCachedBudgets[budgetIndex] = { ...budgetToToggle, show: !budgetToToggle.show };
     setCachedBudgets(newCachedBudgets);
+    if (budgetToToggle.id === selectedBudgetId) setSelectedBudgetId("");
   };
 
   const removeAllData = async () => {

@@ -2,12 +2,12 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { useAuth } from "./authContext";
+import { IS_PRODUCTION } from "../utils";
+import { useAuthContext } from "./authContext";
 import { CachedBudget, useStorageContext } from "./storageContext";
-import { IS_PRODUCTION } from "./utils";
 
 const useYNABProvider = () => {
-  const { tokenExpired } = useAuth();
+  const { tokenExpired } = useAuthContext();
   const {
     tokenData,
     selectedBudgetId,
@@ -109,5 +109,5 @@ const useYNABProvider = () => {
 const { BaseContext, Provider } = createProvider(useYNABProvider);
 
 /** Hook that provides user's budget data from YNAB */
-export const useYNAB = () => useContext(BaseContext);
+export const useYNABContext = () => useContext(BaseContext);
 export const YNABProvider = Provider;

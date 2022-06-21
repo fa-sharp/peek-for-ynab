@@ -4,24 +4,23 @@ import { ExternalLink, Logout } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
 import { CategoriesView } from "~components";
-import { AuthProvider, useAuth } from "~lib/authContext";
-import { StorageProvider, useStorageContext } from "~lib/storageContext";
-import { YNABProvider, useYNAB } from "~lib/ynabContext";
+import {
+  AppProvider,
+  useAuthContext,
+  useStorageContext,
+  useYNABContext
+} from "~lib/context";
 
 const PopupComponent = () => (
-  <StorageProvider>
-    <AuthProvider>
-      <YNABProvider>
-        <PopupView />
-      </YNABProvider>
-    </AuthProvider>
-  </StorageProvider>
+  <AppProvider>
+    <PopupView />
+  </AppProvider>
 );
 
 function PopupView() {
   const router = useRouter();
-  const { login, loginWithOAuth, logout, loggedIn, tokenExpired } = useAuth();
-  const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNAB();
+  const { login, loginWithOAuth, logout, loggedIn, tokenExpired } = useAuthContext();
+  const { categoryGroupsData, savedCategoriesData, refreshBudgets } = useYNABContext();
   const {
     cachedBudgets,
     selectedBudgetId,

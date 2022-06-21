@@ -8,8 +8,7 @@ const cors = Cors({
   origin: [`chrome-extension://${CHROME_EXTENSION_ID}`]
 });
 
-// Helper method to wait for a middleware to execute before continuing
-// And to throw an error when an error happens in a middleware
+/** Adds CORS headers to Next.js API routes */
 export default function initCorsMiddleware() {
   return (req: NextApiRequest, res: NextApiResponse) =>
     new Promise((resolve, reject) => {
