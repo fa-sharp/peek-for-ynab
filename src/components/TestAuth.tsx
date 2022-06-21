@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import { StorageProvider, useStorageContext } from "~lib/storageContext";
+import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
 
 function TestAuthWrapper() {
   return (
@@ -31,7 +31,7 @@ function TestAuth() {
     console.log("Fetching new OAuth token!", { code: router.query.code });
     setAuthAttempted(true);
     fetch(
-      `/api/auth/initial?code=${router.query.code}&redirectUri=${process.env.NEXT_PUBLIC_TEST_REDIRECT_URI}`
+      `/api/auth/initial?code=${router.query.code}&redirectUri=http://localhost:3000/testLogin`
     )
       .then((res) => {
         if (!res.ok) throw { message: "Error fetching token!", status: res.status };

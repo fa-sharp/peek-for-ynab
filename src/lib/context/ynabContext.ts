@@ -7,12 +7,12 @@ import { useAuthContext } from "./authContext";
 import { CachedBudget, useStorageContext } from "./storageContext";
 
 const useYNABProvider = () => {
-  const { tokenExpired } = useAuthContext();
+  const { tokenExpired, loggedIn } = useAuthContext();
   const {
     tokenData,
     selectedBudgetId,
     savedCategories,
-    cachedBudgets: currentCachedBudgets,
+    cachedBudgets,
     setCachedBudgets
   } = useStorageContext();
 
@@ -35,16 +35,21 @@ const useYNABProvider = () => {
           id: budgetSummary.id,
           name: budgetSummary.name,
           currencyFormat: budgetSummary.currency_format || undefined,
-          show: !currentCachedBudgets
+          show: !cachedBudgets
             ? index < 5 // if there's no cache (e.g. initial login), show first 5 budgets
-            : currentCachedBudgets.find((b) => b.id === budgetSummary.id)?.show || false // Retain show/hide settings. New budgets are hidden by default
+            : cachedBudgets.find((b) => b.id === budgetSummary.id)?.show || false // Retain show/hide settings. New budgets are hidden by default
         })
       );
       setCachedBudgets(newCachedBudgets);
     } catch (err) {
       console.error("Error fetching budgets", err);
     }
-  }, [currentCachedBudgets, setCachedBudgets, ynabAPI]);
+  }, [cachedBudgets, setCachedBudgets, ynabAPI]);
+
+  /** Automatically fetch budgets from API if there is no cached budget data */
+  useEffect(() => {
+    if (loggedIn && !tokenExpired && !cachedBudgets) refreshBudgets();
+  }, [loggedIn, cachedBudgets, tokenExpired, refreshBudgets]);
 
   const [categoryGroupsData, setCategoryGroupsData] = useState<
     null | ynab.CategoryGroupWithCategories[]

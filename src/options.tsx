@@ -21,6 +21,7 @@ function OptionsView() {
 
   return (
     <section
+      aria-label="Settings"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -28,34 +29,35 @@ function OptionsView() {
         minWidth: "240px",
         width: "max-content"
       }}>
-      <h2>Peek for YNAB</h2>
-      {loggedIn ? (
-        <button onClick={() => logout()}>Logout and clear all data</button>
+      {!loggedIn ? (
+        <button onClick={() => loginWithOAuth()}>Login with YNAB</button>
       ) : (
-        <button onClick={() => loginWithOAuth()}>Login</button>
+        <>
+          <button onClick={() => logout()}>Logout and clear all data</button>
+          <h3
+            style={{
+              display: "flex",
+              alignItems: "center"
+            }}>
+            Budgets
+            <IconButton
+              label="Refresh budgets"
+              onClick={() => refreshBudgets()}
+              icon={<Refresh />}
+            />
+          </h3>
+          {cachedBudgets?.map((budget) => (
+            <div key={budget.id}>
+              {budget.name}{" "}
+              <input
+                type="checkbox"
+                checked={budget.show}
+                onChange={() => toggleShowBudget(budget.id)}
+              />
+            </div>
+          ))}
+        </>
       )}
-      <h3
-        style={{
-          display: "flex",
-          alignItems: "center"
-        }}>
-        Budgets
-        <IconButton
-          label="Refresh budgets"
-          onClick={() => refreshBudgets()}
-          icon={<Refresh />}
-        />
-      </h3>
-      {cachedBudgets?.map((budget) => (
-        <div key={budget.id}>
-          {budget.name}{" "}
-          <input
-            type="checkbox"
-            checked={budget.show}
-            onChange={() => toggleShowBudget(budget.id)}
-          />
-        </div>
-      ))}
     </section>
   );
 }

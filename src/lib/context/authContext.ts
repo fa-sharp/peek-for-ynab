@@ -5,7 +5,11 @@ import * as ynab from "ynab";
 import { IS_PRODUCTION } from "../utils";
 import { TokenData, useStorageContext } from "./storageContext";
 
-const { PLASMO_PUBLIC_MAIN_URL, PLASMO_PUBLIC_YNAB_CLIENT_ID } = process.env;
+const {
+  PLASMO_PUBLIC_MAIN_URL,
+  PLASMO_PUBLIC_YNAB_CLIENT_ID,
+  NEXT_PUBLIC_YNAB_CLIENT_ID
+} = process.env;
 
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();
@@ -55,10 +59,15 @@ const useAuthProvider = () => {
 
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = () => {
-    if (!chrome || !chrome.identity) return;
+    // if no chrome API available, assume we're testing/developing in a regular web browser context
+    if (!chrome || !chrome.identity) {
+      window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
+      return;
+    }
 
+    // initiate OAuth flow through chrome API
     const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
-    const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/initial`;
+    const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL}/api/auth/initial`;
 
     chrome.identity.launchWebAuthFlow(
       {
