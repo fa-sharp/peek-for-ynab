@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Refresh } from "tabler-icons-react";
 
 import { IconButton } from "~components";
@@ -19,6 +20,8 @@ function OptionsView() {
   const { refreshBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
+  const [loggingIn, setLoggingIn] = useState(false);
+
   return (
     <section
       aria-label="Settings"
@@ -30,7 +33,15 @@ function OptionsView() {
         width: "max-content"
       }}>
       {!loggedIn ? (
-        <button onClick={() => loginWithOAuth()}>Login with YNAB</button>
+        <button
+          disabled={loggingIn}
+          onClick={async () => {
+            setLoggingIn(true);
+            await loginWithOAuth();
+            setLoggingIn(false);
+          }}>
+          Login with YNAB
+        </button>
       ) : (
         <>
           <button onClick={() => logout()}>Logout and clear all data</button>

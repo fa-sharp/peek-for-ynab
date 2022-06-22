@@ -58,52 +58,55 @@ const useAuthProvider = () => {
   };
 
   /** Authenticate the YNAB user through OAuth */
-  const loginWithOAuth = () => {
-    // if no chrome API available, assume we're testing/developing in a regular web browser context
-    if (!chrome || !chrome.identity) {
-      window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
-      return;
-    }
-
-    // initiate OAuth flow through chrome API
-    const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
-    const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL}/api/auth/initial`;
-
-    chrome.identity.launchWebAuthFlow(
-      {
-        interactive: true,
-        url: `https://app.youneedabudget.com/oauth/authorize?client_id=${PLASMO_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
-      },
-      (responseUrl) => {
-        try {
-          if (!responseUrl) throw "No response URL!";
-          const oAuthCode = new URL(responseUrl).searchParams.get("code");
-          if (!oAuthCode) throw "No OAuth code found!";
-
-          fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`)
-            .then((res) => {
-              if (!res.ok)
-                throw { message: "Error getting initial token!", status: res.status };
-              return res.json();
-            })
-            .then((newTokenData) => {
-              if (!IS_PRODUCTION) console.log("Got a new token!");
-              setTokenData(newTokenData);
-            })
-            .catch((err) => {
-              console.error("OAuth login failed: ", err);
-              setTokenData(null);
-            });
-        } catch (err) {
-          console.error("OAuth login failed: ", err);
-        }
+  const loginWithOAuth = () =>
+    new Promise<void>((resolve) => {
+      // if no chrome API available, assume we're testing/developing in a regular web browser context
+      if (!chrome || !chrome.identity) {
+        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
+        resolve();
       }
-    );
-  };
+
+      // initiate OAuth flow through chrome API
+      const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
+      const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL}/api/auth/initial`;
+
+      chrome.identity.launchWebAuthFlow(
+        {
+          interactive: true,
+          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${PLASMO_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
+        },
+        (responseUrl) => {
+          try {
+            if (!responseUrl) throw "No response URL!";
+            const oAuthCode = new URL(responseUrl).searchParams.get("code");
+            if (!oAuthCode) throw "No OAuth code found!";
+
+            fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`)
+              .then((res) => {
+                if (!res.ok)
+                  throw { message: "Error getting initial token!", status: res.status };
+                return res.json();
+              })
+              .then((newTokenData) => {
+                if (!IS_PRODUCTION) console.log("Got a new token!");
+                setTokenData(newTokenData);
+              })
+              .catch((err) => {
+                console.error("OAuth login failed: ", err);
+                setTokenData(null);
+              })
+              .finally(resolve);
+          } catch (err) {
+            console.error("OAuth login failed: ", err);
+            resolve();
+          }
+        }
+      );
+    });
 
   /** Clears all data, including the user's token */
   const logout = async () => {
-    await setTokenData(null);
+    setTokenData(null);
     removeAllData();
   };
 
@@ -112,6 +115,6 @@ const useAuthProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);
 
-/** Hook to authenticate the YNAB user */
+/** Hook to authenticate the YNAB user. Manages the access and refresh tokens. */
 export const useAuthContext = () => useContext(BaseContext);
 export const AuthProvider = Provider;
