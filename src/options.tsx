@@ -16,7 +16,8 @@ const OptionsComponent = () => (
 );
 
 function OptionsView() {
-  const { cachedBudgets, toggleShowBudget } = useStorageContext();
+  const { settings, changeSetting, cachedBudgets, toggleShowBudget } =
+    useStorageContext();
   const { refreshBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
@@ -45,6 +46,14 @@ function OptionsView() {
       ) : (
         <>
           <button onClick={() => logout()}>Logout and clear all data</button>
+          <label>
+            Show accounts{" "}
+            <input
+              type="checkbox"
+              checked={settings.showAccounts}
+              onChange={(e) => changeSetting("showAccounts", e.target.checked)}
+            />
+          </label>
           <h3
             style={{
               display: "flex",

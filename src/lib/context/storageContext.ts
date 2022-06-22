@@ -9,6 +9,11 @@ export interface TokenData {
   expires: number;
 }
 
+export interface AppSettings {
+  /** Whether to fetch and show accounts from each budget */
+  showAccounts: boolean;
+}
+
 /** Cached budget data, stored in the browser */
 export interface CachedBudget {
   id: string;
@@ -31,6 +36,10 @@ const useStorageProvider = () => {
       defaultValue: null
     });
 
+  const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
+    defaultValue: { showAccounts: false }
+  });
+
   /** Cached API data: List of all user's budgets */
   const [cachedBudgets, setCachedBudgets, { removeItem: removeCachedBudgets }] =
     useLocalStorage<null | CachedBudget[]>("cachedBudgets", { defaultValue: null });
@@ -48,12 +57,23 @@ const useStorageProvider = () => {
     () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
     [cachedBudgets, selectedBudgetId]
   );
+
+  const changeSetting = <K extends keyof AppSettings>(
+    key: K,
+    newValue: AppSettings[K]
+  ) => {
+    setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
+  };
+
+  /** Save/pin a category */
   const saveCategory = (categoryToSave: SavedCategory) => {
     const foundDuplicate = savedCategories.find(
       (savedCategory) => savedCategory.categoryId === categoryToSave.categoryId
     );
     if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
   };
+
+  /** Remove/unpin a category  */
   const removeCategory = (categoryIdToRemove: string) => {
     setSavedCategories(
       savedCategories.filter(
@@ -61,6 +81,7 @@ const useStorageProvider = () => {
       )
     );
   };
+
   /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!cachedBudgets) return;
@@ -85,6 +106,8 @@ const useStorageProvider = () => {
   return {
     tokenData,
     setTokenData,
+    settings,
+    changeSetting,
     cachedBudgets,
     setCachedBudgets,
     selectedBudgetId,

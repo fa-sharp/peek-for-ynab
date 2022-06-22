@@ -10,6 +10,7 @@ const useYNABProvider = () => {
   const { tokenExpired, loggedIn } = useAuthContext();
   const {
     tokenData,
+    settings,
     selectedBudgetId,
     savedCategories,
     cachedBudgets,
@@ -29,7 +30,7 @@ const useYNABProvider = () => {
     if (!ynabAPI) return;
     try {
       const budgetsData = await ynabAPI.budgets.getBudgets();
-      if (!IS_PRODUCTION) console.log("Fetched budgets successfully", budgetsData);
+      if (!IS_PRODUCTION) console.log("Fetched budgets!", budgetsData);
       const newCachedBudgets: CachedBudget[] = budgetsData.data.budgets.map(
         (budgetSummary, index) => ({
           id: budgetSummary.id,
@@ -63,7 +64,7 @@ const useYNABProvider = () => {
     ynabAPI.categories
       .getCategories(selectedBudgetId)
       .then((categories) => {
-        if (!IS_PRODUCTION) console.log("Fetched categories successfully", categories);
+        if (!IS_PRODUCTION) console.log("Fetched categories!", categories);
         setCategoryGroupsData(categories.data.category_groups);
 
         // Create a flattened category array
@@ -84,8 +85,9 @@ const useYNABProvider = () => {
     };
   }, [selectedBudgetId, ynabAPI]);
 
+  /** Get data of saved categories in the currently selected budget */
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData || !savedCategories) return null; // If there's no data, return empty array
+    if (!categoriesData || !savedCategories) return null; // If there's no data, return `null`
 
     // For each saved category in the current budget, grab the category data and add to array
     return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {
@@ -99,11 +101,31 @@ const useYNABProvider = () => {
     }, []);
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
+  const [accountsData, setAccountsData] = useState<null | ynab.Account[]>(null);
+
+  /** Fetch accounts for the selected budget (if user has enabled it in settings).
+   * Re-runs if the user selects another budget */
+  useEffect(() => {
+    if (!settings.showAccounts || !selectedBudgetId || !ynabAPI) return;
+
+    ynabAPI.accounts
+      .getAccounts(selectedBudgetId)
+      .then((accountsResponse) => {
+        if (!IS_PRODUCTION) console.log("Fetched accounts!", accountsResponse);
+        setAccountsData(accountsResponse.data.accounts.filter((a) => a.closed === false)); // only get open accounts
+      })
+      .catch((err) => console.error("Error fetching accounts", err));
+
+    return () => setAccountsData(null); // cleanup
+  }, [settings.showAccounts, selectedBudgetId, ynabAPI]);
+
   return {
-    /** API data: List of user's category groups, with categories contained in each one */
+    /** API data: List of all category groups in current budget, with categories contained in each one */
     categoryGroupsData,
-    /** API data: Flattened list of all of user's categories (without category groups) */
+    /** API data: Flattened list of all categories (without category groups) in current budget */
     categoriesData,
+    /** API data: List of all open accounts in current budget */
+    accountsData,
     /** API data: List of saved categories in the currently selected budget */
     savedCategoriesData,
     /** Fetch user's budgets from API and store/refresh the cache */
