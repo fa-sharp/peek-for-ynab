@@ -25,7 +25,6 @@ function OptionsView() {
 
   return (
     <section
-      aria-label="Settings"
       style={{
         display: "flex",
         flexDirection: "column",
@@ -46,6 +45,14 @@ function OptionsView() {
       ) : (
         <>
           <button onClick={() => logout()}>Logout and clear all data</button>
+          <button
+            style={{ marginTop: 4 }}
+            onClick={() => window.open(process.env.PLASMO_PUBLIC_DONATE_URL, "_blank")}>
+            ☕ Buy me coffee and support my work!
+          </button>
+          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
+            Settings
+          </h3>
           <label>
             Show accounts{" "}
             <input
@@ -54,11 +61,7 @@ function OptionsView() {
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />
           </label>
-          <h3
-            style={{
-              display: "flex",
-              alignItems: "center"
-            }}>
+          <h3 className="heading-big" style={{ marginTop: 8 }}>
             Budgets
             <IconButton
               label="Refresh budgets"

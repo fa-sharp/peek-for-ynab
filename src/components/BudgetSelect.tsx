@@ -2,11 +2,11 @@ import type { CachedBudget } from "~lib/context/storageContext";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({
-  budgets,
+  shownBudgets: budgets,
   selectedBudgetId,
   setSelectedBudgetId
 }: {
-  budgets: CachedBudget[];
+  shownBudgets: CachedBudget[];
   selectedBudgetId: string;
   setSelectedBudgetId: (budgetId: string) => void;
 }) {
@@ -17,13 +17,11 @@ export default function BudgetSelect({
       value={selectedBudgetId || "initial"}
       onChange={(e) => setSelectedBudgetId(e.target.value)}>
       {!selectedBudgetId && <option value="initial">--Select a budget--</option>}
-      {budgets.map((budget) =>
-        budget.show ? (
-          <option key={budget.id} value={budget.id}>
-            {budget.name}
-          </option>
-        ) : null
-      )}
+      {budgets.map((budget) => (
+        <option key={budget.id} value={budget.id}>
+          {budget.name}
+        </option>
+      ))}
     </select>
   );
 }

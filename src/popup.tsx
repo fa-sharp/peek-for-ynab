@@ -1,10 +1,11 @@
-import { ExternalLink, Settings } from "tabler-icons-react";
-
-import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
-import { CategoriesView } from "~components";
-import AccountsView from "~components/AccountsView";
-import SavedAccountsView from "~components/SavedAccountsView";
-import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
+import {
+  AccountsView,
+  CategoriesView,
+  PopupNav,
+  SavedAccountsView,
+  SavedCategoriesView
+} from "~components";
+import { AppProvider, useAuthContext } from "~lib/context";
 
 function PopupComponent() {
   return (
@@ -16,7 +17,6 @@ function PopupComponent() {
 
 function PopupView() {
   const { loggedIn, loginWithOAuth } = useAuthContext();
-  const { cachedBudgets, selectedBudgetId, setSelectedBudgetId } = useStorageContext();
 
   return (
     <div
@@ -41,37 +41,7 @@ function PopupView() {
         </div>
       ) : (
         <>
-          <nav
-            style={{
-              marginBottom: 8,
-              display: "flex",
-              justifyContent: "space-between"
-            }}>
-            {cachedBudgets && (
-              <BudgetSelect
-                budgets={cachedBudgets}
-                selectedBudgetId={selectedBudgetId}
-                setSelectedBudgetId={setSelectedBudgetId}
-              />
-            )}
-            {selectedBudgetId && (
-              <IconButton
-                label="Open budget in YNAB"
-                onClick={() =>
-                  window.open(
-                    `https://app.youneedabudget.com/${selectedBudgetId}/budget`,
-                    "_blank"
-                  )
-                }
-                icon={<ExternalLink />}
-              />
-            )}
-            <IconButton
-              label="Settings"
-              onClick={() => chrome?.runtime.openOptionsPage()}
-              icon={<Settings />}
-            />
-          </nav>
+          <PopupNav />
 
           <SavedCategoriesView />
           <SavedAccountsView />

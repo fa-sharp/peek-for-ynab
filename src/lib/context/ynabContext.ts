@@ -48,7 +48,7 @@ const useYNABProvider = () => {
     }
   }, [cachedBudgets, setCachedBudgets, ynabAPI]);
 
-  /** Automatically fetch budgets from API if there is no cached budget data */
+  /** Automatically fetch budgets from API if logged in and there is no cached budget data */
   useEffect(() => {
     if (loggedIn && !tokenExpired && !cachedBudgets) refreshBudgets();
   }, [loggedIn, cachedBudgets, tokenExpired, refreshBudgets]);
