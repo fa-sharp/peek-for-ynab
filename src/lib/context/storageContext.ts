@@ -1,8 +1,7 @@
 import { createProvider } from "puro";
 import { useContext, useMemo } from "react";
+import useLocalStorage from "use-local-storage-state";
 import type { CurrencyFormat } from "ynab";
-
-import { useStorage } from "@plasmohq/storage";
 
 export interface TokenData {
   accessToken: string;
@@ -26,21 +25,25 @@ export interface SavedCategory {
 }
 
 const useStorageProvider = () => {
-  const [tokenData, setTokenData, { remove: removeToken }] = useStorage<TokenData | null>(
-    { key: "tokenData", area: "local" },
-    null
-  );
+  /** The token used to authenticate the YNAB user */
+  const [tokenData, setTokenData, { removeItem: removeToken }] =
+    useLocalStorage<TokenData | null>("tokenData", {
+      defaultValue: null
+    });
 
-  const [cachedBudgets, setCachedBudgets, { remove: removeCachedBudgets }] = useStorage<
-    null | CachedBudget[]
-  >({ key: "cachedBudgets", area: "local" }, null);
+  /** Cached API data: List of all user's budgets */
+  const [cachedBudgets, setCachedBudgets, { removeItem: removeCachedBudgets }] =
+    useLocalStorage<null | CachedBudget[]>("cachedBudgets", { defaultValue: null });
 
-  const [selectedBudgetId, setSelectedBudgetId, { remove: removeSelectedBudget }] =
-    useStorage({ key: "selectedBudgetId", area: "local" }, "");
+  /** The budget currently in view */
+  const [selectedBudgetId, setSelectedBudgetId, { removeItem: removeSelectedBudget }] =
+    useLocalStorage("selectedBudgetId", { defaultValue: "" });
 
-  const [savedCategories, setSavedCategories, { remove: removeSavedCategories }] =
-    useStorage<SavedCategory[]>({ key: "savedCategories", area: "local" }, []);
+  /** The categories saved by the user */
+  const [savedCategories, setSavedCategories, { removeItem: removeSavedCategories }] =
+    useLocalStorage<SavedCategory[]>("savedCategories", { defaultValue: [] });
 
+  /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
   const selectedBudgetData = useMemo(
     () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
     [cachedBudgets, selectedBudgetId]
@@ -58,6 +61,7 @@ const useStorageProvider = () => {
       )
     );
   };
+  /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!cachedBudgets) return;
     const budgetIndex = cachedBudgets.findIndex((budget) => budget.id === budgetId);
@@ -70,41 +74,26 @@ const useStorageProvider = () => {
     if (budgetToToggle.id === selectedBudgetId) setSelectedBudgetId("");
   };
 
-  const removeAllData = async () => {
-    await setTokenData(null);
+  /** Clears all values, removes all saved data from browser storage */
+  const removeAllData = () => {
     removeToken();
-
-    await setSelectedBudgetId("");
     removeSelectedBudget();
-
-    await setSavedCategories([]);
     removeSavedCategories();
-
-    await setCachedBudgets(null);
     removeCachedBudgets();
   };
 
   return {
-    /** The token used to authenticate the YNAB user */
     tokenData,
     setTokenData,
-    /** Cached API data: List of all user's budgets */
     cachedBudgets,
     setCachedBudgets,
-    /** The ID of the budget currently in view */
     selectedBudgetId,
     setSelectedBudgetId,
-    /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
     selectedBudgetData,
-    /** Toggle whether a budget is shown or not. */
     toggleShowBudget,
-    /** The categories saved by the user */
     savedCategories,
-    /** Save/pin a category */
     saveCategory,
-    /** Remove/unsave a category  */
     removeCategory,
-    /** Clears all values, removes all saved data from browser storage */
     removeAllData
   };
 };

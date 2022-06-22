@@ -26,6 +26,7 @@ specifiers:
   tabler-icons-react: ^1.49.0
   typescript: 4.7.3
   url: ^0.11.0
+  use-local-storage-state: ^18.1.0
   ynab: ^1.28.0
 
 dependencies:
@@ -37,6 +38,7 @@ dependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   tabler-icons-react: 1.49.0_react@18.2.0
+  use-local-storage-state: 18.1.0_biqbaboplfbrettd7655fr4n2y
   ynab: 1.28.0
 
 devDependencies:
@@ -4714,6 +4716,17 @@ packages:
       punycode: 1.3.2
       querystring: 0.2.0
     dev: true
+
+  /use-local-storage-state/18.1.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-UY86uFHeQyh0oVMjKdco+lzDWok+rx2Fz4uBXVvLM1kfjd71tDmiOPtZY48SsAP3UAGndjUAS9tslQCxSQ4L7Q==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /utf8/2.1.2:
     resolution: {integrity: sha512-QXo+O/QkLP/x1nyi54uQiG0XrODxdysuQvE5dtVqv7F5K2Qb6FsN+qbr6KhF5wQ20tfcV3VQp0/2x1e1MRSPWg==}
