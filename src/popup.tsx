@@ -2,6 +2,7 @@ import { ExternalLink, Settings } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
 import { CategoriesView } from "~components";
+import AccountsView from "~components/AccountsView";
 import {
   AppProvider,
   useAuthContext,
@@ -19,7 +20,7 @@ function PopupComponent() {
 
 function PopupView() {
   const { loggedIn, loginWithOAuth } = useAuthContext();
-  const { categoryGroupsData, savedCategoriesData } = useYNABContext();
+  const { categoryGroupsData, accountsData, savedCategoriesData } = useYNABContext();
   const {
     cachedBudgets,
     selectedBudgetId,
@@ -99,6 +100,13 @@ function PopupView() {
               savedCategories={savedCategories}
               selectedBudgetData={selectedBudgetData}
               saveCategory={saveCategory}
+            />
+          )}
+
+          {selectedBudgetData && accountsData && (
+            <AccountsView
+              accountsData={accountsData}
+              selectedBudgetData={selectedBudgetData}
             />
           )}
         </>

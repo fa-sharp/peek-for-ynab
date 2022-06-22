@@ -6,6 +6,8 @@ import { IconButton } from "~components";
 import type { CachedBudget, SavedCategory } from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
+import "./style.css";
+
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView({
   categoryGroupsData,
@@ -22,15 +24,8 @@ function CategoriesView({
 
   return (
     <>
-      <h3
-        style={{
-          marginTop: 8,
-          marginBottom: 4,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}>
-        Categories
+      <div className="heading-big">
+        <div role="heading">Categories</div>
         <IconButton
           label={categoriesExpanded ? "Collapse" : "Expand"}
           onClick={() => setCategoriesExpanded(!categoriesExpanded)}
@@ -42,7 +37,7 @@ function CategoriesView({
             )
           }
         />
-      </h3>
+      </div>
       {categoriesExpanded &&
         categoryGroupsData.map((categoryGroup) => (
           <CategoryGroupView
@@ -78,14 +73,8 @@ export function CategoryGroupView({
 
   return (
     <>
-      <h4
-        style={{
-          marginBlock: 4,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center"
-        }}>
-        {categoryGroup.name}
+      <div className="heading-medium">
+        <div role="heading">{categoryGroup.name}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -97,7 +86,7 @@ export function CategoryGroupView({
             )
           }
         />
-      </h4>
+      </div>
       {expanded &&
         categoryGroup.categories.map((category) => (
           <CategoryView
@@ -123,17 +112,7 @@ const CategoryView = ({
   isSaved: boolean;
   onSaveCategory: (categoryId: string) => void;
 }) => (
-  <div
-    key={categoryData.id}
-    style={{
-      height: "1.6rem",
-      marginBlock: "2px",
-      paddingBlock: "1px",
-      borderBlockEnd: "solid 1px #ddd",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center"
-    }}>
+  <div className="balance-display">
     {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
     {!isSaved && (
       <IconButton

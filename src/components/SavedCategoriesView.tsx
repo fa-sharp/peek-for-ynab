@@ -24,17 +24,7 @@ export default function SavedCategoriesView({
         gap: "2px"
       }}>
       {savedCategoryData.map(({ id, budgeted, activity, balance, goal_target, name }) => (
-        <div
-          key={id}
-          style={{
-            height: "1.6rem",
-            marginBlock: "2px",
-            paddingBlock: "1px",
-            borderBlockEnd: "solid 1px #ddd",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}>
+        <div key={id} className="balance-display">
           <div
             title={
               `Budgeted: ${formatCurrency(budgeted, budgetData.currencyFormat)}` +

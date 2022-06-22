@@ -1,0 +1,32 @@
+.heading-big {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 8;
+  margin-bottom: 4;
+
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+.heading-medium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-block: 2px;
+
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.balance-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 1.6rem;
+  margin-block: 2px;
+  border-block-end: solid 1px #ddd;
+}
