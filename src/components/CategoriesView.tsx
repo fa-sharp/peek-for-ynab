@@ -3,24 +3,24 @@ import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { IconButton } from "~components";
-import type { CachedBudget, SavedCategory } from "~lib/context/storageContext";
+import { useYNABContext } from "~lib/context";
+import {
+  CachedBudget,
+  SavedCategory,
+  useStorageContext
+} from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
 import "./style.css";
 
 /** View of all categories in a budget, grouped by category groups */
-function CategoriesView({
-  categoryGroupsData,
-  selectedBudgetData,
-  savedCategories,
-  saveCategory
-}: {
-  savedCategories: SavedCategory[];
-  categoryGroupsData: CategoryGroupWithCategories[];
-  selectedBudgetData: CachedBudget;
-  saveCategory: (category: SavedCategory) => void;
-}) {
+function CategoriesView() {
+  const { selectedBudgetData, savedCategories, saveCategory } = useStorageContext();
+  const { categoryGroupsData } = useYNABContext();
+
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+
+  if (!selectedBudgetData || !categoryGroupsData) return null;
 
   return (
     <>
@@ -116,7 +116,7 @@ const CategoryView = ({
     {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
     {!isSaved && (
       <IconButton
-        label="Add"
+        label="Pin"
         onClick={() => onSaveCategory(categoryData.id)}
         icon={<Pinned size={20} color="gray" strokeWidth={1} />}
       />

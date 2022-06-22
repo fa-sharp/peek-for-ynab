@@ -23,10 +23,16 @@ export interface CachedBudget {
   show: boolean;
 }
 
-/** A category saved by the user, stored in the browser */
+/** A category saved by the user */
 export interface SavedCategory {
-  budgetId: string;
   categoryId: string;
+  budgetId: string;
+}
+
+/** An account saved by the user */
+export interface SavedAccount {
+  accountId: string;
+  budgetId: string;
 }
 
 const useStorageProvider = () => {
@@ -52,6 +58,10 @@ const useStorageProvider = () => {
   const [savedCategories, setSavedCategories, { removeItem: removeSavedCategories }] =
     useLocalStorage<SavedCategory[]>("savedCategories", { defaultValue: [] });
 
+  /** The categories saved by the user */
+  const [savedAccounts, setSavedAccounts, { removeItem: removeSavedAccounts }] =
+    useLocalStorage<SavedAccount[]>("savedAccounts", { defaultValue: [] });
+
   /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
   const selectedBudgetData = useMemo(
     () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
@@ -65,21 +75,27 @@ const useStorageProvider = () => {
     setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
   };
 
-  /** Save/pin a category */
   const saveCategory = (categoryToSave: SavedCategory) => {
     const foundDuplicate = savedCategories.find(
-      (savedCategory) => savedCategory.categoryId === categoryToSave.categoryId
+      (c) => c.categoryId === categoryToSave.categoryId
     );
     if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
   };
-
-  /** Remove/unpin a category  */
   const removeCategory = (categoryIdToRemove: string) => {
     setSavedCategories(
       savedCategories.filter(
         (savedCategory) => savedCategory.categoryId !== categoryIdToRemove
       )
     );
+  };
+  const saveAccount = (accountToSave: SavedAccount) => {
+    const foundDuplicate = savedAccounts.find(
+      (a) => a.accountId === accountToSave.accountId
+    );
+    if (!foundDuplicate) setSavedAccounts([...savedAccounts, accountToSave]);
+  };
+  const removeAccount = (accountIdToRemove: string) => {
+    setSavedAccounts(savedAccounts.filter((a) => a.accountId !== accountIdToRemove));
   };
 
   /** Toggle whether a budget is shown or not. */
@@ -100,6 +116,7 @@ const useStorageProvider = () => {
     removeToken();
     removeSelectedBudget();
     removeSavedCategories();
+    removeSavedAccounts();
     removeCachedBudgets();
   };
 
@@ -117,6 +134,9 @@ const useStorageProvider = () => {
     savedCategories,
     saveCategory,
     removeCategory,
+    savedAccounts,
+    saveAccount,
+    removeAccount,
     removeAllData
   };
 };

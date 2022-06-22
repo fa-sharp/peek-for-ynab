@@ -12,6 +12,7 @@ const useYNABProvider = () => {
     tokenData,
     settings,
     selectedBudgetId,
+    savedAccounts,
     savedCategories,
     cachedBudgets,
     setCachedBudgets
@@ -87,7 +88,7 @@ const useYNABProvider = () => {
 
   /** Get data of saved categories in the currently selected budget */
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData || !savedCategories) return null; // If there's no data, return `null`
+    if (!categoriesData) return null; // If there's no data, return `null`
 
     // For each saved category in the current budget, grab the category data and add to array
     return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {
@@ -119,6 +120,19 @@ const useYNABProvider = () => {
     return () => setAccountsData(null); // cleanup
   }, [settings.showAccounts, selectedBudgetId, ynabAPI]);
 
+  /** Get data of saved accounts in the currently selected budget */
+  const savedAccountsData = useMemo(() => {
+    if (!accountsData) return null;
+    // For each saved account in the current budget, grab the account data and add to array
+    return savedAccounts.reduce<ynab.Account[]>((newArray, savedAccount) => {
+      if (savedAccount.budgetId === selectedBudgetId) {
+        const categoryData = accountsData.find((a) => a.id === savedAccount.accountId);
+        if (categoryData) newArray.push(categoryData);
+      }
+      return newArray;
+    }, []);
+  }, [accountsData, savedAccounts, selectedBudgetId]);
+
   return {
     /** API data: List of all category groups in current budget, with categories contained in each one */
     categoryGroupsData,
@@ -126,6 +140,8 @@ const useYNABProvider = () => {
     categoriesData,
     /** API data: List of all open accounts in current budget */
     accountsData,
+    /** API data: List of saved accounts in the currently selected budget */
+    savedAccountsData,
     /** API data: List of saved categories in the currently selected budget */
     savedCategoriesData,
     /** Fetch user's budgets from API and store/refresh the cache */

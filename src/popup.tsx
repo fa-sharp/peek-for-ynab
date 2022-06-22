@@ -3,12 +3,8 @@ import { ExternalLink, Settings } from "tabler-icons-react";
 import { BudgetSelect, IconButton, SavedCategoriesView } from "~components";
 import { CategoriesView } from "~components";
 import AccountsView from "~components/AccountsView";
-import {
-  AppProvider,
-  useAuthContext,
-  useStorageContext,
-  useYNABContext
-} from "~lib/context";
+import SavedAccountsView from "~components/SavedAccountsView";
+import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 
 function PopupComponent() {
   return (
@@ -20,16 +16,7 @@ function PopupComponent() {
 
 function PopupView() {
   const { loggedIn, loginWithOAuth } = useAuthContext();
-  const { categoryGroupsData, accountsData, savedCategoriesData } = useYNABContext();
-  const {
-    cachedBudgets,
-    selectedBudgetId,
-    setSelectedBudgetId,
-    selectedBudgetData,
-    savedCategories,
-    saveCategory,
-    removeCategory
-  } = useStorageContext();
+  const { cachedBudgets, selectedBudgetId, setSelectedBudgetId } = useStorageContext();
 
   return (
     <div
@@ -54,7 +41,7 @@ function PopupView() {
         </div>
       ) : (
         <>
-          <div
+          <nav
             style={{
               marginBottom: 8,
               display: "flex",
@@ -84,31 +71,13 @@ function PopupView() {
               onClick={() => chrome?.runtime.openOptionsPage()}
               icon={<Settings />}
             />
-          </div>
+          </nav>
 
-          {selectedBudgetData && savedCategoriesData && (
-            <SavedCategoriesView
-              savedCategoryData={savedCategoriesData}
-              budgetData={selectedBudgetData}
-              removeCategory={removeCategory}
-            />
-          )}
+          <SavedCategoriesView />
+          <SavedAccountsView />
 
-          {selectedBudgetData && categoryGroupsData && (
-            <CategoriesView
-              categoryGroupsData={categoryGroupsData}
-              savedCategories={savedCategories}
-              selectedBudgetData={selectedBudgetData}
-              saveCategory={saveCategory}
-            />
-          )}
-
-          {selectedBudgetData && accountsData && (
-            <AccountsView
-              accountsData={accountsData}
-              selectedBudgetData={selectedBudgetData}
-            />
-          )}
+          <CategoriesView />
+          <AccountsView />
         </>
       )}
     </div>

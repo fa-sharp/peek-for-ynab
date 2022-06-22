@@ -2,15 +2,13 @@ import type { NextApiHandler } from "next";
 import { URL } from "url";
 
 import type { TokenData } from "~lib/context/storageContext";
-import initCorsMiddleware from "~lib/nextCorsMiddleware";
+import { corsMiddleware } from "~lib/nextCorsMiddleware";
 
 export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
 const { NEXT_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
-const cors = initCorsMiddleware();
-
 const handler: NextApiHandler = async (req, res) => {
-  await cors(req, res);
+  await corsMiddleware(req, res);
 
   if (!YNAB_CLIENT_ID || !YNAB_SECRET)
     return res.status(500).json({ message: "Server error!" });

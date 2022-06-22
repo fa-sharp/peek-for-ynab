@@ -1,6 +1,6 @@
 import type { MouseEventHandler, ReactElement } from "react";
 
-/** An icon that functions as a button. Uses native <button> element with aria-label to ensure accessibility */
+/** An icon that functions as a button. Uses HTML <button> element with `aria-label` for accessibility */
 export default function IconButton({
   icon,
   onClick,

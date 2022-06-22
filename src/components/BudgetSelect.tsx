@@ -12,6 +12,7 @@ export default function BudgetSelect({
 }) {
   return (
     <select
+      aria-label="Budget selection"
       style={{ flex: 1, width: "100%" }}
       value={selectedBudgetId || "initial"}
       onChange={(e) => setSelectedBudgetId(e.target.value)}>
