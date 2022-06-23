@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Refresh } from "tabler-icons-react";
 
-import { IconButton } from "~components";
 import {
   AppProvider,
   useAuthContext,
@@ -31,31 +30,32 @@ export function OptionsView() {
         display: "flex",
         flexDirection: "column",
         padding: 16,
-        minWidth: "240px",
+        maxWidth: "700px",
         width: "max-content"
       }}>
       {!loggedIn ? (
         <button
+          className={`${styles.button} ${styles.rounded} ${styles.accent}`}
           disabled={loggingIn}
           onClick={async () => {
             setLoggingIn(true);
             await loginWithOAuth();
             setLoggingIn(false);
           }}>
-          Login with YNAB
+          🔑 Login to YNAB
         </button>
       ) : (
         <>
-          <button onClick={() => logout()}>Logout and clear all data</button>
           <button
+            className={`${styles.button} ${styles.rounded} ${styles.accent}`}
             style={{ marginTop: 4 }}
             onClick={() => window.open(process.env.NEXT_PUBLIC_DONATE_URL, "_blank")}>
-            ☕ Buy me coffee and support my work!
+            ☕ Support the extension!
           </button>
           <h3 className={styles["heading-big"]} style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label>
+          <label className={styles.flexRow}>
             Show accounts{" "}
             <input
               type="checkbox"
@@ -63,24 +63,33 @@ export function OptionsView() {
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />
           </label>
-          <h3 className={styles["heading-big"]} style={{ marginTop: 8 }}>
+          <h3 className={styles["heading-big"]} style={{ marginTop: "1rem" }}>
             Budgets
-            <IconButton
-              label="Refresh budgets"
-              onClick={() => refreshBudgets()}
-              icon={<Refresh />}
-            />
           </h3>
+          <button
+            title="Refresh the list of budgets from YNAB"
+            className={`${styles.button} ${styles.rounded} ${styles.accent} ${styles.flexRow}`}
+            style={{ width: "fit-content", marginBottom: 8 }}
+            onClick={() => refreshBudgets()}>
+            <Refresh size={18} />
+            Refresh budgets
+          </button>
           {cachedBudgets?.map((budget) => (
-            <div key={budget.id}>
-              {budget.name}{" "}
+            <label key={budget.id} className={styles.flexRow} style={{ marginBottom: 4 }}>
               <input
                 type="checkbox"
                 checked={budget.show}
                 onChange={() => toggleShowBudget(budget.id)}
               />
-            </div>
+              {budget.name}
+            </label>
           ))}
+          <button
+            style={{ marginTop: 12 }}
+            className={`${styles.button} ${styles.rounded} ${styles.warn}`}
+            onClick={() => logout()}>
+            Logout and clear all data
+          </button>
         </>
       )}
     </section>

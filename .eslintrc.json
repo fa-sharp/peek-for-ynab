@@ -26,7 +26,8 @@
     "rules": {
         "react/react-in-jsx-scope": "off",
         "react-hooks/rules-of-hooks": "warn", 
-        "react-hooks/exhaustive-deps": "warn" 
+        "react-hooks/exhaustive-deps": "warn",
+        "@next/next/no-css-tags": "off"
     },
     "settings": {
         "react": {
