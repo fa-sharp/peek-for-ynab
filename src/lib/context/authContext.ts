@@ -17,7 +17,7 @@ const useAuthProvider = () => {
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
 
     const refreshUrl = `${process.env.NEXT_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
-    fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`)
+    fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
       .then((res) => {
         if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
         return res.json();
@@ -75,7 +75,9 @@ const useAuthProvider = () => {
             const oAuthCode = new URL(responseUrl).searchParams.get("code");
             if (!oAuthCode) throw "No OAuth code found!";
 
-            fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`)
+            fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`, {
+              method: "POST"
+            })
               .then((res) => {
                 if (!res.ok)
                   throw { message: "Error getting initial token!", status: res.status };

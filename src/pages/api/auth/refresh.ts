@@ -14,7 +14,7 @@ const handler: NextApiHandler = async (req, res) => {
   if (!YNAB_CLIENT_ID || !YNAB_SECRET)
     return res.status(500).json({ message: "Server error!" });
 
-  if (typeof req.query.refreshToken !== "string")
+  if (typeof req.query.refreshToken !== "string" || req.method !== "POST")
     return res.status(400).json({ message: "Invalid!" });
 
   const tokenUrlParams = new URLSearchParams({

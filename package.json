@@ -2,7 +2,7 @@
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
   "version": "0.2.0",
-  "description": "A Chrome widget that lets you check on your YNAB category balances",
+  "description": "Check on your YNAB category balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
   "scripts": {
@@ -51,6 +51,9 @@
       "https://*/*",
       "$NEXT_PUBLIC_MAIN_URL/*"
     ],
+    "options_ui": {
+      "open_in_tab": false
+    },
     "key": "$CRX_PUBLIC_KEY"
   }
 }
