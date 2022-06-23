@@ -1,0 +1,64 @@
+:root {
+  --accent: #ffffff;
+  --accent-hover: #ebf7ff;
+  --warn: #e6abab;
+  --warn-hover: #ed8282;
+  --border: #4d4d4d;
+  --border-radius: 4px;
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+
+.heading-big {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-block: 4px;
+
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+.heading-medium {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-block: 3px;
+
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.button {
+  cursor: pointer;
+  padding: 0.4rem 0.7rem;
+  text-align: center;
+}
+
+.rounded {
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+}
+
+.accent {
+  background-color: var(--accent);
+}
+
+.accent:hover {
+  background-color: var(--accent-hover);
+}
+
+.warn {
+  background-color: var(--warn);
+}
+
+.warn:hover {
+  background-color: var(--warn-hover);
+}

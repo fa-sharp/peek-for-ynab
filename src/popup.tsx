@@ -7,7 +7,7 @@ import {
 } from "~components";
 import { AppProvider, useAuthContext } from "~lib/context";
 
-import * as styles from "./components/styles.module.css";
+import "./global.css";
 
 function PopupWrapper() {
   return (
@@ -33,7 +33,7 @@ export function PopupView() {
       {!loggedIn ? (
         <div style={{ display: "flex", gap: 8 }}>
           <button
-            className={`${styles.button} ${styles.rounded} ${styles.accent}`}
+            className="button rounded accent"
             onClick={
               chrome?.runtime
                 ? () => chrome.runtime.openOptionsPage()
@@ -41,9 +41,7 @@ export function PopupView() {
             }>
             🔑 Login
           </button>
-          <button className={`${styles.button} ${styles.rounded} ${styles.accent}`}>
-            🔒 Privacy Policy
-          </button>
+          <button className="button rounded accent">🔒 Privacy Policy</button>
         </div>
       ) : (
         <>

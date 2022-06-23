@@ -8,7 +8,7 @@ import {
   useYNABContext
 } from "~lib/context";
 
-import * as styles from "./components/styles.module.css";
+import "./global.css";
 
 const OptionsWrapper = () => (
   <AppProvider>
@@ -35,7 +35,7 @@ export function OptionsView() {
       }}>
       {!loggedIn ? (
         <button
-          className={`${styles.button} ${styles.rounded} ${styles.accent}`}
+          className={"button rounded accent"}
           disabled={loggingIn}
           onClick={async () => {
             setLoggingIn(true);
@@ -47,15 +47,15 @@ export function OptionsView() {
       ) : (
         <>
           <button
-            className={`${styles.button} ${styles.rounded} ${styles.accent}`}
             style={{ marginTop: 4 }}
+            className="button rounded accent"
             onClick={() => window.open(process.env.NEXT_PUBLIC_DONATE_URL, "_blank")}>
             ☕ Support the extension!
           </button>
-          <h3 className={styles["heading-big"]} style={{ marginTop: "1rem" }}>
+          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label className={styles.flexRow}>
+          <label className={"flex-row"}>
             Show accounts{" "}
             <input
               type="checkbox"
@@ -63,19 +63,19 @@ export function OptionsView() {
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />
           </label>
-          <h3 className={styles["heading-big"]} style={{ marginTop: "1rem" }}>
+          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Budgets
           </h3>
           <button
             title="Refresh the list of budgets from YNAB"
-            className={`${styles.button} ${styles.rounded} ${styles.accent} ${styles.flexRow}`}
+            className={"button rounded accent flex-row"}
             style={{ width: "fit-content", marginBottom: 8 }}
             onClick={() => refreshBudgets()}>
             <Refresh size={18} />
             Refresh budgets
           </button>
           {cachedBudgets?.map((budget) => (
-            <label key={budget.id} className={styles.flexRow} style={{ marginBottom: 4 }}>
+            <label key={budget.id} className="flex-row" style={{ marginBottom: 4 }}>
               <input
                 type="checkbox"
                 checked={budget.show}
@@ -86,7 +86,7 @@ export function OptionsView() {
           ))}
           <button
             style={{ marginTop: 12 }}
-            className={`${styles.button} ${styles.rounded} ${styles.warn}`}
+            className="button rounded warn"
             onClick={() => logout()}>
             Logout and clear all data
           </button>

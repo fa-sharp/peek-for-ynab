@@ -24,7 +24,7 @@ function CategoriesView() {
 
   return (
     <>
-      <div className={styles["heading-big"]}>
+      <div className="heading-big">
         <div role="heading">Categories</div>
         <IconButton
           label={categoriesExpanded ? "Collapse" : "Expand"}
@@ -73,7 +73,7 @@ export function CategoryGroupView({
 
   return (
     <>
-      <div className={styles["heading-medium"]}>
+      <div className="heading-medium">
         <div role="heading">{categoryGroup.name}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
