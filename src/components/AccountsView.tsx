@@ -18,7 +18,7 @@ function AccountsView() {
   const [expanded, setExpanded] = useState(false);
 
   const { savedAccounts, saveAccount, selectedBudgetData } = useStorageContext();
-  const { accountsData } = useYNABContext();
+  const { accountsData, getAccountTxs } = useYNABContext();
 
   if (!selectedBudgetData || !accountsData) return null;
   return (
@@ -45,6 +45,7 @@ function AccountsView() {
             savedAccounts={savedAccounts}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
+            getAccountTxs={getAccountTxs}
           />
           <AccountTypeView
             accountType="Tracking"
@@ -52,6 +53,7 @@ function AccountsView() {
             savedAccounts={savedAccounts}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
+            getAccountTxs={getAccountTxs}
           />
         </>
       )}
@@ -72,6 +74,7 @@ function AccountTypeView({
   budgetData: CachedBudget;
   savedAccounts: SavedAccount[];
   saveAccount: (a: SavedAccount) => void;
+  getAccountTxs: (accountId: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -97,16 +100,23 @@ function AccountTypeView({
             key={account.id}
             account={account}
             currencyFormat={budgetData.currencyFormat}
-            button={
-              savedAccounts.some((a) => a.accountId === account.id) ? null : (
-                <IconButton
-                  icon={<Pinned size={20} color="gray" strokeWidth={1} />}
-                  label="Pin"
-                  onClick={() =>
-                    saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                  }
-                />
-              )
+            actionElements={
+              <div>
+                {/* <IconButton
+                  icon={<ReportMoney size={20} color="gray" strokeWidth={1} />}
+                  label="Get transactions"
+                  onClick={() => getAccountTxs(account.id)}
+                /> */}
+                {savedAccounts.some((a) => a.accountId === account.id) ? null : (
+                  <IconButton
+                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    label="Pin"
+                    onClick={() =>
+                      saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                    }
+                  />
+                )}
+              </div>
             }
           />
         ))}
@@ -117,11 +127,11 @@ function AccountTypeView({
 export const AccountView = ({
   account: { name, balance, cleared_balance, uncleared_balance },
   currencyFormat,
-  button
+  actionElements
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
-  button?: ReactElement | null;
+  actionElements?: ReactElement | null;
 }) => (
   <div className={styles["balance-display"]}>
     <div
@@ -136,7 +146,7 @@ export const AccountView = ({
         colorsEnabled={true}
       />
     </div>
-    {button}
+    {actionElements}
   </div>
 );
 

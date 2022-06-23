@@ -26,7 +26,7 @@ export default function SavedAccountsView() {
           key={account.id}
           account={account}
           currencyFormat={selectedBudgetData?.currencyFormat}
-          button={
+          actionElements={
             <IconButton
               label="Remove"
               onClick={() => removeAccount(account.id)}

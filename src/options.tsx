@@ -29,7 +29,7 @@ export function OptionsView() {
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: 16,
+        padding: "0 16px 16px",
         maxWidth: "700px",
         width: "max-content"
       }}>
@@ -47,21 +47,20 @@ export function OptionsView() {
       ) : (
         <>
           <button
-            style={{ marginTop: 4 }}
             className="button rounded accent"
             onClick={() => window.open(process.env.NEXT_PUBLIC_DONATE_URL, "_blank")}>
-            ☕ Support the extension!
+            ☕ Support this extension!
           </button>
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
           <label className={"flex-row"}>
-            Show accounts{" "}
             <input
               type="checkbox"
               checked={settings.showAccounts}
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
-            />
+            />{" "}
+            Show accounts
           </label>
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Budgets

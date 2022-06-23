@@ -120,6 +120,19 @@ const useYNABProvider = () => {
     return () => setAccountsData(null); // cleanup
   }, [settings.showAccounts, selectedBudgetId, ynabAPI]);
 
+  /** Get recent transactions for the selected account */
+  const getAccountTxs = (accountId: string) => {
+    if (!ynabAPI) return;
+    ynabAPI.transactions
+      .getTransactionsByAccount(
+        selectedBudgetId,
+        accountId,
+        new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) // since 10 days ago
+      )
+      .then((txs) => console.log(txs))
+      .catch((err) => console.error("Error fetching transactions", err));
+  };
+
   /** Get data of saved accounts in the currently selected budget */
   const savedAccountsData = useMemo(() => {
     if (!accountsData) return null;
@@ -145,7 +158,9 @@ const useYNABProvider = () => {
     /** API data: List of saved categories in the currently selected budget */
     savedCategoriesData,
     /** Fetch user's budgets from API and store/refresh the cache */
-    refreshBudgets
+    refreshBudgets,
+    /** Get recent transactions for the specified account */
+    getAccountTxs
   };
 };
 
