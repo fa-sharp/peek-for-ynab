@@ -49,7 +49,7 @@
     ],
     "host_permissions": [
       "https://*/*",
-      "$PLASMO_PUBLIC_MAIN_URL/*"
+      "$NEXT_PUBLIC_MAIN_URL/*"
     ],
     "key": "$CRX_PUBLIC_KEY"
   }

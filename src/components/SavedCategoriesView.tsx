@@ -4,12 +4,15 @@ import { IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { formatCurrency } from "~lib/utils";
 
+import * as styles from "./styles.module.css";
+
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
   const { selectedBudgetData, removeCategory } = useStorageContext();
   const { savedCategoriesData } = useYNABContext();
 
-  if (!savedCategoriesData || !selectedBudgetData) return null;
+  if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
+    return null;
 
   return (
     <section
@@ -22,7 +25,7 @@ export default function SavedCategoriesView() {
       }}>
       {savedCategoriesData.map(
         ({ id, budgeted, activity, balance, goal_target, name }) => (
-          <div key={id} className="balance-display">
+          <div key={id} className={styles["balance-display"]}>
             <div
               title={
                 `Budgeted: ${formatCurrency(

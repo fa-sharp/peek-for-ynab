@@ -11,7 +11,7 @@ import {
 } from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
-import "./style.css";
+import * as styles from "./styles.module.css";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
@@ -23,7 +23,7 @@ function AccountsView() {
   if (!selectedBudgetData || !accountsData) return null;
   return (
     <>
-      <div className="heading-big">
+      <div className={styles["heading-big"]}>
         <div role="heading">Accounts</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
@@ -77,7 +77,7 @@ function AccountTypeView({
 
   return (
     <>
-      <div className="heading-medium">
+      <div className={styles["heading-medium"]}>
         <div role="heading">{accountType}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
@@ -123,7 +123,7 @@ export const AccountView = ({
   currencyFormat?: CurrencyFormat;
   button?: ReactElement | null;
 }) => (
-  <div className="balance-display">
+  <div className={styles["balance-display"]}>
     {account.name}: {formatCurrency(account.balance, currencyFormat)}
     {button}
   </div>

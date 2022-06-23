@@ -44,7 +44,7 @@ export default function PopupNav() {
       />
       <IconButton
         label="Settings"
-        onClick={() => chrome?.runtime.openOptionsPage()}
+        onClick={() => chrome?.runtime?.openOptionsPage()}
         icon={<Settings />}
       />
     </nav>

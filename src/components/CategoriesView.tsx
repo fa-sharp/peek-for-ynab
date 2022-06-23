@@ -11,7 +11,7 @@ import {
 } from "~lib/context/storageContext";
 import { formatCurrency } from "~lib/utils";
 
-import "./style.css";
+import * as styles from "./styles.module.css";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
@@ -24,7 +24,7 @@ function CategoriesView() {
 
   return (
     <>
-      <div className="heading-big">
+      <div className={styles["heading-big"]}>
         <div role="heading">Categories</div>
         <IconButton
           label={categoriesExpanded ? "Collapse" : "Expand"}
@@ -73,7 +73,7 @@ export function CategoryGroupView({
 
   return (
     <>
-      <div className="heading-medium">
+      <div className={styles["heading-medium"]}>
         <div role="heading">{categoryGroup.name}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
@@ -112,7 +112,7 @@ const CategoryView = ({
   isSaved: boolean;
   onSaveCategory: (categoryId: string) => void;
 }) => (
-  <div className="balance-display">
+  <div className={styles["balance-display"]}>
     {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
     {!isSaved && (
       <IconButton

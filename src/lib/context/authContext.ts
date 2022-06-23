@@ -5,12 +5,6 @@ import * as ynab from "ynab";
 import { IS_PRODUCTION } from "../utils";
 import { TokenData, useStorageContext } from "./storageContext";
 
-const {
-  PLASMO_PUBLIC_MAIN_URL,
-  PLASMO_PUBLIC_YNAB_CLIENT_ID,
-  NEXT_PUBLIC_YNAB_CLIENT_ID
-} = process.env;
-
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();
 
@@ -22,7 +16,7 @@ const useAuthProvider = () => {
     if (!tokenData) return;
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
 
-    const refreshUrl = `${PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
+    const refreshUrl = `${process.env.NEXT_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`)
       .then((res) => {
         if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
@@ -62,18 +56,18 @@ const useAuthProvider = () => {
     new Promise<void>((resolve) => {
       // if no chrome API available, assume we're testing/developing in a regular web browser context
       if (!chrome || !chrome.identity) {
-        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
+        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
         resolve();
       }
 
       // initiate OAuth flow through chrome API
       const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
-      const initialTokenUrl = `${PLASMO_PUBLIC_MAIN_URL}/api/auth/initial`;
+      const initialTokenUrl = `${process.env.NEXT_PUBLIC_MAIN_URL}/api/auth/initial`;
 
       chrome.identity.launchWebAuthFlow(
         {
           interactive: true,
-          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${PLASMO_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
+          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
         },
         (responseUrl) => {
           try {

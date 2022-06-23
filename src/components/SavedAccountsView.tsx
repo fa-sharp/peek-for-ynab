@@ -10,7 +10,7 @@ export default function SavedAccountsView() {
   const { savedAccountsData } = useYNABContext();
   const { selectedBudgetData, removeAccount } = useStorageContext();
 
-  if (!savedAccountsData) return null;
+  if (!savedAccountsData || savedAccountsData.length === 0) return null;
 
   return (
     <section

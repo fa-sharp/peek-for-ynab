@@ -7,7 +7,7 @@ import {
 } from "~components";
 import { AppProvider, useAuthContext } from "~lib/context";
 
-function PopupComponent() {
+function PopupWrapper() {
   return (
     <AppProvider>
       <PopupView />
@@ -15,7 +15,7 @@ function PopupComponent() {
   );
 }
 
-function PopupView() {
+export function PopupView() {
   const { loggedIn, loginWithOAuth } = useAuthContext();
 
   return (
@@ -54,4 +54,4 @@ function PopupView() {
   );
 }
 
-export default PopupComponent;
+export default PopupWrapper;

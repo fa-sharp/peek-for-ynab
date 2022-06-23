@@ -3,8 +3,7 @@
   justify-content: space-between;
   align-items: center;
 
-  margin-top: 4px;
-  margin-bottom: 4px;
+  margin-block: 4px;
 
   font-size: 1.15rem;
   font-weight: bold;

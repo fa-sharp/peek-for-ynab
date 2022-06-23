@@ -9,13 +9,15 @@ import {
   useYNABContext
 } from "~lib/context";
 
-const OptionsComponent = () => (
+import * as styles from "./components/styles.module.css";
+
+const OptionsWrapper = () => (
   <AppProvider>
     <OptionsView />
   </AppProvider>
 );
 
-function OptionsView() {
+export function OptionsView() {
   const { settings, changeSetting, cachedBudgets, toggleShowBudget } =
     useStorageContext();
   const { refreshBudgets } = useYNABContext();
@@ -47,10 +49,10 @@ function OptionsView() {
           <button onClick={() => logout()}>Logout and clear all data</button>
           <button
             style={{ marginTop: 4 }}
-            onClick={() => window.open(process.env.PLASMO_PUBLIC_DONATE_URL, "_blank")}>
+            onClick={() => window.open(process.env.NEXT_PUBLIC_DONATE_URL, "_blank")}>
             ☕ Buy me coffee and support my work!
           </button>
-          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
+          <h3 className={styles["heading-big"]} style={{ marginTop: "1rem" }}>
             Settings
           </h3>
           <label>
@@ -61,7 +63,7 @@ function OptionsView() {
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />
           </label>
-          <h3 className="heading-big" style={{ marginTop: 8 }}>
+          <h3 className={styles["heading-big"]} style={{ marginTop: 8 }}>
             Budgets
             <IconButton
               label="Refresh budgets"
@@ -85,4 +87,4 @@ function OptionsView() {
   );
 }
 
-export default OptionsComponent;
+export default OptionsWrapper;
