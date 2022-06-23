@@ -5,6 +5,8 @@
   --warn-hover: #ed8282;
   --border: #4d4d4d;
   --border-radius: 4px;
+  --currency-green: #357f16;
+  --currency-red: #a84646;
 }
 
 .flex-row {
@@ -42,6 +44,11 @@
   text-align: center;
 }
 
+.select {
+  padding: 0.3rem;
+  background-color: var(--accent);
+}
+
 .rounded {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
@@ -61,4 +68,16 @@
 
 .warn:hover {
   background-color: var(--warn-hover);
+}
+
+.currency {
+  font-weight: 500;
+}
+
+.currency.positive {
+  color: var(--currency-green);
+}
+
+.currency.negative {
+  color: var(--currency-red);
 }

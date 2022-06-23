@@ -2,7 +2,7 @@ import { ReactElement, useState } from "react";
 import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
-import { IconButton } from "~components";
+import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
   CachedBudget,
@@ -115,7 +115,7 @@ function AccountTypeView({
 }
 
 export const AccountView = ({
-  account,
+  account: { name, balance, cleared_balance, uncleared_balance },
   currencyFormat,
   button
 }: {
@@ -124,7 +124,18 @@ export const AccountView = ({
   button?: ReactElement | null;
 }) => (
   <div className={styles["balance-display"]}>
-    {account.name}: {formatCurrency(account.balance, currencyFormat)}
+    <div
+      title={
+        `Cleared: ${formatCurrency(cleared_balance, currencyFormat)}` +
+        `, Uncleared: ${formatCurrency(uncleared_balance, currencyFormat)}`
+      }>
+      {name}:{" "}
+      <CurrencyView
+        milliUnits={balance}
+        currencyFormat={currencyFormat}
+        colorsEnabled={true}
+      />
+    </div>
     {button}
   </div>
 );

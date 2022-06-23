@@ -1,6 +1,7 @@
 import AccountsView from "./AccountsView";
 import BudgetSelect from "./BudgetSelect";
 import CategoriesView from "./CategoriesView";
+import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 import PopupNav from "./PopupNav";
 import SavedAccountsView from "./SavedAccountsView";
@@ -13,5 +14,6 @@ export {
   AccountsView,
   SavedAccountsView,
   BudgetSelect,
-  IconButton
+  IconButton,
+  CurrencyView
 };

@@ -12,6 +12,7 @@ export default function BudgetSelect({
 }) {
   return (
     <select
+      className="select rounded"
       aria-label="Budget selection"
       style={{ flex: 1, width: "100%" }}
       value={selectedBudgetId || "initial"}

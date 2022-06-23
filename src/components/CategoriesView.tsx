@@ -2,14 +2,13 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
-import { IconButton } from "~components";
+import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
   CachedBudget,
   SavedCategory,
   useStorageContext
 } from "~lib/context/storageContext";
-import { formatCurrency } from "~lib/utils";
 
 import * as styles from "./styles.module.css";
 
@@ -113,7 +112,14 @@ const CategoryView = ({
   onSaveCategory: (categoryId: string) => void;
 }) => (
   <div className={styles["balance-display"]}>
-    {categoryData.name}: {formatCurrency(categoryData.balance, currencyFormat)}
+    <div>
+      {categoryData.name}:{" "}
+      <CurrencyView
+        milliUnits={categoryData.balance}
+        currencyFormat={currencyFormat}
+        colorsEnabled={true}
+      />
+    </div>
     {!isSaved && (
       <IconButton
         label="Pin"
