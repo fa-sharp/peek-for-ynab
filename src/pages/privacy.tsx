@@ -26,10 +26,10 @@ function IndexPage() {
       </p>
       <p>
         {APP_NAME} stores some information in your browser, including a list of your
-        budget names, the currently selected budget, and the categories which you choose
-        to save and pin in the extension. This data is stored locally in your browser and
-        is never sent to a third-party. The data is deleted immediately if you logout of
-        the extension.
+        budget names, budget settings, and the categories and accounts which you choose to
+        save and pin in the extension. This data is stored locally in your browser and is
+        never sent to a third-party. The data is deleted immediately if you logout of the
+        extension.
       </p>
       <p>
         {APP_NAME} does not share data with any third-party and/or analytics services.
