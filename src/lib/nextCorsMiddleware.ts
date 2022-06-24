@@ -2,7 +2,7 @@ import Cors from "cors";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const cors = Cors({
-  methods: ["GET", "HEAD"],
+  methods: ["GET", "POST", "HEAD"],
   origin: [`chrome-extension://${process.env.NEXT_PUBLIC_EXTENSION_ID}`]
 });
 

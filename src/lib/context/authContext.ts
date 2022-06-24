@@ -11,32 +11,34 @@ const useAuthProvider = () => {
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
 
-  /** Callback to fetch and refresh the access token */
+  /** Callback to refresh the access token */
   const refresh = useCallback(() => {
     if (!tokenData) return;
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
 
     const refreshUrl = `${process.env.NEXT_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
-      .then((res) => {
-        if (!res.ok) throw { message: "Error refreshing token!", status: res.status };
+      .then(async (res) => {
+        if (!res.ok) {
+          if (res.status === 401) setTokenData(null); // clear token if status is unauthorized
+          throw {
+            message: "Error refreshing token!",
+            status: res.status,
+            error: await res.json()
+          };
+        }
         return res.json();
       })
       .then((newTokenData) => {
         if (!IS_PRODUCTION) console.log("Got a new token!");
         setTokenData(newTokenData);
       })
-      .catch((err) => {
-        console.error(err);
-        setTokenData(null);
-      });
+      .catch((err) => console.error(err));
   }, [setTokenData, tokenData]);
 
   /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
   useEffect(() => {
-    if (tokenData && tokenExpired) {
-      refresh();
-    }
+    if (tokenData && tokenExpired) refresh();
   }, [refresh, tokenData, tokenExpired]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */

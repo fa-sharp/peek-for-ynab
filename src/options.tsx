@@ -54,7 +54,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label className={"flex-row"}>
+          <label className="flex-row">
             <input
               type="checkbox"
               checked={settings.showAccounts}
