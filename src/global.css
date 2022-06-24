@@ -44,6 +44,21 @@
   text-align: center;
 }
 
+.icon-button {
+  padding: 1px;
+
+  background: none;
+  border: none;
+  line-height: 0;
+  cursor: pointer;
+}
+.icon-button:hover {
+  transform: scale(1.05);
+}
+.icon-button:active {
+  transform: scale(0.95);
+}
+
 .select {
   padding: 0.3rem;
   background-color: var(--accent);

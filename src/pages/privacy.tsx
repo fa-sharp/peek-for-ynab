@@ -18,7 +18,7 @@ function IndexPage() {
         </Link>
         . When you authorize the extension with your YNAB account, {APP_NAME + " "}
         communicates directly with YNAB through their API to access your budget
-        information - including your budgets, budget settings, categories, and category
+        information - including your budgets, budget settings, categories, accounts, and
         balances - from your YNAB account. {APP_NAME} cannot access your YNAB login
         credentials, nor any credentials to your financial institution accounts. You must
         login to YNAB through their website in order to authorize {APP_NAME} for use with

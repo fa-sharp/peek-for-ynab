@@ -11,16 +11,7 @@ export default function IconButton({
   icon: ReactElement;
 }) {
   return (
-    <button
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      style={{
-        background: "none",
-        border: "none",
-        lineHeight: 0,
-        cursor: "pointer"
-      }}>
+    <button aria-label={label} title={label} className="icon-button" onClick={onClick}>
       {icon}
     </button>
   );

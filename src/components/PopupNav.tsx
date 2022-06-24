@@ -15,7 +15,8 @@ export default function PopupNav() {
       style={{
         marginBottom: 8,
         display: "flex",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        gap: 3
       }}>
       <BudgetSelect
         shownBudgets={shownBudgets}

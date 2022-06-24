@@ -41,7 +41,13 @@ export function PopupView() {
             }>
             🔑 Login
           </button>
-          <button className="button rounded accent">🔒 Privacy Policy</button>
+          <button
+            className="button rounded accent"
+            onClick={() =>
+              window.open(`${process.env.NEXT_PUBLIC_MAIN_URL}/privacy`, "_blank")
+            }>
+            🔒 Privacy Policy
+          </button>
         </div>
       ) : (
         <>

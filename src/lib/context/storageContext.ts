@@ -42,9 +42,10 @@ const useStorageProvider = () => {
       defaultValue: null
     });
 
-  const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
-    defaultValue: { showAccounts: false }
-  });
+  const [settings, setSettings, { removeItem: removeSettings }] =
+    useLocalStorage<AppSettings>("settings", {
+      defaultValue: { showAccounts: false }
+    });
 
   /** Cached API data: List of all user's budgets */
   const [cachedBudgets, setCachedBudgets, { removeItem: removeCachedBudgets }] =
@@ -118,6 +119,7 @@ const useStorageProvider = () => {
     removeSavedCategories();
     removeSavedAccounts();
     removeCachedBudgets();
+    removeSettings();
   };
 
   return {
