@@ -54,13 +54,21 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label className="flex-row">
+          <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.showAccounts}
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />{" "}
             Show accounts
+          </label>
+          <label className="flex-row">
+            <input
+              type="checkbox"
+              checked={settings.emojiMode}
+              onChange={(e) => changeSetting("emojiMode", e.target.checked)}
+            />
+            Emoji mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Budgets
@@ -70,11 +78,11 @@ export function OptionsView() {
             className={"button rounded accent flex-row"}
             style={{ width: "fit-content", marginBottom: 8 }}
             onClick={() => refreshBudgets()}>
-            <Refresh size={18} />
+            <Refresh size={14} />
             Refresh budgets
           </button>
           {cachedBudgets?.map((budget) => (
-            <label key={budget.id} className="flex-row" style={{ marginBottom: 4 }}>
+            <label key={budget.id} className="flex-row mb-small">
               <input
                 type="checkbox"
                 checked={budget.show}

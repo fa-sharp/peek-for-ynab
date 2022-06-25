@@ -18,3 +18,10 @@ export const formatCurrency = (
 
   return formattedString;
 };
+
+/** Returns the first emoji found in a string */
+export const findFirstEmoji = (s: string) => {
+  const emojiRegex = /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u200d]+/gu;
+  const emojisArray = s.match(emojiRegex);
+  return emojisArray ? emojisArray[0] : null;
+};

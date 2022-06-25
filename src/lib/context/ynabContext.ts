@@ -13,7 +13,7 @@ export const queryClient = new QueryClient({
 });
 
 const useYNABProvider = () => {
-  const { tokenExpired, loggedIn } = useAuthContext();
+  const { tokenExpired } = useAuthContext();
   const {
     tokenData,
     settings,
@@ -56,8 +56,8 @@ const useYNABProvider = () => {
 
   /** Automatically fetch budgets from API if logged in and there is no cached budget data */
   useEffect(() => {
-    if (loggedIn && !tokenExpired && !cachedBudgets) refreshBudgets();
-  }, [loggedIn, cachedBudgets, tokenExpired, refreshBudgets]);
+    if (ynabAPI && !cachedBudgets) refreshBudgets();
+  }, [cachedBudgets, refreshBudgets, ynabAPI]);
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
   const { data: categoryGroupsData } = useQuery({
@@ -120,18 +120,35 @@ const useYNABProvider = () => {
     }, []);
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
-  /** Get recent transactions for the selected account */
-  const getAccountTxs = (accountId: string) => {
-    if (!ynabAPI) return;
-    ynabAPI.transactions
-      .getTransactionsByAccount(
-        selectedBudgetId,
-        accountId,
-        new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) // since 10 days ago
-      )
-      .then((txs) => console.log(txs))
-      .catch((err) => console.error("Error fetching transactions", err));
-  };
+  const useGetAccountTxs = (accountId: string) =>
+    useQuery({
+      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `accountId-${accountId}`],
+      queryFn: async () => {
+        if (!ynabAPI) return;
+        const response = await ynabAPI.transactions.getTransactionsByAccount(
+          selectedBudgetId,
+          accountId,
+          new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) // since 10 days ago
+        );
+        return response.data.transactions;
+      },
+      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+    });
+
+  const useGetCategoryTxs = (categoryId: string) =>
+    useQuery({
+      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `categoryId-${categoryId}`],
+      queryFn: async () => {
+        if (!ynabAPI) return;
+        const response = await ynabAPI.transactions.getTransactionsByCategory(
+          selectedBudgetId,
+          categoryId,
+          new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) // since 10 days ago
+        );
+        return response.data.transactions;
+      },
+      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+    });
 
   return {
     /** API data: List of all category groups in current budget, with categories contained in each one */
@@ -147,7 +164,9 @@ const useYNABProvider = () => {
     /** Fetch user's budgets from API and store/refresh the cache */
     refreshBudgets,
     /** Get recent transactions for the specified account */
-    getAccountTxs
+    useGetAccountTxs,
+    /** Get recent transactions for the specified category */
+    useGetCategoryTxs
   };
 };
 

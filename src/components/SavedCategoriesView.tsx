@@ -2,14 +2,12 @@ import { PinnedOff } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { formatCurrency } from "~lib/utils";
 
-import CurrencyView from "./CurrencyView";
-import * as styles from "./styles.module.css";
+import { CategoryView } from "./CategoriesView";
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const { selectedBudgetData, removeCategory } = useStorageContext();
+  const { selectedBudgetData, removeCategory, settings } = useStorageContext();
   const { savedCategoriesData } = useYNABContext();
 
   if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
@@ -26,26 +24,20 @@ export default function SavedCategoriesView() {
         flexDirection: "column",
         gap: "2px"
       }}>
-      {savedCategoriesData.map(({ id, budgeted, activity, balance, name }) => (
-        <div key={id} className={styles["balance-display"]}>
-          <div
-            title={
-              `Budgeted: ${formatCurrency(budgeted, currencyFormat)}` +
-              `, Activity: ${formatCurrency(activity, currencyFormat)}`
-            }>
-            {name}:{" "}
-            <CurrencyView
-              milliUnits={balance}
-              currencyFormat={currencyFormat}
-              colorsEnabled={true}
+      {savedCategoriesData.map((category) => (
+        <CategoryView
+          key={category.id}
+          categoryData={category}
+          currencyFormat={currencyFormat}
+          settings={settings}
+          actionElements={
+            <IconButton
+              label="Remove"
+              onClick={() => removeCategory(category.id)}
+              icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
             />
-          </div>
-          <IconButton
-            label="Remove"
-            onClick={() => removeCategory(id)}
-            icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
-          />
-        </div>
+          }
+        />
       ))}
     </section>
   );

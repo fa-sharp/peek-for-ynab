@@ -12,6 +12,8 @@ export interface TokenData {
 export interface AppSettings {
   /** Whether to fetch and show accounts from each budget */
   showAccounts: boolean;
+  /** Category and account names are reduced to emojis */
+  emojiMode: boolean;
 }
 
 /** Cached budget data, stored in the browser */
@@ -44,7 +46,7 @@ const useStorageProvider = () => {
 
   const [settings, setSettings, { removeItem: removeSettings }] =
     useLocalStorage<AppSettings>("settings", {
-      defaultValue: { showAccounts: false }
+      defaultValue: { showAccounts: false, emojiMode: false }
     });
 
   /** Cached API data: List of all user's budgets */

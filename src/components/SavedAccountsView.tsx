@@ -8,7 +8,7 @@ import { AccountView } from "./AccountsView";
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { savedAccountsData } = useYNABContext();
-  const { selectedBudgetData, removeAccount } = useStorageContext();
+  const { selectedBudgetData, removeAccount, settings } = useStorageContext();
 
   if (!savedAccountsData || savedAccountsData.length === 0) return null;
 
@@ -26,6 +26,7 @@ export default function SavedAccountsView() {
           key={account.id}
           account={account}
           currencyFormat={selectedBudgetData?.currencyFormat}
+          settings={settings}
           actionElements={
             <IconButton
               label="Remove"

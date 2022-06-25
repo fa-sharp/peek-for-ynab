@@ -5,20 +5,20 @@ import type { Account, CurrencyFormat } from "ynab";
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
+  AppSettings,
   CachedBudget,
   SavedAccount,
   useStorageContext
 } from "~lib/context/storageContext";
-import { formatCurrency } from "~lib/utils";
-
-import * as styles from "./styles.module.css";
+import { findFirstEmoji, formatCurrency } from "~lib/utils";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
   const [expanded, setExpanded] = useState(false);
 
-  const { savedAccounts, saveAccount, selectedBudgetData } = useStorageContext();
-  const { accountsData, getAccountTxs } = useYNABContext();
+  const { savedAccounts, saveAccount, selectedBudgetData, settings } =
+    useStorageContext();
+  const { accountsData } = useYNABContext();
 
   if (!selectedBudgetData || !accountsData) return null;
   return (
@@ -45,7 +45,7 @@ function AccountsView() {
             savedAccounts={savedAccounts}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
-            getAccountTxs={getAccountTxs}
+            settings={settings}
           />
           <AccountTypeView
             accountType="Tracking"
@@ -53,7 +53,7 @@ function AccountsView() {
             savedAccounts={savedAccounts}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
-            getAccountTxs={getAccountTxs}
+            settings={settings}
           />
         </>
       )}
@@ -67,14 +67,15 @@ function AccountTypeView({
   accountsData,
   budgetData,
   saveAccount,
-  savedAccounts
+  savedAccounts,
+  settings
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
   budgetData: CachedBudget;
   savedAccounts: SavedAccount[];
   saveAccount: (a: SavedAccount) => void;
-  getAccountTxs: (accountId: string) => void;
+  settings: AppSettings;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -100,13 +101,9 @@ function AccountTypeView({
             key={account.id}
             account={account}
             currencyFormat={budgetData.currencyFormat}
+            settings={settings}
             actionElements={
               <div>
-                {/* <IconButton
-                  icon={<ReportMoney size={20} color="gray" strokeWidth={1} />}
-                  label="Get transactions"
-                  onClick={() => getAccountTxs(account.id)}
-                /> */}
                 {savedAccounts.some((a) => a.accountId === account.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
@@ -127,27 +124,36 @@ function AccountTypeView({
 export const AccountView = ({
   account: { name, balance, cleared_balance, uncleared_balance },
   currencyFormat,
-  actionElements
+  actionElements,
+  settings
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
   actionElements?: ReactElement | null;
-}) => (
-  <div className={styles["balance-display"]}>
+  settings: AppSettings;
+}) => {
+  let foundEmoji = null;
+  if (settings.emojiMode) foundEmoji = findFirstEmoji(name);
+
+  return (
     <div
+      className="balance-display"
       title={
+        (settings.emojiMode ? `${name}:\n` : "") +
         `Cleared: ${formatCurrency(cleared_balance, currencyFormat)}` +
         `, Uncleared: ${formatCurrency(uncleared_balance, currencyFormat)}`
       }>
-      {name}:{" "}
-      <CurrencyView
-        milliUnits={balance}
-        currencyFormat={currencyFormat}
-        colorsEnabled={true}
-      />
+      <div>
+        {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}
+        <CurrencyView
+          milliUnits={balance}
+          currencyFormat={currencyFormat}
+          colorsEnabled={true}
+        />
+      </div>
+      {actionElements}
     </div>
-    {actionElements}
-  </div>
-);
+  );
+};
 
 export default AccountsView;

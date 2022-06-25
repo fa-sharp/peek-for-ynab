@@ -1,20 +1,21 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
+  AppSettings,
   CachedBudget,
   SavedCategory,
   useStorageContext
 } from "~lib/context/storageContext";
-
-import * as styles from "./styles.module.css";
+import { findFirstEmoji, formatCurrency } from "~lib/utils";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const { selectedBudgetData, savedCategories, saveCategory } = useStorageContext();
+  const { selectedBudgetData, savedCategories, saveCategory, settings } =
+    useStorageContext();
   const { categoryGroupsData } = useYNABContext();
 
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
@@ -44,6 +45,7 @@ function CategoriesView() {
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
             savedCategories={savedCategories}
+            settings={settings}
             onSaveCategory={(id) =>
               saveCategory({ categoryId: id, budgetId: selectedBudgetData.id })
             }
@@ -58,12 +60,14 @@ export function CategoryGroupView({
   categoryGroup,
   budgetData,
   savedCategories,
-  onSaveCategory
+  onSaveCategory,
+  settings
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
   savedCategories: SavedCategory[];
   onSaveCategory: (categoryId: string) => void;
+  settings: AppSettings;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -91,43 +95,58 @@ export function CategoryGroupView({
           <CategoryView
             key={category.id}
             categoryData={category}
-            isSaved={savedCategories.some((c) => c.categoryId === category.id)}
-            onSaveCategory={onSaveCategory}
             currencyFormat={budgetData.currencyFormat}
+            settings={settings}
+            actionElements={
+              <div>
+                {savedCategories.some((c) => c.categoryId === category.id) ? null : (
+                  <IconButton
+                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    label="Pin"
+                    onClick={() => onSaveCategory(category.id)}
+                  />
+                )}
+              </div>
+            }
           />
         ))}
     </>
   );
 }
 
-const CategoryView = ({
-  categoryData,
-  isSaved,
+export const CategoryView = ({
+  categoryData: { name, budgeted, activity, balance },
   currencyFormat,
-  onSaveCategory
+  settings,
+  actionElements
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
-  isSaved: boolean;
-  onSaveCategory: (categoryId: string) => void;
-}) => (
-  <div className={styles["balance-display"]}>
-    <div>
-      {categoryData.name}:{" "}
-      <CurrencyView
-        milliUnits={categoryData.balance}
-        currencyFormat={currencyFormat}
-        colorsEnabled={true}
-      />
+  actionElements?: ReactElement | null;
+  settings: AppSettings;
+}) => {
+  let foundEmoji = null;
+  if (settings.emojiMode) foundEmoji = findFirstEmoji(name);
+
+  return (
+    <div
+      className="balance-display"
+      title={
+        (settings.emojiMode ? `${name}:\n` : "") +
+        `Budgeted: ${formatCurrency(budgeted, currencyFormat)}` +
+        `, Activity: ${formatCurrency(activity, currencyFormat)}`
+      }>
+      <div>
+        {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}
+        <CurrencyView
+          milliUnits={balance}
+          currencyFormat={currencyFormat}
+          colorsEnabled={true}
+        />
+      </div>
+      {actionElements}
     </div>
-    {!isSaved && (
-      <IconButton
-        label="Pin"
-        onClick={() => onSaveCategory(categoryData.id)}
-        icon={<Pinned size={20} color="gray" strokeWidth={1} />}
-      />
-    )}
-  </div>
-);
+  );
+};
 
 export default CategoriesView;
