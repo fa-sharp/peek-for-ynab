@@ -19,9 +19,12 @@ export const formatCurrency = (
   return formattedString;
 };
 
-/** Returns the first emoji found in a string */
+const emojiRegex =
+  // eslint-disable-next-line no-misleading-character-class
+  /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/u;
+
+/** Returns the first emoji, or consecutive sequence of emojis, found in a string */
 export const findFirstEmoji = (s: string) => {
-  const emojiRegex = /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u200d]+/gu;
-  const emojisArray = s.match(emojiRegex);
-  return emojisArray ? emojisArray[0] : null;
+  const regexResult = emojiRegex.exec(s);
+  return regexResult ? regexResult[0] : null;
 };
