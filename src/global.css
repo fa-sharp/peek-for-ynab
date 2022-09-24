@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap");
 
 :root {
   --accent: #ffffff;
@@ -40,7 +40,7 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  margin-block: 3px;
+  margin-top: 4px;
 
   font-size: 15px;
   font-weight: bold;
@@ -54,6 +54,7 @@ body {
   height: 1.6rem;
   margin-block: 2px;
   border-bottom: solid 1px #ddd;
+  padding-right: 2px;
   padding-bottom: 0.5px;
 }
 
@@ -122,4 +123,8 @@ body {
 
 .font-big {
   font-size: 1.5rem;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

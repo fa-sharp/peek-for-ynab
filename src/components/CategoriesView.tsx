@@ -24,7 +24,9 @@ function CategoriesView() {
 
   return (
     <>
-      <div className="heading-big">
+      <div
+        className="heading-big cursor-pointer"
+        onClick={() => setCategoriesExpanded(!categoriesExpanded)}>
         <div role="heading">Categories</div>
         <IconButton
           label={categoriesExpanded ? "Collapse" : "Expand"}
@@ -76,7 +78,9 @@ export function CategoryGroupView({
 
   return (
     <>
-      <div className="heading-medium">
+      <div
+        className="heading-medium cursor-pointer"
+        onClick={() => setExpanded(!expanded)}>
         <div role="heading">{categoryGroup.name}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
