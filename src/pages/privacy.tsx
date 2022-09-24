@@ -19,17 +19,17 @@ function IndexPage() {
         . When you authorize the extension with your YNAB account, {APP_NAME + " "}
         communicates directly with YNAB through their API to access your budget
         information - including your budgets, budget settings, categories, accounts, and
-        balances - from your YNAB account. {APP_NAME} cannot access your YNAB login
-        credentials, nor any credentials to your financial institution accounts. You must
-        login to YNAB through their website in order to authorize {APP_NAME} for use with
-        your account.
+        balances. {APP_NAME} cannot access your YNAB login credentials, nor any
+        credentials to your financial institution accounts. You must login to YNAB through
+        their website in order to authorize {APP_NAME} for use with your account.
       </p>
       <p>
-        {APP_NAME} stores some information in your browser, including a list of your
-        budget names, budget settings, and the categories and accounts which you choose to
-        save and pin in the extension. This data is stored locally in your browser and is
-        never sent to a third-party. The data is deleted immediately if you logout of the
-        extension.
+        {APP_NAME} stores some information in your browser's local storage, including a
+        list of your budget names, budget settings, and the IDs of the categories and
+        accounts which you save and pin in the extension. This data is stored locally in
+        your browser and is never sent to a third-party. Balances are <em>not</em> stored
+        - rather, they are fetched from YNAB each time you open the extension. All data is
+        deleted immediately when you logout and/or uninstall the extension.
       </p>
       <p>
         {APP_NAME} does not share data with any third-party and/or analytics services.
