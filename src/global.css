@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+
 :root {
   --accent: #ffffff;
   --accent-hover: #ebf7ff;
@@ -7,6 +9,12 @@
   --border-radius: 4px;
   --currency-green: #357f16;
   --currency-red: #a84646;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 14px;
+  margin: 0;
 }
 
 .flex-row {
@@ -23,7 +31,7 @@
 
   margin-block: 4px;
 
-  font-size: 1.15rem;
+  font-size: 18px;
   font-weight: bold;
 }
 
@@ -34,7 +42,7 @@
 
   margin-block: 3px;
 
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: bold;
 }
 

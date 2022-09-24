@@ -132,7 +132,7 @@ export const AccountView = ({
   actionElements?: ReactElement | null;
   settings: AppSettings;
 }) => {
-  let foundEmoji = settings.emojiMode ? null : findFirstEmoji(name);
+  let foundEmoji = settings.emojiMode ? findFirstEmoji(name) : null;
 
   return (
     <div
