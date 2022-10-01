@@ -1,6 +1,6 @@
+import { QueryClient, useQuery } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { QueryClient, useQuery } from "react-query";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";

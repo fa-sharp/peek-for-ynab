@@ -1,6 +1,6 @@
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { ReactNode } from "react";
-import { QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
 
 import { AuthProvider, useAuthContext } from "./authContext";
 import { StorageProvider, useStorageContext } from "./storageContext";

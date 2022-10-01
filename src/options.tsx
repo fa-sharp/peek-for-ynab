@@ -46,11 +46,6 @@ export function OptionsView() {
         </button>
       ) : (
         <>
-          <button
-            className="button rounded accent"
-            onClick={() => window.open(process.env.NEXT_PUBLIC_DONATE_URL, "_blank")}>
-            ☕ Support this extension!
-          </button>
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
