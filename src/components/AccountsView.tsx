@@ -152,6 +152,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
+          hideBalance={settings.privateMode}
         />
       </div>
       {actionElements}

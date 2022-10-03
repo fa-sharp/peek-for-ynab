@@ -9,6 +9,7 @@
   --border-radius: 4px;
   --currency-green: #357f16;
   --currency-red: #a84646;
+  --currency-hidden-bg: #d1d1d1;
 }
 
 body {
@@ -108,12 +109,21 @@ body {
 .currency {
   font-weight: 500;
 }
-
-.currency.positive {
+.currency.hidden {
+  color: transparent;
+  background-color: var(--currency-hidden-bg);
+  padding-right: 1.2rem;
+  cursor: default;
+}
+.currency.hidden:hover {
+  background-color: white;
+}
+.currency.positive,
+.currency.positive.hidden:hover {
   color: var(--currency-green);
 }
-
-.currency.negative {
+.currency.negative,
+.currency.negative.hidden:hover {
   color: var(--currency-red);
 }
 

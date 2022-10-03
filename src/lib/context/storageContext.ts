@@ -14,6 +14,8 @@ export interface AppSettings {
   showAccounts: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
+  /** Balances are hidden unless you hover over them */
+  privateMode: boolean;
 }
 
 /** Cached budget data, stored in the browser */
@@ -46,7 +48,7 @@ const useStorageProvider = () => {
 
   const [settings, setSettings, { removeItem: removeSettings }] =
     useLocalStorage<AppSettings>("settings", {
-      defaultValue: { showAccounts: false, emojiMode: false }
+      defaultValue: { showAccounts: false, emojiMode: false, privateMode: false }
     });
 
   /** Cached API data: List of all user's budgets */
