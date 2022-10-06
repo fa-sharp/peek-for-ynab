@@ -24,8 +24,8 @@ function IndexPage() {
         their website in order to authorize {APP_NAME} for use with your account.
       </p>
       <p>
-        {APP_NAME} stores some information in your browser's local storage, including a
-        list of your budget names, budget settings, and the IDs of the categories and
+        {APP_NAME} stores some information in your browser&apos;s local storage, including
+        a list of your budget names, budget settings, and the IDs of the categories and
         accounts which you save and pin in the extension. This data is stored locally in
         your browser and is never sent to a third-party. Balances are <em>not</em> stored
         - rather, they are fetched from YNAB each time you open the extension. All data is

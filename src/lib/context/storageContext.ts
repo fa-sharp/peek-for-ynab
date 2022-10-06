@@ -4,6 +4,8 @@ import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 import type { CurrencyFormat } from "ynab";
 
+import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -42,31 +44,38 @@ export interface SavedAccount {
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
-  const [tokenData, setTokenData, { removeItem: removeToken }] =
-    useLocalStorage<TokenData | null>("tokenData", {
-      defaultValue: null
-    });
+  const [tokenData, setTokenData, { remove: removeToken }] =
+    useExtensionStorage<TokenData | null>(
+      { key: "tokenData", area: "local", isSecret: true },
+      null
+    );
 
-  const [settings, setSettings, { removeItem: removeSettings }] =
-    useLocalStorage<AppSettings>("settings", {
-      defaultValue: { showAccounts: false, emojiMode: false, privateMode: false }
-    });
+  const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
+    defaultValue: { showAccounts: false, emojiMode: false, privateMode: false }
+  });
 
   /** Cached API data: List of all user's budgets */
-  const [cachedBudgets, setCachedBudgets, { removeItem: removeCachedBudgets }] =
-    useLocalStorage<null | CachedBudget[]>("cachedBudgets", { defaultValue: null });
+  const [cachedBudgets, setCachedBudgets] = useLocalStorage<null | CachedBudget[]>(
+    "cachedBudgets",
+    { defaultValue: null }
+  );
 
   /** The budget currently in view */
-  const [selectedBudgetId, setSelectedBudgetId, { removeItem: removeSelectedBudget }] =
-    useLocalStorage("selectedBudgetId", { defaultValue: "" });
+  const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudgetId", {
+    defaultValue: ""
+  });
 
   /** The categories saved by the user */
-  const [savedCategories, setSavedCategories, { removeItem: removeSavedCategories }] =
-    useLocalStorage<SavedCategory[]>("savedCategories", { defaultValue: [] });
+  const [savedCategories, setSavedCategories] = useLocalStorage<SavedCategory[]>(
+    "savedCategories",
+    { defaultValue: [] }
+  );
 
   /** The categories saved by the user */
-  const [savedAccounts, setSavedAccounts, { removeItem: removeSavedAccounts }] =
-    useLocalStorage<SavedAccount[]>("savedAccounts", { defaultValue: [] });
+  const [savedAccounts, setSavedAccounts] = useLocalStorage<SavedAccount[]>(
+    "savedAccounts",
+    { defaultValue: [] }
+  );
 
   /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
   const selectedBudgetData = useMemo(
@@ -120,6 +129,7 @@ const useStorageProvider = () => {
   /** Clears all values, removes all saved data from browser storage */
   const removeAllData = () => {
     flushSync(() => {
+      // Ensure token is removed first so we don't refetch API data
       removeToken();
     });
     localStorage.clear();
