@@ -83,6 +83,7 @@ body {
 .select {
   padding: 0.3rem;
   background-color: var(--accent);
+  font-family: "Open Sans", sans-serif;
 }
 
 .rounded {
@@ -118,11 +119,11 @@ body {
 .currency.hidden:hover {
   background-color: white;
 }
-.currency.positive,
+:not(.hidden).currency.positive,
 .currency.positive.hidden:hover {
   color: var(--currency-green);
 }
-.currency.negative,
+:not(.hidden).currency.negative,
 .currency.negative.hidden:hover {
   color: var(--currency-red);
 }
@@ -137,4 +138,29 @@ body {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+}
+.loading-spinner::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  /* line-height: 0; */
+  border-radius: 50%;
+  border: 2px dotted;
+  border-color: lightblue lightblue transparent;
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

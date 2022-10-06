@@ -1,5 +1,6 @@
 import { createProvider } from "puro";
 import { useContext, useMemo } from "react";
+import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 import type { CurrencyFormat } from "ynab";
 
@@ -118,12 +119,10 @@ const useStorageProvider = () => {
 
   /** Clears all values, removes all saved data from browser storage */
   const removeAllData = () => {
-    removeToken();
-    removeSelectedBudget();
-    removeSavedCategories();
-    removeSavedAccounts();
-    removeCachedBudgets();
-    removeSettings();
+    flushSync(() => {
+      removeToken();
+    });
+    localStorage.clear();
   };
 
   return {

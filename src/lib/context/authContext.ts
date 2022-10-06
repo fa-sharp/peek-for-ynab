@@ -104,7 +104,6 @@ const useAuthProvider = () => {
 
   /** Clears all data, including the user's token */
   const logout = async () => {
-    setTokenData(null);
     removeAllData();
   };
 

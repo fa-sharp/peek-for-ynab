@@ -49,15 +49,27 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label className="flex-row mb-small">
+          <label className="flex-row mb-small" title="Show and pin your accounts in YNAB">
             <input
               type="checkbox"
               checked={settings.showAccounts}
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
-            />{" "}
+            />
             Show accounts
           </label>
-          <label className="flex-row">
+          <label
+            className="flex-row mb-small"
+            title="Hide balances unless you hover over them">
+            <input
+              type="checkbox"
+              checked={settings.privateMode}
+              onChange={(e) => changeSetting("privateMode", e.target.checked)}
+            />
+            Privacy mode
+          </label>
+          <label
+            className="flex-row"
+            title="Do you love using emojis in your budget? This is for you ;)">
             <input
               type="checkbox"
               checked={settings.emojiMode}

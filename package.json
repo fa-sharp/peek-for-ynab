@@ -13,15 +13,15 @@
     "start:next": "next start"
   },
   "dependencies": {
-    "@tanstack/react-query": "^4.8.0",
-    "@tanstack/react-query-devtools": "^4.8.0",
+    "@tanstack/react-query": "^4.10.1",
+    "@tanstack/react-query-devtools": "^4.10.1",
     "cors": "^2.8.5",
     "next": "^12.1.6",
     "plasmo": "^0.55.0",
     "puro": "^0.5.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tabler-icons-react": "^1.49.0",
+    "tabler-icons-react": "^1.55.0",
     "use-local-storage-state": "^18.1.0",
     "ynab": "^1.32.0"
   },
@@ -49,7 +49,6 @@
       "identity"
     ],
     "host_permissions": [
-      "https://*/*",
       "$NEXT_PUBLIC_MAIN_URL/*"
     ],
     "options_ui": {
