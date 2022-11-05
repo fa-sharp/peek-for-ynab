@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect } from "react";
 import * as ynab from "ynab";
@@ -10,6 +11,9 @@ const useAuthProvider = () => {
 
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
+
+  /** The current React Query client */
+  const queryClient = useQueryClient();
 
   /** Callback to refresh the access token */
   const refresh = useCallback(() => {
@@ -103,8 +107,10 @@ const useAuthProvider = () => {
     });
 
   /** Clears all data, including the user's token */
-  const logout = async () => {
+  const logout = () => {
     removeAllData();
+    queryClient.removeQueries();
+    queryClient.clear();
   };
 
   return { login, loginWithOAuth, logout, loggedIn: tokenData != null, tokenExpired };

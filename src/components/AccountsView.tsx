@@ -1,26 +1,31 @@
 import { ReactElement, useState } from "react";
-import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
+import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
   AppSettings,
-  CachedBudget,
   SavedAccount,
   useStorageContext
 } from "~lib/context/storageContext";
+import type { CachedBudget } from "~lib/context/ynabContext";
+import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findFirstEmoji, formatCurrency } from "~lib/utils";
 
+interface Props {
+  addTx: (initialState: AddTransactionInitialState) => void;
+}
+
 /** View of all accounts in a budget, grouped by Budget / Tracking */
-function AccountsView() {
+function AccountsView({ addTx }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const { savedAccounts, saveAccount, selectedBudgetData, settings } =
-    useStorageContext();
-  const { accountsData } = useYNABContext();
+  const { savedAccounts, saveAccount, settings } = useStorageContext();
+  const { accountsData, selectedBudgetData } = useYNABContext();
 
-  if (!selectedBudgetData || !accountsData) return null;
+  if (!settings.showAccounts || !selectedBudgetData || !accountsData) return null;
+
   return (
     <>
       <div
@@ -48,6 +53,7 @@ function AccountsView() {
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
             settings={settings}
+            addTx={addTx}
           />
           <AccountTypeView
             accountType="Tracking"
@@ -56,6 +62,7 @@ function AccountsView() {
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
             settings={settings}
+            addTx={addTx}
           />
         </>
       )}
@@ -70,7 +77,8 @@ function AccountTypeView({
   budgetData,
   saveAccount,
   savedAccounts,
-  settings
+  settings,
+  addTx
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -78,13 +86,14 @@ function AccountTypeView({
   savedAccounts: SavedAccount[];
   saveAccount: (a: SavedAccount) => void;
   settings: AppSettings;
+  addTx: (initialState: AddTransactionInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <>
       <div
-        className="heading-medium cursor-pointer"
+        className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <div role="heading">{accountType}</div>
         <IconButton
@@ -115,6 +124,13 @@ function AccountTypeView({
                     onClick={() =>
                       saveAccount({ accountId: account.id, budgetId: budgetData.id })
                     }
+                  />
+                )}
+                {settings.transactions && (
+                  <IconButton
+                    icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => addTx({ accountId: account.id })}
                   />
                 )}
               </div>

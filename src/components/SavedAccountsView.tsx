@@ -1,16 +1,21 @@
-import { PinnedOff } from "tabler-icons-react";
+import { PinnedOff, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
+import { AccountView } from "~components/AccountsView";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
-import { AccountView } from "./AccountsView";
+interface Props {
+  addTx: (initialState: AddTransactionInitialState) => void;
+}
 
 /** View of user's saved accounts with balances */
-export default function SavedAccountsView() {
-  const { savedAccountsData } = useYNABContext();
-  const { selectedBudgetData, removeAccount, settings } = useStorageContext();
+export default function SavedAccountsView({ addTx }: Props) {
+  const { selectedBudgetData, savedAccountsData } = useYNABContext();
+  const { removeAccount, settings } = useStorageContext();
 
-  if (!savedAccountsData || savedAccountsData.length === 0) return null;
+  if (!settings.showAccounts || !savedAccountsData || savedAccountsData.length === 0)
+    return null;
 
   return (
     <section
@@ -28,11 +33,20 @@ export default function SavedAccountsView() {
           currencyFormat={selectedBudgetData?.currencyFormat}
           settings={settings}
           actionElements={
-            <IconButton
-              label="Remove"
-              onClick={() => removeAccount(account.id)}
-              icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
-            />
+            <div>
+              <IconButton
+                label="Remove"
+                onClick={() => removeAccount(account.id)}
+                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+              />
+              {settings.transactions && (
+                <IconButton
+                  icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                  label={`Add transaction to '${account.name}'`}
+                  onClick={() => addTx({ accountId: account.id })}
+                />
+              )}
+            </div>
           }
         />
       ))}

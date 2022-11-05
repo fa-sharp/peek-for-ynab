@@ -5,7 +5,9 @@ import {
   SavedAccountsView,
   SavedCategoriesView
 } from "~components";
+import TransactionAdd from "~components/TransactionAdd";
 import { AppProvider, useAuthContext } from "~lib/context";
+import { useAddTransaction } from "~lib/useAddTransaction";
 
 import "./global.css";
 
@@ -19,6 +21,7 @@ function PopupWrapper() {
 
 export function PopupView() {
   const { loggedIn, loginWithOAuth } = useAuthContext();
+  const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
 
   return (
     <div
@@ -49,15 +52,20 @@ export function PopupView() {
             🔒 Privacy Policy
           </button>
         </div>
+      ) : addTxState.show ? (
+        <TransactionAdd
+          initialState={addTxState.initialState}
+          closeForm={closeAddTransaction}
+        />
       ) : (
         <>
           <PopupNav />
 
-          <SavedCategoriesView />
-          <SavedAccountsView />
+          <SavedCategoriesView addTx={openAddTransaction} />
+          <SavedAccountsView addTx={openAddTransaction} />
 
-          <CategoriesView />
-          <AccountsView />
+          <CategoriesView addTx={openAddTransaction} />
+          <AccountsView addTx={openAddTransaction} />
         </>
       )}
     </div>

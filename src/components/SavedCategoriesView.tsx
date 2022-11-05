@@ -1,14 +1,18 @@
-import { PinnedOff } from "tabler-icons-react";
+import { PinnedOff, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
+import { CategoryView } from "~components/CategoriesView";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
-import { CategoryView } from "./CategoriesView";
+interface Props {
+  addTx: (initialState: AddTransactionInitialState) => void;
+}
 
 /** View of user's saved categories with balances */
-export default function SavedCategoriesView() {
-  const { selectedBudgetData, removeCategory, settings } = useStorageContext();
-  const { savedCategoriesData } = useYNABContext();
+export default function SavedCategoriesView({ addTx }: Props) {
+  const { removeCategory, settings } = useStorageContext();
+  const { selectedBudgetData, savedCategoriesData } = useYNABContext();
 
   if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
     return null;
@@ -31,11 +35,20 @@ export default function SavedCategoriesView() {
           currencyFormat={currencyFormat}
           settings={settings}
           actionElements={
-            <IconButton
-              label="Remove"
-              onClick={() => removeCategory(category.id)}
-              icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
-            />
+            <div>
+              <IconButton
+                label="Remove"
+                onClick={() => removeCategory(category.id)}
+                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+              />
+              {settings.transactions && (
+                <IconButton
+                  icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                  label={`Add transaction to '${category.name}'`}
+                  onClick={() => addTx({ categoryId: category.id })}
+                />
+              )}
+            </div>
           }
         />
       ))}

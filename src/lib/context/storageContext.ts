@@ -1,8 +1,7 @@
 import { createProvider } from "puro";
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
-import type { CurrencyFormat } from "ynab";
 
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
@@ -15,19 +14,12 @@ export interface TokenData {
 export interface AppSettings {
   /** Whether to fetch and show accounts from each budget */
   showAccounts: boolean;
+  /** Whether to enable adding transactions */
+  transactions: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
-}
-
-/** Cached budget data, stored in the browser */
-export interface CachedBudget {
-  id: string;
-  name: string;
-  currencyFormat?: CurrencyFormat;
-  /** whether the budget is displayed in the main view */
-  show: boolean;
 }
 
 /** A category saved by the user */
@@ -51,12 +43,17 @@ const useStorageProvider = () => {
     );
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
-    defaultValue: { showAccounts: false, emojiMode: false, privateMode: false }
+    defaultValue: {
+      showAccounts: false,
+      transactions: false,
+      privateMode: false,
+      emojiMode: false
+    }
   });
 
-  /** Cached API data: List of all user's budgets */
-  const [cachedBudgets, setCachedBudgets] = useLocalStorage<null | CachedBudget[]>(
-    "cachedBudgets",
+  /** Budgets that the user has selected to show */
+  const [shownBudgetIds, setShownBudgetIds] = useLocalStorage<null | string[]>(
+    "shownBudgetIds",
     { defaultValue: null }
   );
 
@@ -75,12 +72,6 @@ const useStorageProvider = () => {
   const [savedAccounts, setSavedAccounts] = useLocalStorage<SavedAccount[]>(
     "savedAccounts",
     { defaultValue: [] }
-  );
-
-  /** Cached API data: Data from the budget currently in view (e.g. name, currency info, etc.) */
-  const selectedBudgetData = useMemo(
-    () => cachedBudgets?.find((budget) => budget.id === selectedBudgetId) || null,
-    [cachedBudgets, selectedBudgetId]
   );
 
   const changeSetting = <K extends keyof AppSettings>(
@@ -113,17 +104,13 @@ const useStorageProvider = () => {
     setSavedAccounts(savedAccounts.filter((a) => a.accountId !== accountIdToRemove));
   };
 
-  /** Toggle whether a budget is shown or not. */
+  /** Toggle whether a budget is shown or not. Won't do anything if `shownBudgetIds` is null */
   const toggleShowBudget = (budgetId: string) => {
-    if (!cachedBudgets) return;
-    const budgetIndex = cachedBudgets.findIndex((budget) => budget.id === budgetId);
-    const budgetToToggle = cachedBudgets[budgetIndex];
-    if (!budgetToToggle) return;
-
-    const newCachedBudgets = [...cachedBudgets];
-    newCachedBudgets[budgetIndex] = { ...budgetToToggle, show: !budgetToToggle.show };
-    setCachedBudgets(newCachedBudgets);
-    if (budgetToToggle.id === selectedBudgetId) setSelectedBudgetId("");
+    if (!shownBudgetIds) return;
+    if (shownBudgetIds.includes(budgetId)) {
+      setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
+      if (selectedBudgetId === budgetId) setSelectedBudgetId("");
+    } else setShownBudgetIds([budgetId, ...shownBudgetIds]);
   };
 
   /** Clears all values, removes all saved data from browser storage */
@@ -140,11 +127,10 @@ const useStorageProvider = () => {
     setTokenData,
     settings,
     changeSetting,
-    cachedBudgets,
-    setCachedBudgets,
     selectedBudgetId,
     setSelectedBudgetId,
-    selectedBudgetData,
+    shownBudgetIds,
+    setShownBudgetIds,
     toggleShowBudget,
     savedCategories,
     saveCategory,

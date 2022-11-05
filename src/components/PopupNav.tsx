@@ -1,14 +1,13 @@
 import { ArrowsDownUp, ExternalLink, Settings } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useStorageContext } from "~lib/context";
+import { useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupNav() {
-  const { cachedBudgets, selectedBudgetId, setSelectedBudgetId } = useStorageContext();
+  const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
+  const { shownBudgetsData } = useYNABContext();
 
-  if (!cachedBudgets) return null;
-
-  const shownBudgets = cachedBudgets.filter((b) => b.show);
+  if (!shownBudgetsData) return <p>Loading budgets...</p>;
 
   return (
     <nav
@@ -19,17 +18,17 @@ export default function PopupNav() {
         gap: 3
       }}>
       <BudgetSelect
-        shownBudgets={shownBudgets}
+        shownBudgets={shownBudgetsData}
         selectedBudgetId={selectedBudgetId}
         setSelectedBudgetId={setSelectedBudgetId}
       />
       <IconButton
         label="Change budget"
         onClick={() => {
-          const currIndex = shownBudgets.findIndex((b) => b.id === selectedBudgetId);
-          if (currIndex === shownBudgets.length - 1)
-            setSelectedBudgetId(shownBudgets[0].id);
-          else setSelectedBudgetId(shownBudgets[currIndex + 1].id);
+          const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
+          if (currIndex === shownBudgetsData.length - 1)
+            setSelectedBudgetId(shownBudgetsData[0].id);
+          else setSelectedBudgetId(shownBudgetsData[currIndex + 1].id);
         }}
         icon={<ArrowsDownUp />}
       />

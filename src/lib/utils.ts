@@ -2,6 +2,9 @@ import * as ynab from "ynab";
 
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
+export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
+
 export const formatCurrency = (
   millis: number,
   /** the budget's `currency_format` property from YNAB */

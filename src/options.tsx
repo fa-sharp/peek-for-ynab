@@ -17,9 +17,9 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, changeSetting, cachedBudgets, toggleShowBudget } =
+  const { settings, changeSetting, shownBudgetIds, toggleShowBudget } =
     useStorageContext();
-  const { refreshBudgets } = useYNABContext();
+  const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   const [loggingIn, setLoggingIn] = useState(false);
@@ -57,9 +57,15 @@ export function OptionsView() {
             />
             Show accounts
           </label>
-          <label
-            className="flex-row mb-small"
-            title="Hide balances unless you hover over them">
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.transactions}
+              onChange={(e) => changeSetting("transactions", e.target.checked)}
+            />
+            Add transactions
+          </label>
+          <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.privateMode}
@@ -67,9 +73,7 @@ export function OptionsView() {
             />
             Privacy mode
           </label>
-          <label
-            className="flex-row"
-            title="Do you love using emojis in your budget? This is for you ;)">
+          <label className="flex-row">
             <input
               type="checkbox"
               checked={settings.emojiMode}
@@ -84,15 +88,16 @@ export function OptionsView() {
             title="Refresh the list of budgets from YNAB"
             className={"button rounded accent flex-row"}
             style={{ width: "fit-content", marginBottom: 8 }}
-            onClick={() => refreshBudgets()}>
+            onClick={() => refreshBudgets()}
+            disabled={isRefreshingBudgets}>
             <Refresh size={14} />
-            Refresh budgets
+            {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
           </button>
-          {cachedBudgets?.map((budget) => (
+          {budgetsData?.map((budget) => (
             <label key={budget.id} className="flex-row mb-small">
               <input
                 type="checkbox"
-                checked={budget.show}
+                checked={shownBudgetIds?.includes(budget.id)}
                 onChange={() => toggleShowBudget(budget.id)}
               />
               {budget.name}

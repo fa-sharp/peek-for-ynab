@@ -1,22 +1,26 @@
 import { ReactElement, useState } from "react";
-import { ChevronDown, ChevronUp, Pinned } from "tabler-icons-react";
+import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
 import {
   AppSettings,
-  CachedBudget,
   SavedCategory,
   useStorageContext
 } from "~lib/context/storageContext";
+import type { CachedBudget } from "~lib/context/ynabContext";
+import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findFirstEmoji, formatCurrency } from "~lib/utils";
 
+interface Props {
+  addTx: (initialState: AddTransactionInitialState) => void;
+}
+
 /** View of all categories in a budget, grouped by category groups */
-function CategoriesView() {
-  const { selectedBudgetData, savedCategories, saveCategory, settings } =
-    useStorageContext();
-  const { categoryGroupsData } = useYNABContext();
+function CategoriesView({ addTx }: Props) {
+  const { savedCategories, saveCategory, settings } = useStorageContext();
+  const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
 
@@ -51,6 +55,7 @@ function CategoriesView() {
             onSaveCategory={(id) =>
               saveCategory({ categoryId: id, budgetId: selectedBudgetData.id })
             }
+            addTx={addTx}
           />
         ))}
     </>
@@ -63,13 +68,15 @@ export function CategoryGroupView({
   budgetData,
   savedCategories,
   onSaveCategory,
-  settings
+  settings,
+  addTx
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
   savedCategories: SavedCategory[];
   onSaveCategory: (categoryId: string) => void;
   settings: AppSettings;
+  addTx: (initialState: AddTransactionInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -79,7 +86,7 @@ export function CategoryGroupView({
   return (
     <>
       <div
-        className="heading-medium cursor-pointer"
+        className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <div role="heading">{categoryGroup.name}</div>
         <IconButton
@@ -108,6 +115,13 @@ export function CategoryGroupView({
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
                     label="Pin"
                     onClick={() => onSaveCategory(category.id)}
+                  />
+                )}
+                {settings.transactions && (
+                  <IconButton
+                    icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
               </div>

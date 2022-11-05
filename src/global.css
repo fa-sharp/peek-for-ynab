@@ -2,10 +2,11 @@
 
 :root {
   --accent: #ffffff;
-  --accent-hover: #ebf7ff;
+  --accent-hover: #c4e7ff;
   --warn: #e6abab;
   --warn-hover: #ed8282;
   --border: #4d4d4d;
+  --border-light: #c4c4c4;
   --border-radius: 4px;
   --currency-green: #357f16;
   --currency-red: #a84646;
@@ -23,6 +24,25 @@ body {
   align-items: center;
   gap: 6px;
   width: fit-content;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-input {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-input input {
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  font-family: "Open Sans", sans-serif;
 }
 
 .heading-big {
@@ -44,7 +64,13 @@ body {
   margin-top: 4px;
 
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 500;
+}
+
+.heading-bordered {
+  padding-inline: 3px;
+  border-radius: var(--border-radius);
+  border: solid 1px var(--border-light);
 }
 
 .balance-display {
@@ -57,6 +83,11 @@ body {
   border-bottom: solid 1px #ddd;
   padding-right: 2px;
   padding-bottom: 0.5px;
+
+  cursor: default;
+}
+.balance-display:not(:hover) span.hidden {
+  color: transparent;
 }
 
 .button {
@@ -86,6 +117,30 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+.select-dropdown-list {
+  position: absolute;
+  max-height: 8rem;
+  width: 14rem;
+  margin: 0;
+  margin-top: 27px;
+  padding: 0;
+  padding-left: 5px;
+
+  background-color: #fff;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.select-dropdown-item {
+  padding-bottom: 3px;
+}
+.select-dropdown-item.highlighted {
+  background-color: var(--accent-hover);
+}
+.select-dropdown-item.selected {
+  font-weight: bold;
+}
+
 .rounded {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
@@ -110,22 +165,15 @@ body {
 .currency {
   font-weight: 500;
 }
-.currency.hidden {
-  color: transparent;
-  background-color: var(--currency-hidden-bg);
-  padding-right: 1.2rem;
-  cursor: default;
-}
-.currency.hidden:hover {
-  background-color: white;
-}
-:not(.hidden).currency.positive,
-.currency.positive.hidden:hover {
+.currency.positive {
   color: var(--currency-green);
 }
-:not(.hidden).currency.negative,
-.currency.negative.hidden:hover {
+.currency.negative {
   color: var(--currency-red);
+}
+
+.mt-big {
+  margin-top: 8px;
 }
 
 .mb-small {

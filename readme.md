@@ -1,6 +1,6 @@
 # Widget for YNAB
 
-A Chrome extension for YNAB that lets users see their category balances at a glance.
+A Chrome extension for YNAB that lets users see their category and account balances at a glance.
 
 ### Project layout
 
@@ -12,6 +12,15 @@ A Chrome extension for YNAB that lets users see their category balances at a gla
   - `components/` View layer components
 
 ## Building and running locally
+
+### Environment variables
+
+- `NEXT_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes
+
+Set up in your YNAB Developer Settings:
+
+- `NEXT_PUBLIC_YNAB_CLIENT_ID`
+- `YNAB_SECRET`
 
 ### Extension
 
