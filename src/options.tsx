@@ -49,7 +49,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
             Settings
           </h3>
-          <label className="flex-row mb-small" title="Show and pin your accounts in YNAB">
+          <label className="flex-row mb-small" title="Show and pin your accounts">
             <input
               type="checkbox"
               checked={settings.showAccounts}
@@ -57,15 +57,17 @@ export function OptionsView() {
             />
             Show accounts
           </label>
-          <label className="flex-row mb-small">
+          {/* <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.transactions}
               onChange={(e) => changeSetting("transactions", e.target.checked)}
             />
             Add transactions
-          </label>
-          <label className="flex-row mb-small">
+          </label> */}
+          <label
+            className="flex-row mb-small"
+            title="Hide balances unless you hover over them">
             <input
               type="checkbox"
               checked={settings.privateMode}

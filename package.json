@@ -1,13 +1,14 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "Check on your YNAB category balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
     "build:plasmo": "plasmo build",
+    "build:plasmo:zip": "plasmo build --zip",
     "dev:next": "next dev --port 3000",
     "build:next": "next build",
     "start:next": "next start",
@@ -53,12 +54,8 @@
     "permissions": [
       "identity"
     ],
-    "host_permissions": [
-      "$NEXT_PUBLIC_MAIN_URL/*"
-    ],
     "options_ui": {
       "open_in_tab": false
-    },
-    "key": "$CRX_PUBLIC_KEY"
+    }
   }
 }

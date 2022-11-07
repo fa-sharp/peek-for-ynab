@@ -62,7 +62,7 @@ const useAuthProvider = () => {
     new Promise<void>((resolve) => {
       // if no chrome API available, assume we're testing/developing in a regular web browser context
       if (!chrome || !chrome.identity) {
-        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code&scope=read-only`;
+        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code`;
         resolve();
       }
 
@@ -73,7 +73,7 @@ const useAuthProvider = () => {
       chrome.identity.launchWebAuthFlow(
         {
           interactive: true,
-          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code&scope=read-only`
+          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code`
         },
         (responseUrl) => {
           try {

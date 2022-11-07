@@ -2,8 +2,7 @@ import Cors from "cors";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const cors = Cors({
-  methods: ["GET", "POST", "HEAD"],
-  origin: [`chrome-extension://${process.env.NEXT_PUBLIC_EXTENSION_ID}`]
+  methods: ["GET", "POST", "HEAD"]
 });
 
 /** Adds CORS headers to Next.js API routes */
