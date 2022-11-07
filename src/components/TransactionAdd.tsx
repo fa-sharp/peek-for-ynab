@@ -5,7 +5,7 @@ import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
-import { IconButton, PayeeSelect } from ".";
+import { CategorySelect, IconButton, PayeeSelect } from ".";
 
 interface Props {
   initialState?: AddTransactionInitialState;
@@ -57,10 +57,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           />
         </label>
         <PayeeSelect payees={payeesData} selectPayee={setPayee} />
-        <label className="form-input">
-          Category
-          <input defaultValue={category?.name} />
-        </label>
+        <CategorySelect categories={categoriesData} selectCategory={setCategory} />
         <label className="form-input">
           Account
           <input defaultValue={account?.name} />

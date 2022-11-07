@@ -88,10 +88,10 @@ const useYNABProvider = () => {
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
-  const categoriesData = useMemo(() => {
-    if (!categoryGroupsData) return null;
-    return categoryGroupsData.flatMap((categoryGroup) => categoryGroup.categories);
-  }, [categoryGroupsData]);
+  const categoriesData = useMemo(
+    () => categoryGroupsData?.flatMap((categoryGroup) => categoryGroup.categories),
+    [categoryGroupsData]
+  );
 
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {

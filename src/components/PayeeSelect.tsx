@@ -9,7 +9,7 @@ interface Props {
   selectPayee: (payee: CachedPayee | { name: string }) => void;
 }
 
-function getPayeeFilter(inputValue?: string) {
+function getFilter(inputValue?: string) {
   return (payee: CachedPayee) =>
     !inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase());
 }
@@ -32,10 +32,9 @@ export default function PayeeSelect({ payees, selectPayee }: Props) {
       return payee ? payee.name : "";
     },
     onInputValueChange({ inputValue, selectedItem }) {
-      setPayeeList(payees?.filter(getPayeeFilter(inputValue)) || []);
+      setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       if (inputValue && (!selectedItem || inputValue !== selectedItem.name))
-        // New payee
-        selectPayee({ name: inputValue });
+        selectPayee({ name: inputValue }); // New payee
     },
     onSelectedItemChange({ selectedItem }) {
       if (selectedItem) selectPayee(selectedItem); // Existing payee
