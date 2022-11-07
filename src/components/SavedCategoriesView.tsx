@@ -37,7 +37,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
           actionElements={
             <div>
               <IconButton
-                label="Remove"
+                label={`Unpin '${category.name}'`}
                 onClick={() => removeCategory(category.id)}
                 icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
               />

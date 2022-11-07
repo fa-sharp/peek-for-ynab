@@ -120,7 +120,7 @@ function AccountTypeView({
                 {savedAccounts.some((a) => a.accountId === account.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
-                    label="Pin"
+                    label={`Pin ${account.name}`}
                     onClick={() =>
                       saveAccount({ accountId: account.id, budgetId: budgetData.id })
                     }
@@ -129,7 +129,7 @@ function AccountTypeView({
                 {settings.transactions && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
-                    label="Add transaction"
+                    label={`Add transaction to ${account.name}`}
                     onClick={() => addTx({ accountId: account.id })}
                   />
                 )}

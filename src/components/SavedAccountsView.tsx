@@ -35,7 +35,7 @@ export default function SavedAccountsView({ addTx }: Props) {
           actionElements={
             <div>
               <IconButton
-                label="Remove"
+                label={`Unpin '${account.name}'`}
                 onClick={() => removeAccount(account.id)}
                 icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
               />

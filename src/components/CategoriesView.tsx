@@ -22,7 +22,9 @@ function CategoriesView({ addTx }: Props) {
   const { savedCategories, saveCategory, settings } = useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [categoriesExpanded, setCategoriesExpanded] = useState(
+    savedCategories.length ? false : true // Expanded if user hasn't pinned any categories
+  );
 
   if (!selectedBudgetData || !categoryGroupsData) return null;
 
@@ -113,14 +115,14 @@ export function CategoryGroupView({
                 {savedCategories.some((c) => c.categoryId === category.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
-                    label="Pin"
+                    label={`Pin '${category.name}'`}
                     onClick={() => onSaveCategory(category.id)}
                   />
                 )}
                 {settings.transactions && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
-                    label="Add transaction"
+                    label={`Add transaction to ${category.name}`}
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
