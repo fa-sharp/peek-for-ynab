@@ -1,3 +1,4 @@
+import AccountSelect from "./AccountSelect";
 import AccountsView from "./AccountsView";
 import BudgetSelect from "./BudgetSelect";
 import CategoriesView from "./CategoriesView";
@@ -12,6 +13,7 @@ import TransactionAdd from "./TransactionAdd";
 
 export {
   PayeeSelect,
+  AccountSelect,
   CategorySelect,
   PopupNav,
   CategoriesView,

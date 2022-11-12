@@ -3,14 +3,22 @@ import { useCallback, useMemo, useState } from "react";
 import type { Category } from "ynab";
 
 import { useYNABContext } from "~lib/context";
+import { formatCurrency } from "~lib/utils";
 
 interface Props {
+  initialCategory?: Category;
   categories?: Category[];
   selectCategory: (category: Category) => void;
+  disabled?: boolean;
 }
 
-export default function CategorySelect({ categories, selectCategory }: Props) {
-  const { categoryGroupsData } = useYNABContext();
+export default function CategorySelect({
+  initialCategory,
+  categories,
+  selectCategory,
+  disabled
+}: Props) {
+  const { categoryGroupsData, selectedBudgetData } = useYNABContext();
 
   const [categoryList, setCategoryList] = useState(categories ? [...categories] : []);
 
@@ -40,6 +48,7 @@ export default function CategorySelect({ categories, selectCategory }: Props) {
     selectedItem
   } = useCombobox<Category | null>({
     items: categoryList,
+    initialSelectedItem: initialCategory,
     itemToString(category) {
       return category ? category.name : "";
     },
@@ -55,7 +64,7 @@ export default function CategorySelect({ categories, selectCategory }: Props) {
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col" {...getComboboxProps()}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
@@ -71,7 +80,10 @@ export default function CategorySelect({ categories, selectCategory }: Props) {
                   className={itemClassName}
                   key={category.id}
                   {...getItemProps({ item: category, index })}>
-                  {category.name}
+                  {`${category.name} (${formatCurrency(
+                    category.balance,
+                    selectedBudgetData?.currencyFormat
+                  )})`}
                 </li>
               );
             })

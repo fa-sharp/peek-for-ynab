@@ -63,7 +63,7 @@ export default function PopupNav() {
         icon={
           globalIsFetching ? (
             <Refresh />
-          ) : categoriesLastUpdated + 120_000 > Date.now() ? (
+          ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
             <Check />
           ) : (
             <AlertTriangle />

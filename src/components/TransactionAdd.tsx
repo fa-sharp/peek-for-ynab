@@ -5,7 +5,7 @@ import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
-import { CategorySelect, IconButton, PayeeSelect } from ".";
+import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 
 interface Props {
   initialState?: AddTransactionInitialState;
@@ -19,11 +19,11 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [amount, setAmount] = useState("");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
-    if (!initialState?.categoryId) return null;
+    if (!initialState?.categoryId) return;
     return categoriesData?.find((c) => c.id === initialState.categoryId);
   });
   const [account, setAccount] = useState(() => {
-    if (!initialState?.accountId) return null;
+    if (!initialState?.accountId) return;
     return accountsData?.find((a) => a.id === initialState.accountId);
   });
 
@@ -54,16 +54,24 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            disabled={isSaving}
           />
         </label>
-        <PayeeSelect payees={payeesData} selectPayee={setPayee} />
-        <CategorySelect categories={categoriesData} selectCategory={setCategory} />
-        <label className="form-input">
-          Account
-          <input defaultValue={account?.name} />
-        </label>
+        <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
+        <CategorySelect
+          initialCategory={category}
+          categories={categoriesData}
+          selectCategory={setCategory}
+          disabled={isSaving}
+        />
+        <AccountSelect
+          initialAccount={account}
+          accounts={accountsData}
+          selectAccount={setAccount}
+          disabled={isSaving}
+        />
         <button
-          className="button rounded accent mt-big"
+          className="button rounded accent mt-xxl"
           type="submit"
           disabled={isSaving}>
           {isSaving ? "Saving..." : "Save"}

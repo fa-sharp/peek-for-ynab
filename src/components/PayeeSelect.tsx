@@ -7,6 +7,7 @@ interface Props {
   payees?: CachedPayee[];
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
+  disabled?: boolean;
 }
 
 function getFilter(inputValue?: string) {
@@ -14,7 +15,7 @@ function getFilter(inputValue?: string) {
     !inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase());
 }
 
-export default function PayeeSelect({ payees, selectPayee }: Props) {
+export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
   const [payeeList, setPayeeList] = useState(payees ? [...payees] : []);
   const {
     isOpen,
@@ -45,7 +46,7 @@ export default function PayeeSelect({ payees, selectPayee }: Props) {
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
       <div className="flex-col" {...getComboboxProps()}>
-        <input required {...getInputProps()} />
+        <input required {...getInputProps()} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>

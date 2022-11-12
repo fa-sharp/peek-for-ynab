@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap");
 
 :root {
-  --accent: hsl(204, 100%, 94%);
+  --accent: hsl(204, 100%, 96%);
   --accent-hover: hsl(204, 100%, 88%);
   --warn: #e6abab;
   --warn-hover: #ed8282;
@@ -179,6 +179,10 @@ body {
 
 .mt-big {
   margin-top: 2rem;
+}
+
+.mt-xxl {
+  margin-top: 5rem;
 }
 
 .mb-small {
