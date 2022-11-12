@@ -4,14 +4,26 @@ import type { MouseEventHandler, ReactElement } from "react";
 export default function IconButton({
   icon,
   onClick,
-  label
+  label,
+  spin,
+  disabled
 }: {
   label: string;
   onClick: MouseEventHandler;
   icon: ReactElement;
+  spin?: boolean;
+  disabled?: boolean;
 }) {
+  let className = "icon-button";
+  if (spin) className += " spin";
+
   return (
-    <button aria-label={label} title={label} className="icon-button" onClick={onClick}>
+    <button
+      aria-label={label}
+      title={label}
+      className={className}
+      onClick={onClick}
+      disabled={disabled}>
       {icon}
     </button>
   );

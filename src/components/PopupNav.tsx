@@ -1,17 +1,27 @@
-import { ArrowsDownUp, ExternalLink, Settings } from "tabler-icons-react";
+import { useIsFetching } from "@tanstack/react-query";
+import {
+  AlertTriangle,
+  ArrowsDownUp,
+  Check,
+  ExternalLink,
+  Refresh,
+  Settings
+} from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupNav() {
   const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
-  const { shownBudgetsData } = useYNABContext();
+  const { shownBudgetsData, categoriesLastUpdated } = useYNABContext();
+  const globalIsFetching = useIsFetching();
 
   if (!shownBudgetsData) return <p>Loading budgets...</p>;
 
   return (
     <nav
       style={{
+        maxWidth: "280px",
         marginBottom: 8,
         display: "flex",
         justifyContent: "space-between",
@@ -46,6 +56,21 @@ export default function PopupNav() {
         label="Settings"
         onClick={() => chrome?.runtime?.openOptionsPage()}
         icon={<Settings />}
+      />
+      <IconButton
+        label={`Last Updated: ${new Date(categoriesLastUpdated).toLocaleString()}`}
+        onClick={() => undefined}
+        icon={
+          globalIsFetching ? (
+            <Refresh />
+          ) : categoriesLastUpdated + 120_000 > Date.now() ? (
+            <Check />
+          ) : (
+            <AlertTriangle />
+          )
+        }
+        spin={Boolean(globalIsFetching)}
+        disabled={true}
       />
     </nav>
   );
