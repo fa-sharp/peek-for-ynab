@@ -39,11 +39,11 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   };
 
   return (
-    <section aria-label="Add transaction form">
-      <h2 className="heading-big" style={{ marginBottom: "1rem" }}>
-        Add Transaction
+    <section>
+      <div className="heading-big">
+        <div role="heading">Add Transaction</div>
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
-      </h2>
+      </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="form-input">
           Amount

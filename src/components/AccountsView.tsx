@@ -129,7 +129,7 @@ function AccountTypeView({
                 {settings.transactions && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
-                    label={`Add transaction to ${account.name}`}
+                    label={`Add transaction to '${account.name}'`}
                     onClick={() => addTx({ accountId: account.id })}
                   />
                 )}

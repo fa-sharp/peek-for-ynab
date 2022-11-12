@@ -122,7 +122,7 @@ export function CategoryGroupView({
                 {settings.transactions && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
-                    label={`Add transaction to ${category.name}`}
+                    label={`Add transaction to '${category.name}'`}
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
