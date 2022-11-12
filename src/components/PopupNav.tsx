@@ -33,7 +33,7 @@ export default function PopupNav() {
         setSelectedBudgetId={setSelectedBudgetId}
       />
       <IconButton
-        label="Change budget"
+        label="Switch budgets"
         onClick={() => {
           const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
           if (currIndex === shownBudgetsData.length - 1)

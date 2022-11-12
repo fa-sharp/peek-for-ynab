@@ -44,7 +44,7 @@ const useStorageProvider = () => {
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {
-      showAccounts: false,
+      showAccounts: true,
       transactions: false,
       privateMode: false,
       emojiMode: false
@@ -110,7 +110,7 @@ const useStorageProvider = () => {
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
-    } else setShownBudgetIds([budgetId, ...shownBudgetIds]);
+    } else setShownBudgetIds([...shownBudgetIds, budgetId]);
   };
 
   /** Clears all values, removes all saved data from browser storage */

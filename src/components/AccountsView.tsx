@@ -142,7 +142,7 @@ function AccountTypeView({
 }
 
 export const AccountView = ({
-  account: { name, balance, cleared_balance, uncleared_balance },
+  account: { name, balance },
   currencyFormat,
   actionElements,
   settings
@@ -158,9 +158,9 @@ export const AccountView = ({
     <div
       className="balance-display"
       title={
-        (settings.emojiMode ? `${name}:\n` : "") +
-        `Cleared: ${formatCurrency(cleared_balance, currencyFormat)}` +
-        `, Uncleared: ${formatCurrency(uncleared_balance, currencyFormat)}`
+        settings.emojiMode
+          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
+          : undefined
       }>
       <div>
         {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}

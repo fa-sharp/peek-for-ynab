@@ -73,9 +73,9 @@ export function OptionsView() {
               checked={settings.privateMode}
               onChange={(e) => changeSetting("privateMode", e.target.checked)}
             />
-            Privacy mode
+            Hide balances
           </label>
-          <label className="flex-row">
+          <label className="flex-row" title="Show category/account names as emojis only">
             <input
               type="checkbox"
               checked={settings.emojiMode}
@@ -84,17 +84,8 @@ export function OptionsView() {
             Emoji mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1rem" }}>
-            Budgets
+            Show/hide budgets
           </h3>
-          <button
-            title="Refresh the list of budgets from YNAB"
-            className={"button rounded accent flex-row"}
-            style={{ width: "fit-content", marginBottom: 8 }}
-            onClick={() => refreshBudgets()}
-            disabled={isRefreshingBudgets}>
-            <Refresh size={14} />
-            {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
-          </button>
           {budgetsData?.map((budget) => (
             <label key={budget.id} className="flex-row mb-small">
               <input
@@ -105,6 +96,15 @@ export function OptionsView() {
               {budget.name}
             </label>
           ))}
+          <button
+            title="Refresh the list of budgets from YNAB"
+            className={"button rounded accent flex-row"}
+            style={{ width: "fit-content", marginBottom: 8 }}
+            onClick={() => refreshBudgets()}
+            disabled={isRefreshingBudgets}>
+            <Refresh size={14} />
+            {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
+          </button>
           <button
             style={{ marginTop: 12 }}
             className="button rounded warn"

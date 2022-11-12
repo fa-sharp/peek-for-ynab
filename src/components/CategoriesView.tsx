@@ -135,7 +135,7 @@ export function CategoryGroupView({
 }
 
 export const CategoryView = ({
-  categoryData: { name, budgeted, activity, balance },
+  categoryData: { name, balance },
   currencyFormat,
   settings,
   actionElements
@@ -152,9 +152,9 @@ export const CategoryView = ({
     <div
       className="balance-display"
       title={
-        (settings.emojiMode ? `${name}:\n` : "") +
-        `Budgeted: ${formatCurrency(budgeted, currencyFormat)}` +
-        `, Activity: ${formatCurrency(activity, currencyFormat)}`
+        settings.emojiMode
+          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
+          : undefined
       }>
       <div>
         {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}
