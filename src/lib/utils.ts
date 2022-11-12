@@ -10,7 +10,10 @@ export const formatCurrency = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(millis);
+  const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
+    millis,
+    currencyFormat.decimal_digits
+  );
   const formattedString = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,

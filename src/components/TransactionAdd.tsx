@@ -1,5 +1,6 @@
 import { FormEventHandler, useState } from "react";
 import { ArrowBack } from "tabler-icons-react";
+import { SaveTransaction } from "ynab";
 
 import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -14,7 +15,7 @@ interface Props {
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd({ initialState, closeForm }: Props) {
-  const { accountsData, categoriesData, payeesData } = useYNABContext();
+  const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
 
   const [amount, setAmount] = useState("");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
@@ -31,11 +32,18 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
 
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
+    if (!account || !payee || !amount) return;
     setIsSaving(true);
-    setTimeout(() => {
-      console.log("New transaction: ", { payee, category, account, amount });
-      setIsSaving(false);
-    }, 2000);
+    await addTransaction({
+      date: new Date().toISOString(),
+      amount: +amount * 1000,
+      payee_id: "id" in payee ? payee.id : undefined,
+      payee_name: "id" in payee ? undefined : payee.name,
+      account_id: account.id,
+      category_id: category?.id,
+      cleared: SaveTransaction.ClearedEnum.Uncleared
+    });
+    setIsSaving(false);
   };
 
   return (

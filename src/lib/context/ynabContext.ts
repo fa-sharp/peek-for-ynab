@@ -125,8 +125,8 @@ const useYNABProvider = () => {
   const refreshCategoriesAndAccounts = useCallback(
     async () =>
       Promise.all([
-        queryClient.invalidateQueries(["categoryGroups"]),
-        queryClient.invalidateQueries(["accounts"])
+        queryClient.refetchQueries({ queryKey: ["categoryGroups"], type: "active" }),
+        queryClient.refetchQueries({ queryKey: ["accounts"], type: "active" })
       ]),
     [queryClient]
   );
