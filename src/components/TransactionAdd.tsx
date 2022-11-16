@@ -43,6 +43,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       category_id: category?.id,
       cleared: SaveTransaction.ClearedEnum.Uncleared
     });
+    closeForm();
     setIsSaving(false);
   };
 

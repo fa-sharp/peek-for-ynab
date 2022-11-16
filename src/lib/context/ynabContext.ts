@@ -122,14 +122,14 @@ const useYNABProvider = () => {
     onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched accounts!", data)
   });
 
-  const refreshCategoriesAndAccounts = useCallback(
-    async () =>
-      Promise.all([
-        queryClient.refetchQueries({ queryKey: ["categoryGroups"], type: "active" }),
-        queryClient.refetchQueries({ queryKey: ["accounts"], type: "active" })
-      ]),
-    [queryClient]
-  );
+  const refreshCategoriesAndAccounts = useCallback(() => {
+    queryClient.refetchQueries({
+      queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
+    });
+    queryClient.refetchQueries({
+      queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
+    });
+  }, [queryClient, selectedBudgetId]);
 
   /** Fetch payees for the selected budget (if user enables transactions) */
   const { data: payeesData } = useQuery({
@@ -141,10 +141,10 @@ const useYNABProvider = () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
       return response.data.payees
-        .map(({ id, name, transfer_account_id }) => ({
-          id,
-          name,
-          transferId: transfer_account_id
+        .map((payee) => ({
+          id: payee.id,
+          name: payee.name,
+          transferId: payee.transfer_account_id
         }))
         .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
     },
@@ -202,7 +202,7 @@ const useYNABProvider = () => {
       });
       !IS_PRODUCTION &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
-      refreshCategoriesAndAccounts;
+      setTimeout(refreshCategoriesAndAccounts, 500);
     },
     [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
   );
