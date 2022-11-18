@@ -1,5 +1,5 @@
-import { FormEventHandler, useState } from "react";
-import { ArrowBack } from "tabler-icons-react";
+import { FormEventHandler, MouseEventHandler, useState } from "react";
+import { ArrowBack, Minus, Plus } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
 import { useYNABContext } from "~lib/context";
@@ -18,6 +18,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
 
   const [amount, setAmount] = useState("");
+  const [amountType, setAmountType] = useState<"inflow" | "outflow">("outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
     if (!initialState?.categoryId) return;
@@ -30,13 +31,18 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
 
   const [isSaving, setIsSaving] = useState(false);
 
+  const flipAmountType: MouseEventHandler = (event) => {
+    event.preventDefault();
+    setAmountType((prev) => (prev === "inflow" ? "outflow" : "inflow"));
+  };
+
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
     if (!account || !payee || !amount) return;
     setIsSaving(true);
     await addTransaction({
       date: new Date().toISOString(),
-      amount: +amount * 1000,
+      amount: amountType === "inflow" ? +amount * 1000 : +amount * -1000,
       payee_id: "id" in payee ? payee.id : undefined,
       payee_name: "id" in payee ? undefined : payee.name,
       account_id: account.id,
@@ -54,18 +60,34 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
-        <label className="form-input">
+        <div className="form-input">
           Amount
-          <input
-            required
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            disabled={isSaving}
-          />
-        </label>
+          <div className="flex-row">
+            <IconButton
+              label={amountType}
+              icon={
+                amountType === "inflow" ? (
+                  <Plus color="var(--currency-green)" />
+                ) : (
+                  <Minus color="var(--currency-red)" />
+                )
+              }
+              onClick={flipAmountType}
+            />
+            <input
+              required
+              autoFocus
+              aria-label="Amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              disabled={isSaving}
+            />
+          </div>
+        </div>
         <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
         <CategorySelect
           initialCategory={category}
