@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { nanoid } from "nanoid";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect } from "react";
 import * as ynab from "ynab";
@@ -59,31 +60,47 @@ const useAuthProvider = () => {
 
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = () =>
-    new Promise<void>((resolve) => {
+    new Promise<void>((resolve, reject) => {
+      if (!process.env.NEXT_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+      const authorizeState = nanoid();
+      const authorizeParams = new URLSearchParams({
+        client_id: process.env.NEXT_PUBLIC_YNAB_CLIENT_ID,
+        redirect_uri:
+          chrome?.identity?.getRedirectURL() || "http://localhost:3000/testLogin",
+        response_type: "code",
+        state: authorizeState
+      });
+      const authorizeUrl = new URL("https://app.youneedabudget.com/oauth/authorize");
+      authorizeUrl.search = authorizeParams.toString();
+
       // if no chrome API available, assume we're testing/developing in a regular web browser context
       if (!chrome || !chrome.identity) {
-        window.location.href = `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=http://localhost:3000/testLogin&response_type=code`;
+        window.location.href = authorizeUrl.toString();
         resolve();
       }
 
       // initiate OAuth flow through chrome API
-      const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org`;
       const initialTokenUrl = `${process.env.NEXT_PUBLIC_MAIN_URL}/api/auth/initial`;
-
       chrome.identity.launchWebAuthFlow(
         {
           interactive: true,
-          url: `https://app.youneedabudget.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_YNAB_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=code`
+          url: authorizeUrl.toString()
         },
-        (responseUrl) => {
+        (response) => {
           try {
-            if (!responseUrl) throw "No response URL!";
-            const oAuthCode = new URL(responseUrl).searchParams.get("code");
-            if (!oAuthCode) throw "No OAuth code found!";
+            if (!response) throw "No response URL!";
+            const responseURL = new URL(response);
+            const oauthCode = responseURL.searchParams.get("code");
+            const returnedState = responseURL.searchParams.get("state");
+            if (!oauthCode) throw "No OAuth code found!";
+            if (returnedState !== authorizeState) throw "State param doesn't match!";
 
-            fetch(`${initialTokenUrl}?code=${oAuthCode}&redirectUri=${redirectUri}`, {
-              method: "POST"
-            })
+            fetch(
+              `${initialTokenUrl}?code=${oauthCode}&redirectUri=${chrome.identity.getRedirectURL()}`,
+              {
+                method: "POST"
+              }
+            )
               .then((res) => {
                 if (!res.ok)
                   throw { message: "Error getting initial token!", status: res.status };
