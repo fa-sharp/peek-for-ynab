@@ -53,8 +53,8 @@ const useYNABProvider = () => {
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
       const { data } = await ynabAPI.budgets.getBudgets();
-      // Show first five budgets by default
-      if (!shownBudgetIds) setShownBudgetIds(data.budgets.slice(0, 5).map((b) => b.id));
+      // Show first four budgets by default
+      if (!shownBudgetIds) setShownBudgetIds(data.budgets.slice(0, 4).map((b) => b.id));
       return data.budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
