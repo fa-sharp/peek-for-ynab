@@ -36,8 +36,13 @@ function IndexPage() {
         {APP_NAME} does not share data with any third-party and/or analytics services.
       </p>
       <p>
-        This privacy policy is subject to change at any time. This website will show the
+        This privacy policy may be updated periodically to reflect changes in the
+        extension&apos;s functionality and data practices. This website will show the
         latest version of the policy.
+      </p>
+      <br />
+      <p style={{ color: "gray" }}>
+        <em>Last updated: Nov 21, 2022</em>
       </p>
     </main>
   );
