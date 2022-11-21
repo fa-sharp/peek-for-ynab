@@ -1,4 +1,5 @@
 import { useIsFetching } from "@tanstack/react-query";
+import { useCallback } from "react";
 import {
   AlertTriangle,
   ArrowsDownUp,
@@ -9,12 +10,21 @@ import {
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupNav() {
   const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
   const { shownBudgetsData, categoriesLastUpdated } = useYNABContext();
+  const { isRefreshingToken } = useAuthContext();
   const globalIsFetching = useIsFetching();
+
+  const switchBudget = useCallback(() => {
+    if (!shownBudgetsData) return;
+    const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
+    if (currIndex >= shownBudgetsData.length - 1)
+      setSelectedBudgetId(shownBudgetsData[0].id);
+    else setSelectedBudgetId(shownBudgetsData[currIndex + 1].id);
+  }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
 
   if (!shownBudgetsData) return <p>Loading budgets...</p>;
 
@@ -32,18 +42,9 @@ export default function PopupNav() {
         selectedBudgetId={selectedBudgetId}
         setSelectedBudgetId={setSelectedBudgetId}
       />
+      <IconButton label="Switch budget" onClick={switchBudget} icon={<ArrowsDownUp />} />
       <IconButton
-        label="Switch budgets"
-        onClick={() => {
-          const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
-          if (currIndex === shownBudgetsData.length - 1)
-            setSelectedBudgetId(shownBudgetsData[0].id);
-          else setSelectedBudgetId(shownBudgetsData[currIndex + 1].id);
-        }}
-        icon={<ArrowsDownUp />}
-      />
-      <IconButton
-        label="Open budget in YNAB"
+        label="Open this budget in YNAB"
         onClick={() =>
           window.open(
             `https://app.youneedabudget.com/${selectedBudgetId}/budget`,
@@ -61,15 +62,15 @@ export default function PopupNav() {
         label={`Last Updated: ${new Date(categoriesLastUpdated).toLocaleString()}`}
         onClick={() => undefined}
         icon={
-          globalIsFetching ? (
+          globalIsFetching || isRefreshingToken ? (
             <Refresh />
           ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
             <Check />
           ) : (
-            <AlertTriangle />
+            <AlertTriangle /> // indicates data is stale/old
           )
         }
-        spin={Boolean(globalIsFetching)}
+        spin={Boolean(globalIsFetching || isRefreshingToken)}
         disabled={true}
       />
     </nav>

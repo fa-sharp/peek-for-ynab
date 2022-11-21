@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";
@@ -13,6 +13,9 @@ const useAuthProvider = () => {
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
 
+  /** Whether token is being refreshed */
+  const [isRefreshingToken, setIsRefreshingToken] = useState(false);
+
   /** The current React Query client */
   const queryClient = useQueryClient();
 
@@ -20,6 +23,7 @@ const useAuthProvider = () => {
   const refresh = useCallback(() => {
     if (!tokenData) return;
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
+    setIsRefreshingToken(true);
 
     const refreshUrl = `${process.env.NEXT_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
@@ -38,7 +42,8 @@ const useAuthProvider = () => {
         if (!IS_PRODUCTION) console.log("Got a new token!");
         setTokenData(newTokenData);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setIsRefreshingToken(false));
   }, [setTokenData, tokenData]);
 
   /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
@@ -130,7 +135,14 @@ const useAuthProvider = () => {
     queryClient.clear();
   };
 
-  return { login, loginWithOAuth, logout, loggedIn: tokenData != null, tokenExpired };
+  return {
+    login,
+    loginWithOAuth,
+    logout,
+    loggedIn: tokenData != null,
+    tokenExpired,
+    isRefreshingToken
+  };
 };
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);
