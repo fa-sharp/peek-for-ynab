@@ -10,29 +10,34 @@ function IndexPage() {
       <Head>
         <title>{APP_NAME} - Privacy Policy</title>
       </Head>
-      <h1>Privacy Policy</h1>
+      <h1>{APP_NAME} - Privacy Policy</h1>
+      <Link href="/">Home</Link>
       <p>
         {APP_NAME} follows the{" "}
         <Link href="https://api.youneedabudget.com/#terms">
           YNAB API Terms of Service
         </Link>
         . When you authorize the extension with your YNAB account, {APP_NAME + " "}
-        communicates directly with YNAB through their API to access your budget
-        information - including your budgets, budget settings, categories, accounts, and
-        balances. {APP_NAME} cannot access your YNAB login credentials, nor any
-        credentials to your financial institution accounts. You must login to YNAB through
-        their website in order to authorize {APP_NAME} for use with your account.
+        communicates directly with YNAB through their API to access your budget data -
+        including your budgets, budget settings, categories, accounts, and balances.{" "}
+        {APP_NAME} cannot access your YNAB login credentials, nor any credentials to your
+        financial institution accounts. You must login to YNAB through their website in
+        order to authorize {APP_NAME} for use with your account.
       </p>
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
-        a list of your budget names, budget settings, and the IDs of the categories and
-        accounts which you save and pin in the extension. This data is stored locally in
-        your browser and is never sent to a third-party. Balances are <em>not</em> stored
-        - rather, they are fetched from YNAB each time you open the extension. All data is
-        deleted immediately when you logout and/or uninstall the extension.
+        your extension settings and the list of categories and accounts you choose to pin.{" "}
+        {APP_NAME} also caches data from your budget, which allows the extension to fetch
+        and display your data quickly and efficiently. This cached data is stored locally
+        in your browser and is never sent to a third-party. All data is immediately
+        deleted if you logout and/or uninstall the extension.
       </p>
       <p>
         {APP_NAME} does not share data with any third-party and/or analytics services.
+      </p>
+      <p>
+        This privacy policy is subject to change at any time. This website will show the
+        latest version of the policy.
       </p>
     </main>
   );

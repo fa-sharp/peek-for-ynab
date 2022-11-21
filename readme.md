@@ -7,9 +7,11 @@ A Chrome extension for YNAB that lets users see their category and account balan
 - `src/`
   - `popup.tsx` Extension - popup component
   - `options.tsx` Extension - options component
-  - `pages/` Website - pages (Next.js)
-  - `lib/` Various library and utility functions
-  - `components/` View layer components
+  - `pages/` Website and server (Next.js)
+    - `api/` API routes to fetch OAuth tokens from YNAB API
+  - `lib/` Library and utility functions
+    - `context/` - React Context that provides auth, API data, and storage to the extension
+  - `components/` View components
 
 ## Building and running locally
 
@@ -17,10 +19,10 @@ A Chrome extension for YNAB that lets users see their category and account balan
 
 - `NEXT_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes
 
-Set up in your YNAB Developer Settings:
+Set up an OAuth application in your YNAB Developer Settings:
 
-- `NEXT_PUBLIC_YNAB_CLIENT_ID`
-- `YNAB_SECRET`
+- `NEXT_PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
+- `YNAB_SECRET`: OAuth secret (server only)
 
 ### Extension
 
@@ -38,7 +40,7 @@ For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
 
 ### Website
 
-The website is created with [Next.js](https://nextjs.org/). Pages are located in the `src/pages/` folder. You can run the development server via:
+The website is created with [Next.js](https://nextjs.org/). Pages and API routes are located in the `src/pages/` folder. You can run the development server via:
 
 ```bash
 pnpm dev:next
