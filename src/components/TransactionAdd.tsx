@@ -28,6 +28,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     if (!initialState?.accountId) return;
     return accountsData?.find((a) => a.id === initialState.accountId);
   });
+  const [memo, setMemo] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -47,7 +48,8 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       payee_name: "id" in payee ? undefined : payee.name,
       account_id: account.id,
       category_id: category?.id,
-      cleared: SaveTransaction.ClearedEnum.Uncleared
+      cleared: SaveTransaction.ClearedEnum.Uncleared,
+      memo
     });
     closeForm();
     setIsSaving(false);
@@ -101,8 +103,12 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           selectAccount={setAccount}
           disabled={isSaving}
         />
+        <label className="form-input">
+          Memo
+          <textarea value={memo} onChange={(e) => setMemo(e.target.value)} />
+        </label>
         <button
-          className="button rounded accent mt-xxl"
+          className="button rounded accent mt-big"
           type="submit"
           disabled={isSaving}>
           {isSaving ? "Saving..." : "Save"}

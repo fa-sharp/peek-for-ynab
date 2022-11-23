@@ -38,7 +38,8 @@ body {
   gap: 2px;
 }
 
-.form-input input {
+.form-input input,
+.form-input textarea {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
