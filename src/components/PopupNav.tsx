@@ -12,6 +12,7 @@ import {
 import { BudgetSelect, IconButton } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
+/** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
   const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
   const { shownBudgetsData, categoriesLastUpdated } = useYNABContext();
@@ -25,6 +26,10 @@ export default function PopupNav() {
       setSelectedBudgetId(shownBudgetsData[0].id);
     else setSelectedBudgetId(shownBudgetsData[currIndex + 1].id);
   }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
+
+  const openBudget = useCallback(() => {
+    window.open(`https://app.youneedabudget.com/${selectedBudgetId}/budget`, "_blank");
+  }, [selectedBudgetId]);
 
   if (!shownBudgetsData) return <p>Loading budgets...</p>;
 
@@ -42,15 +47,16 @@ export default function PopupNav() {
         selectedBudgetId={selectedBudgetId}
         setSelectedBudgetId={setSelectedBudgetId}
       />
-      <IconButton label="Switch budget" onClick={switchBudget} icon={<ArrowsDownUp />} />
+      {shownBudgetsData.length > 1 && (
+        <IconButton
+          label="Switch budget"
+          onClick={switchBudget}
+          icon={<ArrowsDownUp />}
+        />
+      )}
       <IconButton
         label="Open this budget in YNAB"
-        onClick={() =>
-          window.open(
-            `https://app.youneedabudget.com/${selectedBudgetId}/budget`,
-            "_blank"
-          )
-        }
+        onClick={openBudget}
         icon={<ExternalLink />}
       />
       <IconButton
