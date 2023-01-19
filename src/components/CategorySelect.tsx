@@ -22,16 +22,20 @@ export default function CategorySelect({
 
   const [categoryList, setCategoryList] = useState(categories ? [...categories] : []);
 
-  /** Ignored categories when adding a transaction (Ready to Assign, CCP categories) */
-  const ignoredCategoryIds = useMemo(
-    () => categoryGroupsData?.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id)),
-    [categoryGroupsData]
-  );
+  /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
+  const ignoredCategoryIds = useMemo(() => {
+    if (!categoryGroupsData) return undefined;
+    const ignoredIds = new Set(
+      categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
+    );
+    ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
+    return ignoredIds;
+  }, [categoryGroupsData]);
 
   const getFilter = useCallback(
     (inputValue?: string) => {
       return (category: Category) =>
-        !ignoredCategoryIds?.includes(category.id) &&
+        !ignoredCategoryIds?.has(category.id) &&
         (!inputValue || category.name.toLowerCase().includes(inputValue.toLowerCase()));
     },
     [ignoredCategoryIds]
@@ -80,10 +84,12 @@ export default function CategorySelect({
                   className={itemClassName}
                   key={category.id}
                   {...getItemProps({ item: category, index })}>
-                  {`${category.name} (${formatCurrency(
-                    category.balance,
-                    selectedBudgetData?.currencyFormat
-                  )})`}
+                  {category.name}{" "}
+                  {category.name !== "Inflow: Ready to Assign" &&
+                    `(${formatCurrency(
+                      category.balance,
+                      selectedBudgetData?.currencyFormat
+                    )})`}
                 </li>
               );
             })

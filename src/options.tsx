@@ -46,7 +46,8 @@ export function OptionsView() {
         </button>
       ) : (
         <>
-          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
+          <h1>Peek for YNAB</h1>
+          <h3 className="heading-big" style={{ marginTop: "0" }}>
             Settings
           </h3>
           <label className="flex-row mb-small" title="Show and pin your accounts">
@@ -55,35 +56,48 @@ export function OptionsView() {
               checked={settings.showAccounts}
               onChange={(e) => changeSetting("showAccounts", e.target.checked)}
             />
-            Show accounts
+            💲 Show accounts
           </label>
-          {/* <label className="flex-row mb-small">
-            <input
-              type="checkbox"
-              checked={settings.transactions}
-              onChange={(e) => changeSetting("transactions", e.target.checked)}
-            />
-            Add transactions
-          </label> */}
-          <label
-            className="flex-row mb-small"
-            title="Hide balances unless you hover over them">
+          <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.privateMode}
               onChange={(e) => changeSetting("privateMode", e.target.checked)}
             />
-            Hide balances
+            🕶️ Hide balances unless you hover over them
           </label>
-          <label className="flex-row" title="Show category/account names as emojis only">
+          <label className="flex-row">
             <input
               type="checkbox"
               checked={settings.emojiMode}
               onChange={(e) => changeSetting("emojiMode", e.target.checked)}
             />
-            Emoji mode
+            😉 Display category/account names as emojis only
           </label>
-          <h3 className="heading-big" style={{ marginTop: "1rem" }}>
+          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
+            Transaction entry
+          </h3>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.txEnabled}
+              onChange={(e) => changeSetting("txEnabled", e.target.checked)}
+            />
+            💸 Enable transaction entry (BETA - bugs likely!!)
+          </label>
+          {settings.txEnabled && (
+            <>
+              <label className="flex-row mb-small">
+                <input
+                  type="checkbox"
+                  checked={settings.txApproved}
+                  onChange={(e) => changeSetting("txApproved", e.target.checked)}
+                />
+                🔵 Mark entered transactions as Approved
+              </label>
+            </>
+          )}
+          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Show/hide budgets
           </h3>
           {budgetsData?.map((budget) => (
@@ -99,7 +113,7 @@ export function OptionsView() {
           <button
             title="Refresh the list of budgets from YNAB"
             className={"button rounded accent flex-row"}
-            style={{ width: "fit-content", marginBottom: 8 }}
+            style={{ width: "fit-content", marginBlock: 8 }}
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>
             <Refresh size={14} />

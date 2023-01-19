@@ -69,11 +69,11 @@ export default function PopupNav() {
         onClick={() => undefined}
         icon={
           globalIsFetching || isRefreshingToken ? (
-            <Refresh />
+            <Refresh color="black" />
           ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
-            <Check />
+            <Check color="var(--currency-green)" />
           ) : (
-            <AlertTriangle /> // indicates data is stale/old
+            <AlertTriangle color="darkorange" /> // indicates data is stale/old
           )
         }
         spin={Boolean(globalIsFetching || isRefreshingToken)}

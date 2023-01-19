@@ -2,7 +2,7 @@ import { FormEventHandler, MouseEventHandler, useState } from "react";
 import { ArrowBack, Minus, Plus } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
-import { useYNABContext } from "~lib/context";
+import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
@@ -16,6 +16,7 @@ interface Props {
 /** Form that lets user add a transaction. */
 export default function TransactionAdd({ initialState, closeForm }: Props) {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
+  const { settings } = useStorageContext();
 
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState<"inflow" | "outflow">("outflow");
@@ -49,6 +50,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       account_id: account.id,
       category_id: category?.id,
       cleared: SaveTransaction.ClearedEnum.Uncleared,
+      approved: settings.txApproved,
       memo
     });
     closeForm();
@@ -105,7 +107,11 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         />
         <label className="form-input">
           Memo
-          <textarea value={memo} onChange={(e) => setMemo(e.target.value)} />
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            disabled={isSaving}
+          />
         </label>
         <button
           className="button rounded accent mt-big"

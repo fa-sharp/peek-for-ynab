@@ -112,7 +112,7 @@ const useYNABProvider = () => {
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
     queryKey: ["accounts", `budgetId-${selectedBudgetId}`],
     enabled: Boolean(
-      (settings.showAccounts || settings.transactions) && ynabAPI && selectedBudgetId
+      (settings.showAccounts || settings.txEnabled) && ynabAPI && selectedBudgetId
     ),
     queryFn: async () => {
       if (!ynabAPI) return;
@@ -136,7 +136,7 @@ const useYNABProvider = () => {
     queryKey: ["payees", `budgetId-${selectedBudgetId}`],
     staleTime: ONE_DAY_IN_MILLIS,
     cacheTime: TWO_WEEKS_IN_MILLIS,
-    enabled: Boolean(settings.transactions && ynabAPI && selectedBudgetId),
+    enabled: Boolean(settings.txEnabled && ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);

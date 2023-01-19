@@ -117,7 +117,7 @@ function AccountTypeView({
             settings={settings}
             actionElements={
               <aside aria-label="actions">
-                {settings.transactions && (
+                {settings.txEnabled && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
                     label={`Add transaction to '${account.name}'`}

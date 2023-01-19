@@ -57,7 +57,7 @@
       "identity"
     ],
     "options_ui": {
-      "open_in_tab": false
+      "open_in_tab": true
     }
   }
 }

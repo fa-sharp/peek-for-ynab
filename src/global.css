@@ -108,7 +108,7 @@ body {
   cursor: pointer;
 }
 .icon-button:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 .icon-button:active {
   transform: scale(0.95);
@@ -139,6 +139,7 @@ body {
 
 .select-dropdown-item {
   padding-bottom: 3px;
+  cursor: pointer;
 }
 .select-dropdown-item.highlighted {
   background-color: var(--accent-hover);
@@ -187,7 +188,7 @@ body {
 }
 
 .mb-small {
-  margin-bottom: 4;
+  margin-bottom: 6px;
 }
 
 .font-big {

@@ -15,7 +15,9 @@ export interface AppSettings {
   /** Whether to fetch and show accounts from each budget */
   showAccounts: boolean;
   /** Whether to enable adding transactions */
-  transactions: boolean;
+  txEnabled: boolean;
+  /** Whether transactions are automatically marked Approved */
+  txApproved: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
@@ -45,7 +47,8 @@ const useStorageProvider = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {
       showAccounts: true,
-      transactions: false,
+      txEnabled: false,
+      txApproved: false,
       privateMode: false,
       emojiMode: false
     }
