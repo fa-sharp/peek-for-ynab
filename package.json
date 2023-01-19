@@ -1,7 +1,7 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Check on your YNAB category and account balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
@@ -15,23 +15,23 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@plasmohq/storage": "^0.12.1",
-    "@tanstack/query-core": "^4.15.1",
-    "@tanstack/react-query": "^4.16.1",
-    "@tanstack/react-query-devtools": "^4.16.1",
-    "@tanstack/react-query-persist-client": "^4.16.1",
+    "@plasmohq/storage": "^0.14.0",
+    "@tanstack/query-core": "^4.22.0",
+    "@tanstack/react-query": "^4.22.0",
+    "@tanstack/react-query-devtools": "^4.22.0",
+    "@tanstack/react-query-persist-client": "^4.22.0",
     "cors": "^2.8.5",
-    "downshift": "^6.1.12",
+    "downshift": "^6",
     "idb-keyval": "^6.2.0",
     "nanoid": "^4.0.0",
     "next": "^12.1.6",
-    "plasmo": "^0.55.0",
-    "puro": "^0.5.0",
+    "plasmo": "^0.62.2",
+    "puro": "^0.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tabler-icons-react": "^1.55.0",
-    "use-local-storage-state": "^18.1.0",
-    "ynab": "^1.32.0"
+    "use-local-storage-state": "^18.1.2",
+    "ynab": "^1.42.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^12.1.6",
