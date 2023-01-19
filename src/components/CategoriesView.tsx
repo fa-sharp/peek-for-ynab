@@ -111,14 +111,7 @@ export function CategoryGroupView({
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
             actionElements={
-              <div>
-                {savedCategories.some((c) => c.categoryId === category.id) ? null : (
-                  <IconButton
-                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
-                    label={`Pin '${category.name}'`}
-                    onClick={() => onSaveCategory(category.id)}
-                  />
-                )}
+              <aside aria-label="actions">
                 {settings.transactions && (
                   <IconButton
                     icon={<Plus size={20} color="gray" strokeWidth={1} />}
@@ -126,7 +119,14 @@ export function CategoryGroupView({
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
-              </div>
+                {savedCategories.some((c) => c.categoryId === category.id) ? null : (
+                  <IconButton
+                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    label={`Pin '${category.name}'`}
+                    onClick={() => onSaveCategory(category.id)}
+                  />
+                )}
+              </aside>
             }
           />
         ))}

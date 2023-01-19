@@ -33,12 +33,7 @@ export default function SavedAccountsView({ addTx }: Props) {
           currencyFormat={selectedBudgetData?.currencyFormat}
           settings={settings}
           actionElements={
-            <div>
-              <IconButton
-                label={`Unpin '${account.name}'`}
-                onClick={() => removeAccount(account.id)}
-                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
-              />
+            <aside aria-label="actions">
               {settings.transactions && (
                 <IconButton
                   icon={<Plus size={20} color="gray" strokeWidth={1} />}
@@ -46,7 +41,12 @@ export default function SavedAccountsView({ addTx }: Props) {
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}
-            </div>
+              <IconButton
+                label={`Unpin '${account.name}'`}
+                onClick={() => removeAccount(account.id)}
+                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+              />
+            </aside>
           }
         />
       ))}

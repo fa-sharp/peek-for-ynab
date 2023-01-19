@@ -35,12 +35,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
           currencyFormat={currencyFormat}
           settings={settings}
           actionElements={
-            <div>
-              <IconButton
-                label={`Unpin '${category.name}'`}
-                onClick={() => removeCategory(category.id)}
-                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
-              />
+            <aside aria-label="actions">
               {settings.transactions && (
                 <IconButton
                   icon={<Plus size={20} color="gray" strokeWidth={1} />}
@@ -48,7 +43,12 @@ export default function SavedCategoriesView({ addTx }: Props) {
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}
-            </div>
+              <IconButton
+                label={`Unpin '${category.name}'`}
+                onClick={() => removeCategory(category.id)}
+                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+              />
+            </aside>
           }
         />
       ))}
