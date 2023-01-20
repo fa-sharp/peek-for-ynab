@@ -19,10 +19,10 @@ function IndexPage() {
         </Link>
         . When you authorize the extension with your YNAB account, {APP_NAME + " "}
         communicates directly with YNAB through their API to access your budget data -
-        including your budgets, budget settings, categories, accounts, and balances.{" "}
-        {APP_NAME} cannot access your YNAB login credentials, nor any credentials to your
-        financial institution accounts. You must login to YNAB through their website in
-        order to authorize {APP_NAME} for use with your account.
+        including your budgets, budget settings, categories, accounts, payees, and
+        balances. {APP_NAME} cannot access your YNAB login credentials, nor any
+        credentials to your financial institution accounts. You must login to YNAB through
+        their website in order to authorize {APP_NAME} for use with your account.
       </p>
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
@@ -42,7 +42,7 @@ function IndexPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Nov 21, 2022</em>
+        <em>Last updated: Jan 20, 2023</em>
       </p>
     </main>
   );

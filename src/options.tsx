@@ -34,23 +34,26 @@ export function OptionsView() {
         width: "max-content"
       }}>
       {!loggedIn ? (
-        <button
-          className={"button rounded accent"}
-          disabled={loggingIn}
-          onClick={async () => {
-            setLoggingIn(true);
-            await loginWithOAuth();
-            setLoggingIn(false);
-          }}>
-          🔑 Login to YNAB
-        </button>
+        <>
+          <h1>Peek for YNAB</h1>
+          <button
+            className={"button rounded accent"}
+            disabled={loggingIn}
+            onClick={async () => {
+              setLoggingIn(true);
+              await loginWithOAuth();
+              setLoggingIn(false);
+            }}>
+            🔑 Login to YNAB
+          </button>
+        </>
       ) : (
         <>
           <h1>Peek for YNAB</h1>
           <h3 className="heading-big" style={{ marginTop: "0" }}>
             Settings
           </h3>
-          <label className="flex-row mb-small" title="Show and pin your accounts">
+          <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.showAccounts}
@@ -83,7 +86,7 @@ export function OptionsView() {
               checked={settings.txEnabled}
               onChange={(e) => changeSetting("txEnabled", e.target.checked)}
             />
-            💸 Enable transaction entry (BETA - bugs likely!!)
+            💸 Enable transaction entry (BETA - there will be bugs!!)
           </label>
           {settings.txEnabled && (
             <>
@@ -93,7 +96,7 @@ export function OptionsView() {
                   checked={settings.txApproved}
                   onChange={(e) => changeSetting("txApproved", e.target.checked)}
                 />
-                🔵 Mark entered transactions as Approved
+                ℹ️ Mark entered transactions as Approved
               </label>
             </>
           )}
@@ -112,7 +115,7 @@ export function OptionsView() {
           ))}
           <button
             title="Refresh the list of budgets from YNAB"
-            className={"button rounded accent flex-row"}
+            className={"button rounded accent flex-row mb-small"}
             style={{ width: "fit-content", marginBlock: 8 }}
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>
