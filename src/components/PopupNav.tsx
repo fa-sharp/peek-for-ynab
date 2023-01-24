@@ -71,13 +71,14 @@ export default function PopupNav() {
           globalIsFetching || isRefreshingToken ? (
             <Refresh color="black" />
           ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
-            <Check color="#58be2d" />
+            <Check color="var(--success)" />
           ) : (
-            <AlertTriangle color="darkorange" /> // indicates data is stale/old
+            <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
           )
         }
         spin={Boolean(globalIsFetching || isRefreshingToken)}
         disabled={true}
+        noAction={true}
       />
     </nav>
   );

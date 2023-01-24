@@ -6,16 +6,19 @@ export default function IconButton({
   onClick,
   label,
   spin,
-  disabled
+  disabled,
+  noAction
 }: {
   label: string;
   onClick: MouseEventHandler;
   icon: ReactElement;
   spin?: boolean;
   disabled?: boolean;
+  noAction?: boolean;
 }) {
   let className = "icon-button";
   if (spin) className += " spin";
+  if (noAction) className += " noaction";
 
   return (
     <button

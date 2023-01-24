@@ -52,10 +52,20 @@ const useYNABProvider = () => {
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
-      const { data } = await ynabAPI.budgets.getBudgets();
+      const {
+        data: { budgets }
+      } = await ynabAPI.budgets.getBudgets();
+      // Sort budgets by last modified
+      budgets.sort((a, b) =>
+        a.last_modified_on &&
+        b.last_modified_on &&
+        new Date(a.last_modified_on).valueOf() < new Date(b.last_modified_on).valueOf()
+          ? 1
+          : -1
+      );
       // Show first two budgets by default
-      if (!shownBudgetIds) setShownBudgetIds(data.budgets.slice(0, 2).map((b) => b.id));
-      return data.budgets.map((budgetSummary) => ({
+      if (!shownBudgetIds) setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
+      return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
         currencyFormat: budgetSummary.currency_format || undefined

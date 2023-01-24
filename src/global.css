@@ -11,6 +11,9 @@
   --currency-green: #357f16;
   --currency-red: #a84646;
   --currency-hidden-bg: #d1d1d1;
+  --error: #da2626;
+  --success: #58be2d;
+  --stale: #ff8c00;
 }
 
 body {
@@ -107,14 +110,18 @@ body {
   line-height: 0;
   cursor: pointer;
 }
-.icon-button:hover {
-  transform: scale(1.08);
+.icon-button:hover:not(.noaction) {
+  transform: scale(1.05);
 }
-.icon-button:active {
+.icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
 .icon-button.spin {
   animation: spin 1s linear infinite;
+}
+
+.icon-button.noaction {
+  cursor: initial;
 }
 
 .select {
@@ -167,6 +174,10 @@ body {
 
 .warn:hover {
   background-color: var(--warn-hover);
+}
+
+.error-message {
+  color: var(--error);
 }
 
 .currency {
