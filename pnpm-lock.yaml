@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@next/eslint-plugin-next': ^12.1.6
-  '@plasmohq/storage': ^0.14.0
+  '@plasmohq/storage': ^0.15
   '@tanstack/query-core': ^4.22.0
   '@tanstack/react-query': ^4.22.0
   '@tanstack/react-query-devtools': ^4.22.0
@@ -35,7 +35,7 @@ specifiers:
   ynab: ^1.45.0
 
 dependencies:
-  '@plasmohq/storage': 0.14.0_react@18.2.0
+  '@plasmohq/storage': 0.15.0_react@18.2.0
   '@tanstack/query-core': 4.22.0
   '@tanstack/react-query': 4.22.0_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query-devtools': 4.22.0_gp275tdwez2a4eujt75dnnp754
@@ -1881,8 +1881,8 @@ packages:
       - whiskers
     dev: false
 
-  /@plasmohq/storage/0.14.0_react@18.2.0:
-    resolution: {integrity: sha512-KJMpYaVMesGwjKR5dvv/chazfUuLnmV9ZcN6T8FiK45KxGHt6sI2frEP6hSeWcIuenxzKq4JIzzDHPOvMAhjVw==}
+  /@plasmohq/storage/0.15.0_react@18.2.0:
+    resolution: {integrity: sha512-521NLNVEncdNTmoafLyyaN1huvISLqyJtKDdcYhiGaN2LEOZZaSMAxEeBh/S0MWq/C03IetXfIkuWKFwrXUbkw==}
     peerDependencies:
       react: ^16.8.6 || ^17 || ^18
     peerDependenciesMeta:

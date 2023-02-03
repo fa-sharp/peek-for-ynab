@@ -1,7 +1,7 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Check on your YNAB category and account balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@7.1.9",
@@ -15,7 +15,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@plasmohq/storage": "^0.14.0",
+    "@plasmohq/storage": "^0.15",
     "@tanstack/query-core": "^4.22.0",
     "@tanstack/react-query": "^4.22.0",
     "@tanstack/react-query-devtools": "^4.22.0",

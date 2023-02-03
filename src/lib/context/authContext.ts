@@ -139,6 +139,7 @@ const useAuthProvider = () => {
     login,
     loginWithOAuth,
     logout,
+    authLoading: tokenData === undefined,
     loggedIn: tokenData != null,
     tokenExpired,
     isRefreshingToken

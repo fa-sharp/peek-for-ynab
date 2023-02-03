@@ -38,11 +38,11 @@ export interface SavedAccount {
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
-  const [tokenData, setTokenData, { remove: removeToken }] =
-    useExtensionStorage<TokenData | null>(
-      { key: "tokenData", area: "local", isSecret: true },
-      null
-    );
+  const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
+    TokenData | null | undefined
+  >({ key: "tokenData", area: "local", isSecret: true }, (data, isHydrated) =>
+    !isHydrated ? undefined : !data ? null : data
+  );
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {

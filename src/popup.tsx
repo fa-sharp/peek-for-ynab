@@ -5,6 +5,7 @@ import {
   SavedAccountsView,
   SavedCategoriesView
 } from "~components";
+import PopupLogin from "~components/PopupLogin";
 import TransactionAdd from "~components/TransactionAdd";
 import { AppProvider, useAuthContext } from "~lib/context";
 import { useAddTransaction } from "~lib/useAddTransaction";
@@ -20,7 +21,7 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { loggedIn, loginWithOAuth } = useAuthContext();
+  const { loggedIn, authLoading } = useAuthContext();
   const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
 
   return (
@@ -33,25 +34,8 @@ export function PopupView() {
         width: "max-content",
         maxWidth: "330px"
       }}>
-      {!loggedIn ? (
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            className="button rounded accent"
-            onClick={
-              chrome?.runtime
-                ? () => chrome.runtime.openOptionsPage()
-                : () => loginWithOAuth()
-            }>
-            🔑 Login
-          </button>
-          <button
-            className="button rounded accent"
-            onClick={() =>
-              window.open(`${process.env.NEXT_PUBLIC_MAIN_URL}/privacy`, "_blank")
-            }>
-            🔒 Privacy Policy
-          </button>
-        </div>
+      {authLoading ? null : !loggedIn ? (
+        <PopupLogin />
       ) : addTxState.show ? (
         <TransactionAdd
           initialState={addTxState.initialState}
