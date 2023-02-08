@@ -9,6 +9,7 @@ interface Props {
   initialAccount?: Account;
   accounts?: Account[];
   selectAccount: (account: Account) => void;
+  isTransfer?: boolean;
   disabled?: boolean;
 }
 
@@ -16,6 +17,7 @@ export default function AccountSelect({
   initialAccount,
   accounts,
   selectAccount,
+  isTransfer = false,
   disabled
 }: Props) {
   const { selectedBudgetData } = useYNABContext();
@@ -52,7 +54,7 @@ export default function AccountSelect({
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>Account</label>
+      <label {...getLabelProps()}>{isTransfer ? "From" : "Account"}</label>
       <div className="flex-col" {...getComboboxProps()}>
         <input required {...getInputProps()} disabled={disabled} />
         <ul

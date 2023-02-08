@@ -18,6 +18,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
   const { settings } = useStorageContext();
 
+  const [isTransfer, setIsTransfer] = useState(false);
   const [date, setDate] = useState(() => new Date().toISOString().substring(0, 10));
   const [amount, setAmount] = useState("");
   const [cleared, setCleared] = useState(false);
@@ -50,16 +51,29 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-    if (!account || !payee || !amount) return;
+    if (!account || !payee || !amount) {
+      setErrorMessage("Missing some fields!");
+      return;
+    }
+    if (isTransfer) {
+      if (!("transferId" in payee)) {
+        setErrorMessage("'To' account is not valid!");
+        return;
+      }
+      if (payee.transferId === account.id) {
+        setErrorMessage("Can't transfer to the same account!");
+        return;
+      }
+    }
     setIsSaving(true);
     try {
       await addTransaction({
         date,
-        amount: amountType === "Inflow" ? +amount * 1000 : +amount * -1000,
+        amount: amountType === "Outflow" || isTransfer ? +amount * -1000 : +amount * 1000,
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
-        category_id: category?.id,
+        category_id: isTransfer ? undefined : category?.id,
         cleared: cleared
           ? SaveTransaction.ClearedEnum.Cleared
           : SaveTransaction.ClearedEnum.Uncleared,
@@ -81,22 +95,32 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
+        <label className="flex-row">
+          <input
+            type="checkbox"
+            checked={isTransfer}
+            onChange={(e) => setIsTransfer(e.target.checked)}
+          />
+          Transfer
+        </label>
         <div className="form-input">
           Amount
           <div className="flex-row">
-            <IconButton
-              label={`${
-                amountType === "Inflow" ? "Inflow" : "Outflow"
-              } (Click to switch)`}
-              icon={
-                amountType === "Inflow" ? (
-                  <Plus color="var(--currency-green)" />
-                ) : (
-                  <Minus color="var(--currency-red)" />
-                )
-              }
-              onClick={flipAmountType}
-            />
+            {!isTransfer && (
+              <IconButton
+                label={`${
+                  amountType === "Inflow" ? "Inflow" : "Outflow"
+                } (Click to switch)`}
+                icon={
+                  amountType === "Inflow" ? (
+                    <Plus color="var(--currency-green)" />
+                  ) : (
+                    <Minus color="var(--currency-red)" />
+                  )
+                }
+                onClick={flipAmountType}
+              />
+            )}
             <input
               required
               autoFocus
@@ -122,22 +146,35 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             />
           </div>
         </div>
-        <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
-        <CategorySelect
-          initialCategory={category}
-          categories={categoriesData}
-          selectCategory={setCategory}
-          disabled={isSaving}
-        />
+        {!isTransfer && (
+          <>
+            <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
+            <CategorySelect
+              initialCategory={category}
+              categories={categoriesData}
+              selectCategory={setCategory}
+              disabled={isSaving}
+            />
+          </>
+        )}
         <AccountSelect
           initialAccount={account}
           accounts={accountsData}
           selectAccount={setAccount}
+          isTransfer={isTransfer}
           disabled={isSaving}
         />
+        {isTransfer && (
+          <PayeeSelect
+            payees={payeesData}
+            selectPayee={setPayee}
+            disabled={isSaving}
+            isTransfer
+          />
+        )}
         <label className="form-input">
           Memo
-          <textarea
+          <input
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
             disabled={isSaving}

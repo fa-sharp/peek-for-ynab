@@ -8,15 +8,29 @@ interface Props {
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
   disabled?: boolean;
+  isTransfer?: boolean;
 }
 
-function getFilter(inputValue?: string) {
+function getFilter(inputValue?: string, isTransfer?: boolean) {
   return (payee: CachedPayee) =>
-    !inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase());
+    (!inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase())) &&
+    (isTransfer ? payee.transferId != null : payee.transferId == null);
 }
 
-export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
-  const [payeeList, setPayeeList] = useState(payees ? [...payees] : []);
+export default function PayeeSelect({
+  payees,
+  selectPayee,
+  isTransfer = false,
+  disabled
+}: Props) {
+  const [payeeList, setPayeeList] = useState(() => {
+    if (!payees) return [];
+    return [
+      ...payees.filter((payee) =>
+        isTransfer ? payee.transferId != null : payee.transferId == null
+      )
+    ];
+  });
   const {
     isOpen,
     getLabelProps,
@@ -33,27 +47,36 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
       return payee ? payee.name : "";
     },
     onInputValueChange({ inputValue, selectedItem }) {
-      setPayeeList(payees?.filter(getFilter(inputValue)) || []);
-      if (inputValue && (!selectedItem || inputValue !== selectedItem.name))
-        selectPayee({ name: inputValue }); // New payee
+      setPayeeList(payees?.filter(getFilter(inputValue, isTransfer)) || []);
+      // If user is inputting a new payee name and it's not a transfer, create a new payee
+      if (
+        !isTransfer &&
+        inputValue &&
+        (!selectedItem || inputValue !== selectedItem.name)
+      )
+        selectPayee({ name: inputValue });
     },
     onSelectedItemChange({ selectedItem }) {
-      if (selectedItem) selectPayee(selectedItem); // Existing payee
+      if (selectedItem) selectPayee(selectedItem); // Select existing payee
     }
   });
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>Payee</label>
+      <label {...getLabelProps()}>{isTransfer ? "To" : "Payee"}</label>
       <div className="flex-col" {...getComboboxProps()}>
         <input required {...getInputProps()} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
           {!isOpen ? null : payeeList.length === 0 ? (
-            <li className="select-dropdown-item">
-              --New payee &apos;{inputValue}&apos;--
-            </li>
+            isTransfer ? (
+              <li className="select-dropdown-item">--Transfer account not found!--</li>
+            ) : (
+              <li className="select-dropdown-item">
+                --New payee &apos;{inputValue}&apos;--
+              </li>
+            )
           ) : (
             payeeList.map((payee, index) => {
               let itemClassName = "select-dropdown-item";
