@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -22,6 +22,8 @@ export interface AppSettings {
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
+  /** Whether data is synced to the user's Chrome profile */
+  sync: boolean;
 }
 
 /** A category saved by the user */
@@ -50,31 +52,34 @@ const useStorageProvider = () => {
       txEnabled: false,
       txApproved: false,
       privateMode: false,
-      emojiMode: false
+      emojiMode: false,
+      sync: false
     }
   });
-
-  /** Budgets that the user has selected to show */
-  const [shownBudgetIds, setShownBudgetIds] = useLocalStorage<null | string[]>(
-    "shownBudgetIds",
-    { defaultValue: null }
-  );
 
   /** The budget currently in view */
   const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudgetId", {
     defaultValue: ""
   });
 
-  /** The categories saved by the user */
-  const [savedCategories, setSavedCategories] = useLocalStorage<SavedCategory[]>(
-    "savedCategories",
-    { defaultValue: [] }
+  const storageArea = useMemo(() => (settings.sync ? "sync" : "local"), [settings.sync]);
+
+  /** Budgets that the user has selected to show. Is synced if the user chooses. */
+  const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<null | string[]>(
+    { key: "shownBudgetIds", area: storageArea },
+    (data, isHydrated) => (!isHydrated ? null : !data ? [] : data)
   );
 
-  /** The categories saved by the user */
-  const [savedAccounts, setSavedAccounts] = useLocalStorage<SavedAccount[]>(
-    "savedAccounts",
-    { defaultValue: [] }
+  /** The categories saved by the user. Is synced if the user chooses. */
+  const [savedCategories, setSavedCategories] = useExtensionStorage<SavedCategory[]>(
+    { key: "savedCategories", area: storageArea },
+    (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
+  );
+
+  /** The categories saved by the user. Is synced if the user chooses. */
+  const [savedAccounts, setSavedAccounts] = useExtensionStorage<SavedAccount[]>(
+    { key: "savedAccounts", area: storageArea },
+    (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
   );
 
   const changeSetting = <K extends keyof AppSettings>(

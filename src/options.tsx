@@ -77,6 +77,14 @@ export function OptionsView() {
             />
             😉 Display category/account names as emojis only
           </label>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.sync}
+              onChange={(e) => changeSetting("sync", e.target.checked)}
+            />
+            🔄 Sync settings to your Chrome profile (BETA)
+          </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
           </h3>
