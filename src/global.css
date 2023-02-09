@@ -32,7 +32,7 @@ body {
 .flex-col {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .form-input {
@@ -188,6 +188,10 @@ body {
 }
 .currency.negative {
   color: var(--currency-red);
+}
+
+.mt-small {
+  margin-top: 6px;
 }
 
 .mt-big {

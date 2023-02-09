@@ -10,7 +10,7 @@ export default function IconButton({
   noAction
 }: {
   label: string;
-  onClick: MouseEventHandler;
+  onClick?: MouseEventHandler;
   icon: ReactElement;
   spin?: boolean;
   disabled?: boolean;

@@ -1,5 +1,5 @@
 import { FormEventHandler, MouseEventHandler, useState } from "react";
-import { ArrowBack, CircleC, Minus, Plus } from "tabler-icons-react";
+import { ArrowBack, CircleC, Minus, Plus, SwitchHorizontal } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -41,11 +41,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
     setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
-  };
-
-  const flipCleared: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setCleared((prev) => !prev);
   };
 
   const onSaveTransaction: FormEventHandler = async (event) => {
@@ -96,12 +91,50 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
+          Cleared?
+          <input
+            type="checkbox"
+            checked={cleared}
+            onChange={(e) => setCleared(e.target.checked)}
+          />
+          {cleared ? (
+            <IconButton
+              label="Cleared"
+              icon={<CircleC fill="var(--currency-green)" color="white" />}
+              disabled
+              noAction
+            />
+          ) : (
+            <IconButton
+              label=""
+              icon={<CircleC color="transparent" />}
+              disabled
+              noAction
+            />
+          )}
+        </label>
+        <label className="flex-row">
+          Transfer?
           <input
             type="checkbox"
             checked={isTransfer}
             onChange={(e) => setIsTransfer(e.target.checked)}
           />
-          Transfer
+          {isTransfer ? (
+            <IconButton
+              label="Transfer"
+              icon={<SwitchHorizontal color="black" />}
+              disabled
+              noAction
+            />
+          ) : (
+            <IconButton
+              label=""
+              icon={<SwitchHorizontal color="transparent" />}
+              disabled
+              noAction
+            />
+          )}
         </label>
         <div className="form-input">
           Amount
@@ -132,17 +165,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
-            />
-            <IconButton
-              label={`${cleared ? "Cleared" : "Uncleared"} (Click to switch)`}
-              icon={
-                cleared ? (
-                  <CircleC fill="var(--currency-green)" color="white" />
-                ) : (
-                  <CircleC />
-                )
-              }
-              onClick={flipCleared}
             />
           </div>
         </div>
