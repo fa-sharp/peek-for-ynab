@@ -69,7 +69,7 @@ export function OptionsView() {
             />
             🕶️ Hide balances unless you hover over them
           </label>
-          <label className="flex-row">
+          <label className="flex-row mb-small">
             <input
               type="checkbox"
               checked={settings.emojiMode}
@@ -83,7 +83,7 @@ export function OptionsView() {
               checked={settings.sync}
               onChange={(e) => changeSetting("sync", e.target.checked)}
             />
-            🔄 Sync settings to your Chrome profile (BETA)
+            🔄 Sync pinned categories, accounts, and budgets to your Chrome profile (BETA)
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
@@ -94,7 +94,7 @@ export function OptionsView() {
               checked={settings.txEnabled}
               onChange={(e) => changeSetting("txEnabled", e.target.checked)}
             />
-            💸 Enable transaction entry (BETA - there will be bugs!!)
+            💸 Enable transaction entry (BETA)
           </label>
           {settings.txEnabled && (
             <>

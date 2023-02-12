@@ -112,13 +112,19 @@ const useStorageProvider = () => {
     setSavedAccounts(savedAccounts.filter((a) => a.accountId !== accountIdToRemove));
   };
 
-  /** Toggle whether a budget is shown or not. Won't do anything if `shownBudgetIds` is null */
+  /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!shownBudgetIds) return;
     if (shownBudgetIds.includes(budgetId)) {
+      // hide budget
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
-    } else setShownBudgetIds([...shownBudgetIds, budgetId]);
+      // delete saved accounts and categories for this budget
+      setSavedAccounts(savedAccounts.filter((a) => a.budgetId !== budgetId));
+      setSavedCategories(savedCategories.filter((c) => c.budgetId !== budgetId));
+    }
+    // show budget
+    else setShownBudgetIds([...shownBudgetIds, budgetId]);
   };
 
   /** Clears all values, removes all saved data from browser storage */
