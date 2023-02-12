@@ -15,19 +15,19 @@ function IndexPage() {
         <li>View all your current category and account balances at a glance</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Quickly switch between your budgets</li>
-        <li>&quot;Hide&quot; your balances, for use in public places</li>
         <li>Fully keyboard accessible</li>
+      </ul>
+      <h2>Coming soon!</h2>
+      <ul>
+        <li>Add transactions directly from the extension</li>
+        <li>Sync your pinned categories and accounts to your Chrome profile</li>
+        <li>Multi-browser support</li>
       </ul>
       <h2>Screenshots</h2>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Image src="/screenshots/collapsed-view.png" width={300} height={250} />
         <Image src="/screenshots/expanded-view.png" width={300} height={500} />
       </div>
-      <h2>Coming soon!</h2>
-      <ul>
-        <li>Add transactions directly from the extension</li>
-        <li>Multi-browser support</li>
-      </ul>
     </main>
   );
 }

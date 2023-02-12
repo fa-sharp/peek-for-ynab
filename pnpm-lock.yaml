@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@next/eslint-plugin-next': ^12.1.6
-  '@plasmohq/storage': ^0.15
+  '@plasmohq/storage': ^0.15.0
   '@tanstack/query-core': ^4.22.0
   '@tanstack/react-query': ^4.22.0
   '@tanstack/react-query-devtools': ^4.22.0
@@ -16,7 +16,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.28.0
   '@typescript-eslint/parser': ^5.28.0
   cors: ^2.8.5
-  downshift: ^6
+  downshift: ^6.1.12
   eslint: ^8.24.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-react: ^7.31.8
@@ -24,13 +24,13 @@ specifiers:
   idb-keyval: ^6.2.0
   nanoid: ^4.0.0
   next: ^12.1.6
-  plasmo: ^0.59
+  plasmo: ^0.59.3
   prettier: 2.6.2
   puro: ^0.8.0
   react: 18.2.0
   react-dom: 18.2.0
   tabler-icons-react: ^1.55.0
-  typescript: ^4.9
+  typescript: ^4.9.3
   use-local-storage-state: ^18.1.2
   ynab: ^1.45.0
 
@@ -2450,7 +2450,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001414
+      caniuse-lite: 1.0.30001451
       electron-to-chromium: 1.4.270
       escalade: 3.1.1
       node-releases: 2.0.6
@@ -2462,7 +2462,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001414
+      caniuse-lite: 1.0.30001451
       electron-to-chromium: 1.4.270
       node-releases: 2.0.6
       update-browserslist-db: 1.0.9_browserslist@4.21.4
@@ -2541,12 +2541,8 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /caniuse-lite/1.0.30001352:
-    resolution: {integrity: sha512-GUgH8w6YergqPQDGWhJGt8GDRnY0L/iJVQcU3eJ46GYf52R8tk0Wxp0PymuFVZboJYXGiCqwozAYZNRjVj6IcA==}
-    dev: false
-
-  /caniuse-lite/1.0.30001414:
-    resolution: {integrity: sha512-t55jfSaWjCdocnFdKQoO+d2ct9C59UZg4dY3OnUlSZ447r8pUtIKdp0hpAzrGFultmTC+Us+KpKi4GZl/LXlFg==}
+  /caniuse-lite/1.0.30001451:
+    resolution: {integrity: sha512-XY7UbUpGRatZzoRft//5xOa69/1iGJRBlrieH6QYrkKLIFn3m7OVEJ81dSrKoy2BnKsdbX5cLrOispZNYo9v2w==}
 
   /capital-case/1.0.4:
     resolution: {integrity: sha512-ds37W8CytHgwnhGGTi88pcPyR15qoNkOpYwmMMfnWqqWgESapLqvDx6huFjQ5vqWSn2Z06173XNA7LtMOeUh1A==}
@@ -4623,7 +4619,7 @@ packages:
         optional: true
     dependencies:
       '@next/env': 12.1.6
-      caniuse-lite: 1.0.30001352
+      caniuse-lite: 1.0.30001451
       postcss: 8.4.5
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
