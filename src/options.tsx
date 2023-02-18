@@ -86,7 +86,7 @@ export function OptionsView() {
               checked={settings.txEnabled}
               onChange={(e) => changeSetting("txEnabled", e.target.checked)}
             />
-            💸 Enable transaction entry (BETA - there will be bugs!!)
+            💸 Enable transaction entry (BETA)
           </label>
           {settings.txEnabled && (
             <>
