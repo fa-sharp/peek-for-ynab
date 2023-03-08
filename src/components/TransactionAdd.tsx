@@ -64,7 +64,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     try {
       await addTransaction({
         date,
-        amount: amountType === "Outflow" || isTransfer ? +amount * -1000 : +amount * 1000,
+        amount: amountType === "Outflow" || isTransfer ? Math.round(+amount * -1000) : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
