@@ -129,8 +129,8 @@ const useAuthProvider = () => {
     });
 
   /** Clears all data, including the user's token */
-  const logout = () => {
-    removeAllData();
+  const logout = async () => {
+    await removeAllData();
     queryClient.removeQueries();
     queryClient.clear();
   };

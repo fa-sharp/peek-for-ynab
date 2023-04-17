@@ -115,8 +115,8 @@ const useStorageProvider = () => {
   /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!shownBudgetIds) return;
+    // hide budget
     if (shownBudgetIds.includes(budgetId)) {
-      // hide budget
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
       // delete saved accounts and categories for this budget
@@ -128,11 +128,12 @@ const useStorageProvider = () => {
   };
 
   /** Clears all values, removes all saved data from browser storage */
-  const removeAllData = () => {
+  const removeAllData = async () => {
     flushSync(() => {
       // Ensure token is removed first so we don't refetch API data
       removeToken();
     });
+    await chrome.storage.local.clear();
     localStorage.clear();
   };
 

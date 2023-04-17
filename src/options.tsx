@@ -81,7 +81,16 @@ export function OptionsView() {
             <input
               type="checkbox"
               checked={settings.sync}
-              onChange={(e) => changeSetting("sync", e.target.checked)}
+              onChange={(e) => {
+                const confirmMessage = settings.sync
+                  ? "Are you sure? This will reset your pinned categories, accounts, etc. and stop syncing with your Chrome profile."
+                  : "Are you sure? This will reset any currently pinned categories, accounts, etc. and start syncing with your Chrome profile.";
+                const confirmed = confirm(confirmMessage);
+                if (confirmed) {
+                  changeSetting("sync", e.target.checked);
+                  location.reload();
+                }
+              }}
             />
             🔄 Sync pinned categories, accounts, and budgets to your Chrome profile (BETA)
           </label>
@@ -98,7 +107,9 @@ export function OptionsView() {
           </label>
           {settings.txEnabled && (
             <>
-              <label className="flex-row mb-small">
+              <label
+                className="flex-row mb-small"
+                title="Check this box if you don't want to have to Approve the transactions again in YNAB">
                 <input
                   type="checkbox"
                   checked={settings.txApproved}
@@ -133,7 +144,12 @@ export function OptionsView() {
           <button
             style={{ marginTop: 12 }}
             className="button rounded warn"
-            onClick={() => logout()}>
+            onClick={() => {
+              const confirmed = confirm(
+                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any data synced with your Chrome profile."
+              );
+              if (confirmed) logout();
+            }}>
             Logout and clear all data
           </button>
         </>
