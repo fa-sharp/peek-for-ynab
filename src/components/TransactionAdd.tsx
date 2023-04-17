@@ -1,6 +1,15 @@
 import { FormEventHandler, MouseEventHandler, useMemo, useState } from "react";
-import { ArrowBack, CircleC, Minus, Plus, SwitchHorizontal } from "tabler-icons-react";
+import {
+  ArrowBack,
+  CircleC,
+  Minus,
+  Plus,
+  SwitchHorizontal,
+  Wand
+} from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
+
+import { sendToContentScript } from "@plasmohq/messaging";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -48,6 +57,13 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
     setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
+  };
+
+  const onDetectAmount = async () => {
+    const { amounts } = await sendToContentScript<null, { amounts: Array<number> }>({
+      name: "detect-amounts"
+    });
+    console.log("Received amounts: ", amounts);
   };
 
   const onSaveTransaction: FormEventHandler = async (event) => {
@@ -98,6 +114,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
+        <IconButton icon={<Wand />} label="Detect!" onClick={onDetectAmount} />
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
