@@ -1,4 +1,4 @@
-import { FormEventHandler, MouseEventHandler, useState } from "react";
+import { FormEventHandler, MouseEventHandler, useMemo, useState } from "react";
 import { ArrowBack, CircleC, Minus, Plus, SwitchHorizontal } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
@@ -35,8 +35,15 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [memo, setMemo] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
+
+  /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
+  const isBudgetToTrackingTransfer = useMemo(() => {
+    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
+    const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
+    if (!transferToAccount) return false;
+    return !transferToAccount.on_budget;
+  }, [accountsData, isTransfer, payee]);
 
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
@@ -64,7 +71,10 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     try {
       await addTransaction({
         date,
-        amount: amountType === "Outflow" || isTransfer ? Math.round(+amount * -1000) : Math.round(+amount * 1000),
+        amount:
+          amountType === "Outflow" || isTransfer
+            ? Math.round(+amount * -1000)
+            : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
@@ -187,12 +197,22 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           disabled={isSaving}
         />
         {isTransfer && (
-          <PayeeSelect
-            payees={payeesData}
-            selectPayee={setPayee}
-            disabled={isSaving}
-            isTransfer
-          />
+          <>
+            <PayeeSelect
+              payees={payeesData}
+              selectPayee={setPayee}
+              disabled={isSaving}
+              isTransfer
+            />
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={setCategory}
+                disabled={isSaving}
+              />
+            )}
+          </>
         )}
         <label className="form-input">
           Memo

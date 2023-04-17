@@ -214,22 +214,6 @@ body {
   cursor: pointer;
 }
 
-.loading-spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-}
-.loading-spinner::after {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  /* line-height: 0; */
-  border-radius: 50%;
-  border: 2px dotted;
-  border-color: lightblue lightblue transparent;
-  animation: spin 1s ease-in-out infinite;
-}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

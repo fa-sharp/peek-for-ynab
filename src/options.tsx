@@ -92,7 +92,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync pinned categories, accounts, and budgets to your Chrome profile (BETA)
+            🔄 Sync with your Chrome profile (BETA)
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
@@ -150,7 +150,7 @@ export function OptionsView() {
               );
               if (confirmed) logout();
             }}>
-            Logout and clear all data
+            Logout
           </button>
         </>
       )}
