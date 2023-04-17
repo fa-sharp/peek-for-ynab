@@ -3,6 +3,7 @@ import { useContext, useMemo } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
+import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 export interface TokenData {
@@ -38,11 +39,15 @@ export interface SavedAccount {
   budgetId: string;
 }
 
+const tokenStorage = new Storage({ area: "local" });
+const chromeLocalStorage = new Storage({ area: "local", allCopied: true });
+const chromeSyncStorage = new Storage({ area: "sync", allCopied: true });
+
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
-  >({ key: "tokenData", area: "local", isSecret: true }, (data, isHydrated) =>
+  >({ key: "tokenData", instance: tokenStorage }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
   );
 
@@ -62,23 +67,26 @@ const useStorageProvider = () => {
     defaultValue: ""
   });
 
-  const storageArea = useMemo(() => (settings.sync ? "sync" : "local"), [settings.sync]);
+  const storageArea = useMemo(
+    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
+    [settings.sync]
+  );
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
   const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<null | string[]>(
-    { key: "shownBudgetIds", area: storageArea },
+    { key: "shownBudgetIds", instance: storageArea },
     (data, isHydrated) => (!isHydrated ? null : !data ? [] : data)
   );
 
   /** The categories saved by the user. Is synced if the user chooses. */
   const [savedCategories, setSavedCategories] = useExtensionStorage<SavedCategory[]>(
-    { key: "savedCategories", area: storageArea },
+    { key: "savedCategories", instance: storageArea },
     (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
   );
 
   /** The categories saved by the user. Is synced if the user chooses. */
   const [savedAccounts, setSavedAccounts] = useExtensionStorage<SavedAccount[]>(
-    { key: "savedAccounts", area: storageArea },
+    { key: "savedAccounts", instance: storageArea },
     (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
   );
 
