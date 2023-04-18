@@ -1,4 +1,5 @@
 import { FormEventHandler, MouseEventHandler, useMemo, useState } from "react";
+import { useEffect } from "react";
 import {
   ArrowBack,
   CircleC,
@@ -9,11 +10,15 @@ import {
 } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
-import { sendToContentScript } from "@plasmohq/messaging";
-
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
+import {
+  IS_PRODUCTION,
+  executeScriptInCurrentTab,
+  extractCurrencyAmounts,
+  parseLocaleNumber
+} from "~lib/utils";
 
 import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 
@@ -46,6 +51,19 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Try parsing user's selection as the amount
+  useEffect(() => {
+    executeScriptInCurrentTab(() => getSelection()?.toString())
+      .then((selection) => {
+        if (!selection) return;
+        const parsedNumber = parseLocaleNumber(selection);
+        if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+      })
+      .catch((err) => {
+        !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+      });
+  }, []);
+
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
     if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
@@ -54,16 +72,28 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     return !transferToAccount.on_budget;
   }, [accountsData, isTransfer, payee]);
 
+  const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
+  const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
+  const onDetectAmount = async () => {
+    if (!detectedAmounts) {
+      // Try detecting any currency amounts on the page
+      const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
+      !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
+      setDetectedAmounts(amounts);
+      if (amounts[0]) setAmount(amounts[0].toString());
+    } else if (detectedAmounts[detectedAmountIdx + 1]) {
+      // Iterate through detected amounts
+      setAmount(detectedAmounts[detectedAmountIdx + 1].toString());
+      setDetectedAmountIdx((v) => v + 1);
+    } else {
+      if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
+      setDetectedAmountIdx(0);
+    }
+  };
+
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
     setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
-  };
-
-  const onDetectAmount = async () => {
-    const { amounts } = await sendToContentScript<null, { amounts: Array<number> }>({
-      name: "detect-amounts"
-    });
-    console.log("Received amounts: ", amounts);
   };
 
   const onSaveTransaction: FormEventHandler = async (event) => {
@@ -114,7 +144,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
-        <IconButton icon={<Wand />} label="Detect!" onClick={onDetectAmount} />
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
@@ -193,6 +222,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
+            <IconButton icon={<Wand />} label="Detect amount" onClick={onDetectAmount} />
           </div>
         </div>
         {!isTransfer && (

@@ -15,7 +15,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@plasmohq/messaging": "^0.1.8",
     "@plasmohq/storage": "^1.5.0",
     "@tanstack/query-core": "^4.22.0",
     "@tanstack/react-query": "^4.22.0",
@@ -52,12 +51,9 @@
     "typescript": "^4.9.3"
   },
   "manifest": {
-    "optional_host_permissions": [
-      "https://*/*"
-    ],
     "permissions": [
       "identity",
-      "tabs",
+      "scripting",
       "activeTab"
     ],
     "options_ui": {
