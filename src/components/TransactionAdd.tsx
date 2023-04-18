@@ -19,7 +19,12 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const { settings } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(false);
-  const [date, setDate] = useState(() => new Date().toISOString().substring(0, 10));
+  const [date, setDate] = useState(() => {
+    // get today's date in correct format for input element
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().substring(0, 10);
+  });
   const [amount, setAmount] = useState("");
   const [cleared, setCleared] = useState(false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
@@ -64,7 +69,10 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     try {
       await addTransaction({
         date,
-        amount: amountType === "Outflow" || isTransfer ? Math.round(+amount * -1000) : Math.round(+amount * 1000),
+        amount:
+          amountType === "Outflow" || isTransfer
+            ? Math.round(+amount * -1000)
+            : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
