@@ -5,7 +5,8 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";
-import { TokenData, useStorageContext } from "./storageContext";
+import type { TokenData } from "./storageContext";
+import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();

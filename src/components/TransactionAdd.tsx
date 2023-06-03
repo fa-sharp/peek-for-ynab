@@ -1,4 +1,5 @@
-import { FormEventHandler, MouseEventHandler, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import {
   ArrowBack,

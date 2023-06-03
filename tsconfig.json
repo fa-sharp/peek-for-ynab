@@ -11,12 +11,12 @@
   ],
   "compilerOptions": {
     "strict": true,
-    "verbatimModuleSyntax": false,
     "paths": {
       "~*": [
         "./src/*"
       ]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "isolatedModules": true
   }
 }
