@@ -1,12 +1,12 @@
 import {
   AccountsView,
   CategoriesView,
+  PopupLogin,
   PopupNav,
   SavedAccountsView,
-  SavedCategoriesView
+  SavedCategoriesView,
+  TransactionAdd
 } from "~components";
-import PopupLogin from "~components/PopupLogin";
-import TransactionAdd from "~components/TransactionAdd";
 import { AppProvider, useAuthContext } from "~lib/context";
 import { useAddTransaction } from "~lib/useAddTransaction";
 

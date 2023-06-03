@@ -222,7 +222,13 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
-            <IconButton icon={<Wand />} label="Detect amount" onClick={onDetectAmount} />
+            {!IS_PRODUCTION && (
+              <IconButton
+                icon={<Wand />}
+                label="Detect amount"
+                onClick={onDetectAmount}
+              />
+            )}
           </div>
         </div>
         {!isTransfer && (
