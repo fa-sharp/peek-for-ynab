@@ -6,6 +6,7 @@ import CategorySelect from "./CategorySelect";
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 import PayeeSelect from "./PayeeSelect";
+import PopupLogin from "./PopupLogin";
 import PopupNav from "./PopupNav";
 import SavedAccountsView from "./SavedAccountsView";
 import SavedCategoriesView from "./SavedCategoriesView";
@@ -16,6 +17,7 @@ export {
   AccountSelect,
   CategorySelect,
   PopupNav,
+  PopupLogin,
   CategoriesView,
   SavedCategoriesView,
   AccountsView,

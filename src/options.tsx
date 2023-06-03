@@ -64,22 +64,6 @@ export function OptionsView() {
           <label className="flex-row mb-small">
             <input
               type="checkbox"
-              checked={settings.privateMode}
-              onChange={(e) => changeSetting("privateMode", e.target.checked)}
-            />
-            🕶️ Hide balances unless you hover over them
-          </label>
-          <label className="flex-row mb-small">
-            <input
-              type="checkbox"
-              checked={settings.emojiMode}
-              onChange={(e) => changeSetting("emojiMode", e.target.checked)}
-            />
-            😉 Display category/account names as emojis only
-          </label>
-          <label className="flex-row mb-small">
-            <input
-              type="checkbox"
               checked={settings.sync}
               onChange={(e) => {
                 const confirmMessage = settings.sync
@@ -93,6 +77,22 @@ export function OptionsView() {
               }}
             />
             🔄 Sync with your Chrome profile (BETA)
+          </label>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.privateMode}
+              onChange={(e) => changeSetting("privateMode", e.target.checked)}
+            />
+            🕶️ Hide balances unless you hover over them
+          </label>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.emojiMode}
+              onChange={(e) => changeSetting("emojiMode", e.target.checked)}
+            />
+            😉 Display category/account names as emojis only
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry

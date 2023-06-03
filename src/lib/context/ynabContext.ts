@@ -64,7 +64,8 @@ const useYNABProvider = () => {
           : -1
       );
       // Show first two budgets by default
-      if (!shownBudgetIds) setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
+      if (!shownBudgetIds || shownBudgetIds.length === 0)
+        setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,

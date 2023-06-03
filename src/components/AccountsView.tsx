@@ -1,14 +1,12 @@
-import { ReactElement, useState } from "react";
+import type { ReactElement } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import {
-  AppSettings,
-  SavedAccount,
-  useStorageContext
-} from "~lib/context/storageContext";
+import type { AppSettings, SavedAccount } from "~lib/context/storageContext";
+import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findFirstEmoji, formatCurrency } from "~lib/utils";
