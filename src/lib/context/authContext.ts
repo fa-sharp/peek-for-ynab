@@ -5,7 +5,8 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";
-import { TokenData, useStorageContext } from "./storageContext";
+import type { TokenData } from "./storageContext";
+import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
   const { tokenData, setTokenData, removeAllData } = useStorageContext();
@@ -25,7 +26,7 @@ const useAuthProvider = () => {
     if (!IS_PRODUCTION) console.log("Refreshing token!!");
     setIsRefreshingToken(true);
 
-    const refreshUrl = `${process.env.NEXT_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
+    const refreshUrl = `${process.env.PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
       .then(async (res) => {
         if (!res.ok) {
@@ -66,10 +67,10 @@ const useAuthProvider = () => {
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = () =>
     new Promise<void>((resolve, reject) => {
-      if (!process.env.NEXT_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+      if (!process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
       const authorizeState = nanoid();
       const authorizeParams = new URLSearchParams({
-        client_id: process.env.NEXT_PUBLIC_YNAB_CLIENT_ID,
+        client_id: process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID,
         redirect_uri:
           chrome?.identity?.getRedirectURL() || "http://localhost:3000/testLogin",
         response_type: "code",
@@ -85,7 +86,7 @@ const useAuthProvider = () => {
       }
 
       // initiate OAuth flow through chrome API
-      const initialTokenUrl = `${process.env.NEXT_PUBLIC_MAIN_URL}/api/auth/initial`;
+      const initialTokenUrl = `${process.env.PLASMO_PUBLIC_MAIN_URL}/api/auth/initial`;
       chrome.identity.launchWebAuthFlow(
         {
           interactive: true,
@@ -129,8 +130,8 @@ const useAuthProvider = () => {
     });
 
   /** Clears all data, including the user's token */
-  const logout = () => {
-    removeAllData();
+  const logout = async () => {
+    await removeAllData();
     queryClient.removeQueries();
     queryClient.clear();
   };

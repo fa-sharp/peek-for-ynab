@@ -16,9 +16,13 @@
   --stale: #ff8c00;
 }
 
+html {
+  font-size: 100%;
+}
+
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 14px;
+  font-size: 0.85rem;
   margin: 0;
 }
 
@@ -56,7 +60,7 @@ body {
 
   margin-block: 4px;
 
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -67,7 +71,7 @@ body {
 
   margin-top: 4px;
 
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
@@ -96,6 +100,10 @@ body {
   color: transparent;
 }
 
+.balance-actions {
+  display: flex;
+}
+
 .button {
   cursor: pointer;
   padding: 0.4rem 0.7rem;
@@ -116,10 +124,15 @@ body {
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
+.icon-button.bordered {
+  border: solid 1px var(--border-light);
+  border-radius: 50%;
+  padding: 0px;
+  margin: 1px;
+}
 .icon-button.spin {
   animation: spin 1s linear infinite;
 }
-
 .icon-button.noaction {
   cursor: initial;
 }
@@ -214,22 +227,6 @@ body {
   cursor: pointer;
 }
 
-.loading-spinner {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-}
-.loading-spinner::after {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  /* line-height: 0; */
-  border-radius: 50%;
-  border: 2px dotted;
-  border-color: lightblue lightblue transparent;
-  animation: spin 1s ease-in-out infinite;
-}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

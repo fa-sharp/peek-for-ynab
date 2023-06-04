@@ -1,8 +1,9 @@
 import { createProvider } from "puro";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
+import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 export interface TokenData {
@@ -22,6 +23,8 @@ export interface AppSettings {
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
+  /** Whether data is synced to the user's Chrome profile */
+  sync: boolean;
 }
 
 /** A category saved by the user */
@@ -36,11 +39,15 @@ export interface SavedAccount {
   budgetId: string;
 }
 
+const tokenStorage = new Storage({ area: "local" });
+const chromeLocalStorage = new Storage({ area: "local", allCopied: true });
+const chromeSyncStorage = new Storage({ area: "sync", allCopied: true });
+
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
-  >({ key: "tokenData", area: "local", isSecret: true }, (data, isHydrated) =>
+  >({ key: "tokenData", instance: tokenStorage }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
   );
 
@@ -50,31 +57,39 @@ const useStorageProvider = () => {
       txEnabled: false,
       txApproved: false,
       privateMode: false,
-      emojiMode: false
+      emojiMode: false,
+      sync: false
     }
   });
 
-  /** Budgets that the user has selected to show */
-  const [shownBudgetIds, setShownBudgetIds] = useLocalStorage<null | string[]>(
-    "shownBudgetIds",
-    { defaultValue: null }
-  );
-
   /** The budget currently in view */
-  const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudgetId", {
+  const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
     defaultValue: ""
   });
 
-  /** The categories saved by the user */
-  const [savedCategories, setSavedCategories] = useLocalStorage<SavedCategory[]>(
-    "savedCategories",
-    { defaultValue: [] }
+  const storageArea = useMemo(
+    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
+    [settings.sync]
   );
 
-  /** The categories saved by the user */
-  const [savedAccounts, setSavedAccounts] = useLocalStorage<SavedAccount[]>(
-    "savedAccounts",
-    { defaultValue: [] }
+  /** Budgets that the user has selected to show. Is synced if the user chooses. */
+  const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<null | string[]>(
+    { key: "budgets", instance: storageArea },
+    (data, isHydrated) => (!isHydrated ? null : !data ? [] : data)
+  );
+
+  /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
+  const [savedCategories, setSavedCategories] = useExtensionStorage<{
+    [budgetId: string]: string[] | undefined;
+  }>({ key: "cats", instance: storageArea }, (data, isHydrated) =>
+    !isHydrated ? {} : !data ? {} : data
+  );
+
+  /** The account IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
+  const [savedAccounts, setSavedAccounts] = useExtensionStorage<{
+    [budgetId: string]: string[] | undefined;
+  }>({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
+    !isHydrated ? {} : !data ? {} : data
   );
 
   const changeSetting = <K extends keyof AppSettings>(
@@ -84,44 +99,69 @@ const useStorageProvider = () => {
     setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
   };
 
-  const saveCategory = (categoryToSave: SavedCategory) => {
-    const foundDuplicate = savedCategories.find(
-      (c) => c.categoryId === categoryToSave.categoryId
+  const saveCategory = (newCategory: SavedCategory) => {
+    const foundDuplicate = savedCategories[newCategory.budgetId]?.find(
+      (categoryId) => categoryId === newCategory.categoryId
     );
-    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
+    if (!foundDuplicate)
+      setSavedCategories({
+        ...savedCategories,
+        [newCategory.budgetId]: [
+          ...(savedCategories[newCategory.budgetId] || []),
+          newCategory.categoryId
+        ]
+      });
   };
-  const removeCategory = (categoryIdToRemove: string) => {
-    setSavedCategories(
-      savedCategories.filter(
-        (savedCategory) => savedCategory.categoryId !== categoryIdToRemove
+  const removeCategory = (savedCategory: SavedCategory) => {
+    setSavedCategories({
+      ...savedCategories,
+      [savedCategory.budgetId]: savedCategories[savedCategory.budgetId]?.filter(
+        (categoryId) => categoryId !== savedCategory.categoryId
       )
-    );
+    });
   };
-  const saveAccount = (accountToSave: SavedAccount) => {
-    const foundDuplicate = savedAccounts.find(
-      (a) => a.accountId === accountToSave.accountId
+  const saveAccount = (newAccount: SavedAccount) => {
+    const foundDuplicate = savedAccounts[newAccount.budgetId]?.find(
+      (accountId) => accountId === newAccount.accountId
     );
-    if (!foundDuplicate) setSavedAccounts([...savedAccounts, accountToSave]);
+    if (!foundDuplicate)
+      setSavedAccounts({
+        ...savedAccounts,
+        [newAccount.budgetId]: [
+          ...(savedAccounts[newAccount.budgetId] || []),
+          newAccount.accountId
+        ]
+      });
   };
-  const removeAccount = (accountIdToRemove: string) => {
-    setSavedAccounts(savedAccounts.filter((a) => a.accountId !== accountIdToRemove));
+  const removeAccount = (savedAccount: SavedAccount) => {
+    setSavedAccounts({
+      ...savedAccounts,
+      [savedAccount.budgetId]: savedAccounts[savedAccount.budgetId]?.filter(
+        (accountId) => accountId !== savedAccount.accountId
+      )
+    });
   };
 
-  /** Toggle whether a budget is shown or not. Won't do anything if `shownBudgetIds` is null */
+  /** Toggle whether a budget is shown or not. */
   const toggleShowBudget = (budgetId: string) => {
     if (!shownBudgetIds) return;
+    // hide budget
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
-    } else setShownBudgetIds([...shownBudgetIds, budgetId]);
+      // TODO should we delete saved accounts and categories for this budget?
+    }
+    // show budget
+    else setShownBudgetIds([...shownBudgetIds, budgetId]);
   };
 
   /** Clears all values, removes all saved data from browser storage */
-  const removeAllData = () => {
+  const removeAllData = async () => {
     flushSync(() => {
       // Ensure token is removed first so we don't refetch API data
       removeToken();
     });
+    await chrome.storage.local.clear();
     localStorage.clear();
   };
 

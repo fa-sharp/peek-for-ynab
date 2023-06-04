@@ -64,7 +64,8 @@ const useYNABProvider = () => {
           : -1
       );
       // Show first two budgets by default
-      if (!shownBudgetIds) setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
+      if (!shownBudgetIds || shownBudgetIds.length === 0)
+        setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
@@ -107,15 +108,16 @@ const useYNABProvider = () => {
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData) return null;
-    return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {
-      if (savedCategory.budgetId === selectedBudgetId) {
+    return savedCategories[selectedBudgetId]?.reduce<ynab.Category[]>(
+      (newArray, savedCategoryId) => {
         const categoryData = categoriesData.find(
-          (category) => category.id === savedCategory.categoryId
+          (category) => category.id === savedCategoryId
         );
         if (categoryData) newArray.push(categoryData);
-      }
-      return newArray;
-    }, []);
+        return newArray;
+      },
+      []
+    );
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
@@ -165,13 +167,14 @@ const useYNABProvider = () => {
   const savedAccountsData = useMemo(() => {
     if (!accountsData) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return savedAccounts.reduce<ynab.Account[]>((newArray, savedAccount) => {
-      if (savedAccount.budgetId === selectedBudgetId) {
-        const accountData = accountsData.find((a) => a.id === savedAccount.accountId);
+    return savedAccounts[selectedBudgetId]?.reduce<ynab.Account[]>(
+      (newArray, savedAccountId) => {
+        const accountData = accountsData.find((a) => a.id === savedAccountId);
         if (accountData) newArray.push(accountData);
-      }
-      return newArray;
-    }, []);
+        return newArray;
+      },
+      []
+    );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
   const useGetAccountTxs = (accountId: string) =>

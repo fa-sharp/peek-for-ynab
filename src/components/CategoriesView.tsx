@@ -1,14 +1,12 @@
-import { ReactElement, useState } from "react";
+import type { ReactElement } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import {
-  AppSettings,
-  SavedCategory,
-  useStorageContext
-} from "~lib/context/storageContext";
+import type { AppSettings } from "~lib/context/storageContext";
+import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findFirstEmoji, formatCurrency } from "~lib/utils";
@@ -19,7 +17,8 @@ interface Props {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView({ addTx }: Props) {
-  const { savedCategories, saveCategory, settings } = useStorageContext();
+  const { savedCategories, saveCategory, settings, selectedBudgetId } =
+    useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [categoriesExpanded, setCategoriesExpanded] = useState(
@@ -52,10 +51,10 @@ function CategoriesView({ addTx }: Props) {
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
-            savedCategories={savedCategories}
+            savedCategories={savedCategories[selectedBudgetId]}
             settings={settings}
-            onSaveCategory={(id) =>
-              saveCategory({ categoryId: id, budgetId: selectedBudgetData.id })
+            onSaveCategory={(categoryId) =>
+              saveCategory({ categoryId, budgetId: selectedBudgetId })
             }
             addTx={addTx}
           />
@@ -75,7 +74,7 @@ export function CategoryGroupView({
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
-  savedCategories: SavedCategory[];
+  savedCategories?: string[];
   onSaveCategory: (categoryId: string) => void;
   settings: AppSettings;
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -111,17 +110,19 @@ export function CategoryGroupView({
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
             actionElements={
-              <aside aria-label="actions">
+              <aside className="balance-actions" aria-label="actions">
                 {settings.txEnabled && (
                   <IconButton
-                    icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                    bordered
+                    icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Add transaction to '${category.name}'`}
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
-                {savedCategories.some((c) => c.categoryId === category.id) ? null : (
+                {savedCategories?.some((id) => id === category.id) ? null : (
                   <IconButton
-                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    bordered
+                    icon={<Pinned size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Pin '${category.name}'`}
                     onClick={() => onSaveCategory(category.id)}
                   />

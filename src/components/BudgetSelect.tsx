@@ -14,7 +14,7 @@ export default function BudgetSelect({
     <select
       className="select rounded"
       aria-label="Budget selection"
-      style={{ flex: 1, width: "100%" }}
+      style={{ flex: 1, width: "100%", maxWidth: "12rem" }}
       value={selectedBudgetId || "initial"}
       onChange={(e) => setSelectedBudgetId(e.target.value)}>
       {!selectedBudgetId && <option value="initial">--Select a budget--</option>}

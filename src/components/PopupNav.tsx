@@ -36,7 +36,6 @@ export default function PopupNav() {
   return (
     <nav
       style={{
-        maxWidth: "280px",
         marginBottom: 8,
         display: "flex",
         justifyContent: "space-between",
@@ -47,39 +46,46 @@ export default function PopupNav() {
         selectedBudgetId={selectedBudgetId}
         setSelectedBudgetId={setSelectedBudgetId}
       />
-      {shownBudgetsData.length > 1 && (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 3
+        }}>
+        {shownBudgetsData.length > 1 && (
+          <IconButton
+            label="Switch budget"
+            onClick={switchBudget}
+            icon={<ArrowsDownUp />}
+          />
+        )}
         <IconButton
-          label="Switch budget"
-          onClick={switchBudget}
-          icon={<ArrowsDownUp />}
+          label="Open this budget in YNAB"
+          onClick={openBudget}
+          icon={<ExternalLink />}
         />
-      )}
-      <IconButton
-        label="Open this budget in YNAB"
-        onClick={openBudget}
-        icon={<ExternalLink />}
-      />
-      <IconButton
-        label="Settings"
-        onClick={() => chrome?.runtime?.openOptionsPage()}
-        icon={<Settings />}
-      />
-      <IconButton
-        label={`Last Updated: ${new Date(categoriesLastUpdated).toLocaleString()}`}
-        onClick={() => undefined}
-        icon={
-          globalIsFetching || isRefreshingToken ? (
-            <Refresh color="black" />
-          ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
-            <Check color="var(--success)" />
-          ) : (
-            <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
-          )
-        }
-        spin={Boolean(globalIsFetching || isRefreshingToken)}
-        disabled={true}
-        noAction={true}
-      />
+        <IconButton
+          label="Settings"
+          onClick={() => chrome?.runtime?.openOptionsPage()}
+          icon={<Settings />}
+        />
+        <IconButton
+          label={`Last Updated: ${new Date(categoriesLastUpdated).toLocaleString()}`}
+          onClick={() => undefined}
+          icon={
+            globalIsFetching || isRefreshingToken ? (
+              <Refresh color="black" />
+            ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
+              <Check color="var(--success)" />
+            ) : (
+              <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
+            )
+          }
+          spin={Boolean(globalIsFetching || isRefreshingToken)}
+          disabled={true}
+          noAction={true}
+        />
+      </div>
     </nav>
   );
 }

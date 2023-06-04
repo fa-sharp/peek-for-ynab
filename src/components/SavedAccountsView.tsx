@@ -14,7 +14,12 @@ export default function SavedAccountsView({ addTx }: Props) {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, settings } = useStorageContext();
 
-  if (!settings.showAccounts || !savedAccountsData || savedAccountsData.length === 0)
+  if (
+    !settings.showAccounts ||
+    !savedAccountsData ||
+    !selectedBudgetData ||
+    savedAccountsData.length === 0
+  )
     return null;
 
   return (
@@ -33,18 +38,25 @@ export default function SavedAccountsView({ addTx }: Props) {
           currencyFormat={selectedBudgetData?.currencyFormat}
           settings={settings}
           actionElements={
-            <aside aria-label="actions">
+            <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
-                  icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                  bordered
+                  icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                   label={`Add transaction to '${account.name}'`}
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}
               <IconButton
+                bordered
                 label={`Unpin '${account.name}'`}
-                onClick={() => removeAccount(account.id)}
-                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+                onClick={() =>
+                  removeAccount({
+                    accountId: account.id,
+                    budgetId: selectedBudgetData.id
+                  })
+                }
+                icon={<PinnedOff size={"1.3rem"} color="gray" strokeWidth={1} />}
               />
             </aside>
           }

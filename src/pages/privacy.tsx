@@ -33,8 +33,14 @@ function IndexPage() {
         deleted if you logout and/or uninstall the extension.
       </p>
       <p>
-        {APP_NAME} does not share data with any third-party and/or analytics services.
+        If you turn on the setting to sync your data to your Chrome profile, {APP_NAME}{" "}
+        will store the IDs of your pinned categories, accounts, and budgets in your{" "}
+        <a href="https://chrome.google.com/sync">Chrome profile</a>. Only the IDs are
+        stored, and no balances, names, or other personal information is stored in the
+        Chrome profile. Note that authentication information is not synced between your
+        devices - you must sign in to YNAB on each device separately.
       </p>
+      <p>{APP_NAME} does not share data with any analytics services.</p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
         extension&apos;s functionality and data practices. This website will show the
@@ -42,7 +48,7 @@ function IndexPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Jan 20, 2023</em>
+        <em>Last updated: Feb 12, 2023</em>
       </p>
     </main>
   );

@@ -16,7 +16,7 @@ const PopupLogin = () => {
       <button
         className="button rounded accent"
         onClick={() =>
-          window.open(`${process.env.NEXT_PUBLIC_MAIN_URL}/privacy`, "_blank")
+          window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/privacy`, "_blank")
         }>
         🔒 Privacy Policy
       </button>

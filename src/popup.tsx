@@ -1,12 +1,12 @@
 import {
   AccountsView,
   CategoriesView,
+  PopupLogin,
   PopupNav,
   SavedAccountsView,
-  SavedCategoriesView
+  SavedCategoriesView,
+  TransactionAdd
 } from "~components";
-import PopupLogin from "~components/PopupLogin";
-import TransactionAdd from "~components/TransactionAdd";
 import { AppProvider, useAuthContext } from "~lib/context";
 import { useAddTransaction } from "~lib/useAddTransaction";
 
@@ -31,8 +31,7 @@ export function PopupView() {
         flexDirection: "column",
         padding: 16,
         minWidth: "240px",
-        width: "max-content",
-        maxWidth: "330px"
+        width: "max-content"
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />
