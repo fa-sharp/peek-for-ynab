@@ -114,17 +114,17 @@ function AccountTypeView({
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
             actionElements={
-              <aside aria-label="actions">
+              <aside className="balance-actions" aria-label="actions">
                 {settings.txEnabled && (
                   <IconButton
-                    icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                    icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Add transaction to '${account.name}'`}
                     onClick={() => addTx({ accountId: account.id })}
                   />
                 )}
                 {savedAccounts?.some((id) => id === account.id) ? null : (
                   <IconButton
-                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    icon={<Pinned size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Pin ${account.name}`}
                     onClick={() =>
                       saveAccount({ accountId: account.id, budgetId: budgetData.id })

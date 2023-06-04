@@ -31,8 +31,7 @@ export function PopupView() {
         flexDirection: "column",
         padding: 16,
         minWidth: "240px",
-        width: "max-content",
-        maxWidth: "330px"
+        width: "max-content"
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />

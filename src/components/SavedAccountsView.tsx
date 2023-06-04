@@ -38,10 +38,10 @@ export default function SavedAccountsView({ addTx }: Props) {
           currencyFormat={selectedBudgetData?.currencyFormat}
           settings={settings}
           actionElements={
-            <aside aria-label="actions">
+            <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
-                  icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                  icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                   label={`Add transaction to '${account.name}'`}
                   onClick={() => addTx({ accountId: account.id })}
                 />
@@ -54,7 +54,7 @@ export default function SavedAccountsView({ addTx }: Props) {
                     budgetId: selectedBudgetData.id
                   })
                 }
-                icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
+                icon={<PinnedOff size={"1.3rem"} color="gray" strokeWidth={1} />}
               />
             </aside>
           }

@@ -110,17 +110,17 @@ export function CategoryGroupView({
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
             actionElements={
-              <aside aria-label="actions">
+              <aside className="balance-actions" aria-label="actions">
                 {settings.txEnabled && (
                   <IconButton
-                    icon={<Plus size={20} color="gray" strokeWidth={1} />}
+                    icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Add transaction to '${category.name}'`}
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
                 {savedCategories?.some((id) => id === category.id) ? null : (
                   <IconButton
-                    icon={<Pinned size={20} color="gray" strokeWidth={1} />}
+                    icon={<Pinned size={"1.3rem"} color="gray" strokeWidth={1} />}
                     label={`Pin '${category.name}'`}
                     onClick={() => onSaveCategory(category.id)}
                   />
