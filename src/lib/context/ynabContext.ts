@@ -108,16 +108,14 @@ const useYNABProvider = () => {
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData) return null;
-    return savedCategories.reduce<ynab.Category[]>((newArray, savedCategory) => {
-      if (savedCategory.budgetId === selectedBudgetId) {
-        const categoryData = categoriesData.find(
-          (category) => category.id === savedCategory.categoryId
-        );
-        if (categoryData) newArray.push(categoryData);
-      }
+    return savedCategories.reduce<ynab.Category[]>((newArray, savedCategoryId) => {
+      const categoryData = categoriesData.find(
+        (category) => category.id === savedCategoryId
+      );
+      if (categoryData) newArray.push(categoryData);
       return newArray;
     }, []);
-  }, [categoriesData, savedCategories, selectedBudgetId]);
+  }, [categoriesData, savedCategories]);
 
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
@@ -166,14 +164,12 @@ const useYNABProvider = () => {
   const savedAccountsData = useMemo(() => {
     if (!accountsData) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return savedAccounts.reduce<ynab.Account[]>((newArray, savedAccount) => {
-      if (savedAccount.budgetId === selectedBudgetId) {
-        const accountData = accountsData.find((a) => a.id === savedAccount.accountId);
-        if (accountData) newArray.push(accountData);
-      }
+    return savedAccounts.reduce<ynab.Account[]>((newArray, savedAccountId) => {
+      const accountData = accountsData.find((a) => a.id === savedAccountId);
+      if (accountData) newArray.push(accountData);
       return newArray;
     }, []);
-  }, [accountsData, savedAccounts, selectedBudgetId]);
+  }, [accountsData, savedAccounts]);
 
   const useGetAccountTxs = (accountId: string) =>
     useQuery({

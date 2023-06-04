@@ -27,18 +27,6 @@ export interface AppSettings {
   sync: boolean;
 }
 
-/** A category saved by the user */
-export interface SavedCategory {
-  categoryId: string;
-  budgetId: string;
-}
-
-/** An account saved by the user */
-export interface SavedAccount {
-  accountId: string;
-  budgetId: string;
-}
-
 const tokenStorage = new Storage({ area: "local" });
 const chromeLocalStorage = new Storage({ area: "local", allCopied: true });
 const chromeSyncStorage = new Storage({ area: "sync", allCopied: true });
@@ -68,25 +56,37 @@ const useStorageProvider = () => {
   });
 
   const storageArea = useMemo(
-    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
+    () =>
+      settings.sync
+        ? new Storage({ area: "sync", allCopied: true })
+        : new Storage({ area: "local", allCopied: true }),
     [settings.sync]
   );
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
   const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<null | string[]>(
-    { key: "shownBudgetIds", instance: storageArea },
+    {
+      key: "shownBudgetIds",
+      instance: new Storage({ area: settings.sync ? "sync" : "local", allCopied: true })
+    },
     (data, isHydrated) => (!isHydrated ? null : !data ? [] : data)
   );
 
-  /** The categories saved by the user. Is synced if the user chooses. */
-  const [savedCategories, setSavedCategories] = useExtensionStorage<SavedCategory[]>(
-    { key: "savedCategories", instance: storageArea },
+  /** The pinned category IDs for the selected budget. Is synced if the user chooses. */
+  const [savedCategories, setSavedCategories] = useExtensionStorage<string[]>(
+    {
+      key: `categories-${selectedBudgetId}`,
+      instance: new Storage({ area: settings.sync ? "sync" : "local", allCopied: true })
+    },
     (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
   );
 
-  /** The categories saved by the user. Is synced if the user chooses. */
-  const [savedAccounts, setSavedAccounts] = useExtensionStorage<SavedAccount[]>(
-    { key: "savedAccounts", instance: storageArea },
+  /** The pinned account IDs for the selected budget. Is synced if the user chooses. */
+  const [savedAccounts, setSavedAccounts] = useExtensionStorage<string[]>(
+    {
+      key: `accounts-${selectedBudgetId}`,
+      instance: new Storage({ area: settings.sync ? "sync" : "local", allCopied: true })
+    },
     (data, isHydrated) => (!isHydrated ? [] : !data ? [] : data)
   );
 
@@ -97,27 +97,19 @@ const useStorageProvider = () => {
     setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
   };
 
-  const saveCategory = (categoryToSave: SavedCategory) => {
-    const foundDuplicate = savedCategories.find(
-      (c) => c.categoryId === categoryToSave.categoryId
-    );
-    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryToSave]);
+  const saveCategory = (categoryId: string) => {
+    const foundDuplicate = savedCategories.find((id) => id === categoryId);
+    if (!foundDuplicate) setSavedCategories([...savedCategories, categoryId]);
   };
-  const removeCategory = (categoryIdToRemove: string) => {
-    setSavedCategories(
-      savedCategories.filter(
-        (savedCategory) => savedCategory.categoryId !== categoryIdToRemove
-      )
-    );
+  const removeCategory = (categoryId: string) => {
+    setSavedCategories(savedCategories.filter((id) => id !== categoryId));
   };
-  const saveAccount = (accountToSave: SavedAccount) => {
-    const foundDuplicate = savedAccounts.find(
-      (a) => a.accountId === accountToSave.accountId
-    );
-    if (!foundDuplicate) setSavedAccounts([...savedAccounts, accountToSave]);
+  const saveAccount = (accountId: string) => {
+    const foundDuplicate = savedAccounts.find((id) => id === accountId);
+    if (!foundDuplicate) setSavedAccounts([...savedAccounts, accountId]);
   };
-  const removeAccount = (accountIdToRemove: string) => {
-    setSavedAccounts(savedAccounts.filter((a) => a.accountId !== accountIdToRemove));
+  const removeAccount = (accountId: string) => {
+    setSavedAccounts(savedAccounts.filter((id) => id !== accountId));
   };
 
   /** Toggle whether a budget is shown or not. */
@@ -128,8 +120,8 @@ const useStorageProvider = () => {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
       // delete saved accounts and categories for this budget
-      setSavedAccounts(savedAccounts.filter((a) => a.budgetId !== budgetId));
-      setSavedCategories(savedCategories.filter((c) => c.budgetId !== budgetId));
+      storageArea.remove(`categories-${selectedBudgetId}`);
+      storageArea.remove(`accounts-${selectedBudgetId}`);
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);

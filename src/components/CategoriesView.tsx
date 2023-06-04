@@ -5,7 +5,7 @@ import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings, SavedCategory } from "~lib/context/storageContext";
+import type { AppSettings } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
@@ -52,9 +52,7 @@ function CategoriesView({ addTx }: Props) {
             budgetData={selectedBudgetData}
             savedCategories={savedCategories}
             settings={settings}
-            onSaveCategory={(id) =>
-              saveCategory({ categoryId: id, budgetId: selectedBudgetData.id })
-            }
+            onSaveCategory={(id) => saveCategory(id)}
             addTx={addTx}
           />
         ))}
@@ -73,7 +71,7 @@ export function CategoryGroupView({
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
-  savedCategories: SavedCategory[];
+  savedCategories: string[];
   onSaveCategory: (categoryId: string) => void;
   settings: AppSettings;
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -117,7 +115,7 @@ export function CategoryGroupView({
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
-                {savedCategories.some((c) => c.categoryId === category.id) ? null : (
+                {savedCategories.some((id) => id === category.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
                     label={`Pin '${category.name}'`}
