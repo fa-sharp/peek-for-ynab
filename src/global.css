@@ -22,7 +22,7 @@ html {
 
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin: 0;
 }
 
@@ -124,10 +124,15 @@ body {
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
+.icon-button.bordered {
+  border: solid 1px var(--border-light);
+  border-radius: 50%;
+  padding: 0px;
+  margin: 1px;
+}
 .icon-button.spin {
   animation: spin 1s linear infinite;
 }
-
 .icon-button.noaction {
   cursor: initial;
 }

@@ -41,12 +41,14 @@ export default function SavedAccountsView({ addTx }: Props) {
             <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
+                  bordered
                   icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                   label={`Add transaction to '${account.name}'`}
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}
               <IconButton
+                bordered
                 label={`Unpin '${account.name}'`}
                 onClick={() =>
                   removeAccount({

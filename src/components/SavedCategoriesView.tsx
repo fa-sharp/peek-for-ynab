@@ -38,12 +38,14 @@ export default function SavedCategoriesView({ addTx }: Props) {
             <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
+                  bordered
                   icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
                   label={`Add transaction to '${category.name}'`}
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}
               <IconButton
+                bordered
                 label={`Unpin '${category.name}'`}
                 onClick={() =>
                   removeCategory({
