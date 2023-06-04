@@ -22,7 +22,7 @@ function CategoriesView({ addTx }: Props) {
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [categoriesExpanded, setCategoriesExpanded] = useState(
-    savedCategories.length ? false : true // Expanded if user hasn't pinned any categories
+    savedCategories[selectedBudgetId]?.length ? false : true // Expanded if user hasn't pinned any categories
   );
 
   if (!selectedBudgetData || !categoryGroupsData) return null;
