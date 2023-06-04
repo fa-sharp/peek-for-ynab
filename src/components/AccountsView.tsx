@@ -5,7 +5,7 @@ import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings } from "~lib/context/storageContext";
+import type { AppSettings, SavedAccount } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
@@ -19,7 +19,7 @@ interface Props {
 function AccountsView({ addTx }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const { savedAccounts, saveAccount, settings } = useStorageContext();
+  const { savedAccounts, selectedBudgetId, saveAccount, settings } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
 
   if (!settings.showAccounts || !selectedBudgetData || !accountsData) return null;
@@ -47,7 +47,7 @@ function AccountsView({ addTx }: Props) {
           <AccountTypeView
             accountType="Budget"
             accountsData={accountsData.filter((a) => a.on_budget)}
-            savedAccounts={savedAccounts}
+            savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
             settings={settings}
@@ -56,7 +56,7 @@ function AccountsView({ addTx }: Props) {
           <AccountTypeView
             accountType="Tracking"
             accountsData={accountsData.filter((a) => !a.on_budget)}
-            savedAccounts={savedAccounts}
+            savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             budgetData={selectedBudgetData}
             settings={settings}
@@ -81,8 +81,8 @@ function AccountTypeView({
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
   budgetData: CachedBudget;
-  savedAccounts: string[];
-  saveAccount: (id: string) => void;
+  savedAccounts?: string[];
+  saveAccount: (account: SavedAccount) => void;
   settings: AppSettings;
   addTx: (initialState: AddTransactionInitialState) => void;
 }) {
@@ -122,11 +122,13 @@ function AccountTypeView({
                     onClick={() => addTx({ accountId: account.id })}
                   />
                 )}
-                {savedAccounts.some((id) => id === account.id) ? null : (
+                {savedAccounts?.some((id) => id === account.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
                     label={`Pin ${account.name}`}
-                    onClick={() => saveAccount(account.id)}
+                    onClick={() =>
+                      saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                    }
                   />
                 )}
               </aside>

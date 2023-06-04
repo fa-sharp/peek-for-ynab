@@ -17,7 +17,8 @@ interface Props {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView({ addTx }: Props) {
-  const { savedCategories, saveCategory, settings } = useStorageContext();
+  const { savedCategories, saveCategory, settings, selectedBudgetId } =
+    useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [categoriesExpanded, setCategoriesExpanded] = useState(
@@ -50,9 +51,11 @@ function CategoriesView({ addTx }: Props) {
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
-            savedCategories={savedCategories}
+            savedCategories={savedCategories[selectedBudgetId]}
             settings={settings}
-            onSaveCategory={(id) => saveCategory(id)}
+            onSaveCategory={(categoryId) =>
+              saveCategory({ categoryId, budgetId: selectedBudgetId })
+            }
             addTx={addTx}
           />
         ))}
@@ -71,7 +74,7 @@ export function CategoryGroupView({
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
-  savedCategories: string[];
+  savedCategories?: string[];
   onSaveCategory: (categoryId: string) => void;
   settings: AppSettings;
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -115,7 +118,7 @@ export function CategoryGroupView({
                     onClick={() => addTx({ categoryId: category.id })}
                   />
                 )}
-                {savedCategories.some((id) => id === category.id) ? null : (
+                {savedCategories?.some((id) => id === category.id) ? null : (
                   <IconButton
                     icon={<Pinned size={20} color="gray" strokeWidth={1} />}
                     label={`Pin '${category.name}'`}

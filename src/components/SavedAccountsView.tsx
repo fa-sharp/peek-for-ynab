@@ -14,7 +14,12 @@ export default function SavedAccountsView({ addTx }: Props) {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, settings } = useStorageContext();
 
-  if (!settings.showAccounts || !savedAccountsData || savedAccountsData.length === 0)
+  if (
+    !settings.showAccounts ||
+    !savedAccountsData ||
+    !selectedBudgetData ||
+    savedAccountsData.length === 0
+  )
     return null;
 
   return (
@@ -43,7 +48,12 @@ export default function SavedAccountsView({ addTx }: Props) {
               )}
               <IconButton
                 label={`Unpin '${account.name}'`}
-                onClick={() => removeAccount(account.id)}
+                onClick={() =>
+                  removeAccount({
+                    accountId: account.id,
+                    budgetId: selectedBudgetData.id
+                  })
+                }
                 icon={<PinnedOff size={20} color="gray" strokeWidth={1} />}
               />
             </aside>
