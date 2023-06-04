@@ -17,8 +17,13 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, changeSetting, shownBudgetIds, toggleShowBudget } =
-    useStorageContext();
+  const {
+    settings,
+    changeSetting,
+    shownBudgetIds,
+    toggleShowBudget,
+    setSelectedBudgetId
+  } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
@@ -72,6 +77,7 @@ export function OptionsView() {
                 const confirmed = confirm(confirmMessage);
                 if (confirmed) {
                   changeSetting("sync", e.target.checked);
+                  setSelectedBudgetId("");
                   location.reload();
                 }
               }}

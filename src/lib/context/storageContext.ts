@@ -88,7 +88,7 @@ const useStorageProvider = () => {
   /** The account IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
   const [savedAccounts, setSavedAccounts] = useExtensionStorage<{
     [budgetId: string]: string[] | undefined;
-  }>({ key: "accts", instance: storageArea }, (data, isHydrated) =>
+  }>({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
     !isHydrated ? {} : !data ? {} : data
   );
 
