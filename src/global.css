@@ -102,6 +102,7 @@ body {
 
 .balance-actions {
   display: flex;
+  gap: 1px;
 }
 
 .button {
