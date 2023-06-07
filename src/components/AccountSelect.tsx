@@ -1,14 +1,15 @@
 import { useCombobox } from "downshift";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
 import { useYNABContext } from "~lib/context";
 import { formatCurrency } from "~lib/utils";
 
 interface Props {
-  initialAccount?: Account;
+  initialAccount?: Account | null;
   accounts?: Account[];
-  selectAccount: (account: Account) => void;
+  selectAccount: (account: Account | null) => void;
   isTransfer?: boolean;
   disabled?: boolean;
 }
@@ -29,6 +30,8 @@ export default function AccountSelect({
       !inputValue || account.name.toLowerCase().includes(inputValue.toLowerCase());
   }, []);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const {
     isOpen,
     getLabelProps,
@@ -36,6 +39,8 @@ export default function AccountSelect({
     getInputProps,
     getItemProps,
     getComboboxProps,
+    reset,
+    openMenu,
     highlightedIndex,
     selectedItem
   } = useCombobox<Account | null>({
@@ -56,7 +61,22 @@ export default function AccountSelect({
     <div className="form-input">
       <label {...getLabelProps()}>{isTransfer ? "From" : "Account"}</label>
       <div className="flex-col" {...getComboboxProps()}>
-        <input required {...getInputProps()} disabled={disabled} />
+        {selectedItem && (
+          <button
+            type="button"
+            tabIndex={-1}
+            className="select-clear-button icon-button"
+            aria-label="Clear account"
+            onClick={() => {
+              reset();
+              selectAccount(null);
+              openMenu();
+              inputRef.current?.focus();
+            }}>
+            <X color="gray" />
+          </button>
+        )}
+        <input required {...getInputProps({ ref: inputRef })} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
