@@ -40,7 +40,6 @@ export default function AccountSelect({
     getItemProps,
     getComboboxProps,
     reset,
-    openMenu,
     highlightedIndex,
     selectedItem
   } = useCombobox<Account | null>({
@@ -70,7 +69,6 @@ export default function AccountSelect({
             onClick={() => {
               reset();
               selectAccount(null);
-              openMenu();
               inputRef.current?.focus();
             }}>
             <X color="gray" />

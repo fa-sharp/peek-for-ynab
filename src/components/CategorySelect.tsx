@@ -52,7 +52,6 @@ export default function CategorySelect({
     getItemProps,
     getComboboxProps,
     reset,
-    openMenu,
     highlightedIndex,
     selectedItem
   } = useCombobox<Category | null>({
@@ -82,7 +81,6 @@ export default function CategorySelect({
             onClick={() => {
               reset();
               selectCategory(null);
-              openMenu();
               inputRef.current?.focus();
             }}>
             <X color="gray" />
