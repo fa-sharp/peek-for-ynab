@@ -1,7 +1,7 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Check on your YNAB category and account balances",
   "author": "fa-sharp",
   "packageManager": "pnpm@8.6.0",
