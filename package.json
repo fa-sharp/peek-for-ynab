@@ -56,6 +56,10 @@
       "scripting",
       "activeTab"
     ],
+    "host_permissions": [
+      "https://api.youneedabudget.com/*",
+      "https://api.ynab.com/*"
+    ],
     "options_ui": {
       "open_in_tab": true
     }
