@@ -135,10 +135,10 @@ const useYNABProvider = () => {
   });
 
   const refreshCategoriesAndAccounts = useCallback(() => {
-    queryClient.refetchQueries({
+    queryClient.invalidateQueries({
       queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
     });
-    queryClient.refetchQueries({
+    queryClient.invalidateQueries({
       queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
     });
   }, [queryClient, selectedBudgetId]);
