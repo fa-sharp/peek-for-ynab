@@ -108,7 +108,7 @@ const useYNABProvider = () => {
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData) return null;
-    return savedCategories[selectedBudgetId]?.reduce<ynab.Category[]>(
+    return savedCategories?.[selectedBudgetId]?.reduce<ynab.Category[]>(
       (newArray, savedCategoryId) => {
         const categoryData = categoriesData.find(
           (category) => category.id === savedCategoryId
@@ -167,7 +167,7 @@ const useYNABProvider = () => {
   const savedAccountsData = useMemo(() => {
     if (!accountsData) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return savedAccounts[selectedBudgetId]?.reduce<ynab.Account[]>(
+    return savedAccounts?.[selectedBudgetId]?.reduce<ynab.Account[]>(
       (newArray, savedAccountId) => {
         const accountData = accountsData.find((a) => a.id === savedAccountId);
         if (accountData) newArray.push(accountData);

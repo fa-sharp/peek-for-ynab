@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
@@ -21,21 +21,23 @@ function CategoriesView({ addTx }: Props) {
     useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    // auto-expand if there are no saved categories
+    if (savedCategories && !savedCategories[selectedBudgetId]?.length) setExpanded(true);
+  }, [savedCategories, selectedBudgetId]);
 
-  if (!selectedBudgetData || !categoryGroupsData) return null;
+  if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
 
   return (
     <>
-      <div
-        className="heading-big cursor-pointer"
-        onClick={() => setCategoriesExpanded(!categoriesExpanded)}>
+      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div role="heading">Categories</div>
         <IconButton
-          label={categoriesExpanded ? "Collapse" : "Expand"}
-          onClick={() => setCategoriesExpanded(!categoriesExpanded)}
+          label={expanded ? "Collapse" : "Expand"}
+          onClick={() => setExpanded(!expanded)}
           icon={
-            categoriesExpanded ? (
+            expanded ? (
               <ChevronUp size={24} color="black" strokeWidth={2} />
             ) : (
               <ChevronDown size={24} color="black" strokeWidth={2} />
@@ -43,7 +45,7 @@ function CategoriesView({ addTx }: Props) {
           }
         />
       </div>
-      {categoriesExpanded &&
+      {expanded &&
         categoryGroupsData.map((categoryGroup) => (
           <CategoryGroupView
             key={categoryGroup.id}
