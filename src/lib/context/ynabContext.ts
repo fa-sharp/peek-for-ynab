@@ -63,9 +63,9 @@ const useYNABProvider = () => {
           ? 1
           : -1
       );
-      // Show first two budgets by default
-      if (!shownBudgetIds || shownBudgetIds.length === 0)
-        setShownBudgetIds(budgets.slice(0, 2).map((b) => b.id));
+      // If no budgets have been selected by the user, select the most recently modified budget
+      if (shownBudgetIds && shownBudgetIds.length === 0 && budgets[0])
+        setShownBudgetIds([budgets[0].id]);
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
