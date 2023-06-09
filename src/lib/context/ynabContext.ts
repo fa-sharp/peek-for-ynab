@@ -28,6 +28,7 @@ const useYNABProvider = () => {
     savedAccounts,
     savedCategories,
     shownBudgetIds,
+    setSelectedBudgetId,
     setShownBudgetIds
   } = useStorageContext();
 
@@ -64,8 +65,10 @@ const useYNABProvider = () => {
           : -1
       );
       // If no budgets have been selected by the user, select the most recently modified budget
-      if (shownBudgetIds && shownBudgetIds.length === 0 && budgets[0])
+      if (shownBudgetIds && shownBudgetIds.length === 0 && budgets[0]) {
         setShownBudgetIds([budgets[0].id]);
+        setSelectedBudgetId(budgets[0].id);
+      }
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
@@ -81,7 +84,7 @@ const useYNABProvider = () => {
     [budgetsData, selectedBudgetId]
   );
 
-  /** The budgets the user has selected to show */
+  /** Data from the budgets the user has selected to show */
   const shownBudgetsData = useMemo(
     () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
     [budgetsData, shownBudgetIds]

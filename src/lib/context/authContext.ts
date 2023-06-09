@@ -76,7 +76,7 @@ const useAuthProvider = () => {
         response_type: "code",
         state: authorizeState
       });
-      const authorizeUrl = new URL("https://app.youneedabudget.com/oauth/authorize");
+      const authorizeUrl = new URL("https://app.ynab.com/oauth/authorize");
       authorizeUrl.search = authorizeParams.toString();
 
       // if no chrome API available, assume we're testing/developing in a regular web browser context

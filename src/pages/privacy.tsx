@@ -14,10 +14,8 @@ function IndexPage() {
       <Link href="/">Home</Link>
       <p>
         {APP_NAME} follows the{" "}
-        <Link href="https://api.youneedabudget.com/#terms">
-          YNAB API Terms of Service
-        </Link>
-        . When you authorize the extension with your YNAB account, {APP_NAME + " "}
+        <Link href="https://api.ynab.com/#terms">YNAB API Terms of Service</Link>. When
+        you authorize the extension with your YNAB account, {APP_NAME + " "}
         communicates directly with YNAB through their API to access your budget data -
         including your budgets, budget settings, categories, accounts, payees, and
         balances. {APP_NAME} cannot access your YNAB login credentials, nor any

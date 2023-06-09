@@ -28,10 +28,10 @@ export default function PopupNav() {
   }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
 
   const openBudget = useCallback(() => {
-    window.open(`https://app.youneedabudget.com/${selectedBudgetId}/budget`, "_blank");
+    window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
 
-  if (!shownBudgetsData) return <p>Loading budgets...</p>;
+  if (!shownBudgetsData) return null;
 
   return (
     <nav
@@ -52,7 +52,7 @@ export default function PopupNav() {
           justifyContent: "space-between",
           gap: 3
         }}>
-        {shownBudgetsData.length > 1 && (
+        {shownBudgetsData?.length > 1 && (
           <IconButton
             label="Switch budget"
             onClick={switchBudget}

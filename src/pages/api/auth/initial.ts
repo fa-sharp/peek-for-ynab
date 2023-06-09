@@ -4,7 +4,7 @@ import { URL } from "url";
 import type { TokenData } from "~lib/context/storageContext";
 import { corsMiddleware } from "~lib/nextCorsMiddleware";
 
-export const OAUTH_BASE_URL = "https://app.youneedabudget.com/oauth/token";
+export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 const { NEXT_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
 const handler: NextApiHandler = async (req, res) => {
