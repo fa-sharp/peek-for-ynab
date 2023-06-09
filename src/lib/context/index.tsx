@@ -4,7 +4,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import type { ReactNode } from "react";
 
 import { createIDBPersister } from "~lib/indexedDBPersister";
-import { TWO_WEEKS_IN_MILLIS } from "~lib/utils";
+import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "~lib/utils";
 
 import { AuthProvider, useAuthContext } from "./authContext";
 import { StorageProvider, useStorageContext } from "./storageContext";
@@ -14,7 +14,7 @@ import { YNABProvider, useYNABContext } from "./ynabContext";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 30, // data stays fresh for 30 seconds
+      staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 60 * 5, // 30 seconds in prod, 5 minutes in dev
       cacheTime: 1000 * 60 * 30, // 30 minute cache
       refetchOnWindowFocus: false, // don't refetch on window focus
       retry: 1 // only retry once if there's an error
@@ -32,7 +32,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: TWO_WEEKS_IN_MILLIS
+        maxAge: TWO_WEEKS_IN_MILLIS * 2
       }}>
       <ReactQueryDevtools initialIsOpen={false} />
       <AuthProvider>

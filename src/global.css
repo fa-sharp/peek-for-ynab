@@ -34,6 +34,7 @@ body {
 }
 
 .flex-col {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -146,12 +147,14 @@ body {
 
 .select-dropdown-list {
   position: absolute;
+  z-index: 100;
+
   max-height: 8rem;
-  width: 14rem;
+  width: 97%;
   margin: 0;
-  margin-top: 27px;
+  margin-top: 11%;
   padding: 0;
-  padding-left: 5px;
+  padding-left: 0.25rem;
 
   background-color: #fff;
   overflow-y: auto;
@@ -167,6 +170,12 @@ body {
 }
 .select-dropdown-item.selected {
   font-weight: bold;
+}
+
+.select-clear-button {
+  position: absolute;
+  right: 3px;
+  top: 1px;
 }
 
 .rounded {
@@ -221,7 +230,7 @@ body {
 }
 
 .font-big {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
 }
 
 .cursor-pointer {

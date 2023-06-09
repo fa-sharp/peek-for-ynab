@@ -1,14 +1,15 @@
 import { useCombobox } from "downshift";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { X } from "tabler-icons-react";
 import type { Category } from "ynab";
 
 import { useYNABContext } from "~lib/context";
 import { formatCurrency } from "~lib/utils";
 
 interface Props {
-  initialCategory?: Category;
+  initialCategory?: Category | null;
   categories?: Category[];
-  selectCategory: (category: Category) => void;
+  selectCategory: (category: Category | null) => void;
   disabled?: boolean;
 }
 
@@ -41,6 +42,8 @@ export default function CategorySelect({
     [ignoredCategoryIds]
   );
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const {
     isOpen,
     getLabelProps,
@@ -48,6 +51,7 @@ export default function CategorySelect({
     getInputProps,
     getItemProps,
     getComboboxProps,
+    reset,
     highlightedIndex,
     selectedItem
   } = useCombobox<Category | null>({
@@ -68,7 +72,21 @@ export default function CategorySelect({
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col" {...getComboboxProps()}>
-        <input {...getInputProps()} disabled={disabled} />
+        {selectedItem && (
+          <button
+            type="button"
+            tabIndex={-1}
+            className="select-clear-button icon-button"
+            aria-label="Clear category"
+            onClick={() => {
+              reset();
+              selectCategory(null);
+              inputRef.current?.focus();
+            }}>
+            <X color="gray" />
+          </button>
+        )}
+        <input {...getInputProps({ ref: inputRef })} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>

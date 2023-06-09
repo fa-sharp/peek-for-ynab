@@ -77,7 +77,6 @@ export function OptionsView() {
                 const confirmed = confirm(confirmMessage);
                 if (confirmed) {
                   changeSetting("sync", e.target.checked);
-                  setSelectedBudgetId("");
                   location.reload();
                 }
               }}
@@ -152,7 +151,7 @@ export function OptionsView() {
             className="button rounded warn"
             onClick={() => {
               const confirmed = confirm(
-                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any data synced with your Chrome profile."
+                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any settings synced with your Chrome profile."
               );
               if (confirmed) logout();
             }}>

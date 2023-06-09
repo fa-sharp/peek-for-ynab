@@ -45,12 +45,12 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
-    if (!initialState?.categoryId) return;
-    return categoriesData?.find((c) => c.id === initialState.categoryId);
+    if (!initialState?.categoryId) return null;
+    return categoriesData?.find((c) => c.id === initialState.categoryId) || null;
   });
   const [account, setAccount] = useState(() => {
-    if (!initialState?.accountId) return;
-    return accountsData?.find((a) => a.id === initialState.accountId);
+    if (!initialState?.accountId) return null;
+    return accountsData?.find((a) => a.id === initialState.accountId) || null;
   });
   const [memo, setMemo] = useState("");
 
@@ -105,8 +105,16 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-    if (!account || !payee || !amount) {
-      setErrorMessage("Missing some fields!");
+    if (!account) {
+      setErrorMessage("Please select an account!");
+      return;
+    }
+    if (!payee) {
+      setErrorMessage("Please enter a payee!");
+      return;
+    }
+    if (!amount) {
+      setErrorMessage("Please enter a valid amount!");
       return;
     }
     if (isTransfer) {

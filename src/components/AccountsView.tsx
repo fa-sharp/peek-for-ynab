@@ -17,12 +17,13 @@ interface Props {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView({ addTx }: Props) {
-  const [expanded, setExpanded] = useState(false);
-
   const { savedAccounts, selectedBudgetId, saveAccount, settings } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
 
-  if (!settings.showAccounts || !selectedBudgetData || !accountsData) return null;
+  const [expanded, setExpanded] = useState(false);
+
+  if (!settings.showAccounts || !selectedBudgetData || !accountsData || !savedAccounts)
+    return null;
 
   return (
     <>
