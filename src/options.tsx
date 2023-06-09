@@ -17,13 +17,8 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const {
-    settings,
-    changeSetting,
-    shownBudgetIds,
-    toggleShowBudget,
-    setSelectedBudgetId
-  } = useStorageContext();
+  const { settings, changeSetting, shownBudgetIds, toggleShowBudget } =
+    useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
