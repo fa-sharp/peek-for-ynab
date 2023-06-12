@@ -15,7 +15,8 @@ import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context"
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
   const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
-  const { shownBudgetsData, categoriesLastUpdated } = useYNABContext();
+  const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
+    useYNABContext();
   const { isRefreshingToken } = useAuthContext();
   const globalIsFetching = useIsFetching();
 
@@ -31,6 +32,7 @@ export default function PopupNav() {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
 
+  if (!shownBudgetsData && isRefreshingBudgets) return <p>Loading budgets...</p>;
   if (!shownBudgetsData) return null;
 
   return (

@@ -17,13 +17,8 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const {
-    settings,
-    changeSetting,
-    shownBudgetIds,
-    toggleShowBudget,
-    setSelectedBudgetId
-  } = useStorageContext();
+  const { settings, changeSetting, shownBudgetIds, toggleShowBudget } =
+    useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
@@ -81,7 +76,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync with your Chrome profile (BETA)
+            🔄 Sync with your Chrome profile
           </label>
           <label className="flex-row mb-small">
             <input
@@ -108,7 +103,7 @@ export function OptionsView() {
               checked={settings.txEnabled}
               onChange={(e) => changeSetting("txEnabled", e.target.checked)}
             />
-            💸 Enable transaction entry (BETA)
+            💸 Enable transaction entry
           </label>
           {settings.txEnabled && (
             <>

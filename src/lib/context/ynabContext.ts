@@ -49,7 +49,7 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["budgets"],
     staleTime: TWO_WEEKS_IN_MILLIS, // Budget data stays fresh in cache for two weeks
-    cacheTime: TWO_WEEKS_IN_MILLIS * 2,
+    cacheTime: TWO_WEEKS_IN_MILLIS,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;

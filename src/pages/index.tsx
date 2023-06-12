@@ -16,11 +16,11 @@ function IndexPage() {
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
         <li>Quickly switch between your budgets</li>
+        <li>Sync your pinned categories, accounts, and budgets to your Chrome profile</li>
         <li>Fully keyboard accessible</li>
       </ul>
       <h2>Coming soon!</h2>
       <ul>
-        <li>Sync your pinned categories and accounts to your Chrome profile</li>
         <li>Multi-browser support</li>
       </ul>
       <h2>Screenshots</h2>
