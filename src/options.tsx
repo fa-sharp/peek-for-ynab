@@ -76,7 +76,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync with your Chrome profile (BETA)
+            🔄 Sync with your Chrome profile
           </label>
           <label className="flex-row mb-small">
             <input
@@ -103,7 +103,7 @@ export function OptionsView() {
               checked={settings.txEnabled}
               onChange={(e) => changeSetting("txEnabled", e.target.checked)}
             />
-            💸 Enable transaction entry (BETA)
+            💸 Enable transaction entry
           </label>
           {settings.txEnabled && (
             <>

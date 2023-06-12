@@ -54,7 +54,7 @@ const useStorageProvider = () => {
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {
       showAccounts: true,
-      txEnabled: false,
+      txEnabled: true,
       txApproved: false,
       privateMode: false,
       emojiMode: false,
