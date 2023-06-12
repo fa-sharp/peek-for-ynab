@@ -25,17 +25,17 @@ function IndexPage() {
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
         your extension settings and the list of categories and accounts you choose to pin.{" "}
-        {APP_NAME} also caches data from your budget, which allows the extension to fetch
+        {APP_NAME} also caches data from your budgets, which allows the extension to fetch
         and display your data quickly and efficiently. This cached data is stored locally
-        in your browser and is never sent to a third-party. All data is immediately
+        in your browser and is never sent to a third-party. All cached data is immediately
         deleted if you logout and/or uninstall the extension.
       </p>
       <p>
-        If you turn on the setting to sync your data to your Chrome profile, {APP_NAME}{" "}
-        will store the IDs of your pinned categories, accounts, and budgets in your{" "}
+        If you turn on the setting to sync with your Chrome profile, {APP_NAME} will store
+        the IDs of your pinned categories, accounts, and budgets in your{" "}
         <a href="https://chrome.google.com/sync">Chrome profile</a>. Only the{" "}
         <a href="https://developer.mozilla.org/en-US/docs/Glossary/UUID">UUIDs</a> are
-        saved, and no balances, names, or other personal information is stored in the
+        stored, and no names, balances, or other personal information is stored in the
         Chrome profile. Note that authentication information is not synced between your
         devices - you must login to YNAB on each device separately.
       </p>
