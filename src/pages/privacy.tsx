@@ -33,12 +33,13 @@ function IndexPage() {
       <p>
         If you turn on the setting to sync your data to your Chrome profile, {APP_NAME}{" "}
         will store the IDs of your pinned categories, accounts, and budgets in your{" "}
-        <a href="https://chrome.google.com/sync">Chrome profile</a>. Only the IDs are
-        stored, and no balances, names, or other personal information is stored in the
+        <a href="https://chrome.google.com/sync">Chrome profile</a>. Only the{" "}
+        <a href="https://developer.mozilla.org/en-US/docs/Glossary/UUID">UUIDs</a> are
+        saved, and no balances, names, or other personal information is stored in the
         Chrome profile. Note that authentication information is not synced between your
-        devices - you must sign in to YNAB on each device separately.
+        devices - you must login to YNAB on each device separately.
       </p>
-      <p>{APP_NAME} does not share data with any analytics services.</p>
+      <p>{APP_NAME} does not currently use any third-party analytics services.</p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
         extension&apos;s functionality and data practices. This website will show the
@@ -46,7 +47,7 @@ function IndexPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Feb 12, 2023</em>
+        <em>Last updated: Jun 12, 2023</em>
       </p>
     </main>
   );
