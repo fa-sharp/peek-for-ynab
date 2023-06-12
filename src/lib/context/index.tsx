@@ -32,7 +32,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: TWO_WEEKS_IN_MILLIS
+        maxAge: TWO_WEEKS_IN_MILLIS * 2
       }}>
       <ReactQueryDevtools initialIsOpen={false} />
       <AuthProvider>
