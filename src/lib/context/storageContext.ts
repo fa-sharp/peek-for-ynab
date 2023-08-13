@@ -39,16 +39,24 @@ export interface SavedAccount {
   budgetId: string;
 }
 
-const tokenStorage = new Storage({ area: "local" });
-const chromeLocalStorage = new Storage({ area: "local", allCopied: true });
-const chromeSyncStorage = new Storage({ area: "sync", allCopied: true });
+export const TOKEN_STORAGE_KEY = "tokenData";
+export const REFRESH_NEEDED_KEY = "tokenRefreshing";
+
+export const TOKEN_STORAGE = new Storage({ area: "local" });
+const CHROME_LOCAL_STORAGE = new Storage({ area: "local", allCopied: true });
+const CHROME_SYNC_STORAGE = new Storage({ area: "sync", allCopied: true });
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
-  >({ key: "tokenData", instance: tokenStorage }, (data, isHydrated) =>
+  >({ key: TOKEN_STORAGE_KEY, instance: TOKEN_STORAGE }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
+  );
+  /** Whether the token needs to be refreshed */
+  const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
+    { key: REFRESH_NEEDED_KEY, instance: TOKEN_STORAGE },
+    false
   );
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
@@ -68,7 +76,7 @@ const useStorageProvider = () => {
   });
 
   const storageArea = useMemo(
-    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
+    () => (settings.sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
     [settings.sync]
   );
 
@@ -180,6 +188,8 @@ const useStorageProvider = () => {
   return {
     tokenData,
     setTokenData,
+    tokenRefreshNeeded,
+    setTokenRefreshNeeded,
     settings,
     changeSetting,
     selectedBudgetId,
