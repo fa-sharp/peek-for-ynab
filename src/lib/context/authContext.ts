@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";
@@ -18,7 +18,7 @@ const useAuthProvider = () => {
   /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
   useEffect(() => {
     if (tokenData && tokenExpired) setTokenRefreshNeeded(true);
-  }, [tokenData, tokenExpired]);
+  }, [setTokenRefreshNeeded, tokenData, tokenExpired]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
   const login = (tokenData: TokenData) => {
