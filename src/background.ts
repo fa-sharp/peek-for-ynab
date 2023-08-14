@@ -9,8 +9,7 @@ let isRefreshing = false;
 
 TOKEN_STORAGE.watch({
   [REFRESH_NEEDED_KEY]: async (c) => {
-    if (c.newValue === c.oldValue || isRefreshing) return;
-    if (c.newValue !== true) return;
+    if (c.newValue !== true || isRefreshing) return;
 
     const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
     if (!tokenData) {
