@@ -54,6 +54,12 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+.form-input input[disabled] {
+  background: #eee;
+  border: 1px solid transparent;
+  color: black;
+}
+
 .heading-big {
   display: flex;
   justify-content: space-between;

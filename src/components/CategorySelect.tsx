@@ -21,8 +21,6 @@ export default function CategorySelect({
 }: Props) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
 
-  const [categoryList, setCategoryList] = useState(categories ? [...categories] : []);
-
   /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
@@ -40,6 +38,10 @@ export default function CategorySelect({
         (!inputValue || category.name.toLowerCase().includes(inputValue.toLowerCase()));
     },
     [ignoredCategoryIds]
+  );
+
+  const [categoryList, setCategoryList] = useState(
+    categories ? categories.filter(getFilter()) : []
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
