@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { nanoid } from "nanoid";
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
 import { IS_PRODUCTION } from "../utils";
@@ -9,48 +9,16 @@ import type { TokenData } from "./storageContext";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
-  const { tokenData, setTokenData, removeAllData } = useStorageContext();
+  const { tokenData, setTokenRefreshNeeded, setTokenData, removeAllData } =
+    useStorageContext();
 
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
 
-  /** Whether token is being refreshed */
-  const [isRefreshingToken, setIsRefreshingToken] = useState(false);
-
-  /** The current React Query client */
-  const queryClient = useQueryClient();
-
-  /** Callback to refresh the access token */
-  const refresh = useCallback(() => {
-    if (!tokenData) return;
-    if (!IS_PRODUCTION) console.log("Refreshing token!!");
-    setIsRefreshingToken(true);
-
-    const refreshUrl = `${process.env.PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
-    fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
-      .then(async (res) => {
-        if (!res.ok) {
-          if (res.status === 401) setTokenData(null); // clear token if status is unauthorized
-          throw {
-            message: "Error refreshing token!",
-            status: res.status,
-            error: await res.json()
-          };
-        }
-        return res.json();
-      })
-      .then((newTokenData) => {
-        if (!IS_PRODUCTION) console.log("Got a new token!");
-        setTokenData(newTokenData);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setIsRefreshingToken(false));
-  }, [setTokenData, tokenData]);
-
   /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
   useEffect(() => {
-    if (tokenData && tokenExpired) refresh();
-  }, [refresh, tokenData, tokenExpired]);
+    if (tokenData && tokenExpired) setTokenRefreshNeeded(true);
+  }, [setTokenRefreshNeeded, tokenData, tokenExpired]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
   const login = (tokenData: TokenData) => {
@@ -129,6 +97,9 @@ const useAuthProvider = () => {
       );
     });
 
+  /** The current React Query client */
+  const queryClient = useQueryClient();
+
   /** Clears all data, including the user's token */
   const logout = async () => {
     await removeAllData();
@@ -142,8 +113,7 @@ const useAuthProvider = () => {
     logout,
     authLoading: tokenData === undefined,
     loggedIn: tokenData != null,
-    tokenExpired,
-    isRefreshingToken
+    tokenExpired
   };
 };
 

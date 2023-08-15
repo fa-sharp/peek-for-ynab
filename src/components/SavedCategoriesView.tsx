@@ -1,4 +1,4 @@
-import { PinnedOff, Plus } from "tabler-icons-react";
+import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
@@ -34,27 +34,36 @@ export default function SavedCategoriesView({ addTx }: Props) {
           categoryData={category}
           currencyFormat={currencyFormat}
           settings={settings}
-          actionElements={
+          actionElementsLeft={
+            <IconButton
+              label={`Unpin '${category.name}'`}
+              onClick={() =>
+                removeCategory({
+                  categoryId: category.id,
+                  budgetId: selectedBudgetData.id
+                })
+              }
+              icon={
+                <Pinned
+                  size={"1.3rem"}
+                  fill="var(--action)"
+                  color="var(--action)"
+                  strokeWidth={1}
+                />
+              }
+            />
+          }
+          actionElementsRight={
             <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
                   bordered
-                  icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
+                  accent
+                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                   label={`Add transaction to '${category.name}'`}
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}
-              <IconButton
-                bordered
-                label={`Unpin '${category.name}'`}
-                onClick={() =>
-                  removeCategory({
-                    categoryId: category.id,
-                    budgetId: selectedBudgetData.id
-                  })
-                }
-                icon={<PinnedOff size={"1.3rem"} color="gray" strokeWidth={1} />}
-              />
             </aside>
           }
         />

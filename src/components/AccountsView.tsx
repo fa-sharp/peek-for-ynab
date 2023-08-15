@@ -100,9 +100,9 @@ function AccountTypeView({
           onClick={() => setExpanded(!expanded)}
           icon={
             expanded ? (
-              <ChevronUp size={24} color="gray" strokeWidth={1} />
+              <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
             ) : (
-              <ChevronDown size={24} color="gray" strokeWidth={1} />
+              <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
             )
           }
         />
@@ -114,24 +114,40 @@ function AccountTypeView({
             account={account}
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
-            actionElements={
+            actionElementsLeft={
+              savedAccounts?.some((id) => id === account.id) ? (
+                <IconButton
+                  icon={
+                    <Pinned
+                      size={"1.3rem"}
+                      color="var(--action)"
+                      fill="var(--action)"
+                      strokeWidth={1}
+                    />
+                  }
+                  label="Pinned"
+                  disabled
+                  noAction
+                />
+              ) : (
+                <IconButton
+                  icon={<Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                  label={`Pin ${account.name}`}
+                  onClick={() =>
+                    saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                  }
+                />
+              )
+            }
+            actionElementsRight={
               <aside className="balance-actions" aria-label="actions">
                 {settings.txEnabled && (
                   <IconButton
                     bordered
-                    icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
+                    accent
+                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                     label={`Add transaction to '${account.name}'`}
                     onClick={() => addTx({ accountId: account.id })}
-                  />
-                )}
-                {savedAccounts?.some((id) => id === account.id) ? null : (
-                  <IconButton
-                    bordered
-                    icon={<Pinned size={"1.3rem"} color="gray" strokeWidth={1} />}
-                    label={`Pin ${account.name}`}
-                    onClick={() =>
-                      saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                    }
                   />
                 )}
               </aside>
@@ -145,12 +161,14 @@ function AccountTypeView({
 export const AccountView = ({
   account: { name, balance },
   currencyFormat,
-  actionElements,
+  actionElementsLeft,
+  actionElementsRight,
   settings
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
-  actionElements?: ReactElement | null;
+  actionElementsLeft?: ReactElement | null;
+  actionElementsRight?: ReactElement | null;
   settings: AppSettings;
 }) => {
   const foundEmoji = settings.emojiMode ? findFirstEmoji(name) : null;
@@ -163,16 +181,19 @@ export const AccountView = ({
           ? `${name}: ${formatCurrency(balance, currencyFormat)}`
           : undefined
       }>
-      <div>
-        {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}
+      <div className="flex-row">
+        {actionElementsLeft}
+        {foundEmoji ? <span className="font-big">{foundEmoji}</span> : name}
+      </div>
+      <div className="flex-row">
         <CurrencyView
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
         />
+        {actionElementsRight}
       </div>
-      {actionElements}
     </div>
   );
 };

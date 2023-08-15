@@ -245,7 +245,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             )}
           </div>
         </div>
-        {!isTransfer && (
+        {!isTransfer ? (
           <>
             <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
             <CategorySelect
@@ -254,22 +254,37 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               selectCategory={setCategory}
               disabled={isSaving}
             />
-          </>
-        )}
-        <AccountSelect
-          initialAccount={account}
-          accounts={accountsData}
-          selectAccount={setAccount}
-          isTransfer={isTransfer}
-          disabled={isSaving}
-        />
-        {isTransfer && (
-          <>
-            <PayeeSelect
-              payees={payeesData}
-              selectPayee={setPayee}
+            <AccountSelect
+              initialAccount={account}
+              accounts={accountsData}
+              selectAccount={setAccount}
               disabled={isSaving}
-              isTransfer
+            />
+          </>
+        ) : (
+          <>
+            <AccountSelect
+              initialAccount={account}
+              accounts={accountsData}
+              selectAccount={setAccount}
+              isTransfer="from"
+              disabled={isSaving}
+            />
+            <AccountSelect
+              accounts={accountsData}
+              selectAccount={(account) => {
+                if (!account) {
+                  setPayee(null);
+                  return;
+                }
+                setPayee({
+                  id: account.transfer_payee_id,
+                  name: account.name,
+                  transferId: account.id
+                });
+              }}
+              isTransfer="to"
+              disabled={isSaving}
             />
             {isBudgetToTrackingTransfer && (
               <CategorySelect

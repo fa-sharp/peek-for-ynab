@@ -1,7 +1,7 @@
 import { useCombobox } from "downshift";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { X } from "tabler-icons-react";
-import type { Category } from "ynab";
+import { ChevronDown, X } from "tabler-icons-react";
+import type { Category, CurrencyFormat } from "ynab";
 
 import { useYNABContext } from "~lib/context";
 import { formatCurrency } from "~lib/utils";
@@ -20,8 +20,6 @@ export default function CategorySelect({
   disabled
 }: Props) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
-
-  const [categoryList, setCategoryList] = useState(categories ? [...categories] : []);
 
   /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
   const ignoredCategoryIds = useMemo(() => {
@@ -42,15 +40,21 @@ export default function CategorySelect({
     [ignoredCategoryIds]
   );
 
+  const [categoryList, setCategoryList] = useState(
+    categories ? categories.filter(getFilter()) : []
+  );
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
     isOpen,
+    openMenu,
     getLabelProps,
     getMenuProps,
     getInputProps,
     getItemProps,
     getComboboxProps,
+    setHighlightedIndex,
     reset,
     highlightedIndex,
     selectedItem
@@ -58,7 +62,12 @@ export default function CategorySelect({
     items: categoryList,
     initialSelectedItem: initialCategory,
     itemToString(category) {
-      return category ? category.name : "";
+      if (!category) return "";
+      if (category.name === "Inflow: Ready to Assign") return category.name;
+      return `${category.name} (${formatCurrency(
+        category.balance,
+        selectedBudgetData?.currencyFormat
+      )})`;
     },
     onInputValueChange({ inputValue }) {
       setCategoryList(categories?.filter(getFilter(inputValue)) || []);
@@ -72,21 +81,38 @@ export default function CategorySelect({
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col" {...getComboboxProps()}>
-        {selectedItem && (
+        {selectedItem ? (
           <button
             type="button"
-            tabIndex={-1}
-            className="select-clear-button icon-button"
+            className="select-button-right icon-button"
             aria-label="Clear category"
             onClick={() => {
               reset();
               selectCategory(null);
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}>
+            <X />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="select-button-right icon-button"
+            aria-label="Open category list"
+            tabIndex={-1}
+            onClick={() => {
+              openMenu();
+              setHighlightedIndex(0);
               inputRef.current?.focus();
             }}>
-            <X color="gray" />
+            <ChevronDown />
           </button>
         )}
-        <input {...getInputProps({ ref: inputRef })} disabled={disabled} />
+        <input
+          {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
+          placeholder="(Leave blank to auto-categorize)"
+          disabled={disabled || selectedItem}
+        />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
@@ -102,12 +128,10 @@ export default function CategorySelect({
                   className={itemClassName}
                   key={category.id}
                   {...getItemProps({ item: category, index })}>
-                  {category.name}{" "}
-                  {category.name !== "Inflow: Ready to Assign" &&
-                    `(${formatCurrency(
-                      category.balance,
-                      selectedBudgetData?.currencyFormat
-                    )})`}
+                  {formatCategoryWithBalance(
+                    category,
+                    selectedBudgetData?.currencyFormat
+                  )}
                 </li>
               );
             })
@@ -115,5 +139,19 @@ export default function CategorySelect({
         </ul>
       </div>
     </div>
+  );
+}
+
+function formatCategoryWithBalance(category: Category, currencyFormat?: CurrencyFormat) {
+  if (category.name === "Inflow: Ready to Assign") return <>{category.name}</>;
+
+  return (
+    <>
+      {category.name} (
+      <span className={"currency " + (category.balance < 0 ? "negative" : "positive")}>
+        {formatCurrency(category.balance, currencyFormat)}
+      </span>
+      )
+    </>
   );
 }

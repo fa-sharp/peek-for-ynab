@@ -10,14 +10,14 @@ import {
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
+import { useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { selectedBudgetId, setSelectedBudgetId } = useStorageContext();
+  const { selectedBudgetId, tokenRefreshNeeded, setSelectedBudgetId } =
+    useStorageContext();
   const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
     useYNABContext();
-  const { isRefreshingToken } = useAuthContext();
   const globalIsFetching = useIsFetching();
 
   const switchBudget = useCallback(() => {
@@ -75,7 +75,7 @@ export default function PopupNav() {
           label={`Last Updated: ${new Date(categoriesLastUpdated).toLocaleString()}`}
           onClick={() => undefined}
           icon={
-            globalIsFetching || isRefreshingToken ? (
+            globalIsFetching || tokenRefreshNeeded ? (
               <Refresh color="black" />
             ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
               <Check color="var(--success)" />
@@ -83,7 +83,7 @@ export default function PopupNav() {
               <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
             )
           }
-          spin={Boolean(globalIsFetching || isRefreshingToken)}
+          spin={Boolean(globalIsFetching || tokenRefreshNeeded)}
           disabled={true}
           noAction={true}
         />

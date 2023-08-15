@@ -1,6 +1,6 @@
 import { useCombobox } from "downshift";
 import { useCallback, useRef, useState } from "react";
-import { X } from "tabler-icons-react";
+import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
 import { useYNABContext } from "~lib/context";
@@ -10,7 +10,7 @@ interface Props {
   initialAccount?: Account | null;
   accounts?: Account[];
   selectAccount: (account: Account | null) => void;
-  isTransfer?: boolean;
+  isTransfer?: "from" | "to";
   disabled?: boolean;
 }
 
@@ -18,7 +18,7 @@ export default function AccountSelect({
   initialAccount,
   accounts,
   selectAccount,
-  isTransfer = false,
+  isTransfer,
   disabled
 }: Props) {
   const { selectedBudgetData } = useYNABContext();
@@ -34,11 +34,13 @@ export default function AccountSelect({
 
   const {
     isOpen,
+    openMenu,
     getLabelProps,
     getMenuProps,
     getInputProps,
     getItemProps,
     getComboboxProps,
+    setHighlightedIndex,
     reset,
     highlightedIndex,
     selectedItem
@@ -46,7 +48,11 @@ export default function AccountSelect({
     items: accountList,
     initialSelectedItem: initialAccount,
     itemToString(account) {
-      return account ? account.name : "";
+      if (!account) return "";
+      return `${account.name} (${formatCurrency(
+        account.balance,
+        selectedBudgetData?.currencyFormat
+      )})`;
     },
     onInputValueChange({ inputValue }) {
       setAccountList(accounts?.filter(getFilter(inputValue)) || []);
@@ -58,23 +64,42 @@ export default function AccountSelect({
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>{isTransfer ? "From" : "Account"}</label>
+      <label {...getLabelProps()}>
+        {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
+      </label>
       <div className="flex-col" {...getComboboxProps()}>
-        {selectedItem && (
+        {selectedItem ? (
           <button
             type="button"
-            tabIndex={-1}
-            className="select-clear-button icon-button"
+            className="select-button-right icon-button"
             aria-label="Clear account"
             onClick={() => {
               reset();
               selectAccount(null);
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}>
+            <X />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="select-button-right icon-button"
+            aria-label="Open account list"
+            tabIndex={-1}
+            onClick={() => {
+              openMenu();
+              setHighlightedIndex(0);
               inputRef.current?.focus();
             }}>
-            <X color="gray" />
+            <ChevronDown />
           </button>
         )}
-        <input required {...getInputProps({ ref: inputRef })} disabled={disabled} />
+        <input
+          required
+          {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
+          disabled={disabled || selectedItem}
+        />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
@@ -90,10 +115,14 @@ export default function AccountSelect({
                   className={itemClassName}
                   key={account.id}
                   {...getItemProps({ item: account, index })}>
-                  {`${account.name} (${formatCurrency(
-                    account.balance,
-                    selectedBudgetData?.currencyFormat
-                  )})`}
+                  {account.name} (
+                  <span
+                    className={
+                      "currency " + (account.balance < 0 ? "negative" : "positive")
+                    }>
+                    {formatCurrency(account.balance, selectedBudgetData?.currencyFormat)}
+                  </span>
+                  )
                 </li>
               );
             })
