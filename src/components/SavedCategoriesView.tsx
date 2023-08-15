@@ -1,4 +1,4 @@
-import { Pinned, PinnedOff, Plus } from "tabler-icons-react";
+import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
@@ -43,7 +43,14 @@ export default function SavedCategoriesView({ addTx }: Props) {
                   budgetId: selectedBudgetData.id
                 })
               }
-              icon={<Pinned size={"1.3rem"} fill="gray" color="gray" strokeWidth={1} />}
+              icon={
+                <Pinned
+                  size={"1.3rem"}
+                  fill="var(--action)"
+                  color="var(--action)"
+                  strokeWidth={1}
+                />
+              }
             />
           }
           actionElementsRight={
@@ -52,7 +59,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
                 <IconButton
                   bordered
                   accent
-                  icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
+                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                   label={`Add transaction to '${category.name}'`}
                   onClick={() => addTx({ categoryId: category.id })}
                 />

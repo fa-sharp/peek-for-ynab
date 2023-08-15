@@ -1,4 +1,4 @@
-import { PinnedOff, Plus } from "tabler-icons-react";
+import { Pinned, PinnedOff, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";
@@ -37,27 +37,36 @@ export default function SavedAccountsView({ addTx }: Props) {
           account={account}
           currencyFormat={selectedBudgetData?.currencyFormat}
           settings={settings}
-          actionElements={
+          actionElementsLeft={
+            <IconButton
+              label={`Unpin '${account.name}'`}
+              onClick={() =>
+                removeAccount({
+                  accountId: account.id,
+                  budgetId: selectedBudgetData.id
+                })
+              }
+              icon={
+                <Pinned
+                  size={"1.3rem"}
+                  fill="var(--action)"
+                  color="var(--action)"
+                  strokeWidth={1}
+                />
+              }
+            />
+          }
+          actionElementsRight={
             <aside className="balance-actions" aria-label="actions">
               {settings.txEnabled && (
                 <IconButton
                   bordered
-                  icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
+                  accent
+                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                   label={`Add transaction to '${account.name}'`}
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}
-              <IconButton
-                bordered
-                label={`Unpin '${account.name}'`}
-                onClick={() =>
-                  removeAccount({
-                    accountId: account.id,
-                    budgetId: selectedBudgetData.id
-                  })
-                }
-                icon={<PinnedOff size={"1.3rem"} color="gray" strokeWidth={1} />}
-              />
             </aside>
           }
         />
