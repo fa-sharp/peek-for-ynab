@@ -10,7 +10,7 @@
   --border-radius: 4px;
   --currency-green: #357f16;
   --currency-red: #a84646;
-  --currency-hidden-bg: #d1d1d1;
+  --action: gray;
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
@@ -37,7 +37,7 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .form-input {
@@ -83,7 +83,7 @@ body {
 }
 
 .heading-bordered {
-  padding-inline: 3px;
+  padding-inline-start: 3px;
   border-radius: var(--border-radius);
   border: solid 1px var(--border-light);
 }
@@ -96,7 +96,6 @@ body {
 
   height: 1.6rem;
   margin-block: 2px;
-  margin-left: 3px;
   padding-right: 2px;
   padding-bottom: 0.5px;
   border-bottom: solid 1px #ddd;
@@ -143,6 +142,9 @@ body {
 }
 .icon-button.noaction {
   cursor: initial;
+}
+.icon-button.accent {
+  background-color: var(--accent);
 }
 
 .select {

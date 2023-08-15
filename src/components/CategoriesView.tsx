@@ -95,9 +95,9 @@ export function CategoryGroupView({
           onClick={() => setExpanded(!expanded)}
           icon={
             expanded ? (
-              <ChevronUp size={24} color="gray" strokeWidth={1} />
+              <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
             ) : (
-              <ChevronDown size={24} color="gray" strokeWidth={1} />
+              <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
             )
           }
         />
@@ -109,22 +109,38 @@ export function CategoryGroupView({
             categoryData={category}
             currencyFormat={budgetData.currencyFormat}
             settings={settings}
-            actionElements={
+            actionElementsLeft={
+              savedCategories?.some((id) => id === category.id) ? (
+                <IconButton
+                  icon={
+                    <Pinned
+                      size={"1.3rem"}
+                      color="var(--action)"
+                      fill="var(--action)"
+                      strokeWidth={1}
+                    />
+                  }
+                  label="Pinned"
+                  disabled
+                  noAction
+                />
+              ) : (
+                <IconButton
+                  icon={<Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                  label={`Pin '${category.name}'`}
+                  onClick={() => onSaveCategory(category.id)}
+                />
+              )
+            }
+            actionElementsRight={
               <aside className="balance-actions" aria-label="actions">
                 {settings.txEnabled && (
                   <IconButton
                     bordered
-                    icon={<Plus size={"1.3rem"} color="gray" strokeWidth={1} />}
+                    accent
+                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                     label={`Add transaction to '${category.name}'`}
                     onClick={() => addTx({ categoryId: category.id })}
-                  />
-                )}
-                {savedCategories?.some((id) => id === category.id) ? null : (
-                  <IconButton
-                    bordered
-                    icon={<Pinned size={"1.3rem"} color="gray" strokeWidth={1} />}
-                    label={`Pin '${category.name}'`}
-                    onClick={() => onSaveCategory(category.id)}
                   />
                 )}
               </aside>
@@ -139,11 +155,13 @@ export const CategoryView = ({
   categoryData: { name, balance },
   currencyFormat,
   settings,
-  actionElements
+  actionElementsRight,
+  actionElementsLeft
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
-  actionElements?: ReactElement | null;
+  actionElementsRight?: ReactElement | null;
+  actionElementsLeft?: ReactElement | null;
   settings: AppSettings;
 }) => {
   let foundEmoji = null;
@@ -157,16 +175,19 @@ export const CategoryView = ({
           ? `${name}: ${formatCurrency(balance, currencyFormat)}`
           : undefined
       }>
-      <div>
-        {foundEmoji ? <span className="font-big">{`${foundEmoji} `}</span> : `${name}: `}
+      <div className="flex-row">
+        {actionElementsLeft}
+        {foundEmoji ? <span className="font-big">{foundEmoji}</span> : name}
+      </div>
+      <div className="flex-row">
         <CurrencyView
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
         />
+        {actionElementsRight}
       </div>
-      {actionElements}
     </div>
   );
 };
