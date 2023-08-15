@@ -1,4 +1,4 @@
-import { Pinned, PinnedOff, Plus } from "tabler-icons-react";
+import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";

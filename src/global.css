@@ -56,7 +56,6 @@ body {
 
 .form-input input[disabled] {
   background: #eee;
-  border: 1px solid transparent;
   color: black;
 }
 
