@@ -137,13 +137,15 @@ const useYNABProvider = () => {
     onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched accounts!", data)
   });
 
-  const refreshCategoriesAndAccounts = useCallback(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
-    });
-    queryClient.invalidateQueries({
-      queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
-    });
+  const refreshCategoriesAndAccounts = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
+      })
+    ]);
   }, [queryClient, selectedBudgetId]);
 
   /** Fetch payees for the selected budget (if user enables transactions) */
@@ -218,7 +220,7 @@ const useYNABProvider = () => {
       });
       !IS_PRODUCTION &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
-      setTimeout(refreshCategoriesAndAccounts, 500);
+      setTimeout(() => refreshCategoriesAndAccounts(), 500);
     },
     [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
   );

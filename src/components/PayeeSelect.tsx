@@ -8,28 +8,18 @@ interface Props {
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
   disabled?: boolean;
-  isTransfer?: boolean;
 }
 
-function getFilter(inputValue?: string, isTransfer?: boolean) {
+function getFilter(inputValue?: string) {
   return (payee: CachedPayee) =>
     (!inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase())) &&
-    (isTransfer ? payee.transferId != null : payee.transferId == null);
+    payee.transferId == null;
 }
 
-export default function PayeeSelect({
-  payees,
-  selectPayee,
-  isTransfer = false,
-  disabled
-}: Props) {
+export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
   const [payeeList, setPayeeList] = useState(() => {
     if (!payees) return [];
-    return [
-      ...payees.filter((payee) =>
-        isTransfer ? payee.transferId != null : payee.transferId == null
-      )
-    ];
+    return [...payees.filter((payee) => payee.transferId == null)];
   });
   const {
     isOpen,
@@ -47,13 +37,9 @@ export default function PayeeSelect({
       return payee ? payee.name : "";
     },
     onInputValueChange({ inputValue, selectedItem }) {
-      setPayeeList(payees?.filter(getFilter(inputValue, isTransfer)) || []);
+      setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
-      if (
-        !isTransfer &&
-        inputValue &&
-        (!selectedItem || inputValue !== selectedItem.name)
-      )
+      if (inputValue && (!selectedItem || inputValue !== selectedItem.name))
         selectPayee({ name: inputValue });
     },
     onSelectedItemChange({ selectedItem }) {
@@ -63,20 +49,16 @@ export default function PayeeSelect({
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>{isTransfer ? "To" : "Payee"}</label>
+      <label {...getLabelProps()}>Payee</label>
       <div className="flex-col" {...getComboboxProps()}>
         <input required {...getInputProps()} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>
           {!isOpen ? null : payeeList.length === 0 ? (
-            isTransfer ? (
-              <li className="select-dropdown-item">--Transfer account not found!--</li>
-            ) : (
-              <li className="select-dropdown-item">
-                --New payee &apos;{inputValue}&apos;--
-              </li>
-            )
+            <li className="select-dropdown-item">
+              --New payee &apos;{inputValue}&apos;--
+            </li>
           ) : (
             payeeList.map((payee, index) => {
               let itemClassName = "select-dropdown-item";

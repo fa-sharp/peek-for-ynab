@@ -1,6 +1,6 @@
 import { useCombobox } from "downshift";
 import { useCallback, useRef, useState } from "react";
-import { X } from "tabler-icons-react";
+import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
 import { useYNABContext } from "~lib/context";
@@ -34,11 +34,13 @@ export default function AccountSelect({
 
   const {
     isOpen,
+    openMenu,
     getLabelProps,
     getMenuProps,
     getInputProps,
     getItemProps,
     getComboboxProps,
+    setHighlightedIndex,
     reset,
     highlightedIndex,
     selectedItem
@@ -66,10 +68,10 @@ export default function AccountSelect({
         {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
       </label>
       <div className="flex-col" {...getComboboxProps()}>
-        {selectedItem && (
+        {selectedItem ? (
           <button
             type="button"
-            className="select-clear-button icon-button"
+            className="select-button-right icon-button"
             aria-label="Clear account"
             onClick={() => {
               reset();
@@ -77,6 +79,19 @@ export default function AccountSelect({
               setTimeout(() => inputRef.current?.focus(), 50);
             }}>
             <X />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="select-button-right icon-button"
+            aria-label="Open account list"
+            tabIndex={-1}
+            onClick={() => {
+              openMenu();
+              setHighlightedIndex(0);
+              inputRef.current?.focus();
+            }}>
+            <ChevronDown />
           </button>
         )}
         <input

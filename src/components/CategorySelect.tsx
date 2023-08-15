@@ -1,6 +1,6 @@
 import { useCombobox } from "downshift";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { X } from "tabler-icons-react";
+import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CurrencyFormat } from "ynab";
 
 import { useYNABContext } from "~lib/context";
@@ -48,11 +48,13 @@ export default function CategorySelect({
 
   const {
     isOpen,
+    openMenu,
     getLabelProps,
     getMenuProps,
     getInputProps,
     getItemProps,
     getComboboxProps,
+    setHighlightedIndex,
     reset,
     highlightedIndex,
     selectedItem
@@ -79,10 +81,10 @@ export default function CategorySelect({
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col" {...getComboboxProps()}>
-        {selectedItem && (
+        {selectedItem ? (
           <button
             type="button"
-            className="select-clear-button icon-button"
+            className="select-button-right icon-button"
             aria-label="Clear category"
             onClick={() => {
               reset();
@@ -91,9 +93,23 @@ export default function CategorySelect({
             }}>
             <X />
           </button>
+        ) : (
+          <button
+            type="button"
+            className="select-button-right icon-button"
+            aria-label="Open category list"
+            tabIndex={-1}
+            onClick={() => {
+              openMenu();
+              setHighlightedIndex(0);
+              inputRef.current?.focus();
+            }}>
+            <ChevronDown />
+          </button>
         )}
         <input
           {...getInputProps({ ref: inputRef })}
+          placeholder="(Leave blank to auto-categorize)"
           disabled={disabled || selectedItem}
         />
         <ul
