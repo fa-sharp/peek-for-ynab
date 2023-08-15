@@ -109,6 +109,7 @@ export default function CategorySelect({
         )}
         <input
           {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
           placeholder="(Leave blank to auto-categorize)"
           disabled={disabled || selectedItem}
         />

@@ -54,8 +54,9 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
-.form-input input[disabled] {
-  background: #eee;
+.form-input input.item-selected {
+  border: 1px solid transparent;
+  background: var(--accent);
   color: black;
 }
 

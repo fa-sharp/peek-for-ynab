@@ -97,6 +97,7 @@ export default function AccountSelect({
         <input
           required
           {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
           disabled={disabled || selectedItem}
         />
         <ul
