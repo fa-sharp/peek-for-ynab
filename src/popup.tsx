@@ -7,7 +7,7 @@ import {
   SavedCategoriesView,
   TransactionAdd
 } from "~components";
-import { AppProvider, useAuthContext } from "~lib/context";
+import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useAddTransaction } from "~lib/useAddTransaction";
 
 import "./global.css";
@@ -21,6 +21,7 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
+  const { settings } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
   const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
 
@@ -29,7 +30,7 @@ export function PopupView() {
       style={{
         flexDirection: "column",
         padding: 16,
-        minWidth: "240px",
+        minWidth: settings.emojiMode ? "150px" : "240px",
         width: "max-content"
       }}>
       {authLoading ? null : !loggedIn ? (

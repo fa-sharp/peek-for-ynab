@@ -14,7 +14,7 @@ import { useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { selectedBudgetId, tokenRefreshNeeded, setSelectedBudgetId } =
+  const { selectedBudgetId, settings, tokenRefreshNeeded, setSelectedBudgetId } =
     useStorageContext();
   const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
     useYNABContext();
@@ -50,6 +50,7 @@ export default function PopupNav() {
           gap: 3
         }}>
         <BudgetSelect
+          small={settings.emojiMode}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}

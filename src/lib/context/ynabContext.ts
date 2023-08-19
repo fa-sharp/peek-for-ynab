@@ -97,7 +97,7 @@ const useYNABProvider = () => {
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.categories.getCategories(selectedBudgetId);
-      return response.data.category_groups.filter((group) => !group.hidden);
+      return response.data.category_groups.filter((group) => !group.hidden); // filter out hidden groups
     },
     onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched categories!", data)
   });
@@ -107,7 +107,7 @@ const useYNABProvider = () => {
     () =>
       categoryGroupsData
         ?.flatMap((categoryGroup) => categoryGroup.categories)
-        .filter((category) => !category.hidden),
+        .filter((category) => !category.hidden), // filter out hidden categories
     [categoryGroupsData]
   );
 
@@ -231,10 +231,10 @@ const useYNABProvider = () => {
   return {
     /** API data: List of all user's budgets */
     budgetsData,
-    /** API data: List of all category groups in current budget, with categories contained in each one */
+    /** API data: List of all non-hidden category groups in current budget, with categories contained in each one */
     categoryGroupsData,
     categoriesLastUpdated,
-    /** API data: Flattened list of all categories (without category groups) in current budget */
+    /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
     /** API data: List of all open accounts in current budget (if accounts enabled in settings) */
     accountsData,
