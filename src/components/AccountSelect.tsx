@@ -118,7 +118,12 @@ export default function AccountSelect({
                   {account.name} (
                   <span
                     className={
-                      "currency " + (account.balance < 0 ? "negative" : "positive")
+                      "currency " +
+                      (account.balance < 0
+                        ? "negative"
+                        : account.balance > 0
+                        ? "positive"
+                        : "")
                     }>
                     {formatCurrency(account.balance, selectedBudgetData?.currencyFormat)}
                   </span>

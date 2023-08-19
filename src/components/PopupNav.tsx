@@ -40,23 +40,23 @@ export default function PopupNav() {
       style={{
         marginBottom: 8,
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "flex-end",
         gap: 3
       }}>
-      <BudgetSelect
-        shownBudgets={shownBudgetsData}
-        selectedBudgetId={selectedBudgetId}
-        setSelectedBudgetId={setSelectedBudgetId}
-      />
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           gap: 3
         }}>
+        <BudgetSelect
+          shownBudgets={shownBudgetsData}
+          selectedBudgetId={selectedBudgetId}
+          setSelectedBudgetId={setSelectedBudgetId}
+        />
         {shownBudgetsData?.length > 1 && (
           <IconButton
-            label="Switch budget"
+            label="Next budget"
             onClick={switchBudget}
             icon={<ArrowsDownUp />}
           />

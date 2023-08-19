@@ -17,9 +17,11 @@ function CurrencyView({
 }: Props) {
   let className = !colorsEnabled
     ? "currency"
-    : milliUnits >= 0
+    : milliUnits > 0
     ? "currency positive"
-    : "currency negative";
+    : milliUnits < 0
+    ? "currency negative"
+    : "currency";
   if (hideBalance) className += " hidden";
 
   return <span className={className}>{formatCurrency(milliUnits, currencyFormat)}</span>;

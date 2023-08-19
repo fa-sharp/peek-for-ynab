@@ -97,14 +97,17 @@ const useYNABProvider = () => {
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.categories.getCategories(selectedBudgetId);
-      return response.data.category_groups;
+      return response.data.category_groups.filter((group) => !group.hidden);
     },
     onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched categories!", data)
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
   const categoriesData = useMemo(
-    () => categoryGroupsData?.flatMap((categoryGroup) => categoryGroup.categories),
+    () =>
+      categoryGroupsData
+        ?.flatMap((categoryGroup) => categoryGroup.categories)
+        .filter((category) => !category.hidden),
     [categoryGroupsData]
   );
 

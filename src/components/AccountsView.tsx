@@ -132,7 +132,7 @@ function AccountTypeView({
               ) : (
                 <IconButton
                   icon={<Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label={`Pin ${account.name}`}
+                  label={`Pin '${account.name}'`}
                   onClick={() =>
                     saveAccount({ accountId: account.id, budgetId: budgetData.id })
                   }

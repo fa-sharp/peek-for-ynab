@@ -27,7 +27,6 @@ export function PopupView() {
   return (
     <div
       style={{
-        display: "flex",
         flexDirection: "column",
         padding: 16,
         minWidth: "240px",

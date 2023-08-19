@@ -315,12 +315,25 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           />
         </label>
         <div className="error-message">{errorMessage}</div>
-        <button
-          className="button rounded accent mt-big"
-          type="submit"
-          disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save"}
-        </button>
+        <div
+          className="flex-row"
+          style={{ width: "auto", justifyContent: "space-between" }}>
+          <button
+            type="button"
+            className="button rounded mt-big"
+            style={{ flex: 1 }}
+            onClick={() => closeForm()}
+            disabled={isSaving}>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="button rounded accent mt-big"
+            style={{ flex: 1 }}
+            disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+        </div>
       </form>
     </section>
   );

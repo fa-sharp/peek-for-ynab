@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap");
 
 :root {
-  --accent: hsl(204, 100%, 96%);
+  --accent: hsl(204, 100%, 94%);
   --accent-hover: hsl(204, 100%, 88%);
   --warn: #e6abab;
   --warn-hover: #ed8282;
@@ -92,12 +92,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
-  height: 1.6rem;
   margin-block: 2px;
-  padding-right: 2px;
-  padding-bottom: 0.5px;
+  padding-right: 1px;
+  padding-bottom: 2px;
   border-bottom: solid 1px #ddd;
 
   cursor: default;
@@ -247,9 +246,9 @@ body {
 
 @keyframes spin {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(360deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: rotate(0deg);
   }
 }
