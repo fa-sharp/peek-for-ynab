@@ -23,6 +23,15 @@ export const formatCurrency = (
   return formattedString;
 };
 
+/**
+ * Get today's date (user's local timezone) in ISO format (i.e. for `input[type=date]` element)
+ */
+export const getTodaysDateISO = () => {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().substring(0, 10);
+};
+
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
   //@ts-expect-error shut up TS!

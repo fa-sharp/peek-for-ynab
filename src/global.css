@@ -62,8 +62,8 @@ body {
 
 .heading-big {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 3px;
 
   margin-block: 4px;
 
@@ -73,8 +73,8 @@ body {
 
 .heading-medium {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 3px;
 
   margin-top: 4px;
 
@@ -83,7 +83,6 @@ body {
 }
 
 .heading-bordered {
-  padding-inline-start: 3px;
   border-radius: var(--border-radius);
   border: solid 1px var(--border-light);
 }
@@ -95,7 +94,7 @@ body {
   gap: 8px;
 
   margin-block: 2px;
-  padding-right: 1px;
+  padding-inline: 2px;
   padding-bottom: 2px;
   border-bottom: solid 1px #ddd;
 

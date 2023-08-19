@@ -30,7 +30,6 @@ function AccountsView({ addTx }: Props) {
       <div
         className={"heading-big cursor-pointer"}
         onClick={() => setExpanded(!expanded)}>
-        <div role="heading">Accounts</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -42,6 +41,7 @@ function AccountsView({ addTx }: Props) {
             )
           }
         />
+        <div role="heading">Accounts</div>
       </div>
       {expanded && (
         <>
@@ -94,7 +94,6 @@ function AccountTypeView({
       <div
         className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
-        <div role="heading">{accountType}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -106,6 +105,7 @@ function AccountTypeView({
             )
           }
         />
+        <div role="heading">{accountType}</div>
       </div>
       {expanded &&
         accountsData.map((account) => (

@@ -32,7 +32,6 @@ function CategoriesView({ addTx }: Props) {
   return (
     <>
       <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
-        <div role="heading">Categories</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -44,6 +43,7 @@ function CategoriesView({ addTx }: Props) {
             )
           }
         />
+        <div role="heading">Categories</div>
       </div>
       {expanded &&
         categoryGroupsData.map((categoryGroup) => (
@@ -89,7 +89,6 @@ export function CategoryGroupView({
       <div
         className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
-        <div role="heading">{categoryGroup.name}</div>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -101,6 +100,7 @@ export function CategoryGroupView({
             )
           }
         />
+        <div role="heading">{categoryGroup.name}</div>
       </div>
       {expanded &&
         categoryGroup.categories.map(
