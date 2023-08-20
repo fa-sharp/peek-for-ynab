@@ -92,7 +92,7 @@ const useYNABProvider = () => {
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
   const { data: categoryGroupsData, dataUpdatedAt: categoriesLastUpdated } = useQuery({
-    queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`],
+    queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
@@ -128,7 +128,7 @@ const useYNABProvider = () => {
 
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
-    queryKey: ["accounts", `budgetId-${selectedBudgetId}`],
+    queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(
       (settings.showAccounts || settings.txEnabled) && ynabAPI && selectedBudgetId
     ),
@@ -143,17 +143,17 @@ const useYNABProvider = () => {
   const refreshCategoriesAndAccounts = useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
+        queryKey: ["categoryGroups", { budgetId: selectedBudgetId }]
       }),
       queryClient.invalidateQueries({
-        queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
+        queryKey: ["accounts", { budgetId: selectedBudgetId }]
       })
     ]);
   }, [queryClient, selectedBudgetId]);
 
   /** Fetch payees for the selected budget (if user enables transactions) */
   const { data: payeesData } = useQuery({
-    queryKey: ["payees", `budgetId-${selectedBudgetId}`],
+    queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS,
     cacheTime: TWO_WEEKS_IN_MILLIS,
     enabled: Boolean(settings.txEnabled && ynabAPI && selectedBudgetId),
@@ -185,32 +185,34 @@ const useYNABProvider = () => {
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
-  const useGetAccountTxs = (accountId: string) =>
+  const useGetAccountTxs = (accountId?: string) =>
     useQuery({
-      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `accountId-${accountId}`],
+      enabled: !!accountId,
+      queryKey: ["txs", { budgetId: selectedBudgetId, accountId }],
       queryFn: async () => {
-        if (!ynabAPI) return;
+        if (!ynabAPI || !accountId) return null;
         const response = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 30 * ONE_DAY_IN_MILLIS) // since 30 days ago
         );
-        return response.data.transactions;
+        return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
       },
       onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
     });
 
-  const useGetCategoryTxs = (categoryId: string) =>
+  const useGetCategoryTxs = (categoryId?: string) =>
     useQuery({
-      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `categoryId-${categoryId}`],
+      enabled: !!categoryId,
+      queryKey: ["txs", { budgetId: selectedBudgetId, categoryId }],
       queryFn: async () => {
-        if (!ynabAPI) return;
+        if (!ynabAPI || !categoryId) return null;
         const response = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 30 * ONE_DAY_IN_MILLIS) // since 30 days ago
         );
-        return response.data.transactions;
+        return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
       },
       onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
     });

@@ -7,8 +7,10 @@ import {
   SavedCategoriesView,
   TransactionAdd
 } from "~components";
+import AccountTxsView from "~components/AccountTxsView";
+import CategoryTxsView from "~components/CategoryTxsView";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
-import { useAddTransaction } from "~lib/useAddTransaction";
+import { usePopupState } from "~lib/useAddTransaction";
 
 import "./global.css";
 
@@ -23,7 +25,7 @@ function PopupWrapper() {
 export function PopupView() {
   const { settings } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
-  const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
+  const { popupState, openAddTransaction, openPopupView, openTxsView } = usePopupState();
 
   return (
     <div
@@ -35,21 +37,33 @@ export function PopupView() {
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />
-      ) : addTxState.show ? (
-        <TransactionAdd
-          initialState={addTxState.initialState}
-          closeForm={closeAddTransaction}
-        />
-      ) : (
+      ) : popupState.page === "main" ? (
         <>
           <PopupNav />
 
-          <SavedCategoriesView addTx={openAddTransaction} />
-          <SavedAccountsView addTx={openAddTransaction} />
+          <SavedCategoriesView
+            addTx={openAddTransaction}
+            listTx={(categoryId) => openTxsView("category", categoryId)}
+          />
+          <SavedAccountsView
+            addTx={openAddTransaction}
+            listTx={(accountId) => openTxsView("account", accountId)}
+          />
 
           <CategoriesView addTx={openAddTransaction} />
           <AccountsView addTx={openAddTransaction} />
         </>
+      ) : popupState.page === "addTx" ? (
+        <TransactionAdd
+          initialState={popupState.addTxInitialState}
+          closeForm={openPopupView}
+        />
+      ) : popupState.page === "txView" && popupState.txsViewState?.type === "account" ? (
+        <AccountTxsView id={popupState.txsViewState.id} />
+      ) : popupState.page === "txView" && popupState.txsViewState?.type === "category" ? (
+        <CategoryTxsView id={popupState.txsViewState.id} />
+      ) : (
+        "Invalid popup state!"
       )}
     </div>
   );

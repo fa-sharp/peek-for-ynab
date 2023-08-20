@@ -1,4 +1,4 @@
-import { Pinned, Plus } from "tabler-icons-react";
+import { List, Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";
@@ -7,10 +7,11 @@ import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
 interface Props {
   addTx: (initialState: AddTransactionInitialState) => void;
+  listTx: (accountId: string) => void;
 }
 
 /** View of user's saved accounts with balances */
-export default function SavedAccountsView({ addTx }: Props) {
+export default function SavedAccountsView({ addTx, listTx }: Props) {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, settings } = useStorageContext();
 
@@ -67,6 +68,12 @@ export default function SavedAccountsView({ addTx }: Props) {
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}
+              <IconButton
+                bordered
+                icon={<List size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                label={`List transactions in '${account.name}'`}
+                onClick={() => listTx(account.id)}
+              />
             </aside>
           }
         />

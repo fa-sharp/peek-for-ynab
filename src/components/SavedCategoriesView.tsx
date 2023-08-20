@@ -1,4 +1,4 @@
-import { Pinned, Plus } from "tabler-icons-react";
+import { List, Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
@@ -7,10 +7,11 @@ import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 
 interface Props {
   addTx: (initialState: AddTransactionInitialState) => void;
+  listTx: (categoryId: string) => void;
 }
 
 /** View of user's saved categories with balances */
-export default function SavedCategoriesView({ addTx }: Props) {
+export default function SavedCategoriesView({ addTx, listTx }: Props) {
   const { removeCategory, settings } = useStorageContext();
   const { selectedBudgetData, savedCategoriesData } = useYNABContext();
 
@@ -64,6 +65,12 @@ export default function SavedCategoriesView({ addTx }: Props) {
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}
+              <IconButton
+                bordered
+                icon={<List size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                label={`List transactions in '${category.name}'`}
+                onClick={() => listTx(category.id)}
+              />
             </aside>
           }
         />

@@ -5,22 +5,30 @@ export interface AddTransactionInitialState {
   categoryId?: string;
 }
 
-/** Hook to manage the state of the Add Transaction view */
-export const useAddTransaction = () => {
-  const [addTxState, setAddTxState] = useState<{
-    show: boolean;
-    initialState?: AddTransactionInitialState;
-  }>({ show: false });
+/** Hook to manage the state of the overall popup view */
+export const usePopupState = () => {
+  const [popupState, setPopupState] = useState<{
+    page: "main" | "addTx" | "txView";
+    addTxInitialState?: AddTransactionInitialState;
+    txsViewState?: { type: "category" | "account"; id: string };
+  }>({ page: "main" });
 
   const openAddTransaction = (initialState?: AddTransactionInitialState) => {
-    setAddTxState({ show: true, initialState });
+    setPopupState({ page: "addTx", addTxInitialState: initialState });
   };
 
-  const closeAddTransaction = () => setAddTxState({ show: false });
+  const openPopupView = () => setPopupState({ page: "main" });
+
+  const openTxsView = (type: "category" | "account", id: string) =>
+    setPopupState({
+      page: "txView",
+      txsViewState: { id, type }
+    });
 
   return {
-    addTxState,
+    popupState,
     openAddTransaction,
-    closeAddTransaction
+    openPopupView,
+    openTxsView
   };
 };
