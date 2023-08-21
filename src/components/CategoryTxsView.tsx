@@ -32,30 +32,32 @@ const CategoryTxsView = ({ id, onBack, onOpenTxsView }: Props) => {
         <h2 className="heading-big mb-small">{category.name}</h2>
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={onBack} />
       </div>
-      <div className="flex-row">
+      <div className="flex-col">
         <div className="balance-display">
-          Balance:
+          Current Balance:
           <CurrencyView
             milliUnits={category.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
           />
         </div>
-        <div className="balance-display">
-          Budgeted:
-          <CurrencyView
-            milliUnits={category.budgeted}
-            currencyFormat={selectedBudgetData.currencyFormat}
-            colorsEnabled
-          />
-        </div>
-        <div className="balance-display">
-          Activity:
-          <CurrencyView
-            milliUnits={category.activity}
-            currencyFormat={selectedBudgetData.currencyFormat}
-            colorsEnabled
-          />
+        <div className="flex-row" style={{ justifyContent: "space-between" }}>
+          <div className="balance-display">
+            Budgeted:
+            <CurrencyView
+              milliUnits={category.budgeted}
+              currencyFormat={selectedBudgetData.currencyFormat}
+              colorsEnabled
+            />
+          </div>
+          <div className="balance-display">
+            Activity:
+            <CurrencyView
+              milliUnits={category.activity}
+              currencyFormat={selectedBudgetData.currencyFormat}
+              colorsEnabled
+            />
+          </div>
         </div>
       </div>
       <h3 className="heading-medium mt-md">Transactions</h3>

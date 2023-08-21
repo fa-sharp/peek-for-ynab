@@ -32,7 +32,6 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: fit-content;
 }
 
 .flex-col {

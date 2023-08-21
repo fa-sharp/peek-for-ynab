@@ -62,8 +62,8 @@ export default function TransactionView({
           }}>
           {tx.memo && detailLeft === "memo" ? (
             <div>
-              {tx.memo.slice(0, 40)}
-              {tx.memo.length > 40 ? "..." : ""}
+              {tx.memo.slice(0, 35)}
+              {tx.memo.length > 35 ? "..." : ""}
             </div>
           ) : (
             <div></div>
