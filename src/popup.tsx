@@ -1,14 +1,14 @@
 import {
+  AccountTxsView,
   AccountsView,
   CategoriesView,
+  CategoryTxsView,
   PopupLogin,
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView,
   TransactionAdd
 } from "~components";
-import AccountTxsView from "~components/AccountTxsView";
-import CategoryTxsView from "~components/CategoryTxsView";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { usePopupState } from "~lib/usePopupState";
 
@@ -59,9 +59,9 @@ export function PopupView() {
           closeForm={openPopupView}
         />
       ) : popupState.page === "txView" && popupState.txsViewState?.type === "account" ? (
-        <AccountTxsView id={popupState.txsViewState.id} />
+        <AccountTxsView id={popupState.txsViewState.id} onBack={openPopupView} />
       ) : popupState.page === "txView" && popupState.txsViewState?.type === "category" ? (
-        <CategoryTxsView id={popupState.txsViewState.id} />
+        <CategoryTxsView id={popupState.txsViewState.id} onBack={openPopupView} />
       ) : (
         "Invalid popup state!"
       )}

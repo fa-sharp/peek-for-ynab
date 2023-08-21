@@ -1,8 +1,10 @@
 import AccountSelect from "./AccountSelect";
+import AccountTxsView from "./AccountTxsView";
 import AccountsView from "./AccountsView";
 import BudgetSelect from "./BudgetSelect";
 import CategoriesView from "./CategoriesView";
 import CategorySelect from "./CategorySelect";
+import CategoryTxsView from "./CategoryTxsView";
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 import PayeeSelect from "./PayeeSelect";
@@ -25,5 +27,7 @@ export {
   BudgetSelect,
   IconButton,
   CurrencyView,
-  TransactionAdd
+  TransactionAdd,
+  AccountTxsView,
+  CategoryTxsView
 };

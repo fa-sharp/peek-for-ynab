@@ -1,15 +1,18 @@
 import React, { useMemo } from "react";
+import { ArrowBack } from "tabler-icons-react";
 
 import { useYNABContext } from "~lib/context";
 
 import CurrencyView from "./CurrencyView";
+import IconButton from "./IconButton";
 import TransactionView from "./TransactionView";
 
 type Props = {
   id: string;
+  onBack?: () => void;
 };
 
-const AccountTxsView = ({ id }: Props) => {
+const AccountTxsView = ({ id, onBack }: Props) => {
   const { useGetAccountTxs, accountsData, selectedBudgetData } = useYNABContext();
 
   const account = useMemo(
@@ -23,7 +26,10 @@ const AccountTxsView = ({ id }: Props) => {
 
   return (
     <div>
-      <h2 className="heading-big mb-small">{account.name}</h2>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h2 className="heading-big mb-small">{account.name}</h2>
+        <IconButton icon={<ArrowBack />} label="Back to main view" onClick={onBack} />
+      </div>
       <div className="balance-display">
         Working Balance:
         <CurrencyView
