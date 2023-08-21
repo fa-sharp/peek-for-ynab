@@ -3,7 +3,7 @@ import { List, Pinned, Plus } from "tabler-icons-react";
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
+import type { AddTransactionInitialState } from "~lib/usePopupState";
 
 interface Props {
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -56,6 +56,12 @@ export default function SavedCategoriesView({ addTx, listTx }: Props) {
           }
           actionElementsRight={
             <aside className="balance-actions" aria-label="actions">
+              <IconButton
+                bordered
+                icon={<List size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                label={`List transactions in '${category.name}'`}
+                onClick={() => listTx(category.id)}
+              />
               {settings.txEnabled && (
                 <IconButton
                   bordered
@@ -65,12 +71,6 @@ export default function SavedCategoriesView({ addTx, listTx }: Props) {
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}
-              <IconButton
-                bordered
-                icon={<List size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                label={`List transactions in '${category.name}'`}
-                onClick={() => listTx(category.id)}
-              />
             </aside>
           }
         />

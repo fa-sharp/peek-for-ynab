@@ -10,7 +10,7 @@ import {
 import AccountTxsView from "~components/AccountTxsView";
 import CategoryTxsView from "~components/CategoryTxsView";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
-import { usePopupState } from "~lib/useAddTransaction";
+import { usePopupState } from "~lib/usePopupState";
 
 import "./global.css";
 

@@ -6,7 +6,7 @@ import { SaveTransaction } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
+import type { AddTransactionInitialState } from "~lib/usePopupState";
 import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,

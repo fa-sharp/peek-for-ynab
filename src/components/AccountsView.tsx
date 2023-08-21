@@ -8,7 +8,7 @@ import { useYNABContext } from "~lib/context";
 import type { AppSettings, SavedAccount } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
+import type { AddTransactionInitialState } from "~lib/usePopupState";
 import { findFirstEmoji, formatCurrency } from "~lib/utils";
 
 interface Props {
