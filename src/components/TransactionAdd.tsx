@@ -313,14 +313,14 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           }}>
           <button
             type="submit"
-            className="button rounded accent mt-big"
+            className="button rounded accent mt-lg"
             style={{ flex: 1 }}
             disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
-            className="button rounded mt-big"
+            className="button rounded mt-lg"
             style={{ flex: 1 }}
             onClick={() => closeForm()}
             disabled={isSaving}>

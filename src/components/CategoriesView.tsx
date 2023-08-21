@@ -31,7 +31,9 @@ function CategoriesView({ addTx }: Props) {
 
   return (
     <>
-      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="heading-big cursor-pointer mt-md"
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -102,59 +104,66 @@ export function CategoryGroupView({
         />
         <div role="heading">{categoryGroup.name}</div>
       </div>
-      {expanded &&
-        categoryGroup.categories.map(
-          (category) =>
-            !category.hidden && (
-              <CategoryView
-                key={category.id}
-                categoryData={category}
-                currencyFormat={budgetData.currencyFormat}
-                settings={settings}
-                actionElementsLeft={
-                  savedCategories?.some((id) => id === category.id) ? (
-                    <IconButton
-                      icon={
-                        <Pinned
-                          size={"1.3rem"}
-                          color="var(--action)"
-                          fill="var(--action)"
-                          strokeWidth={1}
-                        />
-                      }
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
-                  ) : (
-                    <IconButton
-                      icon={
-                        <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                      }
-                      label={`Pin '${category.name}'`}
-                      onClick={() => onSaveCategory(category.id)}
-                    />
-                  )
-                }
-                actionElementsRight={
-                  <aside className="balance-actions" aria-label="actions">
-                    {settings.txEnabled &&
-                      categoryGroup.name !== "Credit Card Payments" && (
-                        <IconButton
-                          bordered
-                          accent
-                          icon={
-                            <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                          }
-                          label={`Add transaction to '${category.name}'`}
-                          onClick={() => addTx({ categoryId: category.id })}
-                        />
-                      )}
-                  </aside>
-                }
-              />
-            )
-        )}
+      {expanded && (
+        <div className="flex-col gap-sm">
+          {categoryGroup.categories.map(
+            (category) =>
+              !category.hidden && (
+                <CategoryView
+                  key={category.id}
+                  categoryData={category}
+                  currencyFormat={budgetData.currencyFormat}
+                  settings={settings}
+                  actionElementsLeft={
+                    savedCategories?.some((id) => id === category.id) ? (
+                      <IconButton
+                        icon={
+                          <Pinned
+                            size={"1.3rem"}
+                            color="var(--action)"
+                            fill="var(--action)"
+                            strokeWidth={1}
+                          />
+                        }
+                        label="Pinned"
+                        disabled
+                        noAction
+                      />
+                    ) : (
+                      <IconButton
+                        icon={
+                          <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                        }
+                        label={`Pin '${category.name}'`}
+                        onClick={() => onSaveCategory(category.id)}
+                      />
+                    )
+                  }
+                  actionElementsRight={
+                    <aside className="balance-actions" aria-label="actions">
+                      {settings.txEnabled &&
+                        categoryGroup.name !== "Credit Card Payments" && (
+                          <IconButton
+                            rounded
+                            accent
+                            icon={
+                              <Plus
+                                size={"1.3rem"}
+                                color="var(--action)"
+                                strokeWidth={1}
+                              />
+                            }
+                            label={`Add transaction to '${category.name}'`}
+                            onClick={() => addTx({ categoryId: category.id })}
+                          />
+                        )}
+                    </aside>
+                  }
+                />
+              )
+          )}
+        </div>
+      )}
     </>
   );
 }
