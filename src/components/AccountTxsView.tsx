@@ -30,39 +30,43 @@ const AccountTxsView = ({ id, onBack }: Props) => {
         <h2 className="heading-big mb-small">{account.name}</h2>
         <IconButton icon={<ArrowBack />} label="Back to main view" onClick={onBack} />
       </div>
-      <div className="balance-display">
-        Working Balance:
-        <CurrencyView
-          milliUnits={account.balance}
-          currencyFormat={selectedBudgetData.currencyFormat}
-          colorsEnabled
-        />
+      <div className="flex-row">
+        <div className="balance-display">
+          Working:
+          <CurrencyView
+            milliUnits={account.balance}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="balance-display">
+          Cleared:
+          <CurrencyView
+            milliUnits={account.cleared_balance}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="balance-display">
+          Uncleared:
+          <CurrencyView
+            milliUnits={account.uncleared_balance}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
+        </div>
       </div>
-      <div className="balance-display">
-        Cleared:
-        <CurrencyView
-          milliUnits={account.cleared_balance}
-          currencyFormat={selectedBudgetData.currencyFormat}
-          colorsEnabled
-        />
+      <h3 className="heading-medium mt-md">Transactions</h3>
+      <div className="flex-col gap-sm">
+        {accountTxs.map((tx) => (
+          <TransactionView
+            key={tx.id}
+            tx={tx}
+            detailRight="category"
+            currencyFormat={selectedBudgetData.currencyFormat}
+          />
+        ))}
       </div>
-      <div className="balance-display">
-        Uncleared:
-        <CurrencyView
-          milliUnits={account.uncleared_balance}
-          currencyFormat={selectedBudgetData.currencyFormat}
-          colorsEnabled
-        />
-      </div>
-      <h3 className="heading-medium mt-big">Transactions</h3>
-      {accountTxs.map((tx) => (
-        <TransactionView
-          key={tx.id}
-          tx={tx}
-          detailRight="category"
-          currencyFormat={selectedBudgetData.currencyFormat}
-        />
-      ))}
     </div>
   );
 };

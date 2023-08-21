@@ -51,7 +51,13 @@ export default function TransactionView({
       {expanded && (
         <div
           className="font-small"
-          style={{ display: "flex", justifyContent: "space-between", gap: "4px" }}>
+          style={{
+            position: "relative",
+            bottom: "var(--list-gap-sm)",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "4px"
+          }}>
           {tx.memo && detailLeft === "memo" ? (
             <div>
               {tx.memo.slice(0, 40)}
