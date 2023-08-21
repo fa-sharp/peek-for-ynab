@@ -107,53 +107,60 @@ function AccountTypeView({
         />
         <div role="heading">{accountType}</div>
       </div>
-      {expanded &&
-        accountsData.map((account) => (
-          <AccountView
-            key={account.id}
-            account={account}
-            currencyFormat={budgetData.currencyFormat}
-            settings={settings}
-            actionElementsLeft={
-              savedAccounts?.some((id) => id === account.id) ? (
-                <IconButton
-                  icon={
-                    <Pinned
-                      size={"1.3rem"}
-                      color="var(--action)"
-                      fill="var(--action)"
-                      strokeWidth={1}
-                    />
-                  }
-                  label="Pinned"
-                  disabled
-                  noAction
-                />
-              ) : (
-                <IconButton
-                  icon={<Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label={`Pin '${account.name}'`}
-                  onClick={() =>
-                    saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                  }
-                />
-              )
-            }
-            actionElementsRight={
-              <aside className="balance-actions" aria-label="actions">
-                {settings.txEnabled && (
+      {expanded && (
+        <div className="flex-col gap-sm">
+          {accountsData.map((account) => (
+            <AccountView
+              key={account.id}
+              account={account}
+              currencyFormat={budgetData.currencyFormat}
+              settings={settings}
+              actionElementsLeft={
+                savedAccounts?.some((id) => id === account.id) ? (
                   <IconButton
-                    bordered
-                    accent
-                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                    label={`Add transaction to '${account.name}'`}
-                    onClick={() => addTx({ accountId: account.id })}
+                    icon={
+                      <Pinned
+                        size={"1.3rem"}
+                        color="var(--action)"
+                        fill="var(--action)"
+                        strokeWidth={1}
+                      />
+                    }
+                    label="Pinned"
+                    disabled
+                    noAction
                   />
-                )}
-              </aside>
-            }
-          />
-        ))}
+                ) : (
+                  <IconButton
+                    icon={
+                      <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                    }
+                    label={`Pin '${account.name}'`}
+                    onClick={() =>
+                      saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                    }
+                  />
+                )
+              }
+              actionElementsRight={
+                <aside className="balance-actions" aria-label="actions">
+                  {settings.txEnabled && (
+                    <IconButton
+                      rounded
+                      accent
+                      icon={
+                        <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                      }
+                      label={`Add transaction to '${account.name}'`}
+                      onClick={() => addTx({ accountId: account.id })}
+                    />
+                  )}
+                </aside>
+              }
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 }

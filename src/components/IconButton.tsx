@@ -6,7 +6,7 @@ export default function IconButton({
   onClick,
   label,
   accent,
-  bordered,
+  rounded,
   spin,
   disabled,
   noAction
@@ -15,13 +15,13 @@ export default function IconButton({
   onClick?: MouseEventHandler;
   icon: ReactElement;
   accent?: boolean;
-  bordered?: boolean;
+  rounded?: boolean;
   spin?: boolean;
   disabled?: boolean;
   noAction?: boolean;
 }) {
   let className = "icon-button";
-  if (bordered) className += " bordered";
+  if (rounded) className += " rounded";
   if (spin) className += " spin";
   if (noAction) className += " noaction";
   if (accent) className += " accent";

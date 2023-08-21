@@ -14,6 +14,8 @@
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
+  --list-gap-sm: 0.25rem;
+  --list-gap-lg: 0.5rem;
 }
 
 html {
@@ -38,6 +40,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+.flex-col.gap-sm {
+  gap: var(--list-gap-sm);
 }
 
 .form-input {
@@ -65,7 +70,7 @@ body {
   align-items: center;
   gap: 3px;
 
-  margin-block: 4px;
+  margin-block: 6px;
 
   font-size: 1rem;
   font-weight: bold;
@@ -76,7 +81,7 @@ body {
   align-items: center;
   gap: 3px;
 
-  margin-top: 4px;
+  margin-block: 4px;
 
   font-size: 0.9rem;
   font-weight: 500;
@@ -93,7 +98,6 @@ body {
   align-items: center;
   gap: 8px;
 
-  margin-block: 2px;
   padding-inline: 2px;
   padding-bottom: 2px;
   border-bottom: solid 1px #ddd;
@@ -129,20 +133,15 @@ body {
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
-.icon-button.bordered {
-  border: solid 1px var(--border-light);
+.icon-button.rounded {
+  border: none;
   border-radius: 50%;
-  padding: 0px;
-  margin: 1px;
 }
 .icon-button.spin {
   animation: spin 1s linear infinite;
 }
 .icon-button.noaction {
   cursor: initial;
-}
-.icon-button.accent {
-  background-color: var(--accent);
 }
 
 .select {
@@ -223,8 +222,12 @@ body {
   margin-top: 6px;
 }
 
-.mt-big {
-  margin-top: 2rem;
+.mt-md {
+  margin-top: 1.1rem;
+}
+
+.mt-lg {
+  margin-top: 1.8rem;
 }
 
 .mt-xxl {

@@ -24,14 +24,7 @@ export default function SavedAccountsView({ addTx, listTx }: Props) {
     return null;
 
   return (
-    <section
-      aria-label="Saved accounts"
-      style={{
-        marginBottom: "1.1rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2px"
-      }}>
+    <section aria-label="Saved accounts" className="flex-col mt-md">
       {savedAccountsData.map((account) => (
         <AccountView
           key={account.id}
@@ -67,7 +60,7 @@ export default function SavedAccountsView({ addTx, listTx }: Props) {
               />
               {settings.txEnabled && (
                 <IconButton
-                  bordered
+                  rounded
                   accent
                   icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                   label={`Add transaction to '${account.name}'`}

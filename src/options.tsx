@@ -67,8 +67,8 @@ export function OptionsView() {
               checked={settings.sync}
               onChange={(e) => {
                 const confirmMessage = settings.sync
-                  ? "Are you sure? This will reset your pinned categories, accounts, etc. and stop syncing with your Chrome profile."
-                  : "Are you sure? This will reset any currently pinned categories, accounts, etc. and start syncing with your Chrome profile.";
+                  ? "Are you sure? This will reset your pinned categories, accounts, etc. and stop syncing with your browser profile."
+                  : "Are you sure? This will reset any currently pinned categories, accounts, etc. and start syncing with your browser profile.";
                 const confirmed = confirm(confirmMessage);
                 if (confirmed) {
                   changeSetting("sync", e.target.checked);
@@ -76,7 +76,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync pinned categories/accounts to your Chrome profile
+            🔄 Sync pinned categories/accounts/budgets to your browser profile
           </label>
           <label className="flex-row mb-small">
             <input
@@ -146,7 +146,7 @@ export function OptionsView() {
             className="button rounded warn"
             onClick={() => {
               const confirmed = confirm(
-                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any settings synced with your Chrome profile."
+                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any settings synced to your browser profile."
               );
               if (confirmed) logout();
             }}>
