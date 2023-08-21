@@ -1,14 +1,7 @@
 import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import {
-  ArrowBack,
-  CircleC,
-  Minus,
-  Plus,
-  SwitchHorizontal,
-  Wand
-} from "tabler-icons-react";
+import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
 import { SaveTransaction } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -18,6 +11,7 @@ import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,
   extractCurrencyAmounts,
+  getTodaysDateISO,
   parseLocaleNumber
 } from "~lib/utils";
 
@@ -34,12 +28,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const { settings } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(false);
-  const [date, setDate] = useState(() => {
-    // get today's date in correct format for input element
-    const date = new Date();
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return date.toISOString().substring(0, 10);
-  });
+  const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState("");
   const [cleared, setCleared] = useState(false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
@@ -157,7 +146,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     <section>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
-        <IconButton icon={<ArrowBack />} label="Back to main view" onClick={closeForm} />
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
@@ -310,17 +298,35 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             required
             type="date"
             value={date}
+            max={getTodaysDateISO()}
             onChange={(e) => setDate(e.target.value)}
             disabled={isSaving}
           />
         </label>
         <div className="error-message">{errorMessage}</div>
-        <button
-          className="button rounded accent mt-big"
-          type="submit"
-          disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save"}
-        </button>
+        <div
+          className="flex-row"
+          style={{
+            width: "auto",
+            flexDirection: "row-reverse",
+            justifyContent: "space-between"
+          }}>
+          <button
+            type="submit"
+            className="button rounded accent mt-big"
+            style={{ flex: 1 }}
+            disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            className="button rounded mt-big"
+            style={{ flex: 1 }}
+            onClick={() => closeForm()}
+            disabled={isSaving}>
+            Cancel
+          </button>
+        </div>
       </form>
     </section>
   );

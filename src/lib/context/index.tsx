@@ -34,7 +34,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
         persister,
         maxAge: TWO_WEEKS_IN_MILLIS * 2
       }}>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       <AuthProvider>
         <YNABProvider>{children}</YNABProvider>
       </AuthProvider>

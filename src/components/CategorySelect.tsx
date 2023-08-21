@@ -148,7 +148,11 @@ function formatCategoryWithBalance(category: Category, currencyFormat?: Currency
   return (
     <>
       {category.name} (
-      <span className={"currency " + (category.balance < 0 ? "negative" : "positive")}>
+      <span
+        className={
+          "currency " +
+          (category.balance < 0 ? "negative" : category.balance > 0 ? "positive" : "")
+        }>
         {formatCurrency(category.balance, currencyFormat)}
       </span>
       )
