@@ -50,7 +50,6 @@ export default function SavedCategoriesView({ addTx, listTx }: Props) {
           actionElementsRight={
             <aside className="balance-actions" aria-label="actions">
               <IconButton
-                bordered
                 icon={<List size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                 label={`List transactions in '${category.name}'`}
                 onClick={() => listTx(category.id)}

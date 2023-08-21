@@ -194,7 +194,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
-          new Date(Date.now() - 30 * ONE_DAY_IN_MILLIS) // since 30 days ago
+          ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
         );
         return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
       },
@@ -210,7 +210,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
-          new Date(Date.now() - 30 * ONE_DAY_IN_MILLIS) // since 30 days ago
+          ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
         );
         return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
       },
