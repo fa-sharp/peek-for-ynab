@@ -43,11 +43,11 @@ export function PopupView() {
 
           <SavedCategoriesView
             addTx={openAddTransaction}
-            listTx={(categoryId) => openTxsView("category", categoryId)}
+            listTx={(categoryId) => openTxsView({ type: "category", id: categoryId })}
           />
           <SavedAccountsView
             addTx={openAddTransaction}
-            listTx={(accountId) => openTxsView("account", accountId)}
+            listTx={(accountId) => openTxsView({ type: "account", id: accountId })}
           />
 
           <CategoriesView addTx={openAddTransaction} />
@@ -59,9 +59,17 @@ export function PopupView() {
           closeForm={openPopupView}
         />
       ) : popupState.page === "txView" && popupState.txsViewState?.type === "account" ? (
-        <AccountTxsView id={popupState.txsViewState.id} onBack={openPopupView} />
+        <AccountTxsView
+          id={popupState.txsViewState.id}
+          onBack={openPopupView}
+          onOpenTxsView={openTxsView}
+        />
       ) : popupState.page === "txView" && popupState.txsViewState?.type === "category" ? (
-        <CategoryTxsView id={popupState.txsViewState.id} onBack={openPopupView} />
+        <CategoryTxsView
+          id={popupState.txsViewState.id}
+          onBack={openPopupView}
+          onOpenTxsView={openTxsView}
+        />
       ) : (
         "Invalid popup state!"
       )}

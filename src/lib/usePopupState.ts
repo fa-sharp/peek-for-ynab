@@ -5,12 +5,17 @@ export interface AddTransactionInitialState {
   categoryId?: string;
 }
 
+export interface TransactionsViewState {
+  id: string;
+  type: "account" | "category";
+}
+
 /** Hook to manage the state of the overall popup view */
 export const usePopupState = () => {
   const [popupState, setPopupState] = useState<{
     page: "main" | "addTx" | "txView";
     addTxInitialState?: AddTransactionInitialState;
-    txsViewState?: { type: "category" | "account"; id: string };
+    txsViewState?: TransactionsViewState;
   }>({ page: "main" });
 
   const openAddTransaction = (initialState?: AddTransactionInitialState) => {
@@ -19,10 +24,10 @@ export const usePopupState = () => {
 
   const openPopupView = () => setPopupState({ page: "main" });
 
-  const openTxsView = (type: "category" | "account", id: string) =>
+  const openTxsView = (state: TransactionsViewState) =>
     setPopupState({
       page: "txView",
-      txsViewState: { id, type }
+      txsViewState: state
     });
 
   return {

@@ -10,11 +10,13 @@ export default function TransactionView({
   tx,
   detailLeft = "memo",
   detailRight = "category",
+  detailRightOnClick,
   currencyFormat
 }: {
   tx: ynab.TransactionDetail | ynab.HybridTransaction;
   detailLeft?: "memo";
   detailRight?: "category" | "account";
+  detailRightOnClick?: () => void;
   currencyFormat?: ynab.CurrencyFormat;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -67,10 +69,11 @@ export default function TransactionView({
             <div></div>
           )}
           <div
+            className="accent cursor-pointer"
             style={{
-              borderLeft: "solid 1px var(--border-light)",
-              paddingLeft: "4px"
-            }}>
+              paddingInline: "4px"
+            }}
+            onClick={detailRightOnClick}>
             {tx.transfer_account_id
               ? "Transfer"
               : detailRight === "category"

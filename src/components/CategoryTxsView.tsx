@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { useYNABContext } from "~lib/context";
+import type { TransactionsViewState } from "~lib/usePopupState";
 
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
@@ -9,10 +10,11 @@ import TransactionView from "./TransactionView";
 
 type Props = {
   id: string;
+  onOpenTxsView?: (state: TransactionsViewState) => void;
   onBack?: () => void;
 };
 
-const CategoryTxsView = ({ id, onBack }: Props) => {
+const CategoryTxsView = ({ id, onBack, onOpenTxsView }: Props) => {
   const { useGetCategoryTxs, categoriesData, selectedBudgetData } = useYNABContext();
 
   const category = useMemo(
@@ -63,6 +65,13 @@ const CategoryTxsView = ({ id, onBack }: Props) => {
             key={tx.id}
             tx={tx}
             detailRight="account"
+            detailRightOnClick={() =>
+              onOpenTxsView &&
+              onOpenTxsView({
+                id: tx.account_id,
+                type: "account"
+              })
+            }
             currencyFormat={selectedBudgetData.currencyFormat}
           />
         ))}
