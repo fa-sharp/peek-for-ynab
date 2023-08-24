@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
-import { SaveTransaction } from "ynab";
+import { Circle, CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
+import { SaveTransaction, TransactionDetail } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -42,6 +42,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     return accountsData?.find((a) => a.id === initialState.accountId) || null;
   });
   const [memo, setMemo] = useState("");
+  const [flag, setFlag] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -147,32 +148,9 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>
-      <form className="flex-col" onSubmit={onSaveTransaction}>
+      <form className="flex-col" style={{ gap: 8 }} onSubmit={onSaveTransaction}>
         <label className="flex-row">
-          Cleared?
-          <input
-            type="checkbox"
-            checked={cleared}
-            onChange={(e) => setCleared(e.target.checked)}
-          />
-          {cleared ? (
-            <IconButton
-              label="Cleared"
-              icon={<CircleC fill="var(--currency-green)" color="white" />}
-              disabled
-              noAction
-            />
-          ) : (
-            <IconButton
-              label=""
-              icon={<CircleC color="transparent" />}
-              disabled
-              noAction
-            />
-          )}
-        </label>
-        <label className="flex-row">
-          Transfer?
+          Transfer
           <input
             type="checkbox"
             checked={isTransfer}
@@ -292,6 +270,53 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             disabled={isSaving}
           />
         </label>
+        <div className="flex-row">
+          <label className="flex-row">
+            Cleared
+            <input
+              type="checkbox"
+              checked={cleared}
+              onChange={(e) => setCleared(e.target.checked)}
+            />
+            {cleared ? (
+              <IconButton
+                label="Cleared"
+                icon={<CircleC fill="var(--currency-green)" color="white" />}
+                disabled
+                noAction
+              />
+            ) : (
+              <IconButton
+                label=""
+                icon={<CircleC color="transparent" />}
+                disabled
+                noAction
+              />
+            )}
+          </label>
+          <label className="flex-row">
+            Flag
+            <select
+              className="select rounded"
+              defaultValue=""
+              value={flag}
+              onChange={(e) => setFlag(e.target.value)}>
+              <option value="">None</option>
+              {Object.entries(TransactionDetail.FlagColorEnum).map(
+                ([flagName, flagValue], idx) =>
+                  idx % 2 === 0 && (
+                    <option key={flagValue} value={flagValue}>
+                      {flagName}
+                    </option>
+                  )
+              )}
+            </select>
+            <Circle
+              fill={flag ? flag : "transparent"}
+              color={flag ? flag : "transparent"}
+            />
+          </label>
+        </div>
         <label className="form-input">
           Date
           <input
@@ -303,6 +328,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             disabled={isSaving}
           />
         </label>
+
         <div className="error-message">{errorMessage}</div>
         <div
           className="flex-row"

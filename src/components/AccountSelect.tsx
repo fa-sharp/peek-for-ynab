@@ -68,6 +68,13 @@ export default function AccountSelect({
         {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
       </label>
       <div className="flex-col" {...getComboboxProps()}>
+        <input
+          required
+          {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
+          readOnly={selectedItem}
+          disabled={disabled}
+        />
         {selectedItem ? (
           <button
             type="button"
@@ -94,12 +101,7 @@ export default function AccountSelect({
             <ChevronDown />
           </button>
         )}
-        <input
-          required
-          {...getInputProps({ ref: inputRef })}
-          className={selectedItem ? "item-selected" : ""}
-          disabled={disabled || selectedItem}
-        />
+
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>

@@ -81,6 +81,13 @@ export default function CategorySelect({
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col" {...getComboboxProps()}>
+        <input
+          {...getInputProps({ ref: inputRef })}
+          className={selectedItem ? "item-selected" : ""}
+          placeholder="(Leave blank to auto-categorize)"
+          readOnly={selectedItem}
+          disabled={disabled}
+        />
         {selectedItem ? (
           <button
             type="button"
@@ -107,12 +114,7 @@ export default function CategorySelect({
             <ChevronDown />
           </button>
         )}
-        <input
-          {...getInputProps({ ref: inputRef })}
-          className={selectedItem ? "item-selected" : ""}
-          placeholder="(Leave blank to auto-categorize)"
-          disabled={disabled || selectedItem}
-        />
+
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
           {...getMenuProps()}>

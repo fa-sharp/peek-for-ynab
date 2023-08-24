@@ -32,7 +32,6 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: fit-content;
 }
 
 .flex-col {
@@ -145,7 +144,7 @@ body {
 }
 
 .select {
-  padding: 0.3rem;
+  padding: 0.25rem;
   background-color: white;
   font-family: "Open Sans", sans-serif;
 }
