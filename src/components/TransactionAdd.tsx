@@ -65,8 +65,8 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
     const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
     if (!transferToAccount) return false;
-    return !transferToAccount.on_budget;
-  }, [accountsData, isTransfer, payee]);
+    return !transferToAccount.on_budget && account?.on_budget;
+  }, [account?.on_budget, accountsData, isTransfer, payee]);
 
   const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
   const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
@@ -128,7 +128,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
-        category_id: isTransfer ? undefined : category?.id,
+        category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
         cleared: cleared
           ? SaveTransaction.ClearedEnum.Cleared
           : SaveTransaction.ClearedEnum.Uncleared,
