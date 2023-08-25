@@ -63,7 +63,7 @@ const useStorageProvider = () => {
     defaultValue: {
       showAccounts: true,
       txEnabled: true,
-      txApproved: false,
+      txApproved: true,
       privateMode: false,
       emojiMode: false,
       sync: false

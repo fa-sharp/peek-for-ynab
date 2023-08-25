@@ -109,13 +109,13 @@ export function OptionsView() {
             <>
               <label
                 className="flex-row mb-small"
-                title="Check this box if you don't want to Approve the transactions again in YNAB">
+                title="Check this box if you want to Approve the transactions again in YNAB">
                 <input
                   type="checkbox"
-                  checked={settings.txApproved}
+                  checked={!settings.txApproved}
                   onChange={(e) => changeSetting("txApproved", e.target.checked)}
                 />
-                ℹ️ Mark transactions as Approved
+                ℹ️ Enter transactions as Unapproved
               </label>
             </>
           )}
