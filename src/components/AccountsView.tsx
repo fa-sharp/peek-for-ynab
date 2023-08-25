@@ -9,7 +9,7 @@ import type { AppSettings, SavedAccount } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
-import { findFirstEmoji, formatCurrency } from "~lib/utils";
+import { findEmoji, formatCurrency } from "~lib/utils";
 
 interface Props {
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -178,7 +178,7 @@ export const AccountView = ({
   actionElementsRight?: ReactElement | null;
   settings: AppSettings;
 }) => {
-  const foundEmoji = settings.emojiMode ? findFirstEmoji(name) : null;
+  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
   return (
     <div

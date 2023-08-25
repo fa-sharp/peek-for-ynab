@@ -45,12 +45,12 @@ export const parseLocaleNumber = (value: string, locales = navigator.languages) 
 
 const emojiRegex =
   // eslint-disable-next-line no-misleading-character-class
-  /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/u;
+  /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/gu;
 
-/** Returns the first emoji, or consecutive sequence of emojis, found in a string */
-export const findFirstEmoji = (s: string) => {
-  const regexResult = emojiRegex.exec(s);
-  return regexResult ? regexResult[0] : null;
+/** Returns the emojis found in a string */
+export const findEmoji = (s: string, limit = 3) => {
+  const matches = s.match(emojiRegex);
+  return matches ? matches.slice(0, limit).join("") : null;
 };
 
 /**
