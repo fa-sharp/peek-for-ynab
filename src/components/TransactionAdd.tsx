@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import { Circle, CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
+import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
 import { SaveTransaction, TransactionDetail } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -133,7 +133,10 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           ? SaveTransaction.ClearedEnum.Cleared
           : SaveTransaction.ClearedEnum.Uncleared,
         approved: settings.txApproved,
-        memo
+        memo,
+        flag_color: flag
+          ? (flag as unknown as TransactionDetail.FlagColorEnum)
+          : undefined
       });
       closeForm();
     } catch (err: any) {
@@ -150,25 +153,18 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       </div>
       <form className="flex-col" style={{ gap: 8 }} onSubmit={onSaveTransaction}>
         <label className="flex-row">
-          Transfer
-          <input
-            type="checkbox"
-            checked={isTransfer}
-            onChange={(e) => setIsTransfer(e.target.checked)}
-          />
+          Transfer:
           {isTransfer ? (
             <IconButton
-              label="Transfer"
-              icon={<SwitchHorizontal color="black" />}
-              disabled
-              noAction
+              label="Transfer (click to switch)"
+              icon={<SwitchHorizontal color="var(--currency-green)" />}
+              onClick={() => setIsTransfer(false)}
             />
           ) : (
             <IconButton
-              label=""
-              icon={<SwitchHorizontal color="transparent" />}
-              disabled
-              noAction
+              label="Not transfer (click to switch)"
+              icon={<SwitchHorizontal color="gray" />}
+              onClick={() => setIsTransfer(true)}
             />
           )}
         </label>
@@ -270,35 +266,27 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             disabled={isSaving}
           />
         </label>
-        <div className="flex-row">
+        <div className="flex-row" style={{ justifyContent: "space-between" }}>
           <label className="flex-row">
-            Cleared
-            <input
-              type="checkbox"
-              checked={cleared}
-              onChange={(e) => setCleared(e.target.checked)}
-            />
+            Status:
             {cleared ? (
               <IconButton
-                label="Cleared"
-                icon={<CircleC fill="var(--currency-green)" color="white" />}
-                disabled
-                noAction
+                label="Cleared (click to switch)"
+                icon={<CircleC fill="var(--currency-green)" color="white" size={26} />}
+                onClick={() => setCleared(false)}
               />
             ) : (
               <IconButton
-                label=""
-                icon={<CircleC color="transparent" />}
-                disabled
-                noAction
+                label="Uncleared (click to switch)"
+                icon={<CircleC color="gray" />}
+                onClick={() => setCleared(true)}
               />
             )}
           </label>
           <label className="flex-row">
-            Flag
+            Flag:
             <select
               className="select rounded"
-              defaultValue=""
               value={flag}
               onChange={(e) => setFlag(e.target.value)}>
               <option value="">None</option>
@@ -311,10 +299,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
                   )
               )}
             </select>
-            <Circle
-              fill={flag ? flag : "transparent"}
-              color={flag ? flag : "transparent"}
-            />
           </label>
         </div>
         <label className="form-input">

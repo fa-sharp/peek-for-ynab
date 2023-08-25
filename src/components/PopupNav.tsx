@@ -42,9 +42,7 @@ export default function PopupNav() {
         display: "flex",
         justifyContent: "space-between",
         gap: 8,
-        marginBottom: "0.6rem",
-        paddingBottom: "0.5rem",
-        borderBottom: "solid 2px var(--border-light)"
+        marginBottom: "0.6rem"
       }}>
       <IconButton
         label={
@@ -52,7 +50,6 @@ export default function PopupNav() {
             ? "Status: Refreshing data..."
             : `Status: Last updated ${new Date(categoriesLastUpdated).toLocaleString()}`
         }
-        onClick={() => undefined}
         icon={
           isLoadingData ? (
             <Refresh color="black" />
@@ -63,8 +60,8 @@ export default function PopupNav() {
           )
         }
         spin={Boolean(isLoadingData)}
-        disabled={true}
-        noAction={true}
+        disabled
+        noAction
       />
       <div
         style={{
