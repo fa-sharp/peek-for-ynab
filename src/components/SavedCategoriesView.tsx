@@ -29,7 +29,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
           settings={settings}
           actionElementsLeft={
             <IconButton
-              label={`Unpin '${category.name}'`}
+              label="Unpin"
               onClick={() =>
                 removeCategory({
                   categoryId: category.id,
@@ -53,7 +53,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
                   rounded
                   accent
                   icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label={`Add transaction to '${category.name}'`}
+                  label="Add transaction"
                   onClick={() => addTx({ categoryId: category.id })}
                 />
               )}

@@ -135,7 +135,7 @@ function AccountTypeView({
                     icon={
                       <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                     }
-                    label={`Pin '${account.name}'`}
+                    label="Pin"
                     onClick={() =>
                       saveAccount({ accountId: account.id, budgetId: budgetData.id })
                     }
@@ -151,7 +151,7 @@ function AccountTypeView({
                       icon={
                         <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                       }
-                      label={`Add transaction to '${account.name}'`}
+                      label="Add transaction"
                       onClick={() => addTx({ accountId: account.id })}
                     />
                   )}

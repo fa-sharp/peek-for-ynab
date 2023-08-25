@@ -32,7 +32,7 @@ export default function SavedAccountsView({ addTx }: Props) {
           settings={settings}
           actionElementsLeft={
             <IconButton
-              label={`Unpin '${account.name}'`}
+              label="Unpin"
               onClick={() =>
                 removeAccount({
                   accountId: account.id,
@@ -56,7 +56,7 @@ export default function SavedAccountsView({ addTx }: Props) {
                   rounded
                   accent
                   icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label={`Add transaction to '${account.name}'`}
+                  label="Add transaction"
                   onClick={() => addTx({ accountId: account.id })}
                 />
               )}

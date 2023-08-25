@@ -134,7 +134,7 @@ export function CategoryGroupView({
                         icon={
                           <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                         }
-                        label={`Pin '${category.name}'`}
+                        label="Pin"
                         onClick={() => onSaveCategory(category.id)}
                       />
                     )
@@ -153,7 +153,7 @@ export function CategoryGroupView({
                                 strokeWidth={1}
                               />
                             }
-                            label={`Add transaction to '${category.name}'`}
+                            label="Add transaction"
                             onClick={() => addTx({ categoryId: category.id })}
                           />
                         )}
