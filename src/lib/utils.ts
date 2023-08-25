@@ -48,7 +48,7 @@ const emojiRegex =
   /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/gu;
 
 /** Returns the emojis found in a string */
-export const findEmoji = (s: string, limit = 3) => {
+export const findEmoji = (s: string, limit = 2) => {
   const matches = s.match(emojiRegex);
   return matches ? matches.slice(0, limit).join("") : null;
 };

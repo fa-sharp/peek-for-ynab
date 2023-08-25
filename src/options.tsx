@@ -137,7 +137,7 @@ export function OptionsView() {
                 }
               }}
             />
-            Allow access to the current tab, to enable extra features:
+            Allow access to the currently open tab, to enable these features:
           </label>
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
