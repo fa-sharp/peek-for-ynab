@@ -14,8 +14,8 @@
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
-  --list-gap-sm: 0.25rem;
-  --list-gap-lg: 0.5rem;
+  --spacing-sm: 0.35rem;
+  --spacing-md: 0.45rem;
 }
 
 html {
@@ -31,17 +31,17 @@ body {
 .flex-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--spacing-sm);
 }
 
 .flex-col {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacing-md);
 }
 .flex-col.gap-sm {
-  gap: var(--list-gap-sm);
+  gap: var(--spacing-sm);
 }
 
 .form-input {
@@ -69,7 +69,7 @@ body {
   align-items: center;
   gap: 3px;
 
-  margin-block: 6px;
+  margin-block: var(--spacing-sm);
 
   font-size: 1rem;
   font-weight: bold;
@@ -95,7 +95,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 
   padding-inline: 2px;
   padding-bottom: 2px;
@@ -114,7 +114,7 @@ body {
 
 .button {
   cursor: pointer;
-  padding: 0.4rem 0.7rem;
+  padding: var(--spacing-sm) 0.7rem;
   text-align: center;
 }
 
@@ -218,11 +218,11 @@ body {
 }
 
 .mt-small {
-  margin-top: 6px;
+  margin-top: var(--spacing-sm);
 }
 
 .mt-md {
-  margin-top: 1.1rem;
+  margin-top: 1.2rem;
 }
 
 .mt-lg {
@@ -234,7 +234,7 @@ body {
 }
 
 .mb-small {
-  margin-bottom: 6px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .font-big {

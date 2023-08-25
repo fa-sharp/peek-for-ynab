@@ -158,7 +158,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>
-      <form className="flex-col" style={{ gap: 8 }} onSubmit={onSaveTransaction}>
+      <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
           Transfer:
           {isTransfer ? (
