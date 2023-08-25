@@ -25,6 +25,8 @@ export interface AppSettings {
   privateMode: boolean;
   /** Whether data is synced to the user's Chrome profile */
   sync: boolean;
+  /** Whether access is allowed to current tab for extra features */
+  currentTabAccess: boolean;
 }
 
 /** A category saved by the user */
@@ -66,7 +68,8 @@ const useStorageProvider = () => {
       txApproved: true,
       privateMode: false,
       emojiMode: false,
-      sync: false
+      sync: false,
+      currentTabAccess: false
     }
   });
 

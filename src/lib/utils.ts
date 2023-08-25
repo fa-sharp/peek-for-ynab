@@ -68,6 +68,40 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
   return result as T;
 };
 
+/** Request permissions to access the current tab and execute scripts within it */
+export const requestCurrentTabPermissions = () =>
+  new Promise<boolean>((resolve) => {
+    chrome.permissions.request(
+      {
+        permissions: ["activeTab", "scripting"]
+      },
+      (granted) => {
+        if (granted) resolve(true);
+        else {
+          console.error("Permission denied:", chrome.runtime.lastError);
+          resolve(false);
+        }
+      }
+    );
+  });
+
+/** Remove permissions to access the current tab */
+export const removeCurrentTabPermissions = () =>
+  new Promise<boolean>((resolve) =>
+    chrome.permissions.remove(
+      {
+        permissions: ["activeTab", "scripting"]
+      },
+      (removed) => {
+        if (removed) resolve(true);
+        else {
+          console.error("Error removing permissions:", chrome.runtime.lastError);
+          resolve(false);
+        }
+      }
+    )
+  );
+
 /** Extract any currency amounts on the page. Returns a sorted array of detected amounts, from highest to lowest */
 export const extractCurrencyAmounts = () => {
   /** Get all text content from an element and its descendants, including shadow DOMs */

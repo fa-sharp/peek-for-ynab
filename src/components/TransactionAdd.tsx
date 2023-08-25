@@ -12,7 +12,8 @@ import {
   executeScriptInCurrentTab,
   extractCurrencyAmounts,
   getTodaysDateISO,
-  parseLocaleNumber
+  parseLocaleNumber,
+  requestCurrentTabPermissions
 } from "~lib/utils";
 
 import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
@@ -49,16 +50,20 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
 
   // Try parsing user's selection as the amount
   useEffect(() => {
-    executeScriptInCurrentTab(() => getSelection()?.toString())
-      .then((selection) => {
-        if (!selection) return;
-        const parsedNumber = parseLocaleNumber(selection);
-        if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
-      })
-      .catch((err) => {
-        !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
-      });
-  }, []);
+    if (!settings.currentTabAccess) return;
+    requestCurrentTabPermissions().then((granted) => {
+      if (!granted) return;
+      executeScriptInCurrentTab(() => getSelection()?.toString())
+        .then((selection) => {
+          if (!selection) return;
+          const parsedNumber = parseLocaleNumber(selection);
+          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+        })
+        .catch((err) => {
+          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+        });
+    });
+  }, [settings.currentTabAccess]);
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
@@ -72,6 +77,8 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
   const onDetectAmount = async () => {
     if (!detectedAmounts) {
+      // Check permissions
+      if (!(await requestCurrentTabPermissions())) return;
       // Try detecting any currency amounts on the page
       const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
       !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
@@ -162,7 +169,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             />
           ) : (
             <IconButton
-              label="Not transfer (click to switch)"
+              label="Not a transfer (click to switch)"
               icon={<SwitchHorizontal color="gray" />}
               onClick={() => setIsTransfer(true)}
             />
@@ -198,7 +205,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
-            {!IS_PRODUCTION && (
+            {settings.currentTabAccess && (
               <IconButton
                 icon={<Wand />}
                 label="Detect amount"

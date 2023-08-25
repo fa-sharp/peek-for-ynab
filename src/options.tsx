@@ -7,6 +7,7 @@ import {
   useStorageContext,
   useYNABContext
 } from "~lib/context";
+import { removeCurrentTabPermissions, requestCurrentTabPermissions } from "~lib/utils";
 
 import "./global.css";
 
@@ -113,12 +114,36 @@ export function OptionsView() {
                 <input
                   type="checkbox"
                   checked={!settings.txApproved}
-                  onChange={(e) => changeSetting("txApproved", e.target.checked)}
+                  onChange={(e) => changeSetting("txApproved", !e.target.checked)}
                 />
                 ℹ️ Enter transactions as Unapproved
               </label>
             </>
           )}
+          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
+            Extra features
+          </h3>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.currentTabAccess}
+              onChange={async (e) => {
+                if (e.target.checked) {
+                  if (await requestCurrentTabPermissions())
+                    changeSetting("currentTabAccess", true);
+                } else {
+                  await removeCurrentTabPermissions();
+                  changeSetting("currentTabAccess", false);
+                }
+              }}
+            />
+            Allow access to the current tab, to enable extra features:
+          </label>
+          <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
+            <li>Automatically copy the selected amount into the transaction form</li>
+            <li>Try detecting transaction amounts on the page</li>
+          </ul>
+
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Show/hide budgets
           </h3>

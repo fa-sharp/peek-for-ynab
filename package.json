@@ -52,13 +52,15 @@
   },
   "manifest": {
     "permissions": [
-      "identity",
-      "scripting",
-      "activeTab"
+      "identity"
     ],
     "host_permissions": [
       "https://api.youneedabudget.com/*",
       "https://api.ynab.com/*"
+    ],
+    "optional_permissions": [
+      "scripting",
+      "activeTab"
     ],
     "options_ui": {
       "open_in_tab": true
