@@ -31,7 +31,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [isTransfer, setIsTransfer] = useState(false);
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState("");
-  const [cleared, setCleared] = useState(false);
+  const [cleared, setCleared] = useState(settings.txCleared ? true : false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Refresh } from "tabler-icons-react";
+import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
 
 import {
   AppProvider,
@@ -28,8 +28,6 @@ export function OptionsView() {
   return (
     <section
       style={{
-        display: "flex",
-        flexDirection: "column",
         padding: "0 16px 16px",
         maxWidth: "700px",
         width: "max-content"
@@ -62,7 +60,9 @@ export function OptionsView() {
             />
             💲 Show accounts
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Sync pinned categories/accounts/budgets to your browser profile">
             <input
               type="checkbox"
               checked={settings.sync}
@@ -77,23 +77,27 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync pinned categories/accounts/budgets to your browser profile
+            🔄 Sync with browser profile
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Only display balances when you hover over them with your mouse">
             <input
               type="checkbox"
               checked={settings.privateMode}
               onChange={(e) => changeSetting("privateMode", e.target.checked)}
             />
-            🕶️ Hide balances unless you hover over them
+            🕶️ Show balances on hover
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Display category/account names as emojis only">
             <input
               type="checkbox"
               checked={settings.emojiMode}
               onChange={(e) => changeSetting("emojiMode", e.target.checked)}
             />
-            😉 Display category/account names as emojis only
+            😉 Emoji-only mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
@@ -108,15 +112,28 @@ export function OptionsView() {
           </label>
           {settings.txEnabled && (
             <>
+              <div>Transaction defaults:</div>
               <label
-                className="flex-row mb-small"
-                title="Check this box if you want to Approve the transactions again in YNAB">
+                className="flex-row gap-xs mb-small mt-small"
+                title="Mark transactions as Cleared by default">
+                <input
+                  type="checkbox"
+                  checked={settings.txCleared}
+                  onChange={(e) => changeSetting("txCleared", e.target.checked)}
+                />
+                <CircleC stroke="white" fill="var(--currency-green)" size={20} />
+                Cleared
+              </label>
+              <label
+                className="flex-row gap-xs mb-small"
+                title="Mark transactions as Unapproved by default">
                 <input
                   type="checkbox"
                   checked={!settings.txApproved}
                   onChange={(e) => changeSetting("txApproved", !e.target.checked)}
                 />
-                ℹ️ Enter transactions as Unapproved
+                <InfoCircle stroke="#2ea1be" fill="white" size={20} />
+                Unapproved
               </label>
             </>
           )}
@@ -137,11 +154,11 @@ export function OptionsView() {
                 }
               }}
             />
-            Allow access to the currently open tab, to enable these features:
+            Allow access to the currently open tab for these features:
           </label>
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
-            <li>Try detecting transaction amounts on the page</li>
+            <li>Detect transaction amounts on the page</li>
           </ul>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>

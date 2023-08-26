@@ -17,6 +17,8 @@ export interface AppSettings {
   showAccounts: boolean;
   /** Whether to enable adding transactions */
   txEnabled: boolean;
+  /** Whether transactions are marked Cleared by default */
+  txCleared: boolean;
   /** Whether transactions are automatically marked Approved */
   txApproved: boolean;
   /** Category and account names are reduced to emojis */
@@ -66,6 +68,7 @@ const useStorageProvider = () => {
       showAccounts: true,
       txEnabled: true,
       txApproved: true,
+      txCleared: false,
       privateMode: false,
       emojiMode: false,
       sync: false,
