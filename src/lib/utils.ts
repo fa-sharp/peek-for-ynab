@@ -17,6 +17,7 @@ export const formatCurrency = (
   const formattedString = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
+    currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
   }).format(currencyAmount);
 

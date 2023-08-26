@@ -273,6 +273,17 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             disabled={isSaving}
           />
         </label>
+        <label className="form-input">
+          Date
+          <input
+            required
+            type="date"
+            value={date}
+            max={getTodaysDateISO()}
+            onChange={(e) => setDate(e.target.value)}
+            disabled={isSaving}
+          />
+        </label>
         <div className="flex-row" style={{ justifyContent: "space-between" }}>
           <label className="flex-row">
             Status:
@@ -308,17 +319,6 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             </select>
           </label>
         </div>
-        <label className="form-input">
-          Date
-          <input
-            required
-            type="date"
-            value={date}
-            max={getTodaysDateISO()}
-            onChange={(e) => setDate(e.target.value)}
-            disabled={isSaving}
-          />
-        </label>
 
         <div className="error-message">{errorMessage}</div>
         <div
