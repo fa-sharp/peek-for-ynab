@@ -87,7 +87,7 @@ export function OptionsView() {
               checked={settings.privateMode}
               onChange={(e) => changeSetting("privateMode", e.target.checked)}
             />
-            🕶️ Show balances on hover
+            🕶️ Show balances on hover only
           </label>
           <label
             className="flex-row mb-small"
@@ -97,7 +97,7 @@ export function OptionsView() {
               checked={settings.emojiMode}
               onChange={(e) => changeSetting("emojiMode", e.target.checked)}
             />
-            😉 Emoji-only mode
+            😉 Emoji mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
@@ -112,10 +112,9 @@ export function OptionsView() {
           </label>
           {settings.txEnabled && (
             <>
-              <div>Transaction defaults:</div>
               <label
                 className="flex-row gap-xs mb-small mt-small"
-                title="Mark transactions as Cleared by default">
+                title="Set transactions as Cleared by default">
                 <input
                   type="checkbox"
                   checked={settings.txCleared}
@@ -126,7 +125,7 @@ export function OptionsView() {
               </label>
               <label
                 className="flex-row gap-xs mb-small"
-                title="Mark transactions as Unapproved by default">
+                title="Set transactions as Unapproved (you'll need to Approve them again in YNAB)">
                 <input
                   type="checkbox"
                   checked={!settings.txApproved}
@@ -154,7 +153,7 @@ export function OptionsView() {
                 }
               }}
             />
-            Allow access to the currently open tab for these features:
+            Allow access to the currently open tab, to enable these features:
           </label>
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
