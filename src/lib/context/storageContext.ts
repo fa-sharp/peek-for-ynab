@@ -17,6 +17,8 @@ export interface AppSettings {
   showAccounts: boolean;
   /** Whether to enable adding transactions */
   txEnabled: boolean;
+  /** Whether transactions are marked Cleared by default */
+  txCleared: boolean;
   /** Whether transactions are automatically marked Approved */
   txApproved: boolean;
   /** Category and account names are reduced to emojis */
@@ -25,6 +27,8 @@ export interface AppSettings {
   privateMode: boolean;
   /** Whether data is synced to the user's Chrome profile */
   sync: boolean;
+  /** Whether access is allowed to current tab for extra features */
+  currentTabAccess: boolean;
 }
 
 /** A category saved by the user */
@@ -43,8 +47,8 @@ export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_NEEDED_KEY = "tokenRefreshing";
 
 export const TOKEN_STORAGE = new Storage({ area: "local" });
-const CHROME_LOCAL_STORAGE = new Storage({ area: "local", allCopied: true });
-const CHROME_SYNC_STORAGE = new Storage({ area: "sync", allCopied: true });
+const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
@@ -63,10 +67,12 @@ const useStorageProvider = () => {
     defaultValue: {
       showAccounts: true,
       txEnabled: true,
-      txApproved: false,
+      txApproved: true,
+      txCleared: false,
       privateMode: false,
       emojiMode: false,
-      sync: false
+      sync: false,
+      currentTabAccess: false
     }
   });
 

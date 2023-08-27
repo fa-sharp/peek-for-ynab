@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
@@ -23,53 +24,48 @@ export default function SavedAccountsView({ addTx }: Props) {
     return null;
 
   return (
-    <section
-      aria-label="Saved accounts"
-      style={{
-        marginBottom: "1.1rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2px"
-      }}>
-      {savedAccountsData.map((account) => (
-        <AccountView
-          key={account.id}
-          account={account}
-          currencyFormat={selectedBudgetData?.currencyFormat}
-          settings={settings}
-          actionElementsLeft={
-            <IconButton
-              label={`Unpin '${account.name}'`}
-              onClick={() =>
-                removeAccount({
-                  accountId: account.id,
-                  budgetId: selectedBudgetData.id
-                })
-              }
-              icon={
-                <Pinned
-                  size={"1.3rem"}
-                  fill="var(--action)"
-                  color="var(--action)"
-                  strokeWidth={1}
-                />
-              }
-            />
-          }
-          actionElementsRight={
-            <aside className="balance-actions" aria-label="actions">
-              {settings.txEnabled && (
-                <IconButton
-                  bordered
-                  accent
-                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label={`Add transaction to '${account.name}'`}
-                  onClick={() => addTx({ accountId: account.id })}
-                />
-              )}
-            </aside>
-          }
-        />
+    <section aria-label="Saved accounts" className="flex-col gap-0 mt-md">
+      {savedAccountsData.map((account, idx) => (
+        <Fragment key={account.id}>
+          <AccountView
+            account={account}
+            currencyFormat={selectedBudgetData?.currencyFormat}
+            settings={settings}
+            actionElementsLeft={
+              <IconButton
+                label="Unpin"
+                onClick={() =>
+                  removeAccount({
+                    accountId: account.id,
+                    budgetId: selectedBudgetData.id
+                  })
+                }
+                icon={
+                  <Pinned
+                    size={"1.3rem"}
+                    fill="var(--action)"
+                    color="var(--action)"
+                    strokeWidth={1}
+                  />
+                }
+              />
+            }
+            actionElementsRight={
+              <aside className="balance-actions" aria-label="actions">
+                {settings.txEnabled && (
+                  <IconButton
+                    rounded
+                    accent
+                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => addTx({ accountId: account.id })}
+                  />
+                )}
+              </aside>
+            }
+          />
+          {idx !== savedAccountsData.length - 1 && <div className="sep-line-h"></div>}
+        </Fragment>
       ))}
     </section>
   );

@@ -1,13 +1,15 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
   "packageManager": "pnpm@8.6.0",
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
+    "dev:plasmo:edge": "plasmo dev --target=edge-mv3 --port 3001",
     "build:plasmo": "plasmo build",
+    "build:plasmo:edge": "plasmo build --target=edge-mv3",
     "build:plasmo:zip": "plasmo build --zip",
     "dev:next": "next dev --port 3000",
     "build:next": "next build",
@@ -25,7 +27,7 @@
     "idb-keyval": "^6.2.1",
     "nanoid": "^4.0.2",
     "next": "^12.3.4",
-    "plasmo": "^0.82.0",
+    "plasmo": "^0.82.1",
     "puro": "^0.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -51,14 +53,17 @@
     "typescript": "^5.1.6"
   },
   "manifest": {
+    "key": "$CRX_PUBLIC_KEY",
     "permissions": [
-      "identity",
-      "scripting",
-      "activeTab"
+      "identity"
     ],
     "host_permissions": [
       "https://api.youneedabudget.com/*",
       "https://api.ynab.com/*"
+    ],
+    "optional_permissions": [
+      "scripting",
+      "activeTab"
     ],
     "options_ui": {
       "open_in_tab": true

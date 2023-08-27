@@ -17,6 +17,7 @@ export const formatCurrency = (
   const formattedString = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
+    currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
   }).format(currencyAmount);
 
@@ -45,12 +46,12 @@ export const parseLocaleNumber = (value: string, locales = navigator.languages) 
 
 const emojiRegex =
   // eslint-disable-next-line no-misleading-character-class
-  /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/u;
+  /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/gu;
 
-/** Returns the first emoji, or consecutive sequence of emojis, found in a string */
-export const findFirstEmoji = (s: string) => {
-  const regexResult = emojiRegex.exec(s);
-  return regexResult ? regexResult[0] : null;
+/** Returns the emojis found in a string */
+export const findEmoji = (s: string, limit = 2) => {
+  const matches = s.match(emojiRegex);
+  return matches ? matches.slice(0, limit).join("") : null;
 };
 
 /**
@@ -67,6 +68,40 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
   });
   return result as T;
 };
+
+/** Request permissions to access the current tab and execute scripts within it */
+export const requestCurrentTabPermissions = () =>
+  new Promise<boolean>((resolve) => {
+    chrome.permissions.request(
+      {
+        permissions: ["activeTab", "scripting"]
+      },
+      (granted) => {
+        if (granted) resolve(true);
+        else {
+          console.error("Permission denied:", chrome.runtime.lastError);
+          resolve(false);
+        }
+      }
+    );
+  });
+
+/** Remove permissions to access the current tab */
+export const removeCurrentTabPermissions = () =>
+  new Promise<boolean>((resolve) =>
+    chrome.permissions.remove(
+      {
+        permissions: ["activeTab", "scripting"]
+      },
+      (removed) => {
+        if (removed) resolve(true);
+        else {
+          console.error("Error removing permissions:", chrome.runtime.lastError);
+          resolve(false);
+        }
+      }
+    )
+  );
 
 /** Extract any currency amounts on the page. Returns a sorted array of detected amounts, from highest to lowest */
 export const extractCurrencyAmounts = () => {
@@ -109,4 +144,16 @@ export const extractCurrencyAmounts = () => {
   amounts.sort((a, b) => b - a);
 
   return amounts;
+};
+
+export const flagColorToEmoji = (
+  flagColor: ynab.SaveTransaction.FlagColorEnum | string
+) => {
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Blue) return "🔵";
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Green) return "🟢";
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Orange) return "🟠";
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Purple) return "🟣";
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Red) return "🔴";
+  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Yellow) return "🟡";
+  return null;
 };

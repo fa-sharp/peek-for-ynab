@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
@@ -9,7 +9,7 @@ import type { AppSettings } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AddTransactionInitialState } from "~lib/useAddTransaction";
-import { findFirstEmoji, formatCurrency } from "~lib/utils";
+import { findEmoji, formatCurrency } from "~lib/utils";
 
 interface Props {
   addTx: (initialState: AddTransactionInitialState) => void;
@@ -31,7 +31,9 @@ function CategoriesView({ addTx }: Props) {
 
   return (
     <>
-      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="heading-big cursor-pointer mt-md"
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -102,12 +104,11 @@ export function CategoryGroupView({
         />
         <div role="heading">{categoryGroup.name}</div>
       </div>
-      {expanded &&
-        categoryGroup.categories.map(
-          (category) =>
-            !category.hidden && (
+      {expanded && (
+        <div className="flex-col gap-0">
+          {categoryGroup.categories.map((category, idx) => (
+            <Fragment key={category.id}>
               <CategoryView
-                key={category.id}
                 categoryData={category}
                 currencyFormat={budgetData.currencyFormat}
                 settings={settings}
@@ -131,7 +132,7 @@ export function CategoryGroupView({
                       icon={
                         <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                       }
-                      label={`Pin '${category.name}'`}
+                      label="Pin"
                       onClick={() => onSaveCategory(category.id)}
                     />
                   )
@@ -141,20 +142,25 @@ export function CategoryGroupView({
                     {settings.txEnabled &&
                       categoryGroup.name !== "Credit Card Payments" && (
                         <IconButton
-                          bordered
+                          rounded
                           accent
                           icon={
                             <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                           }
-                          label={`Add transaction to '${category.name}'`}
+                          label="Add transaction"
                           onClick={() => addTx({ categoryId: category.id })}
                         />
                       )}
                   </aside>
                 }
               />
-            )
-        )}
+              {idx !== categoryGroup.categories.length - 1 && (
+                <div className="sep-line-h"></div>
+              )}
+            </Fragment>
+          ))}
+        </div>
+      )}
     </>
   );
 }
@@ -173,7 +179,7 @@ export const CategoryView = ({
   settings: AppSettings;
 }) => {
   let foundEmoji = null;
-  if (settings.emojiMode) foundEmoji = findFirstEmoji(name);
+  if (settings.emojiMode) foundEmoji = findEmoji(name);
 
   return (
     <div

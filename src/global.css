@@ -14,6 +14,9 @@
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
+  --spacing-xs: 0.2rem;
+  --spacing-sm: 0.35rem;
+  --spacing-md: 0.45rem;
 }
 
 html {
@@ -29,15 +32,26 @@ body {
 .flex-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: fit-content;
+  gap: var(--spacing-sm);
 }
 
 .flex-col {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--spacing-md);
+}
+
+.gap-0 {
+  gap: 0px;
+}
+
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
 }
 
 .form-input {
@@ -65,7 +79,7 @@ body {
   align-items: center;
   gap: 3px;
 
-  margin-block: 4px;
+  margin-block: var(--spacing-sm);
 
   font-size: 1rem;
   font-weight: bold;
@@ -76,7 +90,7 @@ body {
   align-items: center;
   gap: 3px;
 
-  margin-top: 4px;
+  margin-block: var(--spacing-xs);
 
   font-size: 0.9rem;
   font-weight: 500;
@@ -91,12 +105,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 
-  margin-block: 2px;
   padding-inline: 2px;
-  padding-bottom: 2px;
-  border-bottom: solid 1px #ddd;
+  padding-block: 0.25rem;
 
   cursor: default;
 }
@@ -111,7 +123,7 @@ body {
 
 .button {
   cursor: pointer;
-  padding: 0.4rem 0.7rem;
+  padding: var(--spacing-sm) 0.7rem;
   text-align: center;
 }
 
@@ -129,11 +141,9 @@ body {
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
-.icon-button.bordered {
-  border: solid 1px var(--border-light);
+.icon-button.rounded {
+  border: none;
   border-radius: 50%;
-  padding: 0px;
-  margin: 1px;
 }
 .icon-button.spin {
   animation: spin 1s linear infinite;
@@ -141,12 +151,9 @@ body {
 .icon-button.noaction {
   cursor: initial;
 }
-.icon-button.accent {
-  background-color: var(--accent);
-}
 
 .select {
-  padding: 0.3rem;
+  padding: 0.25rem;
   background-color: white;
   font-family: "Open Sans", sans-serif;
 }
@@ -220,11 +227,15 @@ body {
 }
 
 .mt-small {
-  margin-top: 6px;
+  margin-top: var(--spacing-sm);
 }
 
-.mt-big {
-  margin-top: 2rem;
+.mt-md {
+  margin-top: 1.2rem;
+}
+
+.mt-lg {
+  margin-top: 1.8rem;
 }
 
 .mt-xxl {
@@ -232,7 +243,7 @@ body {
 }
 
 .mb-small {
-  margin-bottom: 6px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .font-big {
@@ -241,6 +252,11 @@ body {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.sep-line-h {
+  background-color: var(--border-light);
+  height: 1px;
 }
 
 @keyframes spin {
