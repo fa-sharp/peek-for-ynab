@@ -68,8 +68,8 @@ export function OptionsView() {
               checked={settings.sync}
               onChange={(e) => {
                 const confirmMessage = settings.sync
-                  ? "Are you sure? This will reset your pinned categories, accounts, etc. and stop syncing with your browser profile."
-                  : "Are you sure? This will reset any currently pinned categories, accounts, etc. and start syncing with your browser profile.";
+                  ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
+                  : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
                 const confirmed = confirm(confirmMessage);
                 if (confirmed) {
                   changeSetting("sync", e.target.checked);

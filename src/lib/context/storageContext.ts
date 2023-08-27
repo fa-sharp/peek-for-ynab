@@ -47,8 +47,8 @@ export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_NEEDED_KEY = "tokenRefreshing";
 
 export const TOKEN_STORAGE = new Storage({ area: "local" });
-const CHROME_LOCAL_STORAGE = new Storage({ area: "local", allCopied: true });
-const CHROME_SYNC_STORAGE = new Storage({ area: "sync", allCopied: true });
+const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
