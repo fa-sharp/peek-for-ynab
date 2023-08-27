@@ -11,6 +11,7 @@ import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,
   extractCurrencyAmounts,
+  flagColorToEmoji,
   getTodaysDateISO,
   parseLocaleNumber,
   requestCurrentTabPermissions
@@ -170,7 +171,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           ) : (
             <IconButton
               label="Not a transfer (click to switch)"
-              icon={<SwitchHorizontal color="gray" />}
+              icon={<SwitchHorizontal color="#aaa" />}
               onClick={() => setIsTransfer(true)}
             />
           )}
@@ -312,7 +313,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
                 ([flagName, flagValue], idx) =>
                   idx % 2 === 0 && (
                     <option key={flagValue} value={flagValue}>
-                      {flagName}
+                      {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
                     </option>
                   )
               )}

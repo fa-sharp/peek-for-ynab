@@ -145,8 +145,8 @@ export function OptionsView() {
               checked={settings.currentTabAccess}
               onChange={async (e) => {
                 if (e.target.checked) {
-                  if (await requestCurrentTabPermissions())
-                    changeSetting("currentTabAccess", true);
+                  const granted = await requestCurrentTabPermissions();
+                  if (granted) changeSetting("currentTabAccess", true);
                 } else {
                   await removeCurrentTabPermissions();
                   changeSetting("currentTabAccess", false);
