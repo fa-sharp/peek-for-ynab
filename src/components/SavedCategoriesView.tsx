@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
@@ -20,46 +21,48 @@ export default function SavedCategoriesView({ addTx }: Props) {
   const { currencyFormat } = selectedBudgetData;
 
   return (
-    <section aria-label="Saved categories" className="flex-col">
-      {savedCategoriesData.map((category) => (
-        <CategoryView
-          key={category.id}
-          categoryData={category}
-          currencyFormat={currencyFormat}
-          settings={settings}
-          actionElementsLeft={
-            <IconButton
-              label="Unpin"
-              onClick={() =>
-                removeCategory({
-                  categoryId: category.id,
-                  budgetId: selectedBudgetData.id
-                })
-              }
-              icon={
-                <Pinned
-                  size={"1.3rem"}
-                  fill="var(--action)"
-                  color="var(--action)"
-                  strokeWidth={1}
-                />
-              }
-            />
-          }
-          actionElementsRight={
-            <aside className="balance-actions" aria-label="actions">
-              {settings.txEnabled && (
-                <IconButton
-                  rounded
-                  accent
-                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                  label="Add transaction"
-                  onClick={() => addTx({ categoryId: category.id })}
-                />
-              )}
-            </aside>
-          }
-        />
+    <section aria-label="Saved categories" className="flex-col gap-0">
+      {savedCategoriesData.map((category, idx) => (
+        <Fragment key={category.id}>
+          <CategoryView
+            categoryData={category}
+            currencyFormat={currencyFormat}
+            settings={settings}
+            actionElementsLeft={
+              <IconButton
+                label="Unpin"
+                onClick={() =>
+                  removeCategory({
+                    categoryId: category.id,
+                    budgetId: selectedBudgetData.id
+                  })
+                }
+                icon={
+                  <Pinned
+                    size={"1.3rem"}
+                    fill="var(--action)"
+                    color="var(--action)"
+                    strokeWidth={1}
+                  />
+                }
+              />
+            }
+            actionElementsRight={
+              <aside className="balance-actions" aria-label="actions">
+                {settings.txEnabled && (
+                  <IconButton
+                    rounded
+                    accent
+                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => addTx({ categoryId: category.id })}
+                  />
+                )}
+              </aside>
+            }
+          />
+          {idx !== savedCategoriesData.length - 1 && <div className="sep-line-h"></div>}
+        </Fragment>
       ))}
     </section>
   );
