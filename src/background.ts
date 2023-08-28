@@ -18,7 +18,7 @@ TOKEN_STORAGE.watch({
     }
 
     isRefreshing = true;
-    console.log("Refreshing token!!");
+    process.env.NODE_ENV !== "production" && console.log("Refreshing token!");
 
     const refreshUrl = `${process.env.PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
@@ -34,7 +34,7 @@ TOKEN_STORAGE.watch({
         return res.json();
       })
       .then((newTokenData) => {
-        console.log("Got a new token!");
+        process.env.NODE_ENV !== "production" && console.log("Got a new token!");
         return TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, newTokenData);
       })
       .catch((err) => console.error(err))

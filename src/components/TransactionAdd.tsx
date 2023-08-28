@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
-import { SaveTransaction } from "ynab";
+import { SaveTransaction, TransactionDetail } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -11,8 +11,10 @@ import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,
   extractCurrencyAmounts,
+  flagColorToEmoji,
   getTodaysDateISO,
-  parseLocaleNumber
+  parseLocaleNumber,
+  requestCurrentTabPermissions
 } from "~lib/utils";
 
 import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
@@ -30,7 +32,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [isTransfer, setIsTransfer] = useState(false);
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState("");
-  const [cleared, setCleared] = useState(false);
+  const [cleared, setCleared] = useState(settings.txCleared ? true : false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
@@ -42,35 +44,42 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
     return accountsData?.find((a) => a.id === initialState.accountId) || null;
   });
   const [memo, setMemo] = useState("");
+  const [flag, setFlag] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   // Try parsing user's selection as the amount
   useEffect(() => {
-    executeScriptInCurrentTab(() => getSelection()?.toString())
-      .then((selection) => {
-        if (!selection) return;
-        const parsedNumber = parseLocaleNumber(selection);
-        if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
-      })
-      .catch((err) => {
-        !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
-      });
-  }, []);
+    if (!settings.currentTabAccess) return;
+    requestCurrentTabPermissions().then((granted) => {
+      if (!granted) return;
+      executeScriptInCurrentTab(() => getSelection()?.toString())
+        .then((selection) => {
+          if (!selection) return;
+          const parsedNumber = parseLocaleNumber(selection);
+          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+        })
+        .catch((err) => {
+          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+        });
+    });
+  }, [settings.currentTabAccess]);
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
     if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
     const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
     if (!transferToAccount) return false;
-    return !transferToAccount.on_budget;
-  }, [accountsData, isTransfer, payee]);
+    return !transferToAccount.on_budget && account?.on_budget;
+  }, [account?.on_budget, accountsData, isTransfer, payee]);
 
   const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
   const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
   const onDetectAmount = async () => {
     if (!detectedAmounts) {
+      // Check permissions
+      if (!(await requestCurrentTabPermissions())) return;
       // Try detecting any currency amounts on the page
       const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
       !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
@@ -127,12 +136,15 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
-        category_id: isTransfer ? undefined : category?.id,
+        category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
         cleared: cleared
           ? SaveTransaction.ClearedEnum.Cleared
           : SaveTransaction.ClearedEnum.Uncleared,
         approved: settings.txApproved,
-        memo
+        memo,
+        flag_color: flag
+          ? (flag as unknown as TransactionDetail.FlagColorEnum)
+          : undefined
       });
       closeForm();
     } catch (err: any) {
@@ -149,48 +161,18 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
-          Cleared?
-          <input
-            type="checkbox"
-            checked={cleared}
-            onChange={(e) => setCleared(e.target.checked)}
-          />
-          {cleared ? (
-            <IconButton
-              label="Cleared"
-              icon={<CircleC fill="var(--currency-green)" color="white" />}
-              disabled
-              noAction
-            />
-          ) : (
-            <IconButton
-              label=""
-              icon={<CircleC color="transparent" />}
-              disabled
-              noAction
-            />
-          )}
-        </label>
-        <label className="flex-row">
-          Transfer?
-          <input
-            type="checkbox"
-            checked={isTransfer}
-            onChange={(e) => setIsTransfer(e.target.checked)}
-          />
+          Transfer:
           {isTransfer ? (
             <IconButton
-              label="Transfer"
-              icon={<SwitchHorizontal color="black" />}
-              disabled
-              noAction
+              label="Transfer (click to switch)"
+              icon={<SwitchHorizontal color="var(--currency-green)" />}
+              onClick={() => setIsTransfer(false)}
             />
           ) : (
             <IconButton
-              label=""
-              icon={<SwitchHorizontal color="transparent" />}
-              disabled
-              noAction
+              label="Not a transfer (click to switch)"
+              icon={<SwitchHorizontal color="#aaa" />}
+              onClick={() => setIsTransfer(true)}
             />
           )}
         </label>
@@ -224,7 +206,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
-            {!IS_PRODUCTION && (
+            {settings.currentTabAccess && (
               <IconButton
                 icon={<Wand />}
                 label="Detect amount"
@@ -303,6 +285,42 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             disabled={isSaving}
           />
         </label>
+        <div className="flex-row" style={{ justifyContent: "space-between" }}>
+          <label className="flex-row">
+            Status:
+            {cleared ? (
+              <IconButton
+                label="Cleared (click to switch)"
+                icon={<CircleC fill="var(--currency-green)" color="white" size={26} />}
+                onClick={() => setCleared(false)}
+              />
+            ) : (
+              <IconButton
+                label="Uncleared (click to switch)"
+                icon={<CircleC color="gray" />}
+                onClick={() => setCleared(true)}
+              />
+            )}
+          </label>
+          <label className="flex-row">
+            Flag:
+            <select
+              className="select rounded"
+              value={flag}
+              onChange={(e) => setFlag(e.target.value)}>
+              <option value="">None</option>
+              {Object.entries(TransactionDetail.FlagColorEnum).map(
+                ([flagName, flagValue], idx) =>
+                  idx % 2 === 0 && (
+                    <option key={flagValue} value={flagValue}>
+                      {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
+                    </option>
+                  )
+              )}
+            </select>
+          </label>
+        </div>
+
         <div className="error-message">{errorMessage}</div>
         <div
           className="flex-row"

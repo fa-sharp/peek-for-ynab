@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Refresh } from "tabler-icons-react";
+import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
 
 import {
   AppProvider,
@@ -7,6 +7,7 @@ import {
   useStorageContext,
   useYNABContext
 } from "~lib/context";
+import { removeCurrentTabPermissions, requestCurrentTabPermissions } from "~lib/utils";
 
 import "./global.css";
 
@@ -27,8 +28,6 @@ export function OptionsView() {
   return (
     <section
       style={{
-        display: "flex",
-        flexDirection: "column",
         padding: "0 16px 16px",
         maxWidth: "700px",
         width: "max-content"
@@ -61,14 +60,16 @@ export function OptionsView() {
             />
             💲 Show accounts
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Sync pinned categories/accounts/budgets to your browser profile">
             <input
               type="checkbox"
               checked={settings.sync}
               onChange={(e) => {
                 const confirmMessage = settings.sync
-                  ? "Are you sure? This will reset your pinned categories, accounts, etc. and stop syncing with your browser profile."
-                  : "Are you sure? This will reset any currently pinned categories, accounts, etc. and start syncing with your browser profile.";
+                  ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
+                  : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
                 const confirmed = confirm(confirmMessage);
                 if (confirmed) {
                   changeSetting("sync", e.target.checked);
@@ -76,23 +77,27 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync pinned categories/accounts/budgets to your browser profile
+            🔄 Sync with browser profile
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Only display balances when you hover over them with your mouse">
             <input
               type="checkbox"
               checked={settings.privateMode}
               onChange={(e) => changeSetting("privateMode", e.target.checked)}
             />
-            🕶️ Hide balances unless you hover over them
+            🕶️ Show balances on hover only
           </label>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row mb-small"
+            title="Display category/account names as emojis only">
             <input
               type="checkbox"
               checked={settings.emojiMode}
               onChange={(e) => changeSetting("emojiMode", e.target.checked)}
             />
-            😉 Display category/account names as emojis only
+            😉 Emoji mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction entry
@@ -108,17 +113,53 @@ export function OptionsView() {
           {settings.txEnabled && (
             <>
               <label
-                className="flex-row mb-small"
-                title="Check this box if you don't want to Approve the transactions again in YNAB">
+                className="flex-row gap-xs mb-small mt-small"
+                title="Set transactions as Cleared by default">
                 <input
                   type="checkbox"
-                  checked={settings.txApproved}
-                  onChange={(e) => changeSetting("txApproved", e.target.checked)}
+                  checked={settings.txCleared}
+                  onChange={(e) => changeSetting("txCleared", e.target.checked)}
                 />
-                ℹ️ Mark transactions as Approved
+                <CircleC stroke="white" fill="var(--currency-green)" size={20} />
+                Cleared
+              </label>
+              <label
+                className="flex-row gap-xs mb-small"
+                title="Set transactions as Unapproved (you'll need to Approve them again in YNAB)">
+                <input
+                  type="checkbox"
+                  checked={!settings.txApproved}
+                  onChange={(e) => changeSetting("txApproved", !e.target.checked)}
+                />
+                <InfoCircle stroke="#2ea1be" fill="white" size={20} />
+                Unapproved
               </label>
             </>
           )}
+          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
+            Extra features
+          </h3>
+          <label className="flex-row mb-small">
+            <input
+              type="checkbox"
+              checked={settings.currentTabAccess}
+              onChange={async (e) => {
+                if (e.target.checked) {
+                  const granted = await requestCurrentTabPermissions();
+                  if (granted) changeSetting("currentTabAccess", true);
+                } else {
+                  await removeCurrentTabPermissions();
+                  changeSetting("currentTabAccess", false);
+                }
+              }}
+            />
+            Allow access to the currently open tab, to enable these features:
+          </label>
+          <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
+            <li>Automatically copy the selected amount into the transaction form</li>
+            <li>Detect transaction amounts on the page</li>
+          </ul>
+
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Show/hide budgets
           </h3>
