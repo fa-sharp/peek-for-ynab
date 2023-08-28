@@ -21,7 +21,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
   const { currencyFormat } = selectedBudgetData;
 
   return (
-    <section aria-label="Saved categories" className="flex-col gap-0">
+    <section aria-label="Saved categories">
       {savedCategoriesData.map((category, idx) => (
         <Fragment key={category.id}>
           <CategoryView
