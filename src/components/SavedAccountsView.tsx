@@ -25,7 +25,7 @@ export default function SavedAccountsView({ addTx, listTx }: Props) {
     return null;
 
   return (
-    <section aria-label="Saved accounts" className="flex-col gap-0 mt-md">
+    <section aria-label="Saved accounts" className="mt-md">
       {savedAccountsData.map((account, idx) => (
         <Fragment key={account.id}>
           <AccountView

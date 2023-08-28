@@ -104,63 +104,60 @@ export function CategoryGroupView({
         />
         <div role="heading">{categoryGroup.name}</div>
       </div>
-      {expanded && (
-        <div className="flex-col gap-0">
-          {categoryGroup.categories.map((category, idx) => (
-            <Fragment key={category.id}>
-              <CategoryView
-                categoryData={category}
-                currencyFormat={budgetData.currencyFormat}
-                settings={settings}
-                actionElementsLeft={
-                  savedCategories?.some((id) => id === category.id) ? (
-                    <IconButton
-                      icon={
-                        <Pinned
-                          size={"1.3rem"}
-                          color="var(--action)"
-                          fill="var(--action)"
-                          strokeWidth={1}
-                        />
-                      }
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
-                  ) : (
-                    <IconButton
-                      icon={
-                        <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                      }
-                      label="Pin"
-                      onClick={() => onSaveCategory(category.id)}
-                    />
-                  )
-                }
-                actionElementsRight={
-                  <aside className="balance-actions" aria-label="actions">
-                    {settings.txEnabled &&
-                      categoryGroup.name !== "Credit Card Payments" && (
-                        <IconButton
-                          rounded
-                          accent
-                          icon={
-                            <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                          }
-                          label="Add transaction"
-                          onClick={() => addTx({ categoryId: category.id })}
-                        />
-                      )}
-                  </aside>
-                }
-              />
-              {idx !== categoryGroup.categories.length - 1 && (
-                <div className="sep-line-h"></div>
-              )}
-            </Fragment>
-          ))}
-        </div>
-      )}
+      {expanded &&
+        categoryGroup.categories.map((category, idx) => (
+          <Fragment key={category.id}>
+            <CategoryView
+              categoryData={category}
+              currencyFormat={budgetData.currencyFormat}
+              settings={settings}
+              actionElementsLeft={
+                savedCategories?.some((id) => id === category.id) ? (
+                  <IconButton
+                    icon={
+                      <Pinned
+                        size={"1.3rem"}
+                        color="var(--action)"
+                        fill="var(--action)"
+                        strokeWidth={1}
+                      />
+                    }
+                    label="Pinned"
+                    disabled
+                    noAction
+                  />
+                ) : (
+                  <IconButton
+                    icon={
+                      <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                    }
+                    label="Pin"
+                    onClick={() => onSaveCategory(category.id)}
+                  />
+                )
+              }
+              actionElementsRight={
+                <aside className="balance-actions" aria-label="actions">
+                  {settings.txEnabled &&
+                    categoryGroup.name !== "Credit Card Payments" && (
+                      <IconButton
+                        rounded
+                        accent
+                        icon={
+                          <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                        }
+                        label="Add transaction"
+                        onClick={() => addTx({ categoryId: category.id })}
+                      />
+                    )}
+                </aside>
+              }
+            />
+            {idx !== categoryGroup.categories.length - 1 && (
+              <div className="sep-line-h"></div>
+            )}
+          </Fragment>
+        ))}
     </>
   );
 }
