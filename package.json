@@ -18,24 +18,25 @@
   },
   "dependencies": {
     "@plasmohq/storage": "^1.7.2",
+    "plasmo": "^0.82.1",
+    "puro": "^0.8.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
     "@tanstack/query-core": "^4.32.6",
     "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.6",
     "@tanstack/react-query-persist-client": "^4.32.6",
     "cors": "^2.8.5",
+    "croner": "^7.0.1",
     "downshift": "^6.1.12",
     "idb-keyval": "^6.2.1",
     "nanoid": "^4.0.2",
     "next": "^12.3.4",
-    "plasmo": "^0.82.1",
-    "puro": "^0.8.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "tabler-icons-react": "1.55.0",
     "use-local-storage-state": "^18.3.3",
-    "ynab": "^1.55.0"
-  },
-  "devDependencies": {
+    "ynab": "^1.55.0",
     "@next/eslint-plugin-next": "^12.3.4",
     "@trivago/prettier-plugin-sort-imports": "^3.4.0",
     "@types/chrome": "^0.0.190",

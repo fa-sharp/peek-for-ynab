@@ -6,6 +6,8 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
+import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -43,23 +45,20 @@ export interface SavedAccount {
   budgetId: string;
 }
 
-export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_NEEDED_KEY = "tokenRefreshing";
-
-export const TOKEN_STORAGE = new Storage({ area: "local" });
-const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
-const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
+const tokenStorage = new Storage({ area: "local" });
+const chromeLocalStorage = new Storage({ area: "local" });
+const chromeSyncStorage = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
-  >({ key: TOKEN_STORAGE_KEY, instance: TOKEN_STORAGE }, (data, isHydrated) =>
+  >({ key: TOKEN_STORAGE_KEY, instance: tokenStorage }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
   );
   /** Whether the token needs to be refreshed */
   const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
-    { key: REFRESH_NEEDED_KEY, instance: TOKEN_STORAGE },
+    { key: REFRESH_NEEDED_KEY, instance: tokenStorage },
     false
   );
 
@@ -82,7 +81,7 @@ const useStorageProvider = () => {
   });
 
   const storageArea = useMemo(
-    () => (settings.sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
+    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
     [settings.sync]
   );
 
