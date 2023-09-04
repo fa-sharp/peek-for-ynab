@@ -21,7 +21,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
   const { currencyFormat } = selectedBudgetData;
 
   return (
-    <section aria-label="Saved categories" className="flex-col gap-0">
+    <section aria-label="Saved categories">
       {savedCategoriesData.map((category, idx) => (
         <Fragment key={category.id}>
           <CategoryView
@@ -49,15 +49,13 @@ export default function SavedCategoriesView({ addTx }: Props) {
             }
             actionElementsRight={
               <aside className="balance-actions" aria-label="actions">
-                {settings.txEnabled && (
-                  <IconButton
-                    rounded
-                    accent
-                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                    label="Add transaction"
-                    onClick={() => addTx({ categoryId: category.id })}
-                  />
-                )}
+                <IconButton
+                  rounded
+                  accent
+                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                  label="Add transaction"
+                  onClick={() => addTx({ categoryId: category.id })}
+                />
               </aside>
             }
           />

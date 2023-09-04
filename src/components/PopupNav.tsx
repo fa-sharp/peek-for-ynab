@@ -71,7 +71,7 @@ export default function PopupNav() {
           gap: 3
         }}>
         <BudgetSelect
-          small={settings.emojiMode}
+          emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}

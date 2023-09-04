@@ -15,16 +15,11 @@ export default function SavedAccountsView({ addTx }: Props) {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, settings } = useStorageContext();
 
-  if (
-    !settings.showAccounts ||
-    !savedAccountsData ||
-    !selectedBudgetData ||
-    savedAccountsData.length === 0
-  )
+  if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
     return null;
 
   return (
-    <section aria-label="Saved accounts" className="flex-col gap-0 mt-md">
+    <section aria-label="Saved accounts" className="mt-md">
       {savedAccountsData.map((account, idx) => (
         <Fragment key={account.id}>
           <AccountView
@@ -52,15 +47,13 @@ export default function SavedAccountsView({ addTx }: Props) {
             }
             actionElementsRight={
               <aside className="balance-actions" aria-label="actions">
-                {settings.txEnabled && (
-                  <IconButton
-                    rounded
-                    accent
-                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
-                    label="Add transaction"
-                    onClick={() => addTx({ accountId: account.id })}
-                  />
-                )}
+                <IconButton
+                  rounded
+                  accent
+                  icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                  label="Add transaction"
+                  onClick={() => addTx({ accountId: account.id })}
+                />
               </aside>
             }
           />

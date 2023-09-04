@@ -6,6 +6,8 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
+import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -13,10 +15,6 @@ export interface TokenData {
 }
 
 export interface AppSettings {
-  /** Whether to fetch and show accounts from each budget */
-  showAccounts: boolean;
-  /** Whether to enable adding transactions */
-  txEnabled: boolean;
   /** Whether transactions are marked Cleared by default */
   txCleared: boolean;
   /** Whether transactions are automatically marked Approved */
@@ -43,9 +41,6 @@ export interface SavedAccount {
   budgetId: string;
 }
 
-export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_NEEDED_KEY = "tokenRefreshing";
-
 export const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
@@ -65,8 +60,6 @@ const useStorageProvider = () => {
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {
-      showAccounts: true,
-      txEnabled: true,
       txApproved: true,
       txCleared: false,
       privateMode: false,

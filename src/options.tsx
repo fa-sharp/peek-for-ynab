@@ -52,14 +52,6 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "0" }}>
             Settings
           </h3>
-          <label className="flex-row mb-small">
-            <input
-              type="checkbox"
-              checked={settings.showAccounts}
-              onChange={(e) => changeSetting("showAccounts", e.target.checked)}
-            />
-            💲 Show accounts
-          </label>
           <label
             className="flex-row mb-small"
             title="Sync pinned categories/accounts/budgets to your browser profile">
@@ -100,42 +92,30 @@ export function OptionsView() {
             😉 Emoji mode
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Transaction entry
+            Transaction defaults
           </h3>
-          <label className="flex-row mb-small">
+          <label
+            className="flex-row gap-xs mb-small"
+            title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
             <input
               type="checkbox"
-              checked={settings.txEnabled}
-              onChange={(e) => changeSetting("txEnabled", e.target.checked)}
+              checked={settings.txApproved}
+              onChange={(e) => changeSetting("txApproved", e.target.checked)}
             />
-            💸 Enable transaction entry
+            <InfoCircle fill="#2ea1be" stroke="white" size={20} />
+            Approved
           </label>
-          {settings.txEnabled && (
-            <>
-              <label
-                className="flex-row gap-xs mb-small mt-small"
-                title="Set transactions as Cleared by default">
-                <input
-                  type="checkbox"
-                  checked={settings.txCleared}
-                  onChange={(e) => changeSetting("txCleared", e.target.checked)}
-                />
-                <CircleC stroke="white" fill="var(--currency-green)" size={20} />
-                Cleared
-              </label>
-              <label
-                className="flex-row gap-xs mb-small"
-                title="Set transactions as Unapproved (you'll need to Approve them again in YNAB)">
-                <input
-                  type="checkbox"
-                  checked={!settings.txApproved}
-                  onChange={(e) => changeSetting("txApproved", !e.target.checked)}
-                />
-                <InfoCircle stroke="#2ea1be" fill="white" size={20} />
-                Unapproved
-              </label>
-            </>
-          )}
+          <label
+            className="flex-row gap-xs mb-small mt-small"
+            title="Set transactions as Cleared by default">
+            <input
+              type="checkbox"
+              checked={settings.txCleared}
+              onChange={(e) => changeSetting("txCleared", e.target.checked)}
+            />
+            <CircleC stroke="white" fill="var(--currency-green)" size={20} />
+            Cleared
+          </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Extra features
           </h3>
@@ -157,7 +137,7 @@ export function OptionsView() {
           </label>
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
-            <li>Detect transaction amounts on the page</li>
+            <li>(Experimental!) Detect transaction amounts on the page</li>
           </ul>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
