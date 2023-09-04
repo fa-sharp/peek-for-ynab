@@ -15,10 +15,6 @@ export interface TokenData {
 }
 
 export interface AppSettings {
-  /** Whether to fetch and show accounts from each budget */
-  showAccounts: boolean;
-  /** Whether to enable adding transactions */
-  txEnabled: boolean;
   /** Whether transactions are marked Cleared by default */
   txCleared: boolean;
   /** Whether transactions are automatically marked Approved */
@@ -64,8 +60,6 @@ const useStorageProvider = () => {
 
   const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
     defaultValue: {
-      showAccounts: true,
-      txEnabled: true,
       txApproved: true,
       txCleared: false,
       privateMode: false,

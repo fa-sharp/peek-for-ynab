@@ -138,18 +138,17 @@ export function CategoryGroupView({
               }
               actionElementsRight={
                 <aside className="balance-actions" aria-label="actions">
-                  {settings.txEnabled &&
-                    categoryGroup.name !== "Credit Card Payments" && (
-                      <IconButton
-                        rounded
-                        accent
-                        icon={
-                          <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                        }
-                        label="Add transaction"
-                        onClick={() => addTx({ categoryId: category.id })}
-                      />
-                    )}
+                  {categoryGroup.name !== "Credit Card Payments" && (
+                    <IconButton
+                      rounded
+                      accent
+                      icon={
+                        <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                      }
+                      label="Add transaction"
+                      onClick={() => addTx({ categoryId: category.id })}
+                    />
+                  )}
                 </aside>
               }
             />

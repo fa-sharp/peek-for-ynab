@@ -22,8 +22,7 @@ function AccountsView({ addTx }: Props) {
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!settings.showAccounts || !selectedBudgetData || !accountsData || !savedAccounts)
-    return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts) return null;
 
   return (
     <>
@@ -143,17 +142,13 @@ function AccountTypeView({
               }
               actionElementsRight={
                 <aside className="balance-actions" aria-label="actions">
-                  {settings.txEnabled && (
-                    <IconButton
-                      rounded
-                      accent
-                      icon={
-                        <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                      }
-                      label="Add transaction"
-                      onClick={() => addTx({ accountId: account.id })}
-                    />
-                  )}
+                  <IconButton
+                    rounded
+                    accent
+                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => addTx({ accountId: account.id })}
+                  />
                 </aside>
               }
             />

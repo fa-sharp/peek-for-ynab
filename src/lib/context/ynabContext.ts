@@ -23,7 +23,6 @@ const useYNABProvider = () => {
   const { tokenExpired } = useAuthContext();
   const {
     tokenData,
-    settings,
     selectedBudgetId,
     savedAccounts,
     savedCategories,
@@ -133,9 +132,7 @@ const useYNABProvider = () => {
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
     queryKey: ["accounts", `budgetId-${selectedBudgetId}`],
-    enabled: Boolean(
-      (settings.showAccounts || settings.txEnabled) && ynabAPI && selectedBudgetId
-    ),
+    enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
@@ -158,9 +155,9 @@ const useYNABProvider = () => {
   /** Fetch payees for the selected budget (if user enables transactions) */
   const { data: payeesData } = useQuery({
     queryKey: ["payees", `budgetId-${selectedBudgetId}`],
-    staleTime: ONE_DAY_IN_MILLIS,
+    staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
     cacheTime: TWO_WEEKS_IN_MILLIS,
-    enabled: Boolean(settings.txEnabled && ynabAPI && selectedBudgetId),
+    enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
