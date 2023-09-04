@@ -6,6 +6,8 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
+import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -42,9 +44,6 @@ export interface SavedAccount {
   accountId: string;
   budgetId: string;
 }
-
-export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_NEEDED_KEY = "tokenRefreshing";
 
 export const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });

@@ -1,17 +1,16 @@
-import {
-  REFRESH_NEEDED_KEY,
-  TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY,
-  type TokenData
-} from "~lib/context/storageContext";
+import { Storage } from "@plasmohq/storage";
 
+import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import { type TokenData } from "~lib/context/storageContext";
+
+const tokenStorage = new Storage({ area: "local" });
 let isRefreshing = false;
 
-TOKEN_STORAGE.watch({
+tokenStorage.watch({
   [REFRESH_NEEDED_KEY]: async (c) => {
     if (c.newValue !== true || isRefreshing) return;
 
-    const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
+    const tokenData = await tokenStorage.get<TokenData | null>(TOKEN_STORAGE_KEY);
     if (!tokenData) {
       console.error("Not refreshing - no existing token data found");
       return;
@@ -24,7 +23,7 @@ TOKEN_STORAGE.watch({
     fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, { method: "POST" })
       .then(async (res) => {
         if (!res.ok) {
-          if (res.status === 401) await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
+          if (res.status === 401) await tokenStorage.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
           throw {
             message: "Error refreshing token!",
             status: res.status,
@@ -35,13 +34,11 @@ TOKEN_STORAGE.watch({
       })
       .then((newTokenData) => {
         process.env.NODE_ENV !== "production" && console.log("Got a new token!");
-        return TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, newTokenData);
+        return tokenStorage.set(TOKEN_STORAGE_KEY, newTokenData);
       })
       .catch((err) => console.error(err))
       .finally(() => {
-        TOKEN_STORAGE.set(REFRESH_NEEDED_KEY, false).finally(
-          () => (isRefreshing = false)
-        );
+        tokenStorage.set(REFRESH_NEEDED_KEY, false).finally(() => (isRefreshing = false));
       });
   }
 });
