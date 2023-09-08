@@ -39,9 +39,9 @@ function CategoriesView({ addTx }: Props) {
           onClick={() => setExpanded(!expanded)}
           icon={
             expanded ? (
-              <ChevronUp size={24} color="black" strokeWidth={2} />
+              <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
             ) : (
-              <ChevronDown size={24} color="black" strokeWidth={2} />
+              <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
             )
           }
         />
