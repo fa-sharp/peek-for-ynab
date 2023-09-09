@@ -338,7 +338,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
           </button>
           <button
             type="button"
-            className="button rounded mt-lg"
+            className="button rounded warn mt-lg"
             style={{ flex: 1 }}
             onClick={() => closeForm()}
             disabled={isSaving}>

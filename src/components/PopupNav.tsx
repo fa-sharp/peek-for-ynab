@@ -52,7 +52,7 @@ export default function PopupNav() {
         }
         icon={
           isLoadingData ? (
-            <Refresh color="black" />
+            <Refresh />
           ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
             <Check color="var(--success)" />
           ) : (

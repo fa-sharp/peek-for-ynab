@@ -31,7 +31,8 @@ export function PopupView() {
         flexDirection: "column",
         padding: 16,
         minWidth: settings.emojiMode ? "150px" : "240px",
-        width: "max-content"
+        width: "max-content",
+        maxWidth: "340px"
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />
