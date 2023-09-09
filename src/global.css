@@ -228,7 +228,7 @@ button {
 .select-button-right {
   position: absolute;
   right: 3px;
-  top: auto;
+  top: 1px;
 }
 
 .rounded {
