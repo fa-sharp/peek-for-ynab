@@ -6,7 +6,7 @@
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
   --warn-hover: hsl(0, 75%, 72%);
-  --highlight: var(--accent-hover);
+  --highlight: hsl(204, 100%, 92%);
   --border: #4d4d4d;
   --border-light: #c4c4c4;
   --currency-green: #357f16;
@@ -24,16 +24,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #212121;
+    --background: #252525;
+    --border: #969696;
     --border-light: #6e6e6e;
     --action: #ffffff;
     --accent: hsl(210, 43%, 44%);
     --accent-hover: hsl(210, 43%, 54%);
+    --success: #63d035;
     --warn: hsl(0, 37%, 49%);
     --warn-hover: hsl(0, 28%, 55%);
-    --highlight: hsla(0, 0%, 91%, 0.2);
-    --currency-green: #4ddb10;
-    --currency-red: #dc7d7d;
+    --highlight: hsla(0, 0%, 91%, 0.25);
+    --currency-green: #61d231;
+    --currency-red: #ff8888;
 
     color: white;
   }
@@ -91,6 +93,8 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
   font-family: "Open Sans", sans-serif;
+  color: currentColor;
+  background-color: var(--background);
 }
 
 .form-input input.item-selected {
@@ -179,8 +183,9 @@ button {
 
 .select {
   padding: 0.25rem;
-  background-color: white;
   font-family: "Open Sans", sans-serif;
+  background-color: var(--background);
+  color: currentColor;
 }
 
 .select-dropdown-list {
@@ -214,7 +219,6 @@ button {
   position: absolute;
   right: 3px;
   top: auto;
-  color: black;
 }
 
 .rounded {
