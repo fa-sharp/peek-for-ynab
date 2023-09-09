@@ -69,6 +69,16 @@ button {
   gap: var(--spacing-md);
 }
 
+.min-w-0 {
+  min-width: 0;
+}
+
+.hide-overflow {
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+}
+
 .gap-0 {
   gap: 0px;
 }

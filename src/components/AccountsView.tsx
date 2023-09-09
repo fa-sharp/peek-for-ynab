@@ -182,9 +182,13 @@ export const AccountView = ({
           ? `${name}: ${formatCurrency(balance, currencyFormat)}`
           : undefined
       }>
-      <div className="flex-row">
+      <div className="flex-row min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? <span className="font-big">{foundEmoji}</span> : name}
+        {foundEmoji ? (
+          <span className="font-big">{foundEmoji}</span>
+        ) : (
+          <div className="hide-overflow">{name}</div>
+        )}
       </div>
       <div className="flex-row">
         <CurrencyView
