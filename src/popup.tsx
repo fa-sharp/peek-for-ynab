@@ -1,3 +1,5 @@
+import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
+
 import {
   AccountsView,
   CategoriesView,
@@ -7,7 +9,12 @@ import {
   SavedCategoriesView,
   TransactionAdd
 } from "~components";
-import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
+import {
+  AppProvider,
+  useAuthContext,
+  useStorageContext,
+  useYNABContext
+} from "~lib/context";
 import { useAddTransaction } from "~lib/useAddTransaction";
 
 import "./global.css";
@@ -21,9 +28,19 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { settings } = useStorageContext();
+  const { settings, saveCategoriesForBudget, selectedBudgetId } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
+  const { savedCategoriesData } = useYNABContext();
   const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
+
+  const onDragEnd: OnDragEndResponder = (result) => {
+    console.log("onDragEnd:", result);
+    if (!savedCategoriesData || !result.destination) return;
+    const currentCategoryIds = savedCategoriesData.map((c) => c.id);
+    const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
+    currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
+    saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
+  };
 
   return (
     <div
@@ -42,7 +59,7 @@ export function PopupView() {
           closeForm={closeAddTransaction}
         />
       ) : (
-        <>
+        <DragDropContext onDragEnd={onDragEnd}>
           <PopupNav />
 
           <SavedCategoriesView addTx={openAddTransaction} />
@@ -50,7 +67,7 @@ export function PopupView() {
 
           <CategoriesView addTx={openAddTransaction} />
           <AccountsView addTx={openAddTransaction} />
-        </>
+        </DragDropContext>
       )}
     </div>
   );

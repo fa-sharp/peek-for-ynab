@@ -92,7 +92,11 @@ const useStorageProvider = () => {
   );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
-  const [savedCategories, setSavedCategories] = useExtensionStorage<
+  const [
+    savedCategories,
+    setSavedCategories,
+    { setRenderValue: setSavedCategoriesRender }
+  ] = useExtensionStorage<
     | undefined
     | {
         [budgetId: string]: string[] | undefined;
@@ -130,6 +134,14 @@ const useStorageProvider = () => {
           newCategory.categoryId
         ]
       });
+  };
+  const saveCategoriesForBudget = (budgetId: string, categoryIds: string[]) => {
+    const newSavedCategories = {
+      ...savedCategories,
+      [budgetId]: categoryIds
+    };
+    setSavedCategoriesRender(newSavedCategories);
+    setSavedCategories(newSavedCategories);
   };
   const removeCategory = (savedCategory: SavedCategory) => {
     setSavedCategories({
@@ -198,6 +210,7 @@ const useStorageProvider = () => {
     toggleShowBudget,
     savedCategories,
     saveCategory,
+    saveCategoriesForBudget,
     removeCategory,
     savedAccounts,
     saveAccount,

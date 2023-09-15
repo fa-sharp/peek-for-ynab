@@ -299,6 +299,10 @@ button {
   height: 1px;
 }
 
+.transparent {
+  background-color: transparent;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(360deg);
