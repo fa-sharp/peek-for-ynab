@@ -146,7 +146,8 @@ button {
   align-items: center;
   gap: 0.5rem;
 
-  padding: 0.25rem 4px;
+  padding: 0.25rem 4px 0.25rem 6px;
+  border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
   color: transparent;

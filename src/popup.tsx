@@ -51,16 +51,25 @@ export function PopupView() {
 }
 
 function MainPopup() {
-  const { saveCategoriesForBudget, selectedBudgetId } = useStorageContext();
-  const { savedCategoriesData } = useYNABContext();
+  const { saveCategoriesForBudget, saveAccountsForBudget, selectedBudgetId } =
+    useStorageContext();
+  const { savedCategoriesData, savedAccountsData } = useYNABContext();
 
   const onDragEnd: OnDragEndResponder = (result) => {
-    console.log("onDragEnd:", result);
-    if (!savedCategoriesData || !result.destination) return;
-    const currentCategoryIds = savedCategoriesData.map((c) => c.id);
-    const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
-    currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
-    saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
+    if (!result.destination) return;
+    if (result.source.droppableId === "savedCategories") {
+      if (!savedCategoriesData) return;
+      const currentCategoryIds = savedCategoriesData.map((c) => c.id);
+      const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
+      currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
+      saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
+    } else if (result.source.droppableId === "savedAccounts") {
+      if (!savedAccountsData) return;
+      const currentAccountIds = savedAccountsData.map((a) => a.id);
+      const [toBeReordered] = currentAccountIds.splice(result.source.index, 1);
+      currentAccountIds.splice(result.destination.index, 0, toBeReordered);
+      saveAccountsForBudget(selectedBudgetId, currentAccountIds);
+    }
   };
 
   return (

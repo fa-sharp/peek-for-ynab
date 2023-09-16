@@ -46,7 +46,7 @@ export interface SavedAccount {
   budgetId: string;
 }
 
-export const TOKEN_STORAGE = new Storage({ area: "local" });
+const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
@@ -121,14 +121,15 @@ const useStorageProvider = () => {
   );
 
   /** The account IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
-  const [savedAccounts, setSavedAccounts] = useExtensionStorage<
-    | undefined
-    | {
-        [budgetId: string]: string[] | undefined;
-      }
-  >({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
-    !isHydrated ? undefined : !data ? {} : data
-  );
+  const [savedAccounts, setSavedAccounts, { setRenderValue: setSavedAccountsRender }] =
+    useExtensionStorage<
+      | undefined
+      | {
+          [budgetId: string]: string[] | undefined;
+        }
+    >({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
+      !isHydrated ? undefined : !data ? {} : data
+    );
 
   const changeSetting = <K extends keyof AppSettings>(
     key: K,
@@ -179,6 +180,14 @@ const useStorageProvider = () => {
         ]
       });
   };
+  const saveAccountsForBudget = (budgetId: string, accountIds: string[]) => {
+    const newSavedAccounts = {
+      ...savedAccounts,
+      [budgetId]: accountIds
+    };
+    setSavedAccountsRender(newSavedAccounts);
+    setSavedAccounts(newSavedAccounts);
+  };
   const removeAccount = (savedAccount: SavedAccount) => {
     setSavedAccounts({
       ...savedAccounts,
@@ -228,6 +237,7 @@ const useStorageProvider = () => {
     savedCategories,
     saveCategory,
     saveCategoriesForBudget,
+    saveAccountsForBudget,
     removeCategory,
     savedAccounts,
     saveAccount,
