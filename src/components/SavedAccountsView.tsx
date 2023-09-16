@@ -4,16 +4,11 @@ import { Pinned, Plus } from "tabler-icons-react";
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
-
-interface Props {
-  addTx: (initialState: AddTransactionInitialState) => void;
-}
 
 /** View of user's saved accounts with balances */
-export default function SavedAccountsView({ addTx }: Props) {
+export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
-  const { removeAccount, settings } = useStorageContext();
+  const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
 
   if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
     return null;
@@ -27,23 +22,25 @@ export default function SavedAccountsView({ addTx }: Props) {
             currencyFormat={selectedBudgetData?.currencyFormat}
             settings={settings}
             actionElementsLeft={
-              <IconButton
-                label="Unpin"
-                onClick={() =>
-                  removeAccount({
-                    accountId: account.id,
-                    budgetId: selectedBudgetData.id
-                  })
-                }
-                icon={
-                  <Pinned
-                    size={"1.3rem"}
-                    fill="var(--action)"
-                    color="var(--action)"
-                    strokeWidth={1}
-                  />
-                }
-              />
+              !popupState.editMode ? null : (
+                <IconButton
+                  label="Unpin"
+                  onClick={() =>
+                    removeAccount({
+                      accountId: account.id,
+                      budgetId: selectedBudgetData.id
+                    })
+                  }
+                  icon={
+                    <Pinned
+                      size={"1.3rem"}
+                      fill="var(--action)"
+                      color="var(--action)"
+                      strokeWidth={1}
+                    />
+                  }
+                />
+              )
             }
             actionElementsRight={
               <aside className="balance-actions" aria-label="actions">
@@ -52,7 +49,12 @@ export default function SavedAccountsView({ addTx }: Props) {
                   accent
                   icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
                   label="Add transaction"
-                  onClick={() => addTx({ accountId: account.id })}
+                  onClick={() =>
+                    setPopupState({
+                      view: "txAdd",
+                      txAddState: { accountId: account.id }
+                    })
+                  }
                 />
               </aside>
             }

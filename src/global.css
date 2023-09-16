@@ -59,7 +59,7 @@ button {
 .flex-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
 }
 
 .flex-col {
@@ -146,10 +146,7 @@ button {
   align-items: center;
   gap: 0.5rem;
 
-  padding-inline: 2px;
-  padding-block: 0.25rem;
-
-  cursor: default;
+  padding: 0.25rem 4px;
 }
 .balance-display:not(:hover) span.hidden {
   color: transparent;

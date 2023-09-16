@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -27,6 +27,11 @@ export interface AppSettings {
   sync: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
+}
+
+export interface TxAddInitialState {
+  accountId?: string;
+  categoryId?: string;
 }
 
 /** A category saved by the user */
@@ -72,6 +77,16 @@ const useStorageProvider = () => {
   /** The budget currently in view */
   const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
     defaultValue: ""
+  });
+
+  /** Current popup state - not persisted */
+  const [popupState, setPopupState] = useState<{
+    view: "main" | "txAdd";
+    editMode?: boolean;
+    txAddState?: TxAddInitialState;
+  }>({
+    view: "main",
+    editMode: false
   });
 
   const storageArea = useMemo(
@@ -201,6 +216,8 @@ const useStorageProvider = () => {
     setTokenData,
     tokenRefreshNeeded,
     setTokenRefreshNeeded,
+    popupState,
+    setPopupState,
     settings,
     changeSetting,
     selectedBudgetId,

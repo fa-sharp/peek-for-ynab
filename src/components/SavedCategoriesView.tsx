@@ -5,15 +5,10 @@ import { Pinned, Plus } from "tabler-icons-react";
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
-
-interface Props {
-  addTx: (initialState: AddTransactionInitialState) => void;
-}
 
 /** View of user's saved categories with balances */
-export default function SavedCategoriesView({ addTx }: Props) {
-  const { removeCategory, settings } = useStorageContext();
+export default function SavedCategoriesView() {
+  const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
   const { selectedBudgetData, savedCategoriesData } = useYNABContext();
 
   if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
@@ -22,7 +17,7 @@ export default function SavedCategoriesView({ addTx }: Props) {
   const { currencyFormat } = selectedBudgetData;
 
   return (
-    <Droppable droppableId="savedCategories">
+    <Droppable droppableId="savedCategories" isDropDisabled={!popupState.editMode}>
       {(provided, snapshot) => (
         <section
           {...provided.droppableProps}
@@ -30,7 +25,10 @@ export default function SavedCategoriesView({ addTx }: Props) {
           aria-label="Saved categories">
           {savedCategoriesData.map((category, idx) => (
             <Fragment key={category.id}>
-              <Draggable draggableId={category.id} index={idx} isDragDisabled={false}>
+              <Draggable
+                draggableId={category.id}
+                index={idx}
+                isDragDisabled={!popupState.editMode}>
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
@@ -42,23 +40,25 @@ export default function SavedCategoriesView({ addTx }: Props) {
                       currencyFormat={currencyFormat}
                       settings={settings}
                       actionElementsLeft={
-                        <IconButton
-                          label="Unpin"
-                          onClick={() =>
-                            removeCategory({
-                              categoryId: category.id,
-                              budgetId: selectedBudgetData.id
-                            })
-                          }
-                          icon={
-                            <Pinned
-                              size={"1.3rem"}
-                              fill="var(--action)"
-                              color="var(--action)"
-                              strokeWidth={1}
-                            />
-                          }
-                        />
+                        !popupState.editMode ? null : (
+                          <IconButton
+                            label="Unpin"
+                            onClick={() =>
+                              removeCategory({
+                                categoryId: category.id,
+                                budgetId: selectedBudgetData.id
+                              })
+                            }
+                            icon={
+                              <Pinned
+                                size={"1.3rem"}
+                                fill="var(--action)"
+                                color="var(--action)"
+                                strokeWidth={1}
+                              />
+                            }
+                          />
+                        )
                       }
                       actionElementsRight={
                         <aside className="balance-actions" aria-label="actions">
@@ -73,7 +73,12 @@ export default function SavedCategoriesView({ addTx }: Props) {
                               />
                             }
                             label="Add transaction"
-                            onClick={() => addTx({ categoryId: category.id })}
+                            onClick={() =>
+                              setPopupState({
+                                view: "txAdd",
+                                txAddState: { categoryId: category.id }
+                              })
+                            }
                           />
                         </aside>
                       }

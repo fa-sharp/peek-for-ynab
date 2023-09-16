@@ -5,20 +5,21 @@ import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings } from "~lib/context/storageContext";
+import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
-interface Props {
-  addTx: (initialState: AddTransactionInitialState) => void;
-}
-
 /** View of all categories in a budget, grouped by category groups */
-function CategoriesView({ addTx }: Props) {
-  const { savedCategories, saveCategory, settings, selectedBudgetId } =
-    useStorageContext();
+function CategoriesView() {
+  const {
+    savedCategories,
+    saveCategory,
+    setPopupState,
+    popupState,
+    settings,
+    selectedBudgetId
+  } = useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
@@ -54,11 +55,12 @@ function CategoriesView({ addTx }: Props) {
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
             savedCategories={savedCategories[selectedBudgetId]}
+            editMode={popupState.editMode}
             settings={settings}
             onSaveCategory={(categoryId) =>
               saveCategory({ categoryId, budgetId: selectedBudgetId })
             }
-            addTx={addTx}
+            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
         ))}
     </>
@@ -71,15 +73,17 @@ export function CategoryGroupView({
   budgetData,
   savedCategories,
   onSaveCategory,
+  editMode,
   settings,
-  addTx
+  onAddTx
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
   savedCategories?: string[];
   onSaveCategory: (categoryId: string) => void;
+  editMode?: boolean;
   settings: AppSettings;
-  addTx: (initialState: AddTransactionInitialState) => void;
+  onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -112,7 +116,7 @@ export function CategoryGroupView({
               currencyFormat={budgetData.currencyFormat}
               settings={settings}
               actionElementsLeft={
-                savedCategories?.some((id) => id === category.id) ? (
+                !editMode ? null : savedCategories?.some((id) => id === category.id) ? (
                   <IconButton
                     icon={
                       <Pinned
@@ -146,7 +150,7 @@ export function CategoryGroupView({
                         <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
                       }
                       label="Add transaction"
-                      onClick={() => addTx({ categoryId: category.id })}
+                      onClick={() => onAddTx({ categoryId: category.id })}
                     />
                   )}
                 </aside>

@@ -15,7 +15,6 @@ import {
   useStorageContext,
   useYNABContext
 } from "~lib/context";
-import { useAddTransaction } from "~lib/useAddTransaction";
 
 import "./global.css";
 
@@ -28,19 +27,8 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { settings, saveCategoriesForBudget, selectedBudgetId } = useStorageContext();
+  const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
-  const { savedCategoriesData } = useYNABContext();
-  const { addTxState, openAddTransaction, closeAddTransaction } = useAddTransaction();
-
-  const onDragEnd: OnDragEndResponder = (result) => {
-    console.log("onDragEnd:", result);
-    if (!savedCategoriesData || !result.destination) return;
-    const currentCategoryIds = savedCategoriesData.map((c) => c.id);
-    const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
-    currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
-    saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
-  };
 
   return (
     <div
@@ -53,23 +41,38 @@ export function PopupView() {
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />
-      ) : addTxState.show ? (
-        <TransactionAdd
-          initialState={addTxState.initialState}
-          closeForm={closeAddTransaction}
-        />
+      ) : popupState.view === "txAdd" ? (
+        <TransactionAdd />
       ) : (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <PopupNav />
-
-          <SavedCategoriesView addTx={openAddTransaction} />
-          <SavedAccountsView addTx={openAddTransaction} />
-
-          <CategoriesView addTx={openAddTransaction} />
-          <AccountsView addTx={openAddTransaction} />
-        </DragDropContext>
+        <MainPopup />
       )}
     </div>
+  );
+}
+
+function MainPopup() {
+  const { saveCategoriesForBudget, selectedBudgetId } = useStorageContext();
+  const { savedCategoriesData } = useYNABContext();
+
+  const onDragEnd: OnDragEndResponder = (result) => {
+    console.log("onDragEnd:", result);
+    if (!savedCategoriesData || !result.destination) return;
+    const currentCategoryIds = savedCategoriesData.map((c) => c.id);
+    const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
+    currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
+    saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
+  };
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <PopupNav />
+
+      <SavedCategoriesView />
+      <SavedAccountsView />
+
+      <CategoriesView />
+      <AccountsView />
+    </DragDropContext>
   );
 }
 
