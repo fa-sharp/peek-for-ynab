@@ -50,7 +50,7 @@ export default function SavedAccountsView() {
                           }
                           icon={
                             <Pinned
-                              size={"1.3rem"}
+                              size="1.2rem"
                               fill="var(--action)"
                               color="var(--action)"
                               strokeWidth={1}
@@ -65,7 +65,7 @@ export default function SavedAccountsView() {
                           rounded
                           accent
                           icon={
-                            <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
+                            <Plus size="1.2rem" color="var(--action)" strokeWidth={1} />
                           }
                           label="Add transaction"
                           onClick={() =>

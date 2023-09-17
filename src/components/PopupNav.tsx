@@ -102,7 +102,7 @@ export default function PopupNav() {
           icon={<Settings />}
         />
         <IconButton
-          label="Edit"
+          label={popupState.editMode ? "Done editing" : "Edit pinned items"}
           onClick={() => setPopupState({ view: "main", editMode: !popupState.editMode })}
           icon={popupState.editMode ? <PencilOff /> : <Pencil />}
         />

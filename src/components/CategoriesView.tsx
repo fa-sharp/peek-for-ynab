@@ -120,7 +120,7 @@ export function CategoryGroupView({
                 <IconButton
                   icon={
                     <Pinned
-                      size={"1.3rem"}
+                      size="1.2rem"
                       color="var(--action)"
                       fill="var(--action)"
                       strokeWidth={1}
@@ -132,7 +132,7 @@ export function CategoryGroupView({
                 />
               ) : (
                 <IconButton
-                  icon={<Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                  icon={<Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />}
                   label="Pin"
                   onClick={() => onSaveCategory(category.id)}
                 />
@@ -144,7 +144,7 @@ export function CategoryGroupView({
                   <IconButton
                     rounded
                     accent
-                    icon={<Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />}
+                    icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
                     label="Add transaction"
                     onClick={() => onAddTx({ categoryId: category.id })}
                   />

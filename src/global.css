@@ -242,11 +242,11 @@ button {
   background-color: var(--accent-hover);
 }
 
-.warn {
+.warn:not(:disabled) {
   background-color: var(--warn);
 }
 
-.warn:hover {
+.warn:hover:not(:disabled) {
   background-color: var(--warn-hover);
 }
 

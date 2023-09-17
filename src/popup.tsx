@@ -59,16 +59,16 @@ function MainPopup() {
     if (!result.destination) return;
     if (result.source.droppableId === "savedCategories") {
       if (!savedCategoriesData) return;
-      const currentCategoryIds = savedCategoriesData.map((c) => c.id);
-      const [toBeReordered] = currentCategoryIds.splice(result.source.index, 1);
-      currentCategoryIds.splice(result.destination.index, 0, toBeReordered);
-      saveCategoriesForBudget(selectedBudgetId, currentCategoryIds);
+      const savedCategoryIds = savedCategoriesData.map((c) => c.id);
+      const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
+      savedCategoryIds.splice(result.destination.index, 0, categoryId);
+      saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
     } else if (result.source.droppableId === "savedAccounts") {
       if (!savedAccountsData) return;
-      const currentAccountIds = savedAccountsData.map((a) => a.id);
-      const [toBeReordered] = currentAccountIds.splice(result.source.index, 1);
-      currentAccountIds.splice(result.destination.index, 0, toBeReordered);
-      saveAccountsForBudget(selectedBudgetId, currentAccountIds);
+      const savedAccountIds = savedAccountsData.map((a) => a.id);
+      const [accountId] = savedAccountIds.splice(result.source.index, 1);
+      savedAccountIds.splice(result.destination.index, 0, accountId);
+      saveAccountsForBudget(selectedBudgetId, savedAccountIds);
     }
   };
 
