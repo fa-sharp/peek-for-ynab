@@ -103,6 +103,10 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
   font-family: "Open Sans", sans-serif;
+}
+
+.form-input input:not(:disabled),
+.form-input textarea:not(:disabled) {
   color: currentColor;
   background-color: var(--background);
 }
