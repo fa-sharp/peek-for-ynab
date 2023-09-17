@@ -4,9 +4,8 @@ import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
-import { useYNABContext } from "~lib/context";
+import { useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
-import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
@@ -20,13 +19,16 @@ function CategoriesView() {
     settings,
     selectedBudgetId
   } = useStorageContext();
-  const { selectedBudgetData, categoryGroupsData } = useYNABContext();
+  const { selectedBudgetData, savedCategoriesData, categoryGroupsData } =
+    useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
+
+  // activate edit mode if there are no pinned categories
   useEffect(() => {
-    // auto-expand if there are no saved categories
-    if (savedCategories && !savedCategories[selectedBudgetId]?.length) setExpanded(true);
-  }, [savedCategories, selectedBudgetId]);
+    if (savedCategoriesData && savedCategoriesData.length === 0)
+      setPopupState({ view: "main", editMode: true });
+  }, [savedCategoriesData, setPopupState]);
 
   if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
 
