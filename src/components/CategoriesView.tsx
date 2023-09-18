@@ -19,16 +19,15 @@ function CategoriesView() {
     settings,
     selectedBudgetId
   } = useStorageContext();
-  const { selectedBudgetData, savedCategoriesData, categoryGroupsData } =
-    useYNABContext();
+  const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
   // activate edit mode if there are no pinned categories
   useEffect(() => {
-    if (savedCategoriesData && savedCategoriesData.length === 0)
+    if (savedCategories && !savedCategories?.[selectedBudgetId]?.length)
       setPopupState({ view: "main", editMode: true });
-  }, [savedCategoriesData, setPopupState]);
+  }, [savedCategories, selectedBudgetId, setPopupState]);
 
   if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
 
