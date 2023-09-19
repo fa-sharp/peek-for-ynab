@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap");
 
 :root {
   --accent: hsl(204, 100%, 88%);
@@ -125,8 +125,8 @@ button {
 
   margin-block: var(--spacing-sm);
 
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .heading-medium {
@@ -137,12 +137,11 @@ button {
   margin-block: var(--spacing-xs);
 
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .heading-bordered {
-  border-radius: var(--border-radius);
-  border: solid 1px var(--border-light);
+  border-bottom: solid 1px var(--border-light);
 }
 
 .balance-display {
