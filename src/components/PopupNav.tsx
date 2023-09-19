@@ -5,6 +5,8 @@ import {
   ArrowsDownUp,
   Check,
   ExternalLink,
+  Pencil,
+  PencilOff,
   Refresh,
   Settings
 } from "tabler-icons-react";
@@ -14,8 +16,14 @@ import { useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { selectedBudgetId, settings, tokenRefreshNeeded, setSelectedBudgetId } =
-    useStorageContext();
+  const {
+    selectedBudgetId,
+    settings,
+    tokenRefreshNeeded,
+    popupState,
+    setPopupState,
+    setSelectedBudgetId
+  } = useStorageContext();
   const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
     useYNABContext();
   const globalIsFetching = useIsFetching();
@@ -92,6 +100,11 @@ export default function PopupNav() {
           label="Settings"
           onClick={() => chrome?.runtime?.openOptionsPage()}
           icon={<Settings />}
+        />
+        <IconButton
+          label={popupState.editMode ? "Done editing" : "Edit pinned items"}
+          onClick={() => setPopupState({ view: "main", editMode: !popupState.editMode })}
+          icon={popupState.editMode ? <PencilOff /> : <Pencil />}
         />
       </div>
     </nav>

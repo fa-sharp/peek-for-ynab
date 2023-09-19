@@ -237,10 +237,10 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
-    /** API data: List of all open accounts in current budget (if accounts enabled in settings) */
+    /** API data: List of all open accounts in current budget*/
     accountsData,
     accountsLastUpdated,
-    /** API data: List of all payees in current budget (if transactions enabled in settings) */
+    /** API data: List of all payees in current budget */
     payeesData,
     /** API data: Currently selected budget */
     selectedBudgetData,

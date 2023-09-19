@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -29,6 +29,11 @@ export interface AppSettings {
   currentTabAccess: boolean;
 }
 
+export interface TxAddInitialState {
+  accountId?: string;
+  categoryId?: string;
+}
+
 /** A category saved by the user */
 export interface SavedCategory {
   categoryId: string;
@@ -41,7 +46,7 @@ export interface SavedAccount {
   budgetId: string;
 }
 
-export const TOKEN_STORAGE = new Storage({ area: "local" });
+const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
@@ -74,6 +79,16 @@ const useStorageProvider = () => {
     defaultValue: ""
   });
 
+  /** Current popup state - not persisted */
+  const [popupState, setPopupState] = useState<{
+    view: "main" | "txAdd";
+    editMode?: boolean;
+    txAddState?: TxAddInitialState;
+  }>({
+    view: "main",
+    editMode: false
+  });
+
   const storageArea = useMemo(
     () => (settings.sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
     [settings.sync]
@@ -84,15 +99,19 @@ const useStorageProvider = () => {
     { key: "budgets", instance: storageArea },
     (data, isHydrated) => {
       if (!isHydrated) return undefined;
-      else if (!data) {
-        return selectedBudgetId ? [selectedBudgetId] : [];
-      }
+      else if (!data) return selectedBudgetId ? [selectedBudgetId] : [];
+      // select first budget if no budget is currently selected
+      if (data[0] && !selectedBudgetId) setSelectedBudgetId(data[0]);
       return data;
     }
   );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
-  const [savedCategories, setSavedCategories] = useExtensionStorage<
+  const [
+    savedCategories,
+    setSavedCategories,
+    { setRenderValue: setSavedCategoriesRender }
+  ] = useExtensionStorage<
     | undefined
     | {
         [budgetId: string]: string[] | undefined;
@@ -102,14 +121,15 @@ const useStorageProvider = () => {
   );
 
   /** The account IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
-  const [savedAccounts, setSavedAccounts] = useExtensionStorage<
-    | undefined
-    | {
-        [budgetId: string]: string[] | undefined;
-      }
-  >({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
-    !isHydrated ? undefined : !data ? {} : data
-  );
+  const [savedAccounts, setSavedAccounts, { setRenderValue: setSavedAccountsRender }] =
+    useExtensionStorage<
+      | undefined
+      | {
+          [budgetId: string]: string[] | undefined;
+        }
+    >({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
+      !isHydrated ? undefined : !data ? {} : data
+    );
 
   const changeSetting = <K extends keyof AppSettings>(
     key: K,
@@ -131,6 +151,14 @@ const useStorageProvider = () => {
         ]
       });
   };
+  const saveCategoriesForBudget = (budgetId: string, categoryIds: string[]) => {
+    const newSavedCategories = {
+      ...savedCategories,
+      [budgetId]: categoryIds
+    };
+    setSavedCategoriesRender(newSavedCategories);
+    setSavedCategories(newSavedCategories);
+  };
   const removeCategory = (savedCategory: SavedCategory) => {
     setSavedCategories({
       ...savedCategories,
@@ -151,6 +179,14 @@ const useStorageProvider = () => {
           newAccount.accountId
         ]
       });
+  };
+  const saveAccountsForBudget = (budgetId: string, accountIds: string[]) => {
+    const newSavedAccounts = {
+      ...savedAccounts,
+      [budgetId]: accountIds
+    };
+    setSavedAccountsRender(newSavedAccounts);
+    setSavedAccounts(newSavedAccounts);
   };
   const removeAccount = (savedAccount: SavedAccount) => {
     setSavedAccounts({
@@ -189,6 +225,8 @@ const useStorageProvider = () => {
     setTokenData,
     tokenRefreshNeeded,
     setTokenRefreshNeeded,
+    popupState,
+    setPopupState,
     settings,
     changeSetting,
     selectedBudgetId,
@@ -198,6 +236,8 @@ const useStorageProvider = () => {
     toggleShowBudget,
     savedCategories,
     saveCategory,
+    saveCategoriesForBudget,
+    saveAccountsForBudget,
     removeCategory,
     savedAccounts,
     saveAccount,
