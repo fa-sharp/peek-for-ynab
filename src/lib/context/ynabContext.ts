@@ -194,7 +194,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
         return response.data.transactions;
       },
@@ -209,7 +209,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
         return response.data.transactions;
       },
@@ -237,10 +237,10 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
-    /** API data: List of all open accounts in current budget (if accounts enabled in settings) */
+    /** API data: List of all open accounts in current budget*/
     accountsData,
     accountsLastUpdated,
-    /** API data: List of all payees in current budget (if transactions enabled in settings) */
+    /** API data: List of all payees in current budget */
     payeesData,
     /** API data: Currently selected budget */
     selectedBudgetData,

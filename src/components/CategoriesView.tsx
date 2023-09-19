@@ -4,28 +4,30 @@ import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
-import { useYNABContext } from "~lib/context";
-import type { AppSettings } from "~lib/context/storageContext";
-import { useStorageContext } from "~lib/context/storageContext";
+import { useStorageContext, useYNABContext } from "~lib/context";
+import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
-interface Props {
-  addTx: (initialState: AddTransactionInitialState) => void;
-}
-
 /** View of all categories in a budget, grouped by category groups */
-function CategoriesView({ addTx }: Props) {
-  const { savedCategories, saveCategory, settings, selectedBudgetId } =
-    useStorageContext();
+function CategoriesView() {
+  const {
+    savedCategories,
+    saveCategory,
+    setPopupState,
+    popupState,
+    settings,
+    selectedBudgetId
+  } = useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
+
+  // activate edit mode if there are no pinned categories
   useEffect(() => {
-    // auto-expand if there are no saved categories
-    if (savedCategories && !savedCategories[selectedBudgetId]?.length) setExpanded(true);
-  }, [savedCategories, selectedBudgetId]);
+    if (savedCategories && !savedCategories?.[selectedBudgetId]?.length)
+      setPopupState({ view: "main", editMode: true });
+  }, [savedCategories, selectedBudgetId, setPopupState]);
 
   if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
 
@@ -54,11 +56,12 @@ function CategoriesView({ addTx }: Props) {
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
             savedCategories={savedCategories[selectedBudgetId]}
+            editMode={popupState.editMode}
             settings={settings}
             onSaveCategory={(categoryId) =>
               saveCategory({ categoryId, budgetId: selectedBudgetId })
             }
-            addTx={addTx}
+            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
         ))}
     </>
@@ -71,15 +74,17 @@ export function CategoryGroupView({
   budgetData,
   savedCategories,
   onSaveCategory,
+  editMode,
   settings,
-  addTx
+  onAddTx
 }: {
   categoryGroup: CategoryGroupWithCategories;
   budgetData: CachedBudget;
   savedCategories?: string[];
   onSaveCategory: (categoryId: string) => void;
+  editMode?: boolean;
   settings: AppSettings;
-  addTx: (initialState: AddTransactionInitialState) => void;
+  onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -105,57 +110,49 @@ export function CategoryGroupView({
         <div role="heading">{categoryGroup.name}</div>
       </div>
       {expanded &&
-        categoryGroup.categories.map((category, idx) => (
-          <Fragment key={category.id}>
-            <CategoryView
-              categoryData={category}
-              currencyFormat={budgetData.currencyFormat}
-              settings={settings}
-              actionElementsLeft={
-                savedCategories?.some((id) => id === category.id) ? (
-                  <IconButton
-                    icon={
-                      <Pinned
-                        size={"1.3rem"}
-                        color="var(--action)"
-                        fill="var(--action)"
-                        strokeWidth={1}
-                      />
-                    }
-                    label="Pinned"
-                    disabled
-                    noAction
-                  />
-                ) : (
-                  <IconButton
-                    icon={
-                      <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                    }
-                    label="Pin"
-                    onClick={() => onSaveCategory(category.id)}
-                  />
-                )
-              }
-              actionElementsRight={
-                <aside className="balance-actions" aria-label="actions">
-                  {categoryGroup.name !== "Credit Card Payments" && (
-                    <IconButton
-                      rounded
-                      accent
-                      icon={
-                        <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                      }
-                      label="Add transaction"
-                      onClick={() => addTx({ categoryId: category.id })}
+        categoryGroup.categories.map((category) => (
+          <CategoryView
+            key={category.id}
+            categoryData={category}
+            currencyFormat={budgetData.currencyFormat}
+            settings={settings}
+            actionElementsLeft={
+              !editMode ? null : savedCategories?.some((id) => id === category.id) ? (
+                <IconButton
+                  icon={
+                    <Pinned
+                      size="1.2rem"
+                      color="var(--action)"
+                      fill="var(--action)"
+                      strokeWidth={1}
                     />
-                  )}
-                </aside>
-              }
-            />
-            {idx !== categoryGroup.categories.length - 1 && (
-              <div className="sep-line-h"></div>
-            )}
-          </Fragment>
+                  }
+                  label="Pinned"
+                  disabled
+                  noAction
+                />
+              ) : (
+                <IconButton
+                  icon={<Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                  label="Pin"
+                  onClick={() => onSaveCategory(category.id)}
+                />
+              )
+            }
+            actionElementsRight={
+              <aside className="balance-actions" aria-label="actions">
+                {categoryGroup.name !== "Credit Card Payments" && (
+                  <IconButton
+                    rounded
+                    accent
+                    icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                    label="Add transaction"
+                    onClick={() => onAddTx({ categoryId: category.id })}
+                  />
+                )}
+              </aside>
+            }
+          />
         ))}
     </>
   );

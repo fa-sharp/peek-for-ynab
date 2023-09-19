@@ -2,11 +2,10 @@ import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
-import { SaveTransaction, TransactionDetail } from "ynab";
+import { SaveTransactionClearedEnum, SaveTransactionFlagColorEnum } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/useAddTransaction";
 import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,
@@ -19,15 +18,10 @@ import {
 
 import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 
-interface Props {
-  initialState?: AddTransactionInitialState;
-  closeForm: () => void;
-}
-
 /** Form that lets user add a transaction. */
-export default function TransactionAdd({ initialState, closeForm }: Props) {
+export default function TransactionAdd() {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
-  const { settings } = useStorageContext();
+  const { settings, popupState, setPopupState } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(false);
   const [date, setDate] = useState(getTodaysDateISO);
@@ -36,12 +30,14 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
-    if (!initialState?.categoryId) return null;
-    return categoriesData?.find((c) => c.id === initialState.categoryId) || null;
+    if (!popupState.txAddState?.categoryId) return null;
+    return (
+      categoriesData?.find((c) => c.id === popupState.txAddState?.categoryId) || null
+    );
   });
   const [account, setAccount] = useState(() => {
-    if (!initialState?.accountId) return null;
-    return accountsData?.find((a) => a.id === initialState.accountId) || null;
+    if (!popupState.txAddState?.accountId) return null;
+    return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
   });
   const [memo, setMemo] = useState("");
   const [flag, setFlag] = useState("");
@@ -138,15 +134,13 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
         account_id: account.id,
         category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
         cleared: cleared
-          ? SaveTransaction.ClearedEnum.Cleared
-          : SaveTransaction.ClearedEnum.Uncleared,
+          ? SaveTransactionClearedEnum.Cleared
+          : SaveTransactionClearedEnum.Uncleared,
         approved: settings.txApproved,
         memo,
-        flag_color: flag
-          ? (flag as unknown as TransactionDetail.FlagColorEnum)
-          : undefined
+        flag_color: flag ? (flag as unknown as SaveTransactionFlagColorEnum) : undefined
       });
-      closeForm();
+      setPopupState({ view: "main" });
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
       setErrorMessage("Error adding transaction! " + (err?.error?.detail || ""));
@@ -243,7 +237,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             <AccountSelect
               accounts={accountsData}
               selectAccount={(account) => {
-                if (!account) {
+                if (!account || !account.transfer_payee_id) {
                   setPayee(null);
                   return;
                 }
@@ -309,9 +303,9 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
               value={flag}
               onChange={(e) => setFlag(e.target.value)}>
               <option value="">None</option>
-              {Object.entries(TransactionDetail.FlagColorEnum).map(
-                ([flagName, flagValue], idx) =>
-                  idx % 2 === 0 && (
+              {Object.entries(SaveTransactionFlagColorEnum).map(
+                ([flagName, flagValue]) =>
+                  flagValue !== "null" && (
                     <option key={flagValue} value={flagValue}>
                       {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
                     </option>
@@ -340,7 +334,7 @@ export default function TransactionAdd({ initialState, closeForm }: Props) {
             type="button"
             className="button rounded warn mt-lg"
             style={{ flex: 1 }}
-            onClick={() => closeForm()}
+            onClick={() => setPopupState({ view: "main" })}
             disabled={isSaving}>
             Cancel
           </button>
