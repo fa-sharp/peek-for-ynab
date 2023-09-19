@@ -1,0 +1,15 @@
+body {
+  font-size: 0.9rem;
+}
+
+a {
+  color: currentColor;
+}
+
+p {
+  line-height: 1.4rem;
+}
+
+li {
+  margin-bottom: 0.1rem;
+}

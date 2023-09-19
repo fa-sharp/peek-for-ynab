@@ -1,0 +1,21 @@
+.nav {
+  display: flex;
+  gap: 1rem;
+
+  font-size: 1rem;
+}
+
+.currentPage {
+  font-weight: bold;
+}
+
+.mainContent {
+  max-width: 100ch;
+  margin-top: 1rem;
+  margin-inline: auto;
+}
+
+.pageContent {
+  max-width: 85ch;
+  margin-inline: auto;
+}

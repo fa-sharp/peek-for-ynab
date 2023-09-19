@@ -1,34 +1,36 @@
 import Head from "next/head";
 import Image from "next/image";
-import Link from "next/link";
+
+import WebLayout from "~components/website/WebLayout";
 
 function IndexPage() {
   return (
-    <main>
+    <WebLayout>
       <Head>
         <title>Peek for YNAB</title>
       </Head>
       <h1>Peek for YNAB</h1>
-      <Link href="/privacy">Privacy Policy</Link>
+      <h3>A Chrome extension to quickly check on your budget*</h3>
+      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <Image src="/screenshots/light-pinned.png" width={400} height={330} />
+        <Image src="/screenshots/dark-pinned.png" width={400} height={330} />
+      </div>
       <h2>Features</h2>
       <ul>
-        <li>View all your current category and account balances at a glance</li>
+        <li>View your current category and account balances</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
-        <li>Quickly switch between your budgets</li>
-        <li>Sync your pinned categories, accounts, and budgets to your Chrome profile</li>
-        <li>Fully keyboard accessible</li>
+        <li>Support for multiple budgets</li>
+        <li>Dark mode</li>
       </ul>
+
       <h2>Coming soon!</h2>
       <ul>
         <li>Multi-browser support</li>
       </ul>
-      <h2>Screenshots</h2>
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <Image src="/screenshots/collapsed-view.png" width={300} height={250} />
-        <Image src="/screenshots/expanded-view.png" width={300} height={500} />
-      </div>
-    </main>
+      <br />
+      <p>* (before those midnight impulse purchases 😉)</p>
+    </WebLayout>
   );
 }
 
