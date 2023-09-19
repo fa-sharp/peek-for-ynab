@@ -147,13 +147,13 @@ export const extractCurrencyAmounts = () => {
 };
 
 export const flagColorToEmoji = (
-  flagColor: ynab.SaveTransaction.FlagColorEnum | string
+  flagColor: ynab.SaveTransactionFlagColorEnum | string
 ) => {
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Blue) return "🔵";
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Green) return "🟢";
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Orange) return "🟠";
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Purple) return "🟣";
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Red) return "🔴";
-  if (flagColor === ynab.SaveTransaction.FlagColorEnum.Yellow) return "🟡";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Blue) return "🔵";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Green) return "🟢";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Orange) return "🟠";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Purple) return "🟣";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Red) return "🔴";
+  if (flagColor === ynab.SaveTransactionFlagColorEnum.Yellow) return "🟡";
   return null;
 };

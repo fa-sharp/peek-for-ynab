@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
-import { SaveTransaction, TransactionDetail } from "ynab";
+import { SaveTransactionClearedEnum, SaveTransactionFlagColorEnum } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -134,13 +134,11 @@ export default function TransactionAdd() {
         account_id: account.id,
         category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
         cleared: cleared
-          ? SaveTransaction.ClearedEnum.Cleared
-          : SaveTransaction.ClearedEnum.Uncleared,
+          ? SaveTransactionClearedEnum.Cleared
+          : SaveTransactionClearedEnum.Uncleared,
         approved: settings.txApproved,
         memo,
-        flag_color: flag
-          ? (flag as unknown as TransactionDetail.FlagColorEnum)
-          : undefined
+        flag_color: flag ? (flag as unknown as SaveTransactionFlagColorEnum) : undefined
       });
       setPopupState({ view: "main" });
     } catch (err: any) {
@@ -239,7 +237,7 @@ export default function TransactionAdd() {
             <AccountSelect
               accounts={accountsData}
               selectAccount={(account) => {
-                if (!account) {
+                if (!account || !account.transfer_payee_id) {
                   setPayee(null);
                   return;
                 }
@@ -305,9 +303,9 @@ export default function TransactionAdd() {
               value={flag}
               onChange={(e) => setFlag(e.target.value)}>
               <option value="">None</option>
-              {Object.entries(TransactionDetail.FlagColorEnum).map(
-                ([flagName, flagValue], idx) =>
-                  idx % 2 === 0 && (
+              {Object.entries(SaveTransactionFlagColorEnum).map(
+                ([flagName, flagValue]) =>
+                  flagValue !== "null" && (
                     <option key={flagValue} value={flagValue}>
                       {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
                     </option>

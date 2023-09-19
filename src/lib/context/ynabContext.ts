@@ -194,7 +194,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
         return response.data.transactions;
       },
@@ -209,7 +209,7 @@ const useYNABProvider = () => {
         const response = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS) // since 10 days ago
+          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
         return response.data.transactions;
       },
