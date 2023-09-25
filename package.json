@@ -5,6 +5,7 @@
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
   "packageManager": "pnpm@8.6.0",
+  "homepage": "https://peek-for-ynab.vercel.app",
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
     "dev:plasmo:edge": "plasmo dev --target=edge-mv3 --port 3001",
