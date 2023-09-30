@@ -68,7 +68,7 @@ function HelpPage() {
               &nbsp;Category and account data has been updated within the last 4 minutes.
             </li>
             <li>
-              <AlertTriangle color="var(--warn)" />
+              <AlertTriangle color="var(--stale)" />
               &nbsp;Category & account balances/data may be out of date, as they have not
               been updated within the last 4 minutes. Close and re-open the extension to
               refresh data.
@@ -79,14 +79,6 @@ function HelpPage() {
               refreshing is complete.
             </li>
           </ul>
-        </li>
-        <li>
-          <h3>I love this extension!</h3>
-          <p>I&apos;m so glad!!</p>
-        </li>
-        <li>
-          <h3>I don&apos;t like this extension. It sucks.</h3>
-          <p>I understand.</p>
         </li>
       </ul>
     </WebLayout>
