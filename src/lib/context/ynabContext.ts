@@ -23,7 +23,6 @@ const useYNABProvider = () => {
   const { tokenExpired } = useAuthContext();
   const {
     tokenData,
-    settings,
     selectedBudgetId,
     savedAccounts,
     savedCategories,
@@ -133,9 +132,7 @@ const useYNABProvider = () => {
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
-    enabled: Boolean(
-      (settings.showAccounts || settings.txEnabled) && ynabAPI && selectedBudgetId
-    ),
+    enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
@@ -158,9 +155,9 @@ const useYNABProvider = () => {
   /** Fetch payees for the selected budget (if user enables transactions) */
   const { data: payeesData } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
-    staleTime: ONE_DAY_IN_MILLIS,
+    staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
     cacheTime: TWO_WEEKS_IN_MILLIS,
-    enabled: Boolean(settings.txEnabled && ynabAPI && selectedBudgetId),
+    enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
@@ -242,10 +239,10 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
-    /** API data: List of all open accounts in current budget (if accounts enabled in settings) */
+    /** API data: List of all open accounts in current budget*/
     accountsData,
     accountsLastUpdated,
-    /** API data: List of all payees in current budget (if transactions enabled in settings) */
+    /** API data: List of all payees in current budget */
     payeesData,
     /** API data: Currently selected budget */
     selectedBudgetData,

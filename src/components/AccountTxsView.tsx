@@ -1,36 +1,34 @@
 import React, { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
-import { useYNABContext } from "~lib/context";
-import type { TransactionsViewState } from "~lib/usePopupState";
+import { useStorageContext, useYNABContext } from "~lib/context";
 
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 import TransactionView from "./TransactionView";
 
-type Props = {
-  id: string;
-  onOpenTxsView?: (state: TransactionsViewState) => void;
-  onBack?: () => void;
-};
-
-const AccountTxsView = ({ id, onBack, onOpenTxsView }: Props) => {
+const AccountTxsView = () => {
+  const { popupState, setPopupState } = useStorageContext();
   const { useGetAccountTxs, accountsData, selectedBudgetData } = useYNABContext();
 
   const account = useMemo(
-    () => accountsData?.find((a) => a.id === id),
-    [accountsData, id]
+    () => accountsData?.find((a) => a.id === popupState.detailState?.id),
+    [accountsData, popupState.detailState?.id]
   );
-  const { data: accountTxs } = useGetAccountTxs(id);
+  const { data: accountTxs } = useGetAccountTxs(popupState.detailState?.id);
 
-  // Todo: Loading/error states
+  // TODO: Loading/error states
   if (!account || !accountTxs || !selectedBudgetData) return null;
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h2 className="heading-big mb-small">{account.name}</h2>
-        <IconButton icon={<ArrowBack />} label="Back to main view" onClick={onBack} />
+        <IconButton
+          icon={<ArrowBack />}
+          label="Back to main view"
+          onClick={() => setPopupState({ view: "main" })}
+        />
       </div>
       <div className="flex-col">
         <div className="balance-display">
@@ -68,9 +66,11 @@ const AccountTxsView = ({ id, onBack, onOpenTxsView }: Props) => {
             tx={tx}
             detailRight="category"
             detailRightOnClick={() =>
-              onOpenTxsView &&
               tx.category_id &&
-              onOpenTxsView({ id: tx.category_id, type: "category" })
+              setPopupState({
+                view: "detail",
+                detailState: { id: tx.category_id, type: "category" }
+              })
             }
             currencyFormat={selectedBudgetData.currencyFormat}
           />

@@ -1,13 +1,14 @@
 import type { CachedBudget } from "~lib/context/ynabContext";
+import { findEmoji } from "~lib/utils";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({
-  small,
+  emojiMode,
   shownBudgets: budgets,
   selectedBudgetId,
   setSelectedBudgetId
 }: {
-  small?: boolean;
+  emojiMode?: boolean;
   shownBudgets: CachedBudget[];
   selectedBudgetId: string;
   setSelectedBudgetId: (budgetId: string) => void;
@@ -16,14 +17,14 @@ export default function BudgetSelect({
     return (
       <div
         style={{
-          maxWidth: small ? "6rem" : "11rem",
+          maxWidth: emojiMode ? "5rem" : "9rem",
           marginInline: 4,
           fontWeight: 500,
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis"
         }}>
-        {budgets[0].name}
+        {emojiMode ? findEmoji(budgets[0].name) || budgets[0].name : budgets[0].name}
       </div>
     );
 
@@ -34,7 +35,7 @@ export default function BudgetSelect({
       style={{
         flex: 1,
         width: "100%",
-        maxWidth: small ? "6rem" : "11rem",
+        maxWidth: emojiMode ? "5rem" : "9rem",
         fontWeight: 500,
         textOverflow: "ellipsis"
       }}
@@ -43,7 +44,7 @@ export default function BudgetSelect({
       {!selectedBudgetId && <option value="initial">--Select a budget--</option>}
       {budgets.map((budget) => (
         <option key={budget.id} value={budget.id}>
-          {budget.name}
+          {emojiMode ? findEmoji(budget.name) || budget.name : budget.name}
         </option>
       ))}
     </select>

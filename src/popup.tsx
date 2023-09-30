@@ -1,3 +1,5 @@
+import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
+
 import {
   AccountTxsView,
   AccountsView,
@@ -9,8 +11,12 @@ import {
   SavedCategoriesView,
   TransactionAdd
 } from "~components";
-import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
-import { usePopupState } from "~lib/usePopupState";
+import {
+  AppProvider,
+  useAuthContext,
+  useStorageContext,
+  useYNABContext
+} from "~lib/context";
 
 import "./global.css";
 
@@ -23,9 +29,8 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { settings } = useStorageContext();
+  const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
-  const { popupState, openAddTransaction, openPopupView, openTxsView } = usePopupState();
 
   return (
     <div
@@ -33,47 +38,58 @@ export function PopupView() {
         flexDirection: "column",
         padding: 16,
         minWidth: settings.emojiMode ? "150px" : "240px",
-        width: "max-content"
+        width: "max-content",
+        maxWidth: "340px"
       }}>
       {authLoading ? null : !loggedIn ? (
         <PopupLogin />
-      ) : popupState.page === "main" ? (
-        <>
-          <PopupNav />
-
-          <SavedCategoriesView
-            addTx={openAddTransaction}
-            listTx={(categoryId) => openTxsView({ type: "category", id: categoryId })}
-          />
-          <SavedAccountsView
-            addTx={openAddTransaction}
-            listTx={(accountId) => openTxsView({ type: "account", id: accountId })}
-          />
-
-          <CategoriesView addTx={openAddTransaction} />
-          <AccountsView addTx={openAddTransaction} />
-        </>
-      ) : popupState.page === "addTx" ? (
-        <TransactionAdd
-          initialState={popupState.addTxInitialState}
-          closeForm={openPopupView}
-        />
-      ) : popupState.page === "txView" && popupState.txsViewState?.type === "account" ? (
-        <AccountTxsView
-          id={popupState.txsViewState.id}
-          onBack={openPopupView}
-          onOpenTxsView={openTxsView}
-        />
-      ) : popupState.page === "txView" && popupState.txsViewState?.type === "category" ? (
-        <CategoryTxsView
-          id={popupState.txsViewState.id}
-          onBack={openPopupView}
-          onOpenTxsView={openTxsView}
-        />
+      ) : popupState.view === "main" ? (
+        <MainPopup />
+      ) : popupState.view === "txAdd" ? (
+        <TransactionAdd />
+      ) : popupState.view === "detail" && popupState.detailState?.type === "account" ? (
+        <AccountTxsView />
+      ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
+        <CategoryTxsView />
       ) : (
-        "Invalid popup state!"
+        "Something went wrong 😢!"
       )}
     </div>
+  );
+}
+
+function MainPopup() {
+  const { saveCategoriesForBudget, saveAccountsForBudget, selectedBudgetId } =
+    useStorageContext();
+  const { savedCategoriesData, savedAccountsData } = useYNABContext();
+
+  const onDragEnd: OnDragEndResponder = (result) => {
+    if (!result.destination) return;
+    if (result.source.droppableId === "savedCategories") {
+      if (!savedCategoriesData) return;
+      const savedCategoryIds = savedCategoriesData.map((c) => c.id);
+      const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
+      savedCategoryIds.splice(result.destination.index, 0, categoryId);
+      saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
+    } else if (result.source.droppableId === "savedAccounts") {
+      if (!savedAccountsData) return;
+      const savedAccountIds = savedAccountsData.map((a) => a.id);
+      const [accountId] = savedAccountIds.splice(result.source.index, 1);
+      savedAccountIds.splice(result.destination.index, 0, accountId);
+      saveAccountsForBudget(selectedBudgetId, savedAccountIds);
+    }
+  };
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <PopupNav />
+
+      <SavedCategoriesView />
+      <SavedAccountsView />
+
+      <CategoriesView />
+      <AccountsView />
+    </DragDropContext>
   );
 }
 

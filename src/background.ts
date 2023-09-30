@@ -4,7 +4,6 @@ import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import { type TokenData } from "~lib/context/storageContext";
 
 const tokenStorage = new Storage({ area: "local" });
-
 let isRefreshing = false;
 
 tokenStorage.watch({

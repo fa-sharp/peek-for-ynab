@@ -1,29 +1,34 @@
 import type { ReactElement } from "react";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings, SavedAccount } from "~lib/context/storageContext";
+import type {
+  AppSettings,
+  SavedAccount,
+  TxAddInitialState
+} from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import type { AddTransactionInitialState } from "~lib/usePopupState";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
-interface Props {
-  addTx: (initialState: AddTransactionInitialState) => void;
-}
-
 /** View of all accounts in a budget, grouped by Budget / Tracking */
-function AccountsView({ addTx }: Props) {
-  const { savedAccounts, selectedBudgetId, saveAccount, settings } = useStorageContext();
+function AccountsView() {
+  const {
+    savedAccounts,
+    selectedBudgetId,
+    saveAccount,
+    setPopupState,
+    popupState,
+    settings
+  } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!settings.showAccounts || !selectedBudgetData || !accountsData || !savedAccounts)
-    return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts) return null;
 
   return (
     <>
@@ -35,9 +40,9 @@ function AccountsView({ addTx }: Props) {
           onClick={() => setExpanded(!expanded)}
           icon={
             expanded ? (
-              <ChevronUp size={24} color="black" strokeWidth={2} />
+              <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
             ) : (
-              <ChevronDown size={24} color="black" strokeWidth={2} />
+              <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
             )
           }
         />
@@ -50,18 +55,20 @@ function AccountsView({ addTx }: Props) {
             accountsData={accountsData.filter((a) => a.on_budget)}
             savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
+            editMode={popupState.editMode}
             budgetData={selectedBudgetData}
             settings={settings}
-            addTx={addTx}
+            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
           <AccountTypeView
             accountType="Tracking"
             accountsData={accountsData.filter((a) => !a.on_budget)}
             savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
+            editMode={popupState.editMode}
             budgetData={selectedBudgetData}
             settings={settings}
-            addTx={addTx}
+            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
         </>
       )}
@@ -77,7 +84,8 @@ function AccountTypeView({
   saveAccount,
   savedAccounts,
   settings,
-  addTx
+  editMode,
+  onAddTx
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -85,7 +93,8 @@ function AccountTypeView({
   savedAccounts?: string[];
   saveAccount: (account: SavedAccount) => void;
   settings: AppSettings;
-  addTx: (initialState: AddTransactionInitialState) => void;
+  editMode?: boolean;
+  onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -108,57 +117,49 @@ function AccountTypeView({
         <div role="heading">{accountType}</div>
       </div>
       {expanded &&
-        accountsData.map((account, idx) => (
-          <Fragment key={account.id}>
-            <AccountView
-              account={account}
-              currencyFormat={budgetData.currencyFormat}
-              settings={settings}
-              actionElementsLeft={
-                savedAccounts?.some((id) => id === account.id) ? (
-                  <IconButton
-                    icon={
-                      <Pinned
-                        size={"1.3rem"}
-                        color="var(--action)"
-                        fill="var(--action)"
-                        strokeWidth={1}
-                      />
-                    }
-                    label="Pinned"
-                    disabled
-                    noAction
-                  />
-                ) : (
-                  <IconButton
-                    icon={
-                      <Pinned size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                    }
-                    label="Pin"
-                    onClick={() =>
-                      saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                    }
-                  />
-                )
-              }
-              actionElementsRight={
-                <aside className="balance-actions" aria-label="actions">
-                  {settings.txEnabled && (
-                    <IconButton
-                      rounded
-                      accent
-                      icon={
-                        <Plus size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                      }
-                      label="Add transaction"
-                      onClick={() => addTx({ accountId: account.id })}
+        accountsData.map((account) => (
+          <AccountView
+            key={account.id}
+            account={account}
+            currencyFormat={budgetData.currencyFormat}
+            settings={settings}
+            actionElementsLeft={
+              !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
+                <IconButton
+                  icon={
+                    <Pinned
+                      size="1.2rem"
+                      color="var(--action)"
+                      fill="var(--action)"
+                      strokeWidth={1}
                     />
-                  )}
-                </aside>
-              }
-            />
-            {idx !== accountsData.length - 1 && <div className="sep-line-h" />}
-          </Fragment>
+                  }
+                  label="Pinned"
+                  disabled
+                  noAction
+                />
+              ) : (
+                <IconButton
+                  icon={<Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                  label="Pin"
+                  onClick={() =>
+                    saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                  }
+                />
+              )
+            }
+            actionElementsRight={
+              <aside className="balance-actions" aria-label="actions">
+                <IconButton
+                  rounded
+                  accent
+                  icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                  label="Add transaction"
+                  onClick={() => onAddTx({ accountId: account.id })}
+                />
+              </aside>
+            }
+          />
         ))}
     </>
   );
@@ -187,9 +188,13 @@ export const AccountView = ({
           ? `${name}: ${formatCurrency(balance, currencyFormat)}`
           : undefined
       }>
-      <div className="flex-row">
+      <div className="flex-row min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? <span className="font-big">{foundEmoji}</span> : name}
+        {foundEmoji ? (
+          <span className="font-big">{foundEmoji}</span>
+        ) : (
+          <div className="hide-overflow">{name}</div>
+        )}
       </div>
       <div className="flex-row">
         <CurrencyView
