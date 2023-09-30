@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { ChevronDown, ChevronRight } from "tabler-icons-react";
 import * as ynab from "ynab";
 
+import { flagColorToEmoji } from "~lib/utils";
+
 import CurrencyView from "./CurrencyView";
-import IconButton from "./IconButton";
 import TxStatusIcon from "./TxStatusIcon";
+
+const dateFormatter = new Intl.DateTimeFormat("default", {
+  month: "numeric",
+  day: "numeric"
+});
 
 export default function TransactionView({
   tx,
@@ -19,27 +23,23 @@ export default function TransactionView({
   detailRightOnClick?: () => void;
   currencyFormat?: ynab.CurrencyFormat;
 }) {
-  const [expanded, setExpanded] = useState(false);
   const date = ynab.utils.convertFromISODateString(tx.date);
 
   return (
-    <>
+    <div
+      style={{
+        borderBottom: "solid 1px var(--border-light)"
+      }}>
       <div
-        className="balance-display cursor-pointer"
-        onClick={() => setExpanded((prev) => !prev)}>
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 6
+        }}>
         <div className="flex-row">
-          <IconButton
-            icon={
-              expanded ? (
-                <ChevronDown color="var(--action)" size="0.9rem" />
-              ) : (
-                <ChevronRight color="var(--action)" size="0.9rem" />
-              )
-            }
-            label={expanded ? "Collapse" : "Expand"}
-          />
-          <div>{`${date.getUTCMonth() + 1}/${date.getUTCDate()}`}</div>
-          {tx.payee_name}
+          {tx.flag_color && flagColorToEmoji(tx.flag_color)}
+          <div>{dateFormatter.format(date)}</div>
+          <div className="hide-overflow">{tx.payee_name}</div>
         </div>
         <div className="flex-row">
           <CurrencyView
@@ -50,38 +50,33 @@ export default function TransactionView({
           <TxStatusIcon status={tx.cleared} />
         </div>
       </div>
-      {expanded && (
-        <div
-          className="font-small"
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "6px"
+        }}>
+        <button
+          className="button accent cursor-pointer font-small"
           style={{
-            position: "relative",
-            bottom: "var(--list-gap-sm)",
-            display: "flex",
-            justifyContent: "space-between",
-            gap: "4px"
-          }}>
-          {tx.memo && detailLeft === "memo" ? (
-            <div>
-              {tx.memo.slice(0, 35)}
-              {tx.memo.length > 35 ? "..." : ""}
-            </div>
-          ) : (
-            <div></div>
-          )}
-          <div
-            className="accent cursor-pointer"
-            style={{
-              paddingInline: "4px"
-            }}
-            onClick={detailRightOnClick}>
-            {tx.transfer_account_id
-              ? "Transfer"
-              : detailRight === "category"
-              ? tx.category_name
-              : tx.account_name}
-          </div>
-        </div>
-      )}
-    </>
+            border: "none",
+            flexShrink: 0,
+            padding: "2px 5px"
+          }}
+          onClick={detailRightOnClick}>
+          {tx.transfer_account_id
+            ? "Transfer"
+            : detailRight === "category"
+            ? tx.category_name
+            : tx.account_name}
+        </button>
+        {tx.memo && detailLeft === "memo" ? (
+          <div className="font-small hide-overflow">{tx.memo}</div>
+        ) : (
+          <div></div>
+        )}
+      </div>
+    </div>
   );
 }
