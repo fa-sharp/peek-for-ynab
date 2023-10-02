@@ -1,7 +1,14 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import { CircleC, Minus, Plus, SwitchHorizontal, Wand } from "tabler-icons-react";
+import {
+  CircleC,
+  Minus,
+  Plus,
+  SwitchHorizontal,
+  SwitchVertical,
+  Wand
+} from "tabler-icons-react";
 import { SaveTransactionClearedEnum, SaveTransactionFlagColorEnum } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -69,6 +76,25 @@ export default function TransactionAdd() {
     if (!transferToAccount) return false;
     return !transferToAccount.on_budget && account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
+
+  /** Switch the To and From account for a transfer */
+  const switchToFromAccounts = useCallback(() => {
+    const newAccount =
+      payee && "transferId" in payee
+        ? accountsData?.find((a) => a.id === payee.transferId)
+        : null;
+    const newPayee =
+      account && account.transfer_payee_id
+        ? {
+            id: account.transfer_payee_id,
+            name: account.name,
+            transferId: account.id
+          }
+        : null;
+    console.log({ newAccount, newPayee });
+    setAccount(newAccount || null);
+    setPayee(newPayee);
+  }, [account, accountsData, payee]);
 
   const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
   const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
@@ -219,7 +245,7 @@ export default function TransactionAdd() {
               disabled={isSaving}
             />
             <AccountSelect
-              initialAccount={account}
+              currentAccount={account}
               accounts={accountsData}
               selectAccount={setAccount}
               disabled={isSaving}
@@ -228,14 +254,26 @@ export default function TransactionAdd() {
         ) : (
           <>
             <AccountSelect
-              initialAccount={account}
+              currentAccount={account}
               accounts={accountsData}
               selectAccount={setAccount}
               isTransfer="from"
               disabled={isSaving}
             />
+            <div className="flex-row">
+              <IconButton
+                icon={<SwitchVertical />}
+                label="Switch 'From' and 'To' accounts"
+                onClick={switchToFromAccounts}
+              />
+            </div>
             <AccountSelect
               accounts={accountsData}
+              currentAccount={
+                payee && "transferId" in payee
+                  ? accountsData?.find((a) => a.id === payee.transferId) || null
+                  : null
+              }
               selectAccount={(account) => {
                 if (!account || !account.transfer_payee_id) {
                   setPayee(null);

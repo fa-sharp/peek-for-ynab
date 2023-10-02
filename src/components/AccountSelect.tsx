@@ -7,7 +7,7 @@ import { useYNABContext } from "~lib/context";
 import { formatCurrency } from "~lib/utils";
 
 interface Props {
-  initialAccount?: Account | null;
+  currentAccount?: Account | null;
   accounts?: Account[];
   selectAccount: (account: Account | null) => void;
   isTransfer?: "from" | "to";
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function AccountSelect({
-  initialAccount,
+  currentAccount,
   accounts,
   selectAccount,
   isTransfer,
@@ -46,7 +46,7 @@ export default function AccountSelect({
     selectedItem
   } = useCombobox<Account | null>({
     items: accountList,
-    initialSelectedItem: initialAccount,
+    selectedItem: currentAccount,
     itemToString(account) {
       if (!account) return "";
       return `${account.name} (${formatCurrency(
