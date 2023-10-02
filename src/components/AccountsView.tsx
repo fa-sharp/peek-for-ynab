@@ -116,51 +116,57 @@ function AccountTypeView({
         />
         <div role="heading">{accountType}</div>
       </div>
-      {expanded &&
-        accountsData.map((account) => (
-          <AccountView
-            key={account.id}
-            account={account}
-            currencyFormat={budgetData.currencyFormat}
-            settings={settings}
-            actionElementsLeft={
-              !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
-                <IconButton
-                  icon={
-                    <Pinned
-                      size="1.2rem"
-                      color="var(--action)"
-                      fill="var(--action)"
-                      strokeWidth={1}
+      {expanded && (
+        <ul className="list">
+          {accountsData.map((account) => (
+            <li key={account.id}>
+              <AccountView
+                account={account}
+                currencyFormat={budgetData.currencyFormat}
+                settings={settings}
+                actionElementsLeft={
+                  !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
+                    <IconButton
+                      icon={
+                        <Pinned
+                          size="1.2rem"
+                          color="var(--action)"
+                          fill="var(--action)"
+                          strokeWidth={1}
+                        />
+                      }
+                      label="Pinned"
+                      disabled
+                      noAction
                     />
-                  }
-                  label="Pinned"
-                  disabled
-                  noAction
-                />
-              ) : (
-                <IconButton
-                  icon={<Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />}
-                  label="Pin"
-                  onClick={() =>
-                    saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                  }
-                />
-              )
-            }
-            actionElementsRight={
-              <aside className="balance-actions" aria-label="actions">
-                <IconButton
-                  rounded
-                  accent
-                  icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
-                  label="Add transaction"
-                  onClick={() => onAddTx({ accountId: account.id })}
-                />
-              </aside>
-            }
-          />
-        ))}
+                  ) : (
+                    <IconButton
+                      icon={
+                        <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
+                      }
+                      label="Pin"
+                      onClick={() =>
+                        saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                      }
+                    />
+                  )
+                }
+                actionElementsRight={
+                  <aside className="balance-actions" aria-label="actions">
+                    <IconButton
+                      rounded
+                      accent
+                      icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                      label="Add transaction"
+                      onClick={() => onAddTx({ accountId: account.id })}
+                    />
+                  </aside>
+                }
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

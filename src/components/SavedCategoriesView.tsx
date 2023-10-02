@@ -18,10 +18,11 @@ export default function SavedCategoriesView() {
   return (
     <Droppable droppableId="savedCategories" isDropDisabled={!popupState.editMode}>
       {(provided) => (
-        <section
+        <ul
           {...provided.droppableProps}
           ref={provided.innerRef}
-          aria-label="Saved categories">
+          aria-label="Saved categories"
+          className="list">
           {savedCategoriesData.map((category, idx) => (
             <Draggable
               draggableId={category.id}
@@ -29,7 +30,7 @@ export default function SavedCategoriesView() {
               index={idx}
               isDragDisabled={!popupState.editMode}>
               {(provided) => (
-                <div
+                <li
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
@@ -78,12 +79,12 @@ export default function SavedCategoriesView() {
                       </aside>
                     }
                   />
-                </div>
+                </li>
               )}
             </Draggable>
           ))}
           {provided.placeholder}
-        </section>
+        </ul>
       )}
     </Droppable>
   );

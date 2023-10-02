@@ -193,6 +193,12 @@ button {
   cursor: initial;
 }
 
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .select {
   padding: 0.25rem;
   font-family: "Open Sans", sans-serif;
