@@ -28,7 +28,7 @@ function AccountsView() {
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !accountsData || !savedAccounts) return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
 
   return (
     <>

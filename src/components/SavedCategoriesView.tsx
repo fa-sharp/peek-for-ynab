@@ -10,7 +10,12 @@ export default function SavedCategoriesView() {
   const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
   const { selectedBudgetData, savedCategoriesData } = useYNABContext();
 
-  if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
+  if (
+    !selectedBudgetData ||
+    !savedCategoriesData ||
+    !settings ||
+    savedCategoriesData.length === 0
+  )
     return null;
 
   const { currencyFormat } = selectedBudgetData;

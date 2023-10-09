@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Fragment, useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
@@ -23,13 +23,8 @@ function CategoriesView() {
 
   const [expanded, setExpanded] = useState(false);
 
-  // activate edit mode if there are no pinned categories
-  useEffect(() => {
-    if (savedCategories && !savedCategories?.[selectedBudgetId]?.length)
-      setPopupState({ view: "main", editMode: true });
-  }, [savedCategories, selectedBudgetId, setPopupState]);
-
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
+  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
+    return null;
 
   return (
     <>

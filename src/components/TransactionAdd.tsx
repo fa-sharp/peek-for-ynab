@@ -33,7 +33,7 @@ export default function TransactionAdd() {
   const [isTransfer, setIsTransfer] = useState(false);
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState("");
-  const [cleared, setCleared] = useState(settings.txCleared ? true : false);
+  const [cleared, setCleared] = useState(settings?.txCleared ? true : false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
   const [category, setCategory] = useState(() => {
@@ -54,7 +54,7 @@ export default function TransactionAdd() {
 
   // Try parsing user's selection as the amount
   useEffect(() => {
-    if (!settings.currentTabAccess) return;
+    if (!settings?.currentTabAccess) return;
     requestCurrentTabPermissions().then((granted) => {
       if (!granted) return;
       executeScriptInCurrentTab(() => getSelection()?.toString())
@@ -67,7 +67,7 @@ export default function TransactionAdd() {
           !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
         });
     });
-  }, [settings.currentTabAccess]);
+  }, [settings?.currentTabAccess]);
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
@@ -162,7 +162,7 @@ export default function TransactionAdd() {
         cleared: cleared
           ? SaveTransactionClearedEnum.Cleared
           : SaveTransactionClearedEnum.Uncleared,
-        approved: settings.txApproved,
+        approved: settings?.txApproved,
         memo,
         flag_color: flag ? (flag as unknown as SaveTransactionFlagColorEnum) : undefined
       });
@@ -226,7 +226,7 @@ export default function TransactionAdd() {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
-            {settings.currentTabAccess && (
+            {settings?.currentTabAccess && (
               <IconButton
                 icon={<Wand />}
                 label="Detect amount"

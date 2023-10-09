@@ -18,12 +18,14 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, changeSetting, shownBudgetIds, toggleShowBudget } =
+  const { settings, syncEnabled, changeSetting, shownBudgetIds, toggleShowBudget } =
     useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   const [loggingIn, setLoggingIn] = useState(false);
+
+  if (!settings) return null;
 
   return (
     <section
@@ -57,9 +59,9 @@ export function OptionsView() {
             title="Sync pinned categories/accounts/budgets to your browser profile">
             <input
               type="checkbox"
-              checked={settings.sync}
+              checked={syncEnabled}
               onChange={(e) => {
-                const confirmMessage = settings.sync
+                const confirmMessage = syncEnabled
                   ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
                   : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
                 const confirmed = confirm(confirmMessage);
@@ -69,7 +71,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync with browser profile
+            🔄 Sync pinned categories & accounts
           </label>
           <label
             className="flex-row mb-small"

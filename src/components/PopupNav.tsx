@@ -42,7 +42,7 @@ export default function PopupNav() {
   }, [selectedBudgetId]);
 
   if (!shownBudgetsData && isRefreshingBudgets) return <p>Loading budgets...</p>;
-  if (!shownBudgetsData) return null;
+  if (!shownBudgetsData || !settings) return null;
 
   return (
     <nav

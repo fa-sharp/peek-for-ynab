@@ -111,8 +111,11 @@ const useAuthProvider = () => {
     login,
     loginWithOAuth,
     logout,
+    /** Whether authentication/token data is loading */
     authLoading: tokenData === undefined,
+    /** Whether token data is present. Check `authLoading` first */
     loggedIn: tokenData != null,
+    /** Whether token is expired and needs to be refreshed. */
     tokenExpired
   };
 };
