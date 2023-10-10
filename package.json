@@ -69,6 +69,13 @@
     ],
     "options_ui": {
       "open_in_tab": true
+    },
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Alt+Shift+Y"
+        }
+      }
     }
   }
 }
