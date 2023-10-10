@@ -15,7 +15,7 @@ function HelpPage() {
         <li>
           <h3>Which balances are displayed in the extension?</h3>
           <p>
-            For your categories, the extension displays the Available Balance in the
+            For your categories, the extension displays the Available amount in the
             current month. For your accounts, the extension displays the current Working
             Balance. Keep in mind the extension reflects what your budget looks like in
             YNAB <i>right now</i> - e.g. if transactions have not imported from your bank
@@ -47,6 +47,15 @@ function HelpPage() {
             If you usually enter transactions as Cleared in YNAB, you will want to check
             the <b>Cleared</b> setting under <b>Transaction defaults</b>. This way, all
             transactions entered via the extension will be marked as Cleared by default.
+          </p>
+        </li>
+        <li>
+          <h3>Are there keyboard shortcuts to open/use the extension?</h3>
+          <p>
+            Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
+            (you can change this by heading over to chrome://extensions/shortcuts in your
+            browser). From there, you can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>,{" "}
+            <kbd>Space</kbd>, and <kbd>Enter</kbd> keys to navigate the extension.
           </p>
         </li>
         <li>

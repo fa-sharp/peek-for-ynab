@@ -6,7 +6,7 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
-import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 
 export interface TokenData {
   accessToken: string;
@@ -24,7 +24,7 @@ export interface AppSettings {
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
   /** Whether data is synced to the user's Chrome profile */
-  sync: boolean;
+  // sync: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
 }
@@ -51,28 +51,24 @@ const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
-  /** The token used to authenticate the YNAB user */
+  /** The token used to authenticate the YNAB user. Stored locally. */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
   >({ key: TOKEN_STORAGE_KEY, instance: TOKEN_STORAGE }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
   );
-  /** Whether the token needs to be refreshed */
+
+  /** Whether the token needs refreshing. Setting this to `true` will trigger a background job to refresh token. */
   const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
     { key: REFRESH_NEEDED_KEY, instance: TOKEN_STORAGE },
     false
   );
 
-  const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
-    defaultValue: {
-      txApproved: true,
-      txCleared: false,
-      privateMode: false,
-      emojiMode: false,
-      sync: false,
-      currentTabAccess: false
-    }
-  });
+  /** Extension settings. Stored locally. */
+  const [settings, setSettings] = useExtensionStorage<AppSettings | undefined>(
+    "settings",
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
+  );
 
   /** The budget currently in view */
   const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
@@ -89,9 +85,14 @@ const useStorageProvider = () => {
     editMode: false
   });
 
+  /** Whether syncing is enabled */
+  const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
+    defaultValue: false
+  });
+
   const storageArea = useMemo(
-    () => (settings.sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
-    [settings.sync]
+    () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
+    [syncEnabled]
   );
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
@@ -131,11 +132,15 @@ const useStorageProvider = () => {
       !isHydrated ? undefined : !data ? {} : data
     );
 
-  const changeSetting = <K extends keyof AppSettings>(
+  const changeSetting = <K extends keyof AppSettings | "sync">(
     key: K,
-    newValue: AppSettings[K]
+    newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
   ) => {
-    setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
+    if (key === "sync") setSyncEnabled(newValue);
+    else
+      setSettings((prevSettings) =>
+        prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
+      );
   };
 
   const saveCategory = (newCategory: SavedCategory) => {
@@ -228,6 +233,7 @@ const useStorageProvider = () => {
     popupState,
     setPopupState,
     settings,
+    syncEnabled,
     changeSetting,
     selectedBudgetId,
     setSelectedBudgetId,

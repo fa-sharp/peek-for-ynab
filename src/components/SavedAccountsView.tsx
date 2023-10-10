@@ -10,17 +10,22 @@ export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
 
-  if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
+  if (
+    !savedAccountsData ||
+    !selectedBudgetData ||
+    !settings ||
+    savedAccountsData.length === 0
+  )
     return null;
 
   return (
     <Droppable droppableId="savedAccounts" isDropDisabled={!popupState.editMode}>
       {(provided) => (
-        <section
+        <ul
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Saved accounts"
-          className="mt-md">
+          className="list mt-md">
           {savedAccountsData.map((account, idx) => (
             <Draggable
               draggableId={account.id}
@@ -28,7 +33,7 @@ export default function SavedAccountsView() {
               index={idx}
               isDragDisabled={!popupState.editMode}>
               {(provided) => (
-                <div
+                <li
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
@@ -78,12 +83,12 @@ export default function SavedAccountsView() {
                       </aside>
                     }
                   />
-                </div>
+                </li>
               )}
             </Draggable>
           ))}
           {provided.placeholder}
-        </section>
+        </ul>
       )}
     </Droppable>
   );

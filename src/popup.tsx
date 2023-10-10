@@ -1,4 +1,5 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
+import { useEffect } from "react";
 
 import {
   AccountsView,
@@ -30,6 +31,8 @@ export function PopupView() {
   const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
 
+  if (authLoading || !settings) return null;
+
   return (
     <div
       style={{
@@ -39,7 +42,7 @@ export function PopupView() {
         width: "max-content",
         maxWidth: "340px"
       }}>
-      {authLoading ? null : !loggedIn ? (
+      {!loggedIn ? (
         <PopupLogin />
       ) : popupState.view === "txAdd" ? (
         <TransactionAdd />
@@ -51,9 +54,26 @@ export function PopupView() {
 }
 
 function MainPopup() {
-  const { saveCategoriesForBudget, saveAccountsForBudget, selectedBudgetId } =
-    useStorageContext();
+  const {
+    savedCategories,
+    savedAccounts,
+    saveCategoriesForBudget,
+    saveAccountsForBudget,
+    setPopupState,
+    selectedBudgetId
+  } = useStorageContext();
   const { savedCategoriesData, savedAccountsData } = useYNABContext();
+
+  // activate edit mode if there are no pinned categories or accounts
+  useEffect(() => {
+    if (
+      savedCategories &&
+      savedAccounts &&
+      !savedCategories[selectedBudgetId]?.length &&
+      !savedAccounts[selectedBudgetId]?.length
+    )
+      setPopupState({ view: "main", editMode: true });
+  }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
 
   const onDragEnd: OnDragEndResponder = (result) => {
     if (!result.destination) return;

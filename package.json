@@ -1,7 +1,7 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.12.0",
+  "version": "0.12.2",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
   "packageManager": "pnpm@8.6.0",
@@ -69,6 +69,13 @@
     ],
     "options_ui": {
       "open_in_tab": true
+    },
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Alt+Shift+Y"
+        }
+      }
     }
   }
 }
