@@ -23,8 +23,6 @@ export interface AppSettings {
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
-  /** Whether data is synced to the user's Chrome profile */
-  // sync: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
 }
@@ -64,12 +62,6 @@ const useStorageProvider = () => {
     false
   );
 
-  /** Extension settings. Stored locally. */
-  const [settings, setSettings] = useExtensionStorage<AppSettings | undefined>(
-    "settings",
-    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
-  );
-
   /** The budget currently in view */
   const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
     defaultValue: ""
@@ -93,6 +85,12 @@ const useStorageProvider = () => {
   const storageArea = useMemo(
     () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
     [syncEnabled]
+  );
+
+  /** Extension settings. Is synced if the user chooses. */
+  const [settings, setSettings] = useExtensionStorage<AppSettings | undefined>(
+    { key: "settings", instance: storageArea },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
   );
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
