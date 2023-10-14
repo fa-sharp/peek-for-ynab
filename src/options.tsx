@@ -45,7 +45,7 @@ export function OptionsView() {
               await loginWithOAuth();
               setLoggingIn(false);
             }}>
-            🔑 Login to YNAB
+            {!loggingIn ? "🔑 Login to YNAB" : "🔑 Logging in..."}
           </button>
         </>
       ) : (
