@@ -11,19 +11,13 @@ import { findEmoji, formatCurrency } from "~lib/utils";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const {
-    savedCategories,
-    saveCategory,
-    setPopupState,
-    popupState,
-    settings,
-    selectedBudgetId
-  } = useStorageContext();
+  const { saveCategory, setPopupState, budgetOptions, popupState, settings } =
+    useStorageContext();
   const { selectedBudgetData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
+  if (!selectedBudgetData || !categoryGroupsData || !budgetOptions || !settings)
     return null;
 
   return (
@@ -50,12 +44,10 @@ function CategoriesView() {
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
-            savedCategories={savedCategories[selectedBudgetId]}
+            savedCategories={budgetOptions.cats}
             editMode={popupState.editMode}
             settings={settings}
-            onSaveCategory={(categoryId) =>
-              saveCategory({ categoryId, budgetId: selectedBudgetId })
-            }
+            onSaveCategory={(categoryId) => saveCategory(categoryId)}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
         ))}

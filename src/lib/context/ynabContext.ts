@@ -24,8 +24,7 @@ const useYNABProvider = () => {
   const {
     tokenData,
     selectedBudgetId,
-    savedAccounts,
-    savedCategories,
+    budgetOptions: savedBudgetOptions,
     shownBudgetIds,
     setSelectedBudgetId,
     setShownBudgetIds
@@ -116,8 +115,8 @@ const useYNABProvider = () => {
 
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData) return null;
-    return savedCategories?.[selectedBudgetId]?.reduce<ynab.Category[]>(
+    if (!categoriesData || !savedBudgetOptions) return null;
+    return savedBudgetOptions.cats.reduce<ynab.Category[]>(
       (newArray, savedCategoryId) => {
         const categoryData = categoriesData.find(
           (category) => category.id === savedCategoryId
@@ -127,7 +126,7 @@ const useYNABProvider = () => {
       },
       []
     );
-  }, [categoriesData, savedCategories, selectedBudgetId]);
+  }, [categoriesData, savedBudgetOptions]);
 
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
@@ -174,9 +173,9 @@ const useYNABProvider = () => {
 
   /** Select data of only saved accounts from `accountsData` */
   const savedAccountsData = useMemo(() => {
-    if (!accountsData) return null;
+    if (!accountsData || !savedBudgetOptions) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return savedAccounts?.[selectedBudgetId]?.reduce<ynab.Account[]>(
+    return savedBudgetOptions.accounts.reduce<ynab.Account[]>(
       (newArray, savedAccountId) => {
         const accountData = accountsData.find((a) => a.id === savedAccountId);
         if (accountData) newArray.push(accountData);
@@ -184,7 +183,7 @@ const useYNABProvider = () => {
       },
       []
     );
-  }, [accountsData, savedAccounts, selectedBudgetId]);
+  }, [accountsData, savedBudgetOptions]);
 
   const useGetAccountTxs = (accountId: string) =>
     useQuery({
