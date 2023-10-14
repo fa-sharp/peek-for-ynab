@@ -15,6 +15,7 @@
     "dev:next": "next dev --port 3000",
     "build:next": "next build",
     "start:next": "next start",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
