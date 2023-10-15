@@ -32,9 +32,7 @@ export default function PopupNav() {
   const switchBudget = useCallback(() => {
     if (!shownBudgetsData) return;
     const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
-    if (currIndex >= shownBudgetsData.length - 1)
-      setSelectedBudgetId(shownBudgetsData[0].id);
-    else setSelectedBudgetId(shownBudgetsData[currIndex + 1].id);
+    setSelectedBudgetId(shownBudgetsData[(currIndex + 1) % shownBudgetsData.length].id);
   }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
 
   const openBudget = useCallback(() => {

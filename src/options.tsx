@@ -45,7 +45,7 @@ export function OptionsView() {
               await loginWithOAuth();
               setLoggingIn(false);
             }}>
-            🔑 Login to YNAB
+            {!loggingIn ? "🔑 Login to YNAB" : "🔑 Logging in..."}
           </button>
         </>
       ) : (
@@ -56,7 +56,7 @@ export function OptionsView() {
           </h3>
           <label
             className="flex-row mb-small"
-            title="Sync pinned categories/accounts/budgets to your browser profile">
+            title="Sync settings and pinned categories/accounts to your browser profile">
             <input
               type="checkbox"
               checked={syncEnabled}
@@ -71,7 +71,7 @@ export function OptionsView() {
                 }
               }}
             />
-            🔄 Sync pinned categories & accounts
+            🔄 Sync settings
           </label>
           <label
             className="flex-row mb-small"
