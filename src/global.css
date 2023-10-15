@@ -33,6 +33,7 @@
     --success: #63d035;
     --warn: hsl(0, 33%, 50%);
     --warn-hover: hsl(0, 33%, 59%);
+    --error: #ff6c6c;
     --highlight: hsla(0, 0%, 91%, 0.2);
     --currency-green: #61d231;
     --currency-red: #ff8888;
@@ -68,6 +69,10 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+}
+
+.flex-grow {
+  flex-grow: 1;
 }
 
 .min-w-0 {

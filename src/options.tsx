@@ -119,7 +119,7 @@ export function OptionsView() {
             Cleared
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Extra features
+            Permissions
           </h3>
           <label className="flex-row mb-small">
             <input
@@ -139,6 +139,7 @@ export function OptionsView() {
           </label>
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
+            <li>Copy the current URL into the memo field of the transaction</li>
             <li>(Experimental!) Detect transaction amounts on the page</li>
           </ul>
 

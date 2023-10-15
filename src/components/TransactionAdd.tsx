@@ -7,7 +7,8 @@ import {
   Plus,
   SwitchHorizontal,
   SwitchVertical,
-  Wand
+  Wand,
+  WorldWww
 } from "tabler-icons-react";
 import { SaveTransactionClearedEnum, SaveTransactionFlagColorEnum } from "ynab";
 
@@ -115,6 +116,12 @@ export default function TransactionAdd() {
       if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
       setDetectedAmountIdx(0);
     }
+  };
+
+  const onCopyURLIntoMemo = async () => {
+    if (!(await requestCurrentTabPermissions())) return;
+    const url = await executeScriptInCurrentTab(() => location.href);
+    setMemo((memo) => memo + url);
   };
 
   const flipAmountType: MouseEventHandler = (event) => {
@@ -300,12 +307,23 @@ export default function TransactionAdd() {
         )}
         <label className="form-input">
           Memo
-          <input
-            value={memo}
-            onChange={(e) => setMemo(e.target.value)}
-            disabled={isSaving}
-          />
+          <div className="flex-row">
+            <input
+              className="flex-grow"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              disabled={isSaving}
+            />
+            {settings?.currentTabAccess && (
+              <IconButton
+                icon={<WorldWww strokeWidth={1} />}
+                label="Copy URL into memo field"
+                onClick={onCopyURLIntoMemo}
+              />
+            )}
+          </div>
         </label>
+
         <label className="form-input">
           Date
           <input
