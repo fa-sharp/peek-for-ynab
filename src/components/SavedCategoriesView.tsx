@@ -48,7 +48,12 @@ export default function SavedCategoriesView() {
                       !popupState.editMode ? null : (
                         <IconButton
                           label="Unpin"
-                          onClick={() => removeCategory(category.id)}
+                          onClick={() =>
+                            removeCategory({
+                              categoryId: category.id,
+                              budgetId: selectedBudgetData.id
+                            })
+                          }
                           icon={
                             <Pinned
                               size={"1.2rem"}

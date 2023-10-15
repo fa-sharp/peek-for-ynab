@@ -5,20 +5,30 @@ import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
+import type {
+  AppSettings,
+  SavedAccount,
+  TxAddInitialState
+} from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
-  const { budgetOptions, saveAccount, setPopupState, popupState, settings } =
-    useStorageContext();
+  const {
+    savedAccounts,
+    selectedBudgetId,
+    saveAccount,
+    setPopupState,
+    popupState,
+    settings
+  } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !accountsData || !budgetOptions || !settings) return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
 
   return (
     <>
@@ -43,7 +53,7 @@ function AccountsView() {
           <AccountTypeView
             accountType="Budget"
             accountsData={accountsData.filter((a) => a.on_budget)}
-            savedAccounts={budgetOptions.accounts}
+            savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
             budgetData={selectedBudgetData}
@@ -53,7 +63,7 @@ function AccountsView() {
           <AccountTypeView
             accountType="Tracking"
             accountsData={accountsData.filter((a) => !a.on_budget)}
-            savedAccounts={budgetOptions.accounts}
+            savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
             budgetData={selectedBudgetData}
@@ -81,7 +91,7 @@ function AccountTypeView({
   accountsData: Account[];
   budgetData: CachedBudget;
   savedAccounts?: string[];
-  saveAccount: (id: string) => void;
+  saveAccount: (account: SavedAccount) => void;
   settings: AppSettings;
   editMode?: boolean;
   onAddTx: (initialState: TxAddInitialState) => void;
@@ -135,7 +145,9 @@ function AccountTypeView({
                         <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
                       }
                       label="Pin"
-                      onClick={() => saveAccount(account.id)}
+                      onClick={() =>
+                        saveAccount({ accountId: account.id, budgetId: budgetData.id })
+                      }
                     />
                   )
                 }

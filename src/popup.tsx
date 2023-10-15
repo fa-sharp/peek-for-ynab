@@ -54,15 +54,26 @@ export function PopupView() {
 }
 
 function MainPopup() {
-  const { budgetOptions, saveCategories, saveAccounts, setPopupState } =
-    useStorageContext();
+  const {
+    savedCategories,
+    savedAccounts,
+    saveCategoriesForBudget,
+    saveAccountsForBudget,
+    setPopupState,
+    selectedBudgetId
+  } = useStorageContext();
   const { savedCategoriesData, savedAccountsData } = useYNABContext();
 
   // activate edit mode if there are no pinned categories or accounts
   useEffect(() => {
-    if (budgetOptions && !budgetOptions.cats.length && !budgetOptions.accounts.length)
+    if (
+      savedCategories &&
+      savedAccounts &&
+      !savedCategories[selectedBudgetId]?.length &&
+      !savedAccounts[selectedBudgetId]?.length
+    )
       setPopupState({ view: "main", editMode: true });
-  }, [budgetOptions, setPopupState]);
+  }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
 
   const onDragEnd: OnDragEndResponder = (result) => {
     if (!result.destination) return;
@@ -71,13 +82,13 @@ function MainPopup() {
       const savedCategoryIds = savedCategoriesData.map((c) => c.id);
       const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
       savedCategoryIds.splice(result.destination.index, 0, categoryId);
-      saveCategories(savedCategoryIds);
+      saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
     } else if (result.source.droppableId === "savedAccounts") {
       if (!savedAccountsData) return;
       const savedAccountIds = savedAccountsData.map((a) => a.id);
       const [accountId] = savedAccountIds.splice(result.source.index, 1);
       savedAccountIds.splice(result.destination.index, 0, accountId);
-      saveAccounts(savedAccountIds);
+      saveAccountsForBudget(selectedBudgetId, savedAccountIds);
     }
   };
 
