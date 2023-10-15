@@ -5,11 +5,7 @@ import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type {
-  AppSettings,
-  SavedAccount,
-  TxAddInitialState
-} from "~lib/context/storageContext";
+import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
@@ -91,7 +87,7 @@ function AccountTypeView({
   accountsData: Account[];
   budgetData: CachedBudget;
   savedAccounts?: string[];
-  saveAccount: (account: SavedAccount) => void;
+  saveAccount: (accountId: string) => void;
   settings: AppSettings;
   editMode?: boolean;
   onAddTx: (initialState: TxAddInitialState) => void;
@@ -145,9 +141,7 @@ function AccountTypeView({
                         <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
                       }
                       label="Pin"
-                      onClick={() =>
-                        saveAccount({ accountId: account.id, budgetId: budgetData.id })
-                      }
+                      onClick={() => saveAccount(account.id)}
                     />
                   )
                 }

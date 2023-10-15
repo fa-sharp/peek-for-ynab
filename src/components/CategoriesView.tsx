@@ -53,9 +53,7 @@ function CategoriesView() {
             savedCategories={savedCategories[selectedBudgetId]}
             editMode={popupState.editMode}
             settings={settings}
-            onSaveCategory={(categoryId) =>
-              saveCategory({ categoryId, budgetId: selectedBudgetId })
-            }
+            onSaveCategory={(categoryId) => saveCategory(categoryId)}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
         ))}

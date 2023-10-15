@@ -47,12 +47,7 @@ export default function SavedAccountsView() {
                       !popupState.editMode ? null : (
                         <IconButton
                           label="Unpin"
-                          onClick={() =>
-                            removeAccount({
-                              accountId: account.id,
-                              budgetId: selectedBudgetData.id
-                            })
-                          }
+                          onClick={() => removeAccount(account.id)}
                           icon={
                             <Pinned
                               size="1.2rem"
