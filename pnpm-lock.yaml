@@ -29,6 +29,9 @@ dependencies:
   idb-keyval:
     specifier: ^6.2.1
     version: 6.2.1
+  json-formatter-js:
+    specifier: ^2.3.4
+    version: 2.3.4
   nanoid:
     specifier: ^4.0.2
     version: 4.0.2
@@ -4992,6 +4995,10 @@ packages:
 
   /json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
+
+  /json-formatter-js@2.3.4:
+    resolution: {integrity: sha512-gmAzYRtPRmYzeAT4T7+t3NhTF89JOAIioCVDddl9YDb3ls3kWcskirafw/MZGJaRhEU6fRimGJHl7CC7gaAI2Q==}
+    dev: false
 
   /json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}

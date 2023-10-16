@@ -27,6 +27,7 @@
     "cors": "^2.8.5",
     "downshift": "^6.1.12",
     "idb-keyval": "^6.2.1",
+    "json-formatter-js": "^2.3.4",
     "nanoid": "^4.0.2",
     "next": "^12.3.4",
     "plasmo": "^0.83.0",
