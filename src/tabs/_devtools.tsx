@@ -87,8 +87,6 @@ function Devtools() {
         <select value={area} onChange={(e) => setArea(e.target.value as StorageAreaName)}>
           <option>local</option>
           <option>sync</option>
-          <option>managed</option>
-          <option>session</option>
         </select>
       </div>
       <br />
@@ -154,7 +152,7 @@ const FormattedJSON = ({ value }: { value: string }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const spanElement = spanRef.current;
-    const formattedJson = new JSONFormatter(JSON.parse(value)).render();
+    const formattedJson = new JSONFormatter(JSON.parse(value), 2).render();
     spanElement?.appendChild(formattedJson);
 
     return () => {
