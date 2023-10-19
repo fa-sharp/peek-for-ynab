@@ -1,9 +1,13 @@
+import { type DehydratedState } from "@tanstack/react-query";
+import type { PersistedClient } from "@tanstack/react-query-persist-client";
+import { del, get } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
 import { useEffect, useRef, useState } from "react";
 
 import { Storage, type StorageAreaName } from "@plasmohq/storage";
 
 import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
+import { IDB_CACHE_KEY } from "~lib/indexedDBPersister";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
@@ -12,6 +16,7 @@ function Devtools() {
 
   const [area, setArea] = useState<StorageAreaName>("local");
   const [data, setData] = useState<Record<string, string>>({});
+  const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
 
   // Get permissions
@@ -43,6 +48,15 @@ function Devtools() {
       storage.primaryClient.onChanged.removeListener(storageListener);
     };
   }, [area]);
+
+  // Get cache
+  const loadCache = () =>
+    get<PersistedClient>(IDB_CACHE_KEY).then((client) =>
+      setCache(client?.clientState.queries)
+    );
+  useEffect(() => {
+    loadCache();
+  }, []);
 
   return (
     <div
@@ -78,10 +92,10 @@ function Devtools() {
         </>
       )}
 
-      <h3>Permissions</h3>
+      <h3>Browser Permissions</h3>
       {permissions}
 
-      <h3>Chrome Storage</h3>
+      <h3>Browser Storage</h3>
       <div>
         Storage Area:{" "}
         <select value={area} onChange={(e) => setArea(e.target.value as StorageAreaName)}>
@@ -128,12 +142,18 @@ function Devtools() {
                   {typeof JSON.parse(value) !== "object" ? (
                     value
                   ) : (
-                    <FormattedJSON value={value} />
+                    <FormattedJSON value={JSON.parse(value)} />
                   )}
                 </div>
               </div>
             )
         )}
+
+      <h3>API Cache</h3>
+      <div>
+        <button onClick={() => del(IDB_CACHE_KEY).then(loadCache)}>Clear cache</button>
+      </div>
+      {cache && <FormattedJSON value={cache} />}
     </div>
   );
 }
@@ -148,11 +168,11 @@ function DevtoolsWrapper() {
 
 export default DevtoolsWrapper;
 
-const FormattedJSON = ({ value }: { value: string }) => {
+const FormattedJSON = ({ value }: { value: object }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const spanElement = spanRef.current;
-    const formattedJson = new JSONFormatter(JSON.parse(value), 2).render();
+    const formattedJson = new JSONFormatter(value, 2).render();
     spanElement?.appendChild(formattedJson);
 
     return () => {
