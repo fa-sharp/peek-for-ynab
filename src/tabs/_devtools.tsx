@@ -151,6 +151,7 @@ function Devtools() {
 
       <h3>API Cache</h3>
       <div>
+        <button onClick={loadCache}>Refresh</button>
         <button onClick={() => del(IDB_CACHE_KEY).then(loadCache)}>Clear cache</button>
       </div>
       {cache && <FormattedJSON value={cache} />}

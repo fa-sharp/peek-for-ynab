@@ -15,6 +15,8 @@
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
+  --gray: hsl(0, 0%, 89%);
+  --gray-hover: hsl(0, 0%, 80%);
 
   --border-radius: 4px;
   --spacing-xs: 0.2rem;
@@ -29,7 +31,7 @@
     --border-light: #6e6e6e;
     --action: #ffffff;
     --accent: hsl(210, 40%, 39%);
-    --accent-hover: hsl(210, 43%, 48%);
+    --accent-hover: hsl(210, 43%, 50%);
     --success: #63d035;
     --warn: hsl(0, 33%, 50%);
     --warn-hover: hsl(0, 33%, 59%);
@@ -37,6 +39,8 @@
     --highlight: hsla(0, 0%, 91%, 0.2);
     --currency-green: #61d231;
     --currency-red: #ff8888;
+    --gray: hsl(0, 0%, 39%);
+    --gray-hover: hsl(0, 0%, 47%);
 
     color: white;
   }
@@ -263,6 +267,14 @@ button {
 
 .warn:hover:not(:disabled) {
   background-color: var(--warn-hover);
+}
+
+.gray:not(:disabled) {
+  background-color: var(--gray);
+}
+
+.gray:hover:not(:disabled) {
+  background-color: var(--gray-hover);
 }
 
 .error-message {

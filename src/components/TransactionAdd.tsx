@@ -388,7 +388,7 @@ export default function TransactionAdd() {
           </button>
           <button
             type="button"
-            className="button rounded warn mt-lg"
+            className="button gray rounded mt-lg"
             style={{ flex: 1 }}
             onClick={() => setPopupState({ view: "main" })}
             disabled={isSaving}>

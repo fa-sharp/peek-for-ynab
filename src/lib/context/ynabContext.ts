@@ -91,7 +91,7 @@ const useYNABProvider = () => {
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
   const { data: categoryGroupsData, dataUpdatedAt: categoriesLastUpdated } = useQuery({
-    queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`],
+    queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
@@ -131,7 +131,7 @@ const useYNABProvider = () => {
 
   /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
-    queryKey: ["accounts", `budgetId-${selectedBudgetId}`],
+    queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
@@ -144,17 +144,17 @@ const useYNABProvider = () => {
   const refreshCategoriesAndAccounts = useCallback(async () => {
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: ["categoryGroups", `budgetId-${selectedBudgetId}`]
+        queryKey: ["categoryGroups", { budgetId: selectedBudgetId }]
       }),
       queryClient.invalidateQueries({
-        queryKey: ["accounts", `budgetId-${selectedBudgetId}`]
+        queryKey: ["accounts", { budgetId: selectedBudgetId }]
       })
     ]);
   }, [queryClient, selectedBudgetId]);
 
   /** Fetch payees for the selected budget (if user enables transactions) */
   const { data: payeesData } = useQuery({
-    queryKey: ["payees", `budgetId-${selectedBudgetId}`],
+    queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
     cacheTime: TWO_WEEKS_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
@@ -188,7 +188,7 @@ const useYNABProvider = () => {
 
   const useGetAccountTxs = (accountId: string) =>
     useQuery({
-      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `accountId-${accountId}`],
+      queryKey: ["txs", { budgetId: selectedBudgetId }, `accountId-${accountId}`],
       queryFn: async () => {
         if (!ynabAPI) return;
         const response = await ynabAPI.transactions.getTransactionsByAccount(
@@ -203,7 +203,7 @@ const useYNABProvider = () => {
 
   const useGetCategoryTxs = (categoryId: string) =>
     useQuery({
-      queryKey: ["txs", `budgetId-${selectedBudgetId}`, `categoryId-${categoryId}`],
+      queryKey: ["txs", { budgetId: selectedBudgetId }, `categoryId-${categoryId}`],
       queryFn: async () => {
         if (!ynabAPI) return;
         const response = await ynabAPI.transactions.getTransactionsByCategory(
