@@ -198,31 +198,18 @@ const useStorageProvider = () => {
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
+      // Clean up saved categories and accounts for this budget
+      setSavedCategories({
+        ...savedCategories,
+        [budgetId]: undefined
+      });
+      setSavedAccounts({
+        ...savedAccounts,
+        [budgetId]: undefined
+      });
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
-  };
-
-  /** Clear unneeded storage to save space */
-  const clearExtraStorage = () => {
-    if (!shownBudgetIds || !savedAccounts || !savedCategories) return;
-    // Only keep saved accounts and categories for budgets that are shown, to save space
-    const newSavedAccounts = shownBudgetIds.reduce<BudgetToStringArrayMap>(
-      (obj, budgetId) => {
-        obj[budgetId] = savedAccounts[budgetId];
-        return obj;
-      },
-      {}
-    );
-    const newSavedCategories = shownBudgetIds.reduce<BudgetToStringArrayMap>(
-      (obj, budgetId) => {
-        obj[budgetId] = savedCategories[budgetId];
-        return obj;
-      },
-      {}
-    );
-    setSavedAccounts(newSavedAccounts);
-    setSavedCategories(newSavedCategories);
   };
 
   /** Clears all values, removes all saved data from browser storage */
@@ -258,7 +245,6 @@ const useStorageProvider = () => {
     savedAccounts,
     saveAccount,
     removeAccount,
-    clearExtraStorage,
     removeAllData
   };
 };

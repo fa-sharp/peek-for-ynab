@@ -3,7 +3,7 @@ import { del, get, set } from "idb-keyval";
 
 import { IS_PRODUCTION } from "./utils";
 
-const IDB_CACHE_KEY = "ynabCache";
+export const IDB_CACHE_KEY = "ynabCache";
 
 /** Creates an Indexed DB persister for React Query */
 export function createIDBPersister(
