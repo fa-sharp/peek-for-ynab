@@ -39,8 +39,8 @@
     --highlight: hsla(0, 0%, 91%, 0.2);
     --currency-green: #61d231;
     --currency-red: #ff8888;
-    --gray: hsl(0, 0%, 39%);
-    --gray-hover: hsl(0, 0%, 47%);
+    --gray: hsl(0, 0%, 26%);
+    --gray-hover: hsl(0, 0%, 36%);
 
     color: white;
   }

@@ -203,7 +203,7 @@ export default function TransactionAdd() {
             />
           )}
         </label>
-        <div className="form-input">
+        <label className="form-input" htmlFor="amount-input">
           Amount
           <div className="flex-row">
             {!isTransfer && (
@@ -222,6 +222,7 @@ export default function TransactionAdd() {
               />
             )}
             <input
+              id="amount-input"
               required
               autoFocus
               aria-label="Amount"
@@ -241,7 +242,7 @@ export default function TransactionAdd() {
               />
             )}
           </div>
-        </div>
+        </label>
         {!isTransfer ? (
           <>
             <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
