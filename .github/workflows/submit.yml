@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  submit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,16 +14,19 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-
-      - uses: pnpm/action-setup@v2.2.4
+      - uses: pnpm/action-setup@v2
         with:
           version: latest
           run_install: true
       - name: Use Node.js 18.x
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: "pnpm"
       - name: Package the extension into a zip artifact
+        env:
+          PLASMO_PUBLIC_MAIN_URL: https://peek-for-ynab.vercel.app
+          PLASMO_PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
         run: pnpm run build:plasmo:zip
       - name: Browser Platform Publish
         uses: PlasmoHQ/bpp@v3
