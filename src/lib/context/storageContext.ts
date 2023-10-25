@@ -92,8 +92,6 @@ const useStorageProvider = () => {
     (data, isHydrated) => {
       if (!isHydrated) return undefined;
       else if (!data) return selectedBudgetId ? [selectedBudgetId] : [];
-      // select first budget if no budget is currently selected
-      if (data[0] && !selectedBudgetId) setSelectedBudgetId(data[0]);
       return data;
     }
   );

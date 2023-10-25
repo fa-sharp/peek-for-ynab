@@ -12,6 +12,8 @@ const useAuthProvider = () => {
   const { tokenData, setTokenRefreshNeeded, setTokenData, removeAllData } =
     useStorageContext();
 
+  const queryClient = useQueryClient();
+
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
 
@@ -36,6 +38,11 @@ const useAuthProvider = () => {
   const loginWithOAuth = () =>
     new Promise<void>((resolve, reject) => {
       if (!process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+      // Clear API cache and local storage to avoid any leakage of data
+      queryClient.removeQueries();
+      queryClient.clear();
+      localStorage.clear();
+
       const authorizeState = nanoid();
       const authorizeParams = new URLSearchParams({
         client_id: process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID,
@@ -96,9 +103,6 @@ const useAuthProvider = () => {
         }
       );
     });
-
-  /** The current React Query client */
-  const queryClient = useQueryClient();
 
   /** Clears all data, including the user's token */
   const logout = async () => {
