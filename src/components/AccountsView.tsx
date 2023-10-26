@@ -1,6 +1,5 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
@@ -11,10 +10,13 @@ import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
 import {
+  AddTransactionIcon,
   CollapseListIcon,
   CollapseListIconBold,
   ExpandListIcon,
-  ExpandListIconBold
+  ExpandListIconBold,
+  PinItemIcon,
+  PinnedItemIcon
 } from "./icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
@@ -117,24 +119,10 @@ function AccountTypeView({
                 settings={settings}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
-                    <IconButton
-                      icon={
-                        <Pinned
-                          size="1.2rem"
-                          color="var(--action)"
-                          fill="var(--action)"
-                          strokeWidth={1}
-                        />
-                      }
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
+                    <IconButton icon={PinnedItemIcon} label="Pinned" disabled noAction />
                   ) : (
                     <IconButton
-                      icon={
-                        <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
-                      }
+                      icon={PinItemIcon}
                       label="Pin"
                       onClick={() => saveAccount(account.id)}
                     />
@@ -145,7 +133,14 @@ function AccountTypeView({
                     <IconButton
                       rounded
                       accent
-                      icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                      icon={AddTransactionIcon}
+                      label="Add transaction"
+                      onClick={() => onAddTx({ accountId: account.id })}
+                    />
+                    <IconButton
+                      rounded
+                      accent
+                      icon={AddTransactionIcon}
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />

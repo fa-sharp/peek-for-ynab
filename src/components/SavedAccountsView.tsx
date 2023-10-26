@@ -1,9 +1,10 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { Pinned, Plus } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";
 import { useStorageContext, useYNABContext } from "~lib/context";
+
+import { AddTransactionIcon, PinnedItemIcon } from "./icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -48,14 +49,7 @@ export default function SavedAccountsView() {
                         <IconButton
                           label="Unpin"
                           onClick={() => removeAccount(account.id)}
-                          icon={
-                            <Pinned
-                              size="1.2rem"
-                              fill="var(--action)"
-                              color="var(--action)"
-                              strokeWidth={1}
-                            />
-                          }
+                          icon={PinnedItemIcon}
                         />
                       )
                     }
@@ -64,9 +58,7 @@ export default function SavedAccountsView() {
                         <IconButton
                           rounded
                           accent
-                          icon={
-                            <Plus size="1.2rem" color="var(--action)" strokeWidth={1} />
-                          }
+                          icon={AddTransactionIcon}
                           label="Add transaction"
                           onClick={() =>
                             setPopupState({
