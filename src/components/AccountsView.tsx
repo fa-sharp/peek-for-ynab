@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
+import { Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
@@ -9,6 +9,13 @@ import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
+
+import {
+  CollapseListIcon,
+  CollapseListIconBold,
+  ExpandListIcon,
+  ExpandListIconBold
+} from "./icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
@@ -34,13 +41,7 @@ function AccountsView() {
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
-            )
-          }
+          icon={expanded ? CollapseListIconBold : ExpandListIconBold}
         />
         <div role="heading">Accounts</div>
       </div>
@@ -102,13 +103,7 @@ function AccountTypeView({
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
-            )
-          }
+          icon={expanded ? CollapseListIcon : ExpandListIcon}
         />
         <div role="heading">{accountType}</div>
       </div>

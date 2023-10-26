@@ -1,6 +1,5 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
@@ -8,6 +7,16 @@ import { useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
+
+import {
+  AddTransactionIcon,
+  CollapseListIcon,
+  CollapseListIconBold,
+  ExpandListIcon,
+  ExpandListIconBold,
+  PinItemIcon,
+  PinnedItemIcon
+} from "./icons/ActionIcons";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
@@ -34,13 +43,7 @@ function CategoriesView() {
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
-            )
-          }
+          icon={expanded ? CollapseListIconBold : ExpandListIconBold}
         />
         <div role="heading">Categories</div>
       </div>
@@ -81,7 +84,7 @@ export function CategoryGroupView({
 }) {
   const [expanded, setExpanded] = useState(false);
 
-  // skip Ready to Assign category group <div>{categoryGroup.categories[0].name}: {categoryGroup.categories[1].balance}</div>
+  // Skip Ready to Assign category group
   if (categoryGroup.name === "Internal Master Category") return null;
 
   return (
@@ -92,13 +95,7 @@ export function CategoryGroupView({
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
-            )
-          }
+          icon={expanded ? CollapseListIcon : ExpandListIcon}
         />
         <div role="heading">{categoryGroup.name}</div>
       </div>
@@ -112,43 +109,27 @@ export function CategoryGroupView({
                 settings={settings}
                 actionElementsLeft={
                   !editMode ? null : savedCategories?.some((id) => id === category.id) ? (
-                    <IconButton
-                      icon={
-                        <Pinned
-                          size="1.2rem"
-                          color="var(--action)"
-                          fill="var(--action)"
-                          strokeWidth={1}
-                        />
-                      }
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
+                    <IconButton icon={PinnedItemIcon} label="Pinned" disabled noAction />
                   ) : (
                     <IconButton
-                      icon={
-                        <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
-                      }
+                      icon={PinItemIcon}
                       label="Pin"
                       onClick={() => onSaveCategory(category.id)}
                     />
                   )
                 }
                 actionElementsRight={
-                  <aside className="balance-actions" aria-label="actions">
-                    {categoryGroup.name !== "Credit Card Payments" && (
+                  categoryGroup.name === "Credit Card Payments" ? null : (
+                    <aside className="balance-actions" aria-label="actions">
                       <IconButton
                         rounded
                         accent
-                        icon={
-                          <Plus size="1.2rem" color="var(--action)" strokeWidth={1} />
-                        }
+                        icon={AddTransactionIcon}
                         label="Add transaction"
                         onClick={() => onAddTx({ categoryId: category.id })}
                       />
-                    )}
-                  </aside>
+                    </aside>
+                  )
                 }
               />
             </li>
