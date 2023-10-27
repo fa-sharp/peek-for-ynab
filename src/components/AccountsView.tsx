@@ -43,7 +43,7 @@ function AccountsView() {
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={expanded ? CollapseListIconBold : ExpandListIconBold}
+          icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
         />
         <div role="heading">Accounts</div>
       </div>
@@ -105,7 +105,7 @@ function AccountTypeView({
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={expanded ? CollapseListIcon : ExpandListIcon}
+          icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
         />
         <div role="heading">{accountType}</div>
       </div>
@@ -119,10 +119,15 @@ function AccountTypeView({
                 settings={settings}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
-                    <IconButton icon={PinnedItemIcon} label="Pinned" disabled noAction />
+                    <IconButton
+                      icon={<PinnedItemIcon />}
+                      label="Pinned"
+                      disabled
+                      noAction
+                    />
                   ) : (
                     <IconButton
-                      icon={PinItemIcon}
+                      icon={<PinItemIcon />}
                       label="Pin"
                       onClick={() => saveAccount(account.id)}
                     />
@@ -133,14 +138,14 @@ function AccountTypeView({
                     <IconButton
                       rounded
                       accent
-                      icon={AddTransactionIcon}
+                      icon={<AddTransactionIcon />}
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />
                     <IconButton
                       rounded
                       accent
-                      icon={AddTransactionIcon}
+                      icon={<AddTransactionIcon />}
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />

@@ -43,7 +43,7 @@ function CategoriesView() {
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={expanded ? CollapseListIconBold : ExpandListIconBold}
+          icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
         />
         <div role="heading">Categories</div>
       </div>
@@ -95,7 +95,7 @@ export function CategoryGroupView({
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={expanded ? CollapseListIcon : ExpandListIcon}
+          icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
         />
         <div role="heading">{categoryGroup.name}</div>
       </div>
@@ -109,10 +109,15 @@ export function CategoryGroupView({
                 settings={settings}
                 actionElementsLeft={
                   !editMode ? null : savedCategories?.some((id) => id === category.id) ? (
-                    <IconButton icon={PinnedItemIcon} label="Pinned" disabled noAction />
+                    <IconButton
+                      icon={<PinnedItemIcon />}
+                      label="Pinned"
+                      disabled
+                      noAction
+                    />
                   ) : (
                     <IconButton
-                      icon={PinItemIcon}
+                      icon={<PinItemIcon />}
                       label="Pin"
                       onClick={() => onSaveCategory(category.id)}
                     />
@@ -124,7 +129,7 @@ export function CategoryGroupView({
                       <IconButton
                         rounded
                         accent
-                        icon={AddTransactionIcon}
+                        icon={<AddTransactionIcon />}
                         label="Add transaction"
                         onClick={() => onAddTx({ categoryId: category.id })}
                       />

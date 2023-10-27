@@ -50,7 +50,7 @@ export default function SavedCategoriesView() {
                         <IconButton
                           label="Unpin"
                           onClick={() => removeCategory(category.id)}
-                          icon={PinnedItemIcon}
+                          icon={<PinnedItemIcon />}
                         />
                       )
                     }
@@ -59,7 +59,7 @@ export default function SavedCategoriesView() {
                         <IconButton
                           rounded
                           accent
-                          icon={AddTransactionIcon}
+                          icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
                             setPopupState({

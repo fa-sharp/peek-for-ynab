@@ -49,7 +49,7 @@ export default function SavedAccountsView() {
                         <IconButton
                           label="Unpin"
                           onClick={() => removeAccount(account.id)}
-                          icon={PinnedItemIcon}
+                          icon={<PinnedItemIcon />}
                         />
                       )
                     }
@@ -58,7 +58,7 @@ export default function SavedAccountsView() {
                         <IconButton
                           rounded
                           accent
-                          icon={AddTransactionIcon}
+                          icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
                             setPopupState({
