@@ -13,3 +13,15 @@ p {
 li {
   margin-bottom: 0.1rem;
 }
+
+.browser-logos {
+  display: flex;
+  margin: 2rem 0;
+}
+
+.browser-logos > * {
+  background-color: white;
+  border: solid 1px var(--border);
+  border-radius: 5px;
+  line-height: 0;
+}

@@ -15,6 +15,14 @@ function IndexPage() {
         <Image src="/screenshots/light-pinned.png" width={400} height={330} />
         <Image src="/screenshots/dark-pinned.png" width={400} height={330} />
       </div>
+      <div className="browser-logos">
+        <a
+          href="https://chromewebstore.google.com/detail/peek-for-ynab/oakibhlecegcmjcjppmjkiaeedoljbmk?hl=en"
+          target="_blank"
+          rel="noreferrer">
+          <Image src="/chromelogo.png" width={248} height={75} />
+        </a>
+      </div>
       <h2>Features</h2>
       <ul>
         <li>View your current category and account balances</li>

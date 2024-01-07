@@ -17,10 +17,11 @@ A Chrome extension for YNAB that lets users see their category and account balan
 
 ### Environment variables
 
-- `NEXT_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes
+- `PLASMO_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes
 
-Set up an OAuth application in your YNAB Developer Settings:
+Set up an OAuth application in your YNAB Developer Settings, then set the following environment variables:
 
+- `PLASMO_PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
 - `NEXT_PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
 - `YNAB_SECRET`: OAuth secret (server only)
 
