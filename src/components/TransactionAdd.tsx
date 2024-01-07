@@ -24,11 +24,12 @@ import {
   requestCurrentTabPermissions
 } from "~lib/utils";
 
-import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
+import { AccountSelect, CategorySelect, CurrencyView, IconButton, PayeeSelect } from ".";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
-  const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
+  const { accountsData, categoriesData, payeesData, selectedBudgetData, addTransaction } =
+    useYNABContext();
   const { settings, popupState, setPopupState } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(false);
@@ -78,6 +79,23 @@ export default function TransactionAdd() {
     return !transferToAccount.on_budget && account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
 
+  /** The CCP category if this is a credit card payment. We'll want to show the CCP balance. */
+  const ccpCategory = useMemo(() => {
+    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
+    const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
+    const isCreditCardPayment =
+      account?.on_budget &&
+      transferToAccount &&
+      (transferToAccount.type === "creditCard" ||
+        transferToAccount.type === "lineOfCredit");
+    if (!isCreditCardPayment) return;
+    return categoriesData?.find(
+      (c) =>
+        c.category_group_name === "Credit Card Payments" &&
+        c.name === transferToAccount.name
+    );
+  }, [account?.on_budget, accountsData, categoriesData, isTransfer, payee]);
+
   /** Switch the To and From account for a transfer */
   const switchToFromAccounts = useCallback(() => {
     const newAccount =
@@ -92,7 +110,6 @@ export default function TransactionAdd() {
             transferId: account.id
           }
         : null;
-    console.log({ newAccount, newPayee });
     setAccount(newAccount || null);
     setPayee(newPayee);
   }, [account, accountsData, payee]);
@@ -303,6 +320,25 @@ export default function TransactionAdd() {
                 selectCategory={setCategory}
                 disabled={isSaving}
               />
+            )}
+            {ccpCategory && (
+              <div>
+                Payment category:{" "}
+                <button
+                  type="button"
+                  className="button rounded gray"
+                  title="Set to the available amount in this credit card's payment category"
+                  onClick={() => {
+                    if (ccpCategory.balance <= 0) return;
+                    setAmount((ccpCategory.balance / 1000).toFixed(2));
+                  }}>
+                  <CurrencyView
+                    colorsEnabled
+                    milliUnits={ccpCategory.balance}
+                    currencyFormat={selectedBudgetData?.currencyFormat}
+                  />
+                </button>
+              </div>
             )}
           </>
         )}

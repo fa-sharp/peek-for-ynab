@@ -23,6 +23,15 @@ function HelpPage() {
           </p>
         </li>
         <li>
+          <h3>How do I pin/unpin or re-arrange my categories and accounts?</h3>
+          <p>
+            If you have already pinned some items, you will need to click the edit/pencil
+            icon in the upper right in order to show the pin and unpin buttons next to
+            each category and account. You can also then drag and drop your pinned items
+            to re-arrange them how you like.
+          </p>
+        </li>
+        <li>
           <h3>I added a new budget in YNAB, but it is not showing up.</h3>
           <p>
             After you have added a new budget, make sure to click <b>Refresh budgets</b>{" "}
@@ -88,6 +97,10 @@ function HelpPage() {
               refreshing is complete.
             </li>
           </ul>
+        </li>
+        <li>
+          <h3>I have an issue, bug report, or further questions.</h3>
+          <p>Please contact the developer at hello (at) fasharp (dot) io.</p>
         </li>
       </ul>
     </WebLayout>

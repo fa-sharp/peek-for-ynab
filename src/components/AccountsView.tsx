@@ -1,6 +1,5 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
@@ -9,6 +8,16 @@ import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext
 import { useStorageContext } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
+
+import {
+  AddTransactionIcon,
+  CollapseListIcon,
+  CollapseListIconBold,
+  ExpandListIcon,
+  ExpandListIconBold,
+  PinItemIcon,
+  PinnedItemIcon
+} from "./icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
@@ -34,13 +43,7 @@ function AccountsView() {
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
-            )
-          }
+          icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
         />
         <div role="heading">Accounts</div>
       </div>
@@ -102,13 +105,7 @@ function AccountTypeView({
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
-          icon={
-            expanded ? (
-              <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
-            ) : (
-              <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
-            )
-          }
+          icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
         />
         <div role="heading">{accountType}</div>
       </div>
@@ -123,23 +120,14 @@ function AccountTypeView({
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
                     <IconButton
-                      icon={
-                        <Pinned
-                          size="1.2rem"
-                          color="var(--action)"
-                          fill="var(--action)"
-                          strokeWidth={1}
-                        />
-                      }
+                      icon={<PinnedItemIcon />}
                       label="Pinned"
                       disabled
                       noAction
                     />
                   ) : (
                     <IconButton
-                      icon={
-                        <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
-                      }
+                      icon={<PinItemIcon />}
                       label="Pin"
                       onClick={() => saveAccount(account.id)}
                     />
@@ -150,7 +138,14 @@ function AccountTypeView({
                     <IconButton
                       rounded
                       accent
-                      icon={<Plus size="1.2rem" color="var(--action)" strokeWidth={1} />}
+                      icon={<AddTransactionIcon />}
+                      label="Add transaction"
+                      onClick={() => onAddTx({ accountId: account.id })}
+                    />
+                    <IconButton
+                      rounded
+                      accent
+                      icon={<AddTransactionIcon />}
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />
