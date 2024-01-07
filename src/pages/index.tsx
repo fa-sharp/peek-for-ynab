@@ -19,8 +19,14 @@ function IndexPage() {
         <a
           href="https://chromewebstore.google.com/detail/peek-for-ynab/oakibhlecegcmjcjppmjkiaeedoljbmk?hl=en"
           target="_blank"
-          rel="noreferrer">
-          <Image src="/chromelogo.png" width={248} height={75} />
+          rel="noreferrer"
+          title="Go to Chrome Web Store">
+          <Image
+            src="/chromelogo.png"
+            alt="Chrome Web Store logo"
+            width={248}
+            height={75}
+          />
         </a>
       </div>
       <h2>Features</h2>
