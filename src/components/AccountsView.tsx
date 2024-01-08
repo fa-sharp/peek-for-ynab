@@ -142,13 +142,6 @@ function AccountTypeView({
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />
-                    <IconButton
-                      rounded
-                      accent
-                      icon={<AddTransactionIcon />}
-                      label="Add transaction"
-                      onClick={() => onAddTx({ accountId: account.id })}
-                    />
                   </aside>
                 }
               />

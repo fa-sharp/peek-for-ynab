@@ -10,7 +10,7 @@ import {
   Wand,
   WorldWww
 } from "tabler-icons-react";
-import { SaveTransactionClearedEnum, SaveTransactionFlagColorEnum } from "ynab";
+import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
@@ -184,13 +184,14 @@ export default function TransactionAdd() {
         account_id: account.id,
         category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
         cleared: cleared
-          ? SaveTransactionClearedEnum.Cleared
-          : SaveTransactionClearedEnum.Uncleared,
+          ? TransactionClearedStatus.Cleared
+          : TransactionClearedStatus.Uncleared,
         approved: settings?.txApproved,
         memo,
-        flag_color: flag ? (flag as unknown as SaveTransactionFlagColorEnum) : undefined
+        flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined
       });
       setPopupState({ view: "main" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
       setErrorMessage("Error adding transaction! " + (err?.error?.detail || ""));
@@ -244,8 +245,9 @@ export default function TransactionAdd() {
               autoFocus
               aria-label="Amount"
               type="number"
+              inputMode="decimal"
               min="0.01"
-              step="0.01"
+              step="0.001"
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -342,10 +344,12 @@ export default function TransactionAdd() {
             )}
           </>
         )}
-        <label className="form-input">
+        <label className="form-input" htmlFor="memo-input">
           Memo
           <div className="flex-row">
             <input
+              id="memo-input"
+              aria-label="Memo"
               className="flex-grow"
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
@@ -396,14 +400,11 @@ export default function TransactionAdd() {
               value={flag}
               onChange={(e) => setFlag(e.target.value)}>
               <option value="">None</option>
-              {Object.entries(SaveTransactionFlagColorEnum).map(
-                ([flagName, flagValue]) =>
-                  flagValue !== "null" && (
-                    <option key={flagValue} value={flagValue}>
-                      {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
-                    </option>
-                  )
-              )}
+              {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
+                <option key={flagValue} value={flagValue}>
+                  {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
+                </option>
+              ))}
             </select>
           </label>
         </div>

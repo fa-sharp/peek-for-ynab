@@ -40,7 +40,7 @@ export function PopupView() {
         padding: 16,
         minWidth: settings.emojiMode ? "150px" : "240px",
         width: "max-content",
-        maxWidth: "340px"
+        maxWidth: "320px"
       }}>
       {!loggedIn ? (
         <PopupLogin />

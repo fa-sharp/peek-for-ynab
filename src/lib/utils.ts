@@ -129,7 +129,7 @@ export const extractCurrencyAmounts = () => {
   };
 
   const text = getTextContent(document.body);
-  const regex = /[$£€¥]\s?([\d,]+(?:\.\d{1,2})?)/g; // TODO improve this regex for more currencies/locales (or find a different way)
+  const regex = /\p{Sc}\s?([\d,]+(?:\.\d{1,2})?)/gu; // TODO improve this regex for more currencies/locales (or find a different way)
   let match;
   const detected = new Set<number>(); // use a Set to eliminate duplicates
   while ((match = regex.exec(text)) !== null) {
@@ -146,14 +146,12 @@ export const extractCurrencyAmounts = () => {
   return amounts;
 };
 
-export const flagColorToEmoji = (
-  flagColor: ynab.SaveTransactionFlagColorEnum | string
-) => {
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Blue) return "🔵";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Green) return "🟢";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Orange) return "🟠";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Purple) return "🟣";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Red) return "🔴";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Yellow) return "🟡";
+export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
+  if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
+  if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";
+  if (flagColor === ynab.TransactionFlagColor.Orange) return "🟠";
+  if (flagColor === ynab.TransactionFlagColor.Purple) return "🟣";
+  if (flagColor === ynab.TransactionFlagColor.Red) return "🔴";
+  if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
   return null;
 };
