@@ -248,6 +248,7 @@ export default function TransactionAdd() {
               min="0.01"
               step="0.001"
               placeholder="0.00"
+              autoComplete="off"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
@@ -343,6 +344,7 @@ export default function TransactionAdd() {
               id="memo-input"
               aria-label="Memo"
               className="flex-grow"
+              autoComplete="off"
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               disabled={isSaving}
