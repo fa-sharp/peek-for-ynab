@@ -27,7 +27,7 @@ export default function SavedCategoriesView() {
         <ul
           {...provided.droppableProps}
           ref={provided.innerRef}
-          aria-label="Saved categories"
+          aria-label="Pinned categories"
           className="list">
           {savedCategoriesData.map((category, idx) => (
             <Draggable

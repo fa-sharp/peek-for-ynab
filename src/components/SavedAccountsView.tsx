@@ -25,7 +25,7 @@ export default function SavedAccountsView() {
         <ul
           {...provided.droppableProps}
           ref={provided.innerRef}
-          aria-label="Saved accounts"
+          aria-label="Pinned accounts"
           className="list mt-md">
           {savedAccountsData.map((account, idx) => (
             <Draggable

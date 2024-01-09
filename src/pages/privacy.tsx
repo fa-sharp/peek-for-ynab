@@ -32,16 +32,15 @@ function PrivacyPage() {
         logout and/or uninstall the extension.
       </p>
       <p>
-        If you enable the setting to sync to your browser, {APP_NAME} will store the{" "}
-        <a href="https://developer.mozilla.org/en-US/docs/Glossary/UUID">UUIDs</a> of your
-        pinned categories, accounts, and budgets in your browser profile. No other
-        information is stored in the profile.
+        If you enable the sync option in the extension settings, {APP_NAME} will store
+        your settings and the IDs of your pinned categories, accounts, and budgets in your
+        browser profile. No other information is stored in the profile.
       </p>
       <p>
-        If you enable the setting to allow access to the current tab, {APP_NAME} will read
-        the contents of the current tab upon opening the extension, in order to enable
-        additional features. This data is only processed locally in your browser, and will
-        never be sent to any third party.
+        If tab access is allowed in the settings, {APP_NAME} will be able to read the
+        current tab upon opening the extension, in order to enable additional features.
+        This data is only processed locally in your browser, and is not sent to any third
+        party.
       </p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
@@ -50,7 +49,7 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Sep 18, 2023</em>
+        <em>Last updated: Jan 8, 2024</em>
       </p>
     </WebLayout>
   );
