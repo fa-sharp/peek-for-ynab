@@ -140,7 +140,6 @@ export function OptionsView() {
           <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
             <li>Automatically copy the selected amount into the transaction form</li>
             <li>Copy the current URL into the memo field of the transaction</li>
-            <li>(Experimental!) Detect transaction amounts on the page</li>
           </ul>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
