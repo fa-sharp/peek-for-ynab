@@ -7,7 +7,6 @@ import {
   Plus,
   SwitchHorizontal,
   SwitchVertical,
-  Wand,
   WorldWww
 } from "tabler-icons-react";
 import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
@@ -17,7 +16,6 @@ import type { CachedPayee } from "~lib/context/ynabContext";
 import {
   IS_PRODUCTION,
   executeScriptInCurrentTab,
-  extractCurrencyAmounts,
   flagColorToEmoji,
   getTodaysDateISO,
   parseLocaleNumber,
@@ -114,26 +112,27 @@ export default function TransactionAdd() {
     setPayee(newPayee);
   }, [account, accountsData, payee]);
 
-  const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
-  const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
-  const onDetectAmount = async () => {
-    if (!detectedAmounts) {
-      // Check permissions
-      if (!(await requestCurrentTabPermissions())) return;
-      // Try detecting any currency amounts on the page
-      const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
-      !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
-      setDetectedAmounts(amounts);
-      if (amounts[0]) setAmount(amounts[0].toString());
-    } else if (detectedAmounts[detectedAmountIdx + 1]) {
-      // Iterate through detected amounts
-      setAmount(detectedAmounts[detectedAmountIdx + 1].toString());
-      setDetectedAmountIdx((v) => v + 1);
-    } else {
-      if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
-      setDetectedAmountIdx(0);
-    }
-  };
+  // TODO find a better way to detect amounts
+  // const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
+  // const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
+  // // const onDetectAmount = async () => {
+  //   if (!detectedAmounts) {
+  //     // Check permissions
+  //     if (!(await requestCurrentTabPermissions())) return;
+  //     // Try detecting any currency amounts on the page
+  //     const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
+  //     !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
+  //     setDetectedAmounts(amounts);
+  //     if (amounts[0]) setAmount(amounts[0].toString());
+  //   } else if (detectedAmounts[detectedAmountIdx + 1]) {
+  //     // Iterate through detected amounts
+  //     setAmount(detectedAmounts[detectedAmountIdx + 1].toString());
+  //     setDetectedAmountIdx((v) => v + 1);
+  //   } else {
+  //     if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
+  //     setDetectedAmountIdx(0);
+  //   }
+  // };
 
   const onCopyURLIntoMemo = async () => {
     if (!(await requestCurrentTabPermissions())) return;
@@ -253,13 +252,6 @@ export default function TransactionAdd() {
               onChange={(e) => setAmount(e.target.value)}
               disabled={isSaving}
             />
-            {settings?.currentTabAccess && (
-              <IconButton
-                icon={<Wand />}
-                label="Detect amount"
-                onClick={onDetectAmount}
-              />
-            )}
           </div>
         </label>
         {!isTransfer ? (
