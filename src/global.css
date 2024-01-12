@@ -15,8 +15,8 @@
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
-  --gray: hsl(0, 0%, 89%);
-  --gray-hover: hsl(0, 0%, 80%);
+  --gray: hsl(0, 0%, 96%);
+  --gray-hover: hsl(0, 0%, 89%);
 
   --border-radius: 4px;
   --spacing-xs: 0.2rem;
