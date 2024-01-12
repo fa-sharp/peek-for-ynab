@@ -2,10 +2,10 @@ import { useCallback, useMemo, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import {
+  Check,
   CircleC,
   Minus,
   Plus,
-  SwitchHorizontal,
   SwitchVertical,
   WorldWww
 } from "tabler-icons-react";
@@ -205,17 +205,17 @@ export default function TransactionAdd() {
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <label className="flex-row">
-          Transfer:
+          Transfer/Payment?
           {isTransfer ? (
             <IconButton
               label="Transfer (click to switch)"
-              icon={<SwitchHorizontal color="var(--currency-green)" />}
+              icon={<Check color="var(--currency-green)" />}
               onClick={() => setIsTransfer(false)}
             />
           ) : (
             <IconButton
               label="Not a transfer (click to switch)"
-              icon={<SwitchHorizontal color="#aaa" />}
+              icon={<Check color="#aaa" />}
               onClick={() => setIsTransfer(true)}
             />
           )}
