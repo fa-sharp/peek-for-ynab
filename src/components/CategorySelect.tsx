@@ -45,6 +45,7 @@ export default function CategorySelect({
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     isOpen,
@@ -53,7 +54,6 @@ export default function CategorySelect({
     getMenuProps,
     getInputProps,
     getItemProps,
-    getComboboxProps,
     setHighlightedIndex,
     reset,
     highlightedIndex,
@@ -73,23 +73,26 @@ export default function CategorySelect({
       setCategoryList(categories?.filter(getFilter(inputValue)) || []);
     },
     onSelectedItemChange({ selectedItem }) {
-      if (selectedItem) selectCategory(selectedItem);
+      if (selectedItem) {
+        selectCategory(selectedItem);
+        setTimeout(() => clearButtonRef.current?.focus(), 20);
+      }
     }
   });
 
   return (
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
-      <div className="flex-col" {...getComboboxProps()}>
+      <div className="flex-col">
         <input
           {...getInputProps({ ref: inputRef })}
           className={selectedItem ? "item-selected" : ""}
           placeholder="(Leave blank to auto-categorize)"
-          readOnly={selectedItem}
-          disabled={disabled}
+          disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (
           <button
+            ref={clearButtonRef}
             type="button"
             className="select-button-right icon-button"
             aria-label="Clear category"

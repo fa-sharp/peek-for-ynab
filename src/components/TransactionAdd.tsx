@@ -325,7 +325,11 @@ export default function TransactionAdd() {
                   title="Set to the available amount in this credit card's payment category"
                   onClick={() => {
                     if (ccpCategory.balance <= 0) return;
-                    setAmount((ccpCategory.balance / 1000).toFixed(2));
+                    setAmount(
+                      (ccpCategory.balance / 1000).toFixed(
+                        selectedBudgetData?.currencyFormat?.decimal_digits || 2
+                      )
+                    );
                   }}>
                   <CurrencyView
                     colorsEnabled

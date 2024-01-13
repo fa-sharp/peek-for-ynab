@@ -31,6 +31,7 @@ export default function AccountSelect({
   }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     isOpen,
@@ -39,7 +40,6 @@ export default function AccountSelect({
     getMenuProps,
     getInputProps,
     getItemProps,
-    getComboboxProps,
     setHighlightedIndex,
     reset,
     highlightedIndex,
@@ -58,7 +58,10 @@ export default function AccountSelect({
       setAccountList(accounts?.filter(getFilter(inputValue)) || []);
     },
     onSelectedItemChange({ selectedItem }) {
-      if (selectedItem) selectAccount(selectedItem);
+      if (selectedItem) {
+        selectAccount(selectedItem);
+        setTimeout(() => clearButtonRef.current?.focus(), 20);
+      }
     }
   });
 
@@ -67,16 +70,16 @@ export default function AccountSelect({
       <label {...getLabelProps()}>
         {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
       </label>
-      <div className="flex-col" {...getComboboxProps()}>
+      <div className="flex-col">
         <input
           required
           {...getInputProps({ ref: inputRef })}
           className={selectedItem ? "item-selected" : ""}
-          readOnly={selectedItem}
-          disabled={disabled}
+          disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (
           <button
+            ref={clearButtonRef}
             type="button"
             className="select-button-right icon-button"
             aria-label="Clear account"
@@ -124,8 +127,8 @@ export default function AccountSelect({
                       (account.balance < 0
                         ? "negative"
                         : account.balance > 0
-                        ? "positive"
-                        : "")
+                          ? "positive"
+                          : "")
                     }>
                     {formatCurrency(account.balance, selectedBudgetData?.currencyFormat)}
                   </span>
