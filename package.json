@@ -62,7 +62,6 @@
       "identity"
     ],
     "host_permissions": [
-      "https://api.youneedabudget.com/*",
       "https://api.ynab.com/*"
     ],
     "optional_permissions": [
