@@ -15,6 +15,7 @@
     "dev:next": "next dev --port 3000",
     "build:next": "next build",
     "start:next": "next start",
+    "test": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
@@ -54,7 +55,9 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.1.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite-tsconfig-paths": "^4.2.3",
+    "vitest": "^1.2.0"
   },
   "manifest": {
     "key": "$CRX_PUBLIC_KEY",
