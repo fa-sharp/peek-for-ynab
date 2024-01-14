@@ -11,7 +11,7 @@ function IndexPage() {
       </Head>
       <h1>Peek for YNAB</h1>
       <h3>A Chrome extension to quickly check on your budget*</h3>
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+      <div className="flex-row gap-xl">
         <Image src="/screenshots/light-pinned.png" width={400} height={330} />
         <Image src="/screenshots/dark-pinned.png" width={400} height={330} />
       </div>
