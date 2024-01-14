@@ -27,7 +27,6 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     getMenuProps,
     getInputProps,
     getItemProps,
-    getComboboxProps,
     inputValue,
     highlightedIndex,
     selectedItem
@@ -50,7 +49,7 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
   return (
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
-      <div className="flex-col" {...getComboboxProps()}>
+      <div className="flex-col">
         <input required {...getInputProps()} disabled={disabled} />
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}

@@ -1,5 +1,5 @@
 import { useCombobox } from "downshift";
-import { useCallback, useRef, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
@@ -31,6 +31,7 @@ export default function AccountSelect({
   }, []);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     isOpen,
@@ -39,7 +40,6 @@ export default function AccountSelect({
     getMenuProps,
     getInputProps,
     getItemProps,
-    getComboboxProps,
     setHighlightedIndex,
     reset,
     highlightedIndex,
@@ -58,7 +58,10 @@ export default function AccountSelect({
       setAccountList(accounts?.filter(getFilter(inputValue)) || []);
     },
     onSelectedItemChange({ selectedItem }) {
-      if (selectedItem) selectAccount(selectedItem);
+      if (selectedItem) {
+        selectAccount(selectedItem);
+        setTimeout(() => clearButtonRef.current?.focus(), 20);
+      }
     }
   });
 
@@ -67,16 +70,16 @@ export default function AccountSelect({
       <label {...getLabelProps()}>
         {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
       </label>
-      <div className="flex-col" {...getComboboxProps()}>
+      <div className="flex-col">
         <input
           required
           {...getInputProps({ ref: inputRef })}
           className={selectedItem ? "item-selected" : ""}
-          readOnly={selectedItem}
-          disabled={disabled}
+          disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (
           <button
+            ref={clearButtonRef}
             type="button"
             className="select-button-right icon-button"
             aria-label="Clear account"
@@ -108,31 +111,48 @@ export default function AccountSelect({
           {!isOpen ? null : accountList.length === 0 ? (
             <li className="select-dropdown-item">--Account not found!--</li>
           ) : (
-            accountList.map((account, index) => {
-              let itemClassName = "select-dropdown-item";
-              if (highlightedIndex === index) itemClassName += " highlighted";
-              if (selectedItem?.id === account.id) itemClassName += " selected";
-              return (
-                <li
-                  className={itemClassName}
-                  key={account.id}
-                  {...getItemProps({ item: account, index })}>
-                  {account.name} (
-                  <span
-                    className={
-                      "currency " +
-                      (account.balance < 0
-                        ? "negative"
-                        : account.balance > 0
-                        ? "positive"
-                        : "")
-                    }>
-                    {formatCurrency(account.balance, selectedBudgetData?.currencyFormat)}
-                  </span>
-                  )
-                </li>
-              );
-            })
+            (["Budget", "Tracking"] as const)
+              .filter((type) =>
+                accountList.find((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
+              )
+              .map((type) => (
+                <Fragment key={type}>
+                  <li>
+                    <h3 className="heading-medium">{type}</h3>
+                  </li>
+                  {accountList
+                    .filter((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
+                    .map((account) => {
+                      let itemClassName = "select-dropdown-item";
+                      const itemIndex = accountList.findIndex((a) => a.id === account.id);
+                      if (highlightedIndex === itemIndex) itemClassName += " highlighted";
+                      if (selectedItem?.id === account.id) itemClassName += " selected";
+                      return (
+                        <li
+                          className={itemClassName}
+                          key={account.id}
+                          {...getItemProps({ item: account, index: itemIndex })}>
+                          {account.name} (
+                          <span
+                            className={
+                              "currency " +
+                              (account.balance < 0
+                                ? "negative"
+                                : account.balance > 0
+                                  ? "positive"
+                                  : "")
+                            }>
+                            {formatCurrency(
+                              account.balance,
+                              selectedBudgetData?.currencyFormat
+                            )}
+                          </span>
+                          )
+                        </li>
+                      );
+                    })}
+                </Fragment>
+              ))
           )}
         </ul>
       </div>

@@ -325,7 +325,11 @@ export default function TransactionAdd() {
                   title="Set to the available amount in this credit card's payment category"
                   onClick={() => {
                     if (ccpCategory.balance <= 0) return;
-                    setAmount((ccpCategory.balance / 1000).toFixed(2));
+                    setAmount(
+                      (ccpCategory.balance / 1000).toFixed(
+                        selectedBudgetData?.currencyFormat?.decimal_digits || 2
+                      )
+                    );
                   }}>
                   <CurrencyView
                     colorsEnabled
@@ -370,7 +374,7 @@ export default function TransactionAdd() {
             disabled={isSaving}
           />
         </label>
-        <div className="flex-row" style={{ justifyContent: "space-between" }}>
+        <div className="flex-row justify-between">
           <label className="flex-row">
             Status:
             {cleared ? (
@@ -404,24 +408,16 @@ export default function TransactionAdd() {
         </div>
 
         <div className="error-message">{errorMessage}</div>
-        <div
-          className="flex-row"
-          style={{
-            width: "auto",
-            flexDirection: "row-reverse",
-            justifyContent: "space-between"
-          }}>
+        <div className="flex-row flex-row-reverse">
           <button
             type="submit"
-            className="button rounded accent mt-lg"
-            style={{ flex: 1 }}
+            className="button rounded accent mt-lg flex-1"
             disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
-            className="button gray rounded mt-lg"
-            style={{ flex: 1 }}
+            className="button gray rounded mt-lg flex-1"
             onClick={() => setPopupState({ view: "main" })}
             disabled={isSaving}>
             Cancel

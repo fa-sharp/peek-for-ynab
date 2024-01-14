@@ -1,7 +1,7 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.14.3",
+  "version": "0.14.4",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
   "packageManager": "pnpm@8.14.1",
@@ -25,7 +25,7 @@
     "@tanstack/react-query-devtools": "^4.36.1",
     "@tanstack/react-query-persist-client": "^4.36.1",
     "cors": "^2.8.5",
-    "downshift": "^6.1.12",
+    "downshift": "^8.3.1",
     "idb-keyval": "^6.2.1",
     "json-formatter-js": "^2.3.4",
     "nanoid": "^4.0.2",
@@ -62,7 +62,6 @@
       "identity"
     ],
     "host_permissions": [
-      "https://api.youneedabudget.com/*",
       "https://api.ynab.com/*"
     ],
     "optional_permissions": [

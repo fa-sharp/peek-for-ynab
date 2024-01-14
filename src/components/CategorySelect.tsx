@@ -1,5 +1,5 @@
 import { useCombobox } from "downshift";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CurrencyFormat } from "ynab";
 
@@ -45,6 +45,7 @@ export default function CategorySelect({
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     isOpen,
@@ -53,7 +54,6 @@ export default function CategorySelect({
     getMenuProps,
     getInputProps,
     getItemProps,
-    getComboboxProps,
     setHighlightedIndex,
     reset,
     highlightedIndex,
@@ -73,23 +73,26 @@ export default function CategorySelect({
       setCategoryList(categories?.filter(getFilter(inputValue)) || []);
     },
     onSelectedItemChange({ selectedItem }) {
-      if (selectedItem) selectCategory(selectedItem);
+      if (selectedItem) {
+        selectCategory(selectedItem);
+        setTimeout(() => clearButtonRef.current?.focus(), 20);
+      }
     }
   });
 
   return (
     <div className="form-input">
       <label {...getLabelProps()}>Category</label>
-      <div className="flex-col" {...getComboboxProps()}>
+      <div className="flex-col">
         <input
           {...getInputProps({ ref: inputRef })}
           className={selectedItem ? "item-selected" : ""}
           placeholder="(Leave blank to auto-categorize)"
-          readOnly={selectedItem}
-          disabled={disabled}
+          disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (
           <button
+            ref={clearButtonRef}
             type="button"
             className="select-button-right icon-button"
             aria-label="Clear category"
@@ -121,22 +124,43 @@ export default function CategorySelect({
           {!isOpen ? null : categoryList.length === 0 ? (
             <li className="select-dropdown-item">--Category not found!--</li>
           ) : (
-            categoryList.map((category, index) => {
-              let itemClassName = "select-dropdown-item";
-              if (highlightedIndex === index) itemClassName += " highlighted";
-              if (selectedItem?.id === category.id) itemClassName += " selected";
-              return (
-                <li
-                  className={itemClassName}
-                  key={category.id}
-                  {...getItemProps({ item: category, index })}>
-                  {formatCategoryWithBalance(
-                    category,
-                    selectedBudgetData?.currencyFormat
+            categoryGroupsData
+              ?.filter((group) =>
+                categoryList.find((c) => c.category_group_id === group.id)
+              )
+              .map((group) => (
+                <Fragment key={group.id}>
+                  {group.name !== "Internal Master Category" && (
+                    <li>
+                      <h3 className="heading-medium">{group.name}</h3>
+                    </li>
                   )}
-                </li>
-              );
-            })
+                  {categoryList
+                    .filter((c) => c.category_group_id === group.id)
+                    .map((category) => {
+                      let itemClassName = "select-dropdown-item";
+                      const itemIndex = categoryList.findIndex(
+                        (c) => c.id === category.id
+                      );
+                      if (highlightedIndex === itemIndex) itemClassName += " highlighted";
+                      if (selectedItem?.id === category.id) itemClassName += " selected";
+                      return (
+                        <li
+                          className={itemClassName}
+                          key={category.id}
+                          {...getItemProps({
+                            item: category,
+                            index: itemIndex
+                          })}>
+                          {formatCategoryWithBalance(
+                            category,
+                            selectedBudgetData?.currencyFormat
+                          )}
+                        </li>
+                      );
+                    })}
+                </Fragment>
+              ))
           )}
         </ul>
       </div>

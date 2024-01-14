@@ -22,6 +22,7 @@
   --spacing-xs: 0.2rem;
   --spacing-sm: 0.35rem;
   --spacing-md: 0.45rem;
+  --spacing-xl: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -68,6 +69,10 @@ button {
   gap: var(--spacing-md);
 }
 
+.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
 .flex-col {
   position: relative;
   display: flex;
@@ -77,6 +82,14 @@ button {
 
 .flex-grow {
   flex-grow: 1;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .min-w-0 {
@@ -99,6 +112,10 @@ button {
 
 .gap-sm {
   gap: var(--spacing-sm);
+}
+
+.gap-xl {
+  gap: var(--spacing-xl);
 }
 
 .form-input {
