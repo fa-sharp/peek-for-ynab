@@ -6,7 +6,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./.github/workflows/install-deps.yml
 
       - name: Lint
@@ -15,7 +14,6 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./.github/workflows/install-deps.yml
 
       - name: Check types
@@ -24,7 +22,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./.github/workflows/install-deps.yml
 
       - name: Run all tests
@@ -33,7 +30,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: ./.github/workflows/install-deps.yml
 
       - name: Build extension
