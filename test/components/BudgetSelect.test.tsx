@@ -1,15 +1,11 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { randomUUID } from "crypto";
-import { afterEach, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { BudgetSelect } from "~components";
 import type { CachedBudget } from "~lib/context/ynabContext";
-
-afterEach(() => {
-  cleanup();
-});
 
 const createBudgets = (): CachedBudget[] => [
   { id: randomUUID(), name: "Budget 1" },

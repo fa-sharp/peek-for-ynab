@@ -1,16 +1,10 @@
-import { cleanup, renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import { randomUUID } from "crypto";
-import { afterEach, expect, test } from "vitest";
-import "vitest-dom/extend-expect";
+import { expect, test } from "vitest";
 
 import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
 import { StorageProvider, type TokenData } from "~lib/context/storageContext";
-
-afterEach(() => {
-  chrome.storage.local.clear();
-  cleanup();
-});
 
 test("Can render storage hook successfully, with default settings", async () => {
   const { result } = renderHook(useStorageContext, {

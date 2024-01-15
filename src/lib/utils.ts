@@ -1,5 +1,6 @@
 import * as ynab from "ynab";
 
+export const IS_DEV = process.env.NODE_ENV === "development";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;

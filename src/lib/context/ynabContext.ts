@@ -3,7 +3,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_PRODUCTION, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -74,7 +74,7 @@ const useYNABProvider = () => {
         currencyFormat: budgetSummary.currency_format || undefined
       }));
     },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched budgets!", data)
+    onSuccess: (data) => IS_DEV && console.log("Fetched budgets!", data)
   });
 
   /** Data from the currently selected budget */
@@ -105,7 +105,7 @@ const useYNABProvider = () => {
       );
       return categoryGroups;
     },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched categories!", data)
+    onSuccess: (data) => IS_DEV && console.log("Fetched categories!", data)
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
@@ -138,7 +138,7 @@ const useYNABProvider = () => {
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
       return response.data.accounts.filter((a) => a.closed === false); // only get open accounts
     },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched accounts!", data)
+    onSuccess: (data) => IS_DEV && console.log("Fetched accounts!", data)
   });
 
   const refreshCategoriesAndAccounts = useCallback(async () => {
@@ -169,7 +169,7 @@ const useYNABProvider = () => {
         }))
         .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
     },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched payees!", data)
+    onSuccess: (data) => IS_DEV && console.log("Fetched payees!", data)
   });
 
   /** Select data of only saved accounts from `accountsData` */
@@ -198,7 +198,7 @@ const useYNABProvider = () => {
         );
         return response.data.transactions;
       },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+      onSuccess: (data) => IS_DEV && console.log("Fetched transactions!", data)
     });
 
   const useGetCategoryTxs = (categoryId: string) =>
@@ -213,7 +213,7 @@ const useYNABProvider = () => {
         );
         return response.data.transactions;
       },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+      onSuccess: (data) => IS_DEV && console.log("Fetched transactions!", data)
     });
 
   const addTransaction = useCallback(
@@ -222,7 +222,7 @@ const useYNABProvider = () => {
       const response = await ynabAPI.transactions.createTransaction(selectedBudgetId, {
         transaction
       });
-      !IS_PRODUCTION &&
+      IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
       setTimeout(() => refreshCategoriesAndAccounts(), 500);
     },
