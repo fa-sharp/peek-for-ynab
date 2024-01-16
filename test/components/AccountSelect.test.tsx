@@ -40,6 +40,8 @@ test("Mouse behavior works as expected", async () => {
 
   const checkingAcct = screen.getByRole("listbox").children[1];
   expect(checkingAcct).toHaveTextContent("Checking");
+  await user.hover(checkingAcct);
+  expect(checkingAcct, "Highlights account on hover").toHaveClass("highlighted");
   await user.click(checkingAcct);
   expect(selectedAccount, "Selects the proper account on click").toMatchObject({
     id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"
@@ -73,6 +75,10 @@ test("Keyboard behavior works as expected", async () => {
     screen.getByRole("listbox").children,
     "Account list appears on down arrow"
   ).toHaveLength(3);
+  const checkingAcct = screen.getByRole("listbox").children[1];
+  expect(checkingAcct, "First account highlighted on down arrow").toHaveClass(
+    "highlighted"
+  );
   await user.keyboard("{Enter}");
   expect(selectedAccount, "Enter key selects the proper account").toMatchObject({
     id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"

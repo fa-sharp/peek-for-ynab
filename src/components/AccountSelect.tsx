@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useCombobox } from "downshift";
 import { Fragment, useCallback, useRef, useState } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
@@ -123,25 +124,21 @@ export default function AccountSelect({
                   {accountList
                     .filter((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
                     .map((account) => {
-                      let itemClassName = "select-dropdown-item";
                       const itemIndex = accountList.findIndex((a) => a.id === account.id);
-                      if (highlightedIndex === itemIndex) itemClassName += " highlighted";
-                      if (selectedItem?.id === account.id) itemClassName += " selected";
                       return (
                         <li
-                          className={itemClassName}
+                          className={clsx("select-dropdown-item", {
+                            highlighted: highlightedIndex === itemIndex,
+                            selected: selectedItem?.id === account.id
+                          })}
                           key={account.id}
                           {...getItemProps({ item: account, index: itemIndex })}>
                           {account.name} (
                           <span
-                            className={
-                              "currency " +
-                              (account.balance < 0
-                                ? "negative"
-                                : account.balance > 0
-                                  ? "positive"
-                                  : "")
-                            }>
+                            className={clsx("currency", {
+                              positive: account.balance > 0,
+                              negative: account.balance < 0
+                            })}>
                             {formatCurrency(
                               account.balance,
                               selectedBudgetData?.currencyFormat

@@ -40,6 +40,8 @@ test("Mouse behavior works as expected", async () => {
 
   const electricCategory = screen.getByRole("listbox").children[3];
   expect(electricCategory).toHaveTextContent("Electric");
+  await user.hover(electricCategory);
+  expect(electricCategory, "Highlights category on hover").toHaveClass("highlighted");
   await user.click(electricCategory);
   expect(selectedCategory, "Selects the proper category on click").toMatchObject({
     id: "a9586962-70e1-4251-947c-2bdf6f4d04f9"
@@ -73,6 +75,10 @@ test("Keyboard behavior works as expected", async () => {
     screen.getAllByRole("listitem").length,
     "Category list appears on down arrow"
   ).toBeGreaterThan(3);
+  const readyToAssign = screen.getByRole("listbox").children[0];
+  expect(readyToAssign, "First category highlighted on down arrow").toHaveClass(
+    "highlighted"
+  );
   await user.keyboard("{ArrowDown}{ArrowDown}{Enter}");
   expect(selectedCategory, "Enter key selects the proper category").toMatchObject({
     id: "a9586962-70e1-4251-947c-2bdf6f4d04f9"
