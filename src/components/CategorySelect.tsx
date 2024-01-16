@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useCombobox } from "downshift";
 import { Fragment, useCallback, useMemo, useRef, useState } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
@@ -138,15 +139,15 @@ export default function CategorySelect({
                   {categoryList
                     .filter((c) => c.category_group_id === group.id)
                     .map((category) => {
-                      let itemClassName = "select-dropdown-item";
                       const itemIndex = categoryList.findIndex(
                         (c) => c.id === category.id
                       );
-                      if (highlightedIndex === itemIndex) itemClassName += " highlighted";
-                      if (selectedItem?.id === category.id) itemClassName += " selected";
                       return (
                         <li
-                          className={itemClassName}
+                          className={clsx("select-dropdown-item", {
+                            highlighted: highlightedIndex === itemIndex,
+                            selected: selectedItem?.id === category.id
+                          })}
                           key={category.id}
                           {...getItemProps({
                             item: category,
@@ -175,10 +176,10 @@ function formatCategoryWithBalance(category: Category, currencyFormat?: Currency
     <>
       {category.name} (
       <span
-        className={
-          "currency " +
-          (category.balance < 0 ? "negative" : category.balance > 0 ? "positive" : "")
-        }>
+        className={clsx("currency", {
+          positive: category.balance > 0,
+          negative: category.balance < 0
+        })}>
         {formatCurrency(category.balance, currencyFormat)}
       </span>
       )

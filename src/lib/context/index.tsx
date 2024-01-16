@@ -15,7 +15,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 60 * 5, // 30 seconds in prod, 5 minutes in dev
-      cacheTime: 1000 * 60 * 30, // 30 minute cache
       refetchOnWindowFocus: false, // don't refetch on window focus
       retry: 1 // only retry once if there's an error
     }
@@ -34,7 +33,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
         persister,
         maxAge: TWO_WEEKS_IN_MILLIS * 2
       }}>
-      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
       <AuthProvider>
         <YNABProvider>{children}</YNABProvider>
       </AuthProvider>

@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { CurrencyFormat } from "ynab";
 
 import { formatCurrency } from "~lib/utils";
@@ -15,16 +16,16 @@ function CurrencyView({
   colorsEnabled = false,
   hideBalance = false
 }: Props) {
-  let className = !colorsEnabled
-    ? "currency"
-    : milliUnits > 0
-    ? "currency positive"
-    : milliUnits < 0
-    ? "currency negative"
-    : "currency";
-  if (hideBalance) className += " hidden";
-
-  return <span className={className}>{formatCurrency(milliUnits, currencyFormat)}</span>;
+  return (
+    <span
+      className={clsx("currency", {
+        positive: colorsEnabled && milliUnits > 0,
+        negative: colorsEnabled && milliUnits < 0,
+        hidden: hideBalance
+      })}>
+      {formatCurrency(milliUnits, currencyFormat)}
+    </span>
+  );
 }
 
 export default CurrencyView;

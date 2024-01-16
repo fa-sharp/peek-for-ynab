@@ -3,7 +3,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_PRODUCTION, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -48,7 +48,6 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["budgets"],
     staleTime: TWO_WEEKS_IN_MILLIS, // Budget data stays fresh in cache for two weeks
-    cacheTime: TWO_WEEKS_IN_MILLIS,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
@@ -68,13 +67,13 @@ const useYNABProvider = () => {
         setShownBudgetIds([budgets[0].id]);
         setSelectedBudgetId(budgets[0].id);
       }
+      IS_DEV && console.log("Fetched budgets!", budgets);
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
         currencyFormat: budgetSummary.currency_format || undefined
       }));
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched budgets!", data)
+    }
   });
 
   /** Data from the currently selected budget */
@@ -103,9 +102,9 @@ const useYNABProvider = () => {
         // filter out hidden categories
         (group) => (group.categories = group.categories.filter((c) => !c.hidden))
       );
+      IS_DEV && console.log("Fetched categories!", categoryGroups);
       return categoryGroups;
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched categories!", data)
+    }
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
@@ -129,16 +128,17 @@ const useYNABProvider = () => {
     );
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
-  /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
+  /** Fetch accounts for the selected budget */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
-      return response.data.accounts.filter((a) => a.closed === false); // only get open accounts
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched accounts!", data)
+      const accounts = response.data.accounts.filter((a) => a.closed === false); // only get open accounts
+      IS_DEV && console.log("Fetched accounts!", accounts);
+      return accounts;
+    }
   });
 
   const refreshCategoriesAndAccounts = useCallback(async () => {
@@ -152,24 +152,24 @@ const useYNABProvider = () => {
     ]);
   }, [queryClient, selectedBudgetId]);
 
-  /** Fetch payees for the selected budget (if user enables transactions) */
+  /** Fetch payees for the selected budget */
   const { data: payeesData } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
-    cacheTime: TWO_WEEKS_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
-      return response.data.payees
+      const payees = response.data.payees
         .map((payee) => ({
           id: payee.id,
           name: payee.name,
-          transferId: payee.transfer_account_id
+          ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
         }))
         .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched payees!", data)
+      IS_DEV && console.log("Fetched payees!", payees);
+      return payees;
+    }
   });
 
   /** Select data of only saved accounts from `accountsData` */
@@ -191,14 +191,16 @@ const useYNABProvider = () => {
       queryKey: ["txs", { budgetId: selectedBudgetId }, `accountId-${accountId}`],
       queryFn: async () => {
         if (!ynabAPI) return;
-        const response = await ynabAPI.transactions.getTransactionsByAccount(
+        const {
+          data: { transactions }
+        } = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
           new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
-        return response.data.transactions;
-      },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+        IS_DEV && console.log("Fetched transactions!", transactions);
+        return transactions;
+      }
     });
 
   const useGetCategoryTxs = (categoryId: string) =>
@@ -206,14 +208,16 @@ const useYNABProvider = () => {
       queryKey: ["txs", { budgetId: selectedBudgetId }, `categoryId-${categoryId}`],
       queryFn: async () => {
         if (!ynabAPI) return;
-        const response = await ynabAPI.transactions.getTransactionsByCategory(
+        const {
+          data: { transactions }
+        } = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
           new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
         );
-        return response.data.transactions;
-      },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+        IS_DEV && console.log("Fetched transactions!", transactions);
+        return transactions;
+      }
     });
 
   const addTransaction = useCallback(
@@ -222,7 +226,7 @@ const useYNABProvider = () => {
       const response = await ynabAPI.transactions.createTransaction(selectedBudgetId, {
         transaction
       });
-      !IS_PRODUCTION &&
+      IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
       setTimeout(() => refreshCategoriesAndAccounts(), 500);
     },

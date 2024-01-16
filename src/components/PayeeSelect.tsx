@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useCombobox } from "downshift";
 import { useState } from "react";
 
@@ -59,19 +60,17 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
               --New payee &apos;{inputValue}&apos;--
             </li>
           ) : (
-            payeeList.map((payee, index) => {
-              let itemClassName = "select-dropdown-item";
-              if (highlightedIndex === index) itemClassName += " highlighted";
-              if (selectedItem?.id === payee.id) itemClassName += " selected";
-              return (
-                <li
-                  className={itemClassName}
-                  key={payee.id}
-                  {...getItemProps({ item: payee, index })}>
-                  {payee.name}
-                </li>
-              );
-            })
+            payeeList.map((payee, index) => (
+              <li
+                className={clsx("select-dropdown-item", {
+                  highlighted: highlightedIndex === index,
+                  selected: selectedItem?.id === payee.id
+                })}
+                key={payee.id}
+                {...getItemProps({ item: payee, index })}>
+                {payee.name}
+              </li>
+            ))
           )}
         </ul>
       </div>
