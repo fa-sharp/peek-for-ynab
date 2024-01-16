@@ -10,8 +10,10 @@
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
     "dev:plasmo:edge": "plasmo dev --target=edge-mv3 --port 3001",
+    "dev:plasmo:firefox": "plasmo dev --target=firefox-mv2",
     "build:plasmo": "plasmo build --hoist",
     "build:plasmo:edge": "plasmo build --hoist --target=edge-mv3",
+    "build:plasmo:firefox": "plasmo build --hoist --target=firefox-mv2",
     "build:plasmo:zip": "plasmo build --hoist --zip",
     "dev:next": "next dev --port 3000",
     "build:next": "next build",
@@ -88,6 +90,12 @@
         "suggested_key": {
           "default": "Alt+Shift+Y"
         }
+      }
+    },
+    "browser_specific_settings": {
+      "gecko": {
+        "id": "{e734411e-6aae-4590-ab10-65e7a226b311}",
+        "strict_min_version": "42.0"
       }
     }
   }
