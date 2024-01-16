@@ -449,12 +449,12 @@ export const payees = [
   {
     id: "471ecaf5-5da8-49ce-9c99-06f45599d1a7",
     name: "Transfer : Checking",
-    transferId: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"
+    transfer_account_id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"
   },
   {
     id: "99b65028-2421-4d2f-8ca7-b3cfba1678e1",
     name: "Transfer : Savings",
-    transferId: "3857871b-1a41-45b9-81e6-d60ad2d093ba"
+    transfer_account_id: "3857871b-1a41-45b9-81e6-d60ad2d093ba"
   },
   {
     id: "17920337-4897-4491-88d6-d9eb513b9e6a",

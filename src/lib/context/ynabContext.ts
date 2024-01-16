@@ -129,7 +129,7 @@ const useYNABProvider = () => {
     );
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
-  /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
+  /** Fetch accounts for the selected budget */
   const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
@@ -152,7 +152,7 @@ const useYNABProvider = () => {
     ]);
   }, [queryClient, selectedBudgetId]);
 
-  /** Fetch payees for the selected budget (if user enables transactions) */
+  /** Fetch payees for the selected budget */
   const { data: payeesData } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
@@ -165,7 +165,7 @@ const useYNABProvider = () => {
         .map((payee) => ({
           id: payee.id,
           name: payee.name,
-          transferId: payee.transfer_account_id
+          ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
         }))
         .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
     },

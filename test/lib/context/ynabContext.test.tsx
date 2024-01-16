@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { mockServer } from "test/mock/msw";
-import { savedCategories, validToken } from "test/mock/userData";
+import { savedAccounts, savedCategories, validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
 import { budgets } from "test/mock/ynabApiData";
 import { expect, test } from "vitest";
@@ -45,7 +45,6 @@ test("Saved categories data loaded properly", async () => {
     tokenData: JSON.stringify(validToken),
     cats: JSON.stringify(savedCategories)
   });
-  window.localStorage.setItem("selectedBudgetId", budgets[0].id);
 
   const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
   await waitFor(() => expect(result.current.savedCategoriesData).toBeTruthy());
@@ -57,4 +56,37 @@ test("Saved categories data loaded properly", async () => {
   expect(groceriesCategory).toBeTruthy();
   expect(groceriesCategory?.name).toBe("Groceries");
   expect(groceriesCategory?.balance).toBe(0);
+});
+
+test("Saved accounts data loaded properly", async () => {
+  await chrome.storage.local.set({
+    tokenData: JSON.stringify(validToken),
+    accounts: JSON.stringify(savedAccounts)
+  });
+
+  const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
+  await waitFor(() => expect(result.current.savedAccountsData).toBeTruthy());
+
+  expect(result.current.savedAccountsData).toHaveLength(1);
+  const checkingAcct = result.current.savedAccountsData?.find(
+    (a) => a.id === "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"
+  );
+  expect(checkingAcct).toBeTruthy();
+  expect(checkingAcct?.name).toBe("Checking");
+  expect(checkingAcct?.balance).toBe(1000000);
+});
+
+test("Payee data loaded with transfer IDs included", async () => {
+  await chrome.storage.local.set({
+    tokenData: JSON.stringify(validToken)
+  });
+
+  const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
+  await waitFor(() => expect(result.current.payeesData).toBeTruthy());
+
+  const checkingTransferPayee = result.current.payeesData?.find(
+    (p) => p.id === "471ecaf5-5da8-49ce-9c99-06f45599d1a7"
+  );
+  expect(checkingTransferPayee).toBeTruthy();
+  expect(checkingTransferPayee?.transferId).toBeTruthy();
 });
