@@ -6,6 +6,7 @@
   "author": "fa-sharp",
   "packageManager": "pnpm@8.14.1",
   "homepage": "https://peek-for-ynab.vercel.app",
+  "type": "module",
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
     "dev:plasmo:edge": "plasmo dev --target=edge-mv3 --port 3001",
