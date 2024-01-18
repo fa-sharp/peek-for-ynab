@@ -127,7 +127,7 @@ test("Can remove all local data", async () => {
       [randomUUID()]: [randomUUID()]
     })
   });
-  window.localStorage.setItem("selectedBudgetId", randomUUID());
+  window.localStorage.setItem("selectedBudget", randomUUID());
 
   const { result } = renderHook(useStorageContext, {
     wrapper: StorageProvider
