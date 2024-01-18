@@ -3,7 +3,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -47,7 +47,7 @@ const useYNABProvider = () => {
     isFetching: isRefreshingBudgets
   } = useQuery({
     queryKey: ["budgets"],
-    staleTime: TWO_WEEKS_IN_MILLIS, // Budget data stays fresh in cache for two weeks
+    staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
@@ -155,7 +155,7 @@ const useYNABProvider = () => {
   /** Fetch payees for the selected budget */
   const { data: payeesData } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
-    staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
+    staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
