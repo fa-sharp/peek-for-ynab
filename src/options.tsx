@@ -167,11 +167,14 @@ export function OptionsView() {
           <button
             style={{ marginTop: 12 }}
             className="button rounded warn"
-            onClick={() => {
+            onClick={async () => {
               const confirmed = confirm(
-                "Are you sure? Logging out will clear all settings and data stored in your browser. It will NOT erase any settings synced to your browser profile."
+                "Are you sure? Logging out will clear all settings and data stored in your browser."
               );
-              if (confirmed) logout();
+              if (confirmed) {
+                await logout();
+                location.reload();
+              }
             }}>
             Logout
           </button>
