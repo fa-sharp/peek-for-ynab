@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
@@ -31,7 +31,6 @@ const useYNABProvider = () => {
     setShownBudgetIds
   } = useStorageContext();
 
-  const queryClient = useQueryClient();
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
   /** Initialize ynabAPI object if authenticated */
@@ -89,7 +88,11 @@ const useYNABProvider = () => {
   );
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
-  const { data: categoryGroupsData, dataUpdatedAt: categoriesLastUpdated } = useQuery({
+  const {
+    data: categoryGroupsData,
+    dataUpdatedAt: categoriesLastUpdated,
+    refetch: refetchCategoryGroups
+  } = useQuery({
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
@@ -129,7 +132,11 @@ const useYNABProvider = () => {
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
   /** Fetch accounts for the selected budget */
-  const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
+  const {
+    data: accountsData,
+    dataUpdatedAt: accountsLastUpdated,
+    refetch: refetchAccounts
+  } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
@@ -141,16 +148,10 @@ const useYNABProvider = () => {
     }
   });
 
-  const refreshCategoriesAndAccounts = useCallback(async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["categoryGroups", { budgetId: selectedBudgetId }]
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["accounts", { budgetId: selectedBudgetId }]
-      })
-    ]);
-  }, [queryClient, selectedBudgetId]);
+  const refreshCategoriesAndAccounts = useCallback(
+    () => Promise.all([refetchCategoryGroups(), refetchAccounts()]),
+    [refetchAccounts, refetchCategoryGroups]
+  );
 
   /** Fetch payees for the selected budget */
   const { data: payeesData } = useQuery({
@@ -228,7 +229,7 @@ const useYNABProvider = () => {
       });
       IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
-      setTimeout(() => refreshCategoriesAndAccounts(), 500);
+      setTimeout(() => refreshCategoriesAndAccounts(), 350);
     },
     [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
   );
