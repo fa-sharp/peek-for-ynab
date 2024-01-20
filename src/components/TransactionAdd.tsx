@@ -30,12 +30,16 @@ export default function TransactionAdd() {
     useYNABContext();
   const { settings, popupState, setPopupState } = useStorageContext();
 
-  const [isTransfer, setIsTransfer] = useState(false);
+  const [isTransfer, setIsTransfer] = useState(
+    popupState.txAddState?.isTransfer ?? false
+  );
   const [date, setDate] = useState(getTodaysDateISO);
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
   const [cleared, setCleared] = useState(settings?.txCleared ? true : false);
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
-  const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(null);
+  const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
+    popupState.txAddState?.payee || null
+  );
   const [category, setCategory] = useState(() => {
     if (!popupState.txAddState?.categoryId) return null;
     return (
@@ -82,7 +86,7 @@ export default function TransactionAdd() {
     if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
     const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
     const isCreditCardPayment =
-      account?.on_budget &&
+      (!account || account.on_budget) &&
       transferToAccount &&
       (transferToAccount.type === "creditCard" ||
         transferToAccount.type === "lineOfCredit");
@@ -92,7 +96,7 @@ export default function TransactionAdd() {
         c.category_group_name === "Credit Card Payments" &&
         c.name === transferToAccount.name
     );
-  }, [account?.on_budget, accountsData, categoriesData, isTransfer, payee]);
+  }, [account, accountsData, categoriesData, isTransfer, payee]);
 
   /** Switch the To and From account for a transfer */
   const switchToFromAccounts = useCallback(() => {
@@ -327,7 +331,7 @@ export default function TransactionAdd() {
                     if (ccpCategory.balance <= 0) return;
                     setAmount(
                       (ccpCategory.balance / 1000).toFixed(
-                        selectedBudgetData?.currencyFormat?.decimal_digits || 2
+                        selectedBudgetData?.currencyFormat?.decimal_digits ?? 2
                       )
                     );
                   }}>

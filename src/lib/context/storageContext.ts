@@ -8,6 +8,8 @@ import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 
+import type { CachedPayee } from "./ynabContext";
+
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -27,9 +29,13 @@ export interface AppSettings {
   currentTabAccess: boolean;
 }
 
+/** Initial state of the add transaction screen */
 export interface TxAddInitialState {
+  amount?: string;
   accountId?: string;
   categoryId?: string;
+  payee?: CachedPayee;
+  isTransfer?: boolean;
 }
 
 /** Map of budget IDs to string arrays. Useful type for storage. */
