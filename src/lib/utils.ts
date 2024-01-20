@@ -25,6 +25,17 @@ export const formatCurrency = (
   return formattedString;
 };
 
+/** Convert millis to a string value suitable for the HTML number input */
+export const millisToStringValue = (
+  millis: number,
+  currencyFormat = { decimal_digits: 2 }
+) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
+
+export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
+  accountsData?.find(
+    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
+  );
+
 /**
  * Get today's date (user's local timezone) in ISO format (i.e. for `input[type=date]` element)
  */

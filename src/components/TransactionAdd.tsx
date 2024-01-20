@@ -18,6 +18,7 @@ import {
   executeScriptInCurrentTab,
   flagColorToEmoji,
   getTodaysDateISO,
+  millisToStringValue,
   parseLocaleNumber,
   requestCurrentTabPermissions
 } from "~lib/utils";
@@ -330,8 +331,9 @@ export default function TransactionAdd() {
                   onClick={() => {
                     if (ccpCategory.balance <= 0) return;
                     setAmount(
-                      (ccpCategory.balance / 1000).toFixed(
-                        selectedBudgetData?.currencyFormat?.decimal_digits ?? 2
+                      millisToStringValue(
+                        ccpCategory.balance,
+                        selectedBudgetData?.currencyFormat
                       )
                     );
                   }}>

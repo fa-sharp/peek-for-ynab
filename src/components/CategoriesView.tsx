@@ -11,7 +11,12 @@ import { CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import { findEmoji, formatCurrency } from "~lib/utils";
+import {
+  findCCAccount,
+  findEmoji,
+  formatCurrency,
+  millisToStringValue
+} from "~lib/utils";
 
 import {
   AddCCPaymentIcon,
@@ -113,12 +118,8 @@ export function CategoryGroupView({
           {categoryGroup.categories.map((category) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
-              categoryGroup.name === "Credit Card Payments"
-                ? accountsData?.find(
-                    (a) =>
-                      (a.type === "creditCard" || a.type === "lineOfCredit") &&
-                      a.name === category.name
-                  )
+              categoryGroup.name === "Credit Card Payments" && accountsData
+                ? findCCAccount(accountsData, category.name)
                 : undefined;
             return (
               <li key={category.id}>
@@ -164,8 +165,9 @@ export function CategoryGroupView({
                             ccAccount.transfer_payee_id &&
                             onAddTx({
                               isTransfer: true,
-                              amount: (category.balance / 1000).toFixed(
-                                budgetData.currencyFormat?.decimal_digits ?? 2
+                              amount: millisToStringValue(
+                                category.balance,
+                                budgetData.currencyFormat
                               ),
                               payee: {
                                 id: ccAccount.transfer_payee_id,

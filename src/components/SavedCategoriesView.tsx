@@ -3,6 +3,7 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { IconButton } from "~components";
 import { CategoryView } from "~components/CategoriesView";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
   AddCCPaymentIcon,
@@ -36,12 +37,8 @@ export default function SavedCategoriesView() {
           {savedCategoriesData.map((category, idx) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
-              category.category_group_name === "Credit Card Payments"
-                ? accountsData?.find(
-                    (a) =>
-                      (a.type === "creditCard" || a.type === "lineOfCredit") &&
-                      a.name === category.name
-                  )
+              category.category_group_name === "Credit Card Payments" && accountsData
+                ? findCCAccount(accountsData, category.name)
                 : undefined;
             return (
               <Draggable
@@ -95,9 +92,9 @@ export default function SavedCategoriesView() {
                                   view: "txAdd",
                                   txAddState: {
                                     isTransfer: true,
-                                    amount: (category.balance / 1000).toFixed(
-                                      selectedBudgetData.currencyFormat?.decimal_digits ??
-                                        2
+                                    amount: millisToStringValue(
+                                      category.balance,
+                                      currencyFormat
                                     ),
                                     payee: {
                                       id: ccAccount.transfer_payee_id,
