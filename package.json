@@ -35,7 +35,7 @@
     "json-formatter-js": "^2.3.4",
     "nanoid": "^5.0.4",
     "next": "^14.0.4",
-    "plasmo": "^0.84.0",
+    "plasmo": "^0.84.1",
     "puro": "^0.8.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
