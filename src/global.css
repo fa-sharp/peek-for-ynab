@@ -25,26 +25,24 @@
   --spacing-xl: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #252525;
-    --border: #969696;
-    --border-light: #6e6e6e;
-    --action: #ffffff;
-    --accent: hsl(210, 40%, 39%);
-    --accent-hover: hsl(210, 43%, 50%);
-    --success: #63d035;
-    --warn: hsl(0, 33%, 50%);
-    --warn-hover: hsl(0, 33%, 59%);
-    --error: #ff6c6c;
-    --highlight: hsla(0, 0%, 91%, 0.2);
-    --currency-green: #61d231;
-    --currency-red: #ff8888;
-    --gray: hsl(0, 0%, 26%);
-    --gray-hover: hsl(0, 0%, 36%);
+:root.dark {
+  --background: #252525;
+  --border: #969696;
+  --border-light: #6e6e6e;
+  --action: #ffffff;
+  --accent: hsl(210, 40%, 39%);
+  --accent-hover: hsl(210, 43%, 50%);
+  --success: #63d035;
+  --warn: hsl(0, 33%, 50%);
+  --warn-hover: hsl(0, 33%, 59%);
+  --error: #ff6c6c;
+  --highlight: hsla(0, 0%, 91%, 0.2);
+  --currency-green: #61d231;
+  --currency-red: #ff8888;
+  --gray: hsl(0, 0%, 26%);
+  --gray-hover: hsl(0, 0%, 36%);
 
-    color: white;
-  }
+  color: white;
 }
 
 html {

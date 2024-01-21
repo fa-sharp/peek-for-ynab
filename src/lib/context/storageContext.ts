@@ -27,6 +27,8 @@ export interface AppSettings {
   privateMode: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
+  /** The color theme for the extension. @default "auto" */
+  theme?: "auto" | "dark" | "light";
 }
 
 /** Initial state of the add transaction screen */
@@ -123,7 +125,7 @@ const useStorageProvider = () => {
     key: K,
     newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
   ) => {
-    if (key === "sync") setSyncEnabled(newValue);
+    if (key === "sync" && typeof newValue === "boolean") setSyncEnabled(newValue);
     else
       setSettings((prevSettings) =>
         prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
