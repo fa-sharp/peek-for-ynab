@@ -75,6 +75,25 @@ export const accounts = [
     debt_minimum_payments: {},
     debt_escrow_amounts: {},
     deleted: false
+  },
+  {
+    id: "509fec7a-f582-4fc7-8fa3-a133d6aae076",
+    name: "💳 Amex Blue Cash",
+    type: "creditCard",
+    on_budget: true,
+    closed: false,
+    note: "",
+    balance: -130000,
+    cleared_balance: -130000,
+    uncleared_balance: 0,
+    transfer_payee_id: "90319ed5-6d0e-42dd-9e83-faeb2ab4523c",
+    direct_import_linked: true,
+    direct_import_in_error: false,
+    last_reconciled_at: "2024-01-18T06:25:54Z",
+    debt_interest_rates: {},
+    debt_minimum_payments: {},
+    debt_escrow_amounts: {},
+    deleted: false
   }
 ];
 
@@ -116,7 +135,33 @@ export const category_groups = [
     name: "Credit Card Payments",
     hidden: false,
     deleted: false,
-    categories: []
+    categories: [
+      {
+        id: "929d67dc-28fd-4041-8075-1422e23160c5",
+        category_group_id: "70e91c44-0cb2-40f5-88c3-22456eff17af",
+        category_group_name: "Credit Card Payments",
+        name: "💳 Amex Blue Cash",
+        hidden: false,
+        original_category_group_id: null,
+        note: null,
+        budgeted: 109480,
+        activity: 26650,
+        balance: 130000,
+        goal_type: null,
+        goal_day: null,
+        goal_cadence: null,
+        goal_cadence_frequency: null,
+        goal_creation_month: null,
+        goal_target: 0,
+        goal_target_month: null,
+        goal_percentage_complete: null,
+        goal_months_to_budget: null,
+        goal_under_funded: null,
+        goal_overall_funded: null,
+        goal_overall_left: null,
+        deleted: false
+      }
+    ]
   },
   {
     id: "9227e973-4260-4d29-9943-d75a065feb47",
