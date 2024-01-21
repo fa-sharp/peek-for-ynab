@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -93,6 +93,17 @@ const useStorageProvider = () => {
     { key: "settings", instance: storageArea },
     (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
   );
+
+  /** Keep theme setting synced to local storage */
+  const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
+    "light" | "dark" | "auto"
+  >("theme", {
+    defaultValue: "auto"
+  });
+  useEffect(() => {
+    if (settings?.theme && themeLocalSetting !== settings.theme)
+      setThemeLocalSetting(settings.theme);
+  }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
   const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<undefined | string[]>(

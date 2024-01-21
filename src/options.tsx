@@ -7,7 +7,11 @@ import {
   useStorageContext,
   useYNABContext
 } from "~lib/context";
-import { removeCurrentTabPermissions, requestCurrentTabPermissions } from "~lib/utils";
+import {
+  removeCurrentTabPermissions,
+  requestCurrentTabPermissions,
+  useSetColorTheme
+} from "~lib/utils";
 
 import "./global.css";
 
@@ -22,6 +26,8 @@ export function OptionsView() {
     useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
+
+  useSetColorTheme();
 
   const [loggingIn, setLoggingIn] = useState(false);
 
@@ -92,6 +98,19 @@ export function OptionsView() {
               onChange={(e) => changeSetting("emojiMode", e.target.checked)}
             />
             😉 Emoji mode
+          </label>
+          <label className="flex-row mb-small">
+            Theme:
+            <select
+              className="select rounded"
+              value={settings.theme || "auto"}
+              onChange={(e) =>
+                changeSetting("theme", e.target.value as "dark" | "light" | "auto")
+              }>
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
           </label>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Transaction defaults
