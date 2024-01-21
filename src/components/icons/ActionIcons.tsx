@@ -1,4 +1,11 @@
-import { ChevronDown, ChevronUp, Pinned, Plus } from "tabler-icons-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  Pinned,
+  Plus,
+  SwitchHorizontal
+} from "tabler-icons-react";
 
 export const PinnedItemIcon = () => (
   <Pinned size="1.2rem" color="var(--action)" fill="var(--action)" strokeWidth={1} />
@@ -8,6 +15,12 @@ export const PinItemIcon = () => (
 );
 export const AddTransactionIcon = () => (
   <Plus size="1.2rem" color="var(--action)" strokeWidth={1} />
+);
+export const AddTransferIcon = () => (
+  <SwitchHorizontal size="1.2rem" color="var(--action)" strokeWidth={1} />
+);
+export const AddCCPaymentIcon = () => (
+  <CreditCard size="1.2rem" color="var(--action)" strokeWidth={1} />
 );
 
 export const ExpandListIcon = () => (

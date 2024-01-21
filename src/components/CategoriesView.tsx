@@ -1,14 +1,25 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
+import type {
+  Account,
+  Category,
+  CategoryGroupWithCategories,
+  CurrencyFormat
+} from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
-import { findEmoji, formatCurrency } from "~lib/utils";
+import {
+  findCCAccount,
+  findEmoji,
+  formatCurrency,
+  millisToStringValue
+} from "~lib/utils";
 
 import {
+  AddCCPaymentIcon,
   AddTransactionIcon,
   CollapseListIcon,
   CollapseListIconBold,
@@ -28,7 +39,7 @@ function CategoriesView() {
     settings,
     selectedBudgetId
   } = useStorageContext();
-  const { selectedBudgetData, categoryGroupsData } = useYNABContext();
+  const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -53,6 +64,7 @@ function CategoriesView() {
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
             budgetData={selectedBudgetData}
+            accountsData={accountsData}
             savedCategories={savedCategories[selectedBudgetId]}
             editMode={popupState.editMode}
             settings={settings}
@@ -68,6 +80,7 @@ function CategoriesView() {
 export function CategoryGroupView({
   categoryGroup,
   budgetData,
+  accountsData,
   savedCategories,
   onSaveCategory,
   editMode,
@@ -75,6 +88,7 @@ export function CategoryGroupView({
   onAddTx
 }: {
   categoryGroup: CategoryGroupWithCategories;
+  accountsData?: Account[];
   budgetData: CachedBudget;
   savedCategories?: string[];
   onSaveCategory: (categoryId: string) => void;
@@ -101,44 +115,75 @@ export function CategoryGroupView({
       </div>
       {expanded && (
         <ul className="list">
-          {categoryGroup.categories.map((category) => (
-            <li key={category.id}>
-              <CategoryView
-                categoryData={category}
-                currencyFormat={budgetData.currencyFormat}
-                settings={settings}
-                actionElementsLeft={
-                  !editMode ? null : savedCategories?.some((id) => id === category.id) ? (
-                    <IconButton
-                      icon={<PinnedItemIcon />}
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
-                  ) : (
-                    <IconButton
-                      icon={<PinItemIcon />}
-                      label="Pin"
-                      onClick={() => onSaveCategory(category.id)}
-                    />
-                  )
-                }
-                actionElementsRight={
-                  categoryGroup.name === "Credit Card Payments" ? null : (
-                    <aside className="balance-actions" aria-label="actions">
+          {categoryGroup.categories.map((category) => {
+            /** The corresponding credit card account, if this is a CCP category */
+            const ccAccount =
+              categoryGroup.name === "Credit Card Payments" && accountsData
+                ? findCCAccount(accountsData, category.name)
+                : undefined;
+            return (
+              <li key={category.id}>
+                <CategoryView
+                  categoryData={category}
+                  currencyFormat={budgetData.currencyFormat}
+                  settings={settings}
+                  actionElementsLeft={
+                    !editMode ? null : savedCategories?.some(
+                        (id) => id === category.id
+                      ) ? (
                       <IconButton
-                        rounded
-                        accent
-                        icon={<AddTransactionIcon />}
-                        label="Add transaction"
-                        onClick={() => onAddTx({ categoryId: category.id })}
+                        icon={<PinnedItemIcon />}
+                        label="Pinned"
+                        disabled
+                        noAction
                       />
+                    ) : (
+                      <IconButton
+                        icon={<PinItemIcon />}
+                        label="Pin"
+                        onClick={() => onSaveCategory(category.id)}
+                      />
+                    )
+                  }
+                  actionElementsRight={
+                    <aside className="balance-actions" aria-label="actions">
+                      {!ccAccount ? (
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddTransactionIcon />}
+                          label="Add transaction"
+                          onClick={() => onAddTx({ categoryId: category.id })}
+                        />
+                      ) : (
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddCCPaymentIcon />}
+                          label="Add credit card payment"
+                          onClick={() =>
+                            ccAccount.transfer_payee_id &&
+                            onAddTx({
+                              isTransfer: true,
+                              amount: millisToStringValue(
+                                category.balance,
+                                budgetData.currencyFormat
+                              ),
+                              payee: {
+                                id: ccAccount.transfer_payee_id,
+                                name: ccAccount.name,
+                                transferId: ccAccount.id
+                              }
+                            })
+                          }
+                        />
+                      )}
                     </aside>
-                  )
-                }
-              />
-            </li>
-          ))}
+                  }
+                />
+              </li>
+            );
+          })}
         </ul>
       )}
     </>

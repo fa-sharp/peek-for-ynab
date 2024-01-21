@@ -127,3 +127,22 @@ test("Ready to Assign appears as first category", async () => {
   const categoryList = screen.getByRole("listbox").childNodes;
   expect(categoryList[0]).toHaveTextContent("Inflow: Ready to Assign");
 });
+
+test("Credit Card Payment categories don't appear", async () => {
+  const wrapper = createTestAppWrapper();
+
+  const { result } = renderHook(useYNABContext, { wrapper });
+  await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
+
+  const user = userEvent.setup();
+  render(
+    <CategorySelect
+      selectCategory={() => {}}
+      categories={result.current.categoriesData}
+    />,
+    { wrapper }
+  );
+
+  await user.click(screen.getByLabelText("open", { exact: false }));
+  expect(screen.queryByText("Credit Card Payments")).toBeNull();
+});
