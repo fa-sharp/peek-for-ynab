@@ -68,17 +68,6 @@ function HelpPage() {
           </p>
         </li>
         <li>
-          <h3>How do I get dark mode?</h3>
-          <p>
-            Dark mode is activated based on your system theme. This varies depending on
-            your OS: here are the instructions for{" "}
-            <a href="https://support.microsoft.com/en-us/windows/change-colors-in-windows-d26ef4d6-819a-581c-1581-493cfcc005fe">
-              Windows
-            </a>{" "}
-            and <a href="https://support.apple.com/en-us/HT208976">Mac</a>.
-          </p>
-        </li>
-        <li>
           <h3>What does the icon in the upper left corner represent?</h3>
           <ul>
             <li>

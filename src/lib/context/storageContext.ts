@@ -94,7 +94,7 @@ const useStorageProvider = () => {
     (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
   );
 
-  /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see `lib/theme.ts` */
+  /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see also `public/scripts/theme.js` */
   const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
     "light" | "dark" | "auto"
   >("theme", { defaultValue: "auto" });
