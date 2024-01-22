@@ -177,6 +177,8 @@ export const useSetColorTheme = () => {
   });
 
   useLayoutEffect(() => {
+    if (!window?.matchMedia) return;
+
     const prefersDarkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
     if (
       (themeSetting === "auto" && prefersDarkModeQuery.matches) ||
