@@ -170,18 +170,22 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
   return null;
 };
 
-/** Sets the theme based on user setting / media query */
+/**
+ * Sets the theme based on user setting in localStorage and media query.
+ * See also [theme.js](../../public/scripts/theme.js) which avoids the 'flash' on load.
+ */
 export const useSetColorTheme = () => {
   const [themeSetting] = useLocalStorageState<"light" | "dark" | "auto">("theme", {
     defaultValue: "auto"
   });
 
   useLayoutEffect(() => {
-    if (!window?.matchMedia) return;
+    const prefersDarkModeQuery = window?.matchMedia
+      ? window.matchMedia("(prefers-color-scheme: dark)")
+      : null;
 
-    const prefersDarkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
     if (
-      (themeSetting === "auto" && prefersDarkModeQuery.matches) ||
+      (themeSetting === "auto" && prefersDarkModeQuery?.matches) ||
       themeSetting === "dark"
     )
       document.documentElement.classList.add("dark");
@@ -192,8 +196,8 @@ export const useSetColorTheme = () => {
         document.documentElement.classList.add("dark");
       else document.documentElement.classList.remove("dark");
     };
-    prefersDarkModeQuery.addEventListener("change", listener);
+    prefersDarkModeQuery?.addEventListener("change", listener);
 
-    return () => prefersDarkModeQuery.removeEventListener("change", listener);
+    return () => prefersDarkModeQuery?.removeEventListener("change", listener);
   }, [themeSetting]);
 };
