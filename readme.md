@@ -7,6 +7,7 @@ A Chrome extension for YNAB that lets users see their category and account balan
 - `src/`
   - `popup.tsx` Extension - popup component
   - `options.tsx` Extension - options component
+  - `background.ts` Extension - background worker (refreshes the token)
   - `pages/` Website and server (Next.js)
     - `api/` API routes to fetch OAuth tokens from YNAB API
   - `lib/` Library and utility functions

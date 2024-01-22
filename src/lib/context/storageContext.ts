@@ -94,12 +94,10 @@ const useStorageProvider = () => {
     (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
   );
 
-  /** Keep theme setting synced to local storage */
+  /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see `lib/theme.ts` */
   const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
     "light" | "dark" | "auto"
-  >("theme", {
-    defaultValue: "auto"
-  });
+  >("theme", { defaultValue: "auto" });
   useEffect(() => {
     if (settings?.theme && themeLocalSetting !== settings.theme)
       setThemeLocalSetting(settings.theme);
