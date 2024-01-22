@@ -16,6 +16,7 @@ import {
   useStorageContext,
   useYNABContext
 } from "~lib/context";
+import { useSetColorTheme } from "~lib/utils";
 
 import "./global.css";
 
@@ -30,6 +31,8 @@ function PopupWrapper() {
 export function PopupView() {
   const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
+
+  useSetColorTheme();
 
   if (authLoading || !settings) return null;
 

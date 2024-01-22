@@ -17,6 +17,7 @@ li {
 .screenshot {
   border: solid 2px var(--border-light);
   border-radius: 5px;
+  height: auto;
 }
 
 .browser-logos {
