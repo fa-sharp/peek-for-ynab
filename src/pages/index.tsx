@@ -18,6 +18,7 @@ function IndexPage() {
           className="screenshot"
           width={380}
           height={300}
+          priority
         />
         <Image
           src="/screenshots/dark-pinned.png"
@@ -25,6 +26,7 @@ function IndexPage() {
           className="screenshot"
           width={380}
           height={300}
+          priority
         />
       </div>
       <div className="browser-logos">
@@ -48,11 +50,6 @@ function IndexPage() {
         <li>Add transactions directly from the extension</li>
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>
-      </ul>
-
-      <h2>Coming soon!</h2>
-      <ul>
-        <li>Multi-browser support</li>
       </ul>
       <br />
       <p>* (before those midnight impulse purchases 😉)</p>

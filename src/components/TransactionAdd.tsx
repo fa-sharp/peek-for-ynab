@@ -279,20 +279,6 @@ export default function TransactionAdd() {
         ) : (
           <>
             <AccountSelect
-              currentAccount={account}
-              accounts={accountsData}
-              selectAccount={setAccount}
-              isTransfer="from"
-              disabled={isSaving}
-            />
-            <div className="flex-row">
-              <IconButton
-                icon={<SwitchVertical />}
-                label="Switch 'From' and 'To' accounts"
-                onClick={switchToFromAccounts}
-              />
-            </div>
-            <AccountSelect
               accounts={accountsData}
               currentAccount={
                 payee && "transferId" in payee
@@ -313,14 +299,6 @@ export default function TransactionAdd() {
               isTransfer="to"
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
-              <CategorySelect
-                initialCategory={category}
-                categories={categoriesData}
-                selectCategory={setCategory}
-                disabled={isSaving}
-              />
-            )}
             {ccpCategory && (
               <div>
                 Payment category:{" "}
@@ -329,7 +307,7 @@ export default function TransactionAdd() {
                   className="button rounded gray"
                   title="Set to the available amount in this credit card's payment category"
                   onClick={() => {
-                    if (ccpCategory.balance <= 0) return;
+                    if (ccpCategory.balance < 0) return;
                     setAmount(
                       millisToStringValue(
                         ccpCategory.balance,
@@ -344,6 +322,28 @@ export default function TransactionAdd() {
                   />
                 </button>
               </div>
+            )}
+            <div className="flex-row">
+              <IconButton
+                icon={<SwitchVertical />}
+                label="Switch 'To' and 'From' accounts"
+                onClick={switchToFromAccounts}
+              />
+            </div>
+            <AccountSelect
+              currentAccount={account}
+              accounts={accountsData}
+              selectAccount={setAccount}
+              isTransfer="from"
+              disabled={isSaving}
+            />
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={setCategory}
+                disabled={isSaving}
+              />
             )}
           </>
         )}

@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -27,6 +27,8 @@ export interface AppSettings {
   privateMode: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
+  /** The color theme for the extension. @default "auto" */
+  theme?: "auto" | "dark" | "light";
 }
 
 /** Initial state of the add transaction screen */
@@ -92,6 +94,15 @@ const useStorageProvider = () => {
     (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
   );
 
+  /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see also `public/scripts/theme.js` */
+  const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
+    "light" | "dark" | "auto"
+  >("theme", { defaultValue: "auto" });
+  useEffect(() => {
+    if (settings?.theme && themeLocalSetting !== settings.theme)
+      setThemeLocalSetting(settings.theme);
+  }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
+
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
   const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<undefined | string[]>(
     { key: "budgets", instance: storageArea },
@@ -123,7 +134,7 @@ const useStorageProvider = () => {
     key: K,
     newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
   ) => {
-    if (key === "sync") setSyncEnabled(newValue);
+    if (key === "sync" && typeof newValue === "boolean") setSyncEnabled(newValue);
     else
       setSettings((prevSettings) =>
         prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
