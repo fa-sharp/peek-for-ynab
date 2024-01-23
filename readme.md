@@ -1,6 +1,6 @@
-# Widget for YNAB
+# Peek for YNAB
 
-A Chrome extension for YNAB that lets users see their category and account balances at a glance.
+A browser extension for YNAB that lets users see their category and account balances at a glance, and add transactions.
 
 ### Project layout
 
@@ -18,7 +18,9 @@ A Chrome extension for YNAB that lets users see their category and account balan
 
 ### Environment variables
 
-- `PLASMO_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes
+Set the following variables in a `.env` file:
+
+- `PLASMO_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes (when running locally, set this to `http://localhost:3000`)
 
 Set up an OAuth application in your YNAB Developer Settings, then set the following environment variables:
 
@@ -67,7 +69,3 @@ pnpm build:next
 # or
 npm run build:next
 ```
-
-## Submit to the webstores
-
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/workflows#submit-your-extension) and you should be on your way for automated submission!

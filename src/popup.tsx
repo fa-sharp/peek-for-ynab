@@ -1,21 +1,6 @@
-import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
-import { useEffect } from "react";
-
-import {
-  AccountsView,
-  CategoriesView,
-  PopupLogin,
-  PopupNav,
-  SavedAccountsView,
-  SavedCategoriesView,
-  TransactionAdd
-} from "~components";
-import {
-  AppProvider,
-  useAuthContext,
-  useStorageContext,
-  useYNABContext
-} from "~lib/context";
+import { PopupLogin, TransactionAdd } from "~components";
+import PopupMain from "~components/PopupMain";
+import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 
 import "./global.css";
@@ -50,61 +35,9 @@ export function PopupView() {
       ) : popupState.view === "txAdd" ? (
         <TransactionAdd />
       ) : (
-        <MainPopup />
+        <PopupMain />
       )}
     </div>
-  );
-}
-
-function MainPopup() {
-  const {
-    savedCategories,
-    savedAccounts,
-    saveCategoriesForBudget,
-    saveAccountsForBudget,
-    setPopupState,
-    selectedBudgetId
-  } = useStorageContext();
-  const { savedCategoriesData, savedAccountsData } = useYNABContext();
-
-  // activate edit mode if there are no pinned categories or accounts
-  useEffect(() => {
-    if (
-      savedCategories &&
-      savedAccounts &&
-      !savedCategories[selectedBudgetId]?.length &&
-      !savedAccounts[selectedBudgetId]?.length
-    )
-      setPopupState({ view: "main", editMode: true });
-  }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
-
-  const onDragEnd: OnDragEndResponder = (result) => {
-    if (!result.destination) return;
-    if (result.source.droppableId === "savedCategories") {
-      if (!savedCategoriesData) return;
-      const savedCategoryIds = savedCategoriesData.map((c) => c.id);
-      const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
-      savedCategoryIds.splice(result.destination.index, 0, categoryId);
-      saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
-    } else if (result.source.droppableId === "savedAccounts") {
-      if (!savedAccountsData) return;
-      const savedAccountIds = savedAccountsData.map((a) => a.id);
-      const [accountId] = savedAccountIds.splice(result.source.index, 1);
-      savedAccountIds.splice(result.destination.index, 0, accountId);
-      saveAccountsForBudget(selectedBudgetId, savedAccountIds);
-    }
-  };
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <PopupNav />
-
-      <SavedCategoriesView />
-      <SavedAccountsView />
-
-      <CategoriesView />
-      <AccountsView />
-    </DragDropContext>
   );
 }
 
