@@ -92,10 +92,13 @@ export default function SavedCategoriesView() {
                                   view: "txAdd",
                                   txAddState: {
                                     isTransfer: true,
-                                    amount: millisToStringValue(
-                                      category.balance,
-                                      currencyFormat
-                                    ),
+                                    amount:
+                                      category.balance >= 0
+                                        ? millisToStringValue(
+                                            category.balance,
+                                            currencyFormat
+                                          )
+                                        : undefined,
                                     payee: {
                                       id: ccAccount.transfer_payee_id,
                                       name: ccAccount.name,

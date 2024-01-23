@@ -69,7 +69,11 @@ export default function AccountSelect({
   return (
     <div className="form-input">
       <label {...getLabelProps()}>
-        {!isTransfer ? "Account" : isTransfer === "from" ? "From" : "To"}
+        {!isTransfer
+          ? "Account"
+          : isTransfer === "from"
+            ? "Account (From)"
+            : "Payee (To)"}
       </label>
       <div className="flex-col">
         <input

@@ -165,10 +165,13 @@ export function CategoryGroupView({
                             ccAccount.transfer_payee_id &&
                             onAddTx({
                               isTransfer: true,
-                              amount: millisToStringValue(
-                                category.balance,
-                                budgetData.currencyFormat
-                              ),
+                              amount:
+                                category.balance >= 0
+                                  ? millisToStringValue(
+                                      category.balance,
+                                      budgetData.currencyFormat
+                                    )
+                                  : undefined,
                               payee: {
                                 id: ccAccount.transfer_payee_id,
                                 name: ccAccount.name,
