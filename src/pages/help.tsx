@@ -41,17 +41,17 @@ function HelpPage() {
         </li>
         <li>
           <h3>
-            I use bank imports in YNAB. How will that work with transactions I enter via
-            the extension?
+            I use Direct Import (bank imports) in YNAB. How will that work with
+            transactions I enter via the extension?
           </h3>
           <p>
             The transactions will behave just as if you manually entered them in YNAB. If
-            the transaction later imports from the bank, and it matches the transaction
+            the transaction later imports from your bank, and it matches the transaction
             you entered, you will be prompted to approve that match in YNAB.
           </p>
         </li>
         <li>
-          <h3>I do not use bank imports in YNAB. Should I change any settings?</h3>
+          <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
             If you usually enter transactions as Cleared in YNAB, you will want to check
             the <b>Cleared</b> setting under <b>Transaction defaults</b>. This way, all
