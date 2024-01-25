@@ -43,6 +43,25 @@ export const budgets = [
 
 export const accounts = [
   {
+    id: "39c70b03-cf3b-4932-bcd6-5db25884f14d",
+    name: "💰 Mutual Funds",
+    type: "otherAsset",
+    on_budget: false,
+    closed: false,
+    note: "",
+    balance: 16_000_000,
+    cleared_balance: 16_000_000,
+    uncleared_balance: 0,
+    transfer_payee_id: "35764e10-64b2-4ff8-9704-26d171a6197e",
+    direct_import_linked: false,
+    direct_import_in_error: false,
+    last_reconciled_at: "2024-01-16T00:17:31Z",
+    debt_interest_rates: {},
+    debt_minimum_payments: {},
+    debt_escrow_amounts: {},
+    deleted: false
+  },
+  {
     id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e",
     name: "Checking",
     type: "checking",

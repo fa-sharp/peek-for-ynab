@@ -142,7 +142,11 @@ const useYNABProvider = () => {
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
-      const accounts = response.data.accounts.filter((a) => a.closed === false); // only get open accounts
+      const accounts = response.data.accounts
+        .filter((a) => a.closed === false) // filter out closed accounts
+        .sort((a, b) =>
+          a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
+        ); // sort with Budget accounts first
       IS_DEV && console.log("Fetched accounts!", accounts);
       return accounts;
     }

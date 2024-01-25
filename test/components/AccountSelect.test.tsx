@@ -36,7 +36,7 @@ test("Mouse behavior works as expected", async () => {
   expect(
     screen.getByRole("listbox").children,
     "Account list appears on click"
-  ).toHaveLength(4);
+  ).toHaveLength(6);
 
   const checkingAcct = screen.getByRole("listbox").children[1];
   expect(checkingAcct).toHaveTextContent("Checking");
@@ -74,9 +74,9 @@ test("Keyboard behavior works as expected", async () => {
   expect(
     screen.getByRole("listbox").children,
     "Account list appears on down arrow"
-  ).toHaveLength(4);
+  ).toHaveLength(6);
   const checkingAcct = screen.getByRole("listbox").children[1];
-  expect(checkingAcct, "First account highlighted on down arrow").toHaveClass(
+  expect(checkingAcct, "First budget account highlighted on down arrow").toHaveClass(
     "highlighted"
   );
   await user.keyboard("{Enter}");
