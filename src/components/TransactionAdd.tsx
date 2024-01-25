@@ -18,17 +18,15 @@ import {
   executeScriptInCurrentTab,
   flagColorToEmoji,
   getTodaysDateISO,
-  millisToStringValue,
   parseLocaleNumber,
   requestCurrentTabPermissions
 } from "~lib/utils";
 
-import { AccountSelect, CategorySelect, CurrencyView, IconButton, PayeeSelect } from ".";
+import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
-  const { accountsData, categoriesData, payeesData, selectedBudgetData, addTransaction } =
-    useYNABContext();
+  const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
   const { settings, popupState, setPopupState } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(
@@ -83,21 +81,21 @@ export default function TransactionAdd() {
   }, [account?.on_budget, accountsData, isTransfer, payee]);
 
   /** The CCP category if this is a credit card payment. We'll want to show the CCP balance. */
-  const ccpCategory = useMemo(() => {
-    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
-    const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
-    const isCreditCardPayment =
-      (!account || account.on_budget) &&
-      transferToAccount &&
-      (transferToAccount.type === "creditCard" ||
-        transferToAccount.type === "lineOfCredit");
-    if (!isCreditCardPayment) return;
-    return categoriesData?.find(
-      (c) =>
-        c.category_group_name === "Credit Card Payments" &&
-        c.name === transferToAccount.name
-    );
-  }, [account, accountsData, categoriesData, isTransfer, payee]);
+  // const ccpCategory = useMemo(() => {
+  //   if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
+  //   const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
+  //   const isCreditCardPayment =
+  //     (!account || account.on_budget) &&
+  //     transferToAccount &&
+  //     (transferToAccount.type === "creditCard" ||
+  //       transferToAccount.type === "lineOfCredit");
+  //   if (!isCreditCardPayment) return;
+  //   return categoriesData?.find(
+  //     (c) =>
+  //       c.category_group_name === "Credit Card Payments" &&
+  //       c.name === transferToAccount.name
+  //   );
+  // }, [account, accountsData, categoriesData, isTransfer, payee]);
 
   /** Switch the To and From account for a transfer */
   const switchToFromAccounts = useCallback(() => {
@@ -299,7 +297,7 @@ export default function TransactionAdd() {
               isTransfer="to"
               disabled={isSaving}
             />
-            {ccpCategory && (
+            {/* {ccpCategory && (
               <div>
                 Payment category:{" "}
                 <button
@@ -322,7 +320,7 @@ export default function TransactionAdd() {
                   />
                 </button>
               </div>
-            )}
+            )} */}
             <div className="flex-row">
               <IconButton
                 icon={<SwitchVertical />}
