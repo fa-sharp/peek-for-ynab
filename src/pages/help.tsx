@@ -25,10 +25,10 @@ function HelpPage() {
         <li>
           <h3>How do I pin/unpin or re-arrange my categories and accounts?</h3>
           <p>
-            If you have already pinned some items, you will need to click the edit/pencil
-            icon in the upper right in order to show the pin and unpin buttons next to
-            each category and account. You can also then drag and drop your pinned items
-            to re-arrange them how you like.
+            If you have already pinned some items, you will need to click the edit button
+            in the upper right in order to show the pin and unpin buttons next to each
+            category and account. You can also then drag and drop your pinned items to
+            re-arrange them how you like.
           </p>
         </li>
         <li>
@@ -53,9 +53,10 @@ function HelpPage() {
         <li>
           <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
-            If you usually enter transactions as Cleared in YNAB, you will want to check
-            the <b>Cleared</b> setting under <b>Transaction defaults</b>. This way, all
-            transactions entered via the extension will be marked as Cleared by default.
+            If you will enter a lot of your transactions using the extension, you may want
+            to uncheck the <b>Approved</b> setting under <b>Transaction defaults</b>, so
+            that you will be prompted to double-check and Approve the transactions in
+            YNAB.
           </p>
         </li>
         <li>
