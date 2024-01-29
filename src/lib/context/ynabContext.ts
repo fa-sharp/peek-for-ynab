@@ -165,13 +165,14 @@ const useYNABProvider = () => {
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
+      const collator = Intl.Collator();
       const payees = response.data.payees
         .map((payee) => ({
           id: payee.id,
           name: payee.name,
           ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
         }))
-        .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
+        .sort((a, b) => collator.compare(a.name, b.name));
       IS_DEV && console.log("Fetched payees!", payees);
       return payees;
     }
