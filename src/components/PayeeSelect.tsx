@@ -3,6 +3,7 @@ import { useCombobox } from "downshift";
 import { useState } from "react";
 
 import type { CachedPayee } from "~lib/context/ynabContext";
+import { searchWithinString } from "~lib/utils";
 
 interface Props {
   payees?: CachedPayee[];
@@ -13,7 +14,7 @@ interface Props {
 
 function getFilter(inputValue?: string) {
   return (payee: CachedPayee) =>
-    (!inputValue || payee.name.toLowerCase().includes(inputValue.toLowerCase())) &&
+    (!inputValue || searchWithinString(payee.name, inputValue)) &&
     payee.transferId == null;
 }
 

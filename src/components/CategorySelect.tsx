@@ -13,7 +13,7 @@ import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CurrencyFormat } from "ynab";
 
 import { useYNABContext } from "~lib/context";
-import { formatCurrency } from "~lib/utils";
+import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   initialCategory?: Category | null;
@@ -42,7 +42,7 @@ function CategorySelect(
     (inputValue?: string) => {
       return (category: Category) =>
         !ignoredCategoryIds?.has(category.id) &&
-        (!inputValue || category.name.toLowerCase().includes(inputValue.toLowerCase()));
+        (!inputValue || searchWithinString(category.name, inputValue));
     },
     [ignoredCategoryIds]
   );

@@ -12,7 +12,7 @@ import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
 import { useYNABContext } from "~lib/context";
-import { formatCurrency } from "~lib/utils";
+import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   currentAccount?: Account | null;
@@ -32,7 +32,7 @@ function AccountSelect(
 
   const getFilter = useCallback((inputValue?: string) => {
     return (account: Account) =>
-      !inputValue || account.name.toLowerCase().includes(inputValue.toLowerCase());
+      !inputValue || searchWithinString(account.name, inputValue);
   }, []);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
