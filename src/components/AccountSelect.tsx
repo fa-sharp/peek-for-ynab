@@ -1,11 +1,18 @@
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { Fragment, useCallback, useRef, useState } from "react";
+import {
+  type ForwardedRef,
+  Fragment,
+  forwardRef,
+  useCallback,
+  useRef,
+  useState
+} from "react";
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
 
 import { useYNABContext } from "~lib/context";
-import { formatCurrency } from "~lib/utils";
+import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   currentAccount?: Account | null;
@@ -15,23 +22,20 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function AccountSelect({
-  currentAccount,
-  accounts,
-  selectAccount,
-  isTransfer,
-  disabled
-}: Props) {
+function AccountSelect(
+  { currentAccount, accounts, isTransfer, disabled, selectAccount }: Props,
+  ref: ForwardedRef<HTMLInputElement | null>
+) {
   const { selectedBudgetData } = useYNABContext();
 
   const [accountList, setAccountList] = useState(accounts ? [...accounts] : []);
 
   const getFilter = useCallback((inputValue?: string) => {
     return (account: Account) =>
-      !inputValue || account.name.toLowerCase().includes(inputValue.toLowerCase());
+      !inputValue || searchWithinString(account.name, inputValue);
   }, []);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
@@ -61,7 +65,6 @@ export default function AccountSelect({
     onSelectedItemChange({ selectedItem }) {
       if (selectedItem) {
         selectAccount(selectedItem);
-        setTimeout(() => clearButtonRef.current?.focus(), 20);
       }
     }
   });
@@ -78,7 +81,12 @@ export default function AccountSelect({
       <div className="flex-col">
         <input
           required
-          {...getInputProps({ ref: inputRef })}
+          {...getInputProps({
+            ref: (node) => {
+              inputRef.current = node;
+              ref && (ref instanceof Function ? ref(node) : (ref.current = node));
+            }
+          })}
           className={selectedItem ? "item-selected" : ""}
           disabled={disabled || !!selectedItem}
         />
@@ -160,3 +168,5 @@ export default function AccountSelect({
     </div>
   );
 }
+
+export default forwardRef(AccountSelect);

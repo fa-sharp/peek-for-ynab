@@ -38,6 +38,10 @@ export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
   );
 
+/** Check if a search query is contained in a string, in the context of searching (i.e. ignore case) */
+export const searchWithinString = (str: string, query: string) =>
+  str.toLocaleLowerCase().includes(query.toLocaleLowerCase());
+
 /**
  * Get today's date (user's local timezone) in ISO format (i.e. for `input[type=date]` element)
  */

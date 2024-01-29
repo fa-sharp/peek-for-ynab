@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
 import {
@@ -51,6 +51,10 @@ export default function TransactionAdd() {
   });
   const [memo, setMemo] = useState("");
   const [flag, setFlag] = useState("");
+
+  const categoryRef = useRef<HTMLInputElement>(null);
+  const accountRef = useRef<HTMLInputElement>(null);
+  const memoRef = useRef<HTMLInputElement>(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -260,17 +264,39 @@ export default function TransactionAdd() {
         </label>
         {!isTransfer ? (
           <>
-            <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
+            <PayeeSelect
+              payees={payeesData}
+              selectPayee={(selectedPayee) => {
+                setPayee(selectedPayee);
+                if ("id" in selectedPayee) {
+                  if (!category) categoryRef.current?.focus();
+                  else if (!account) accountRef.current?.focus();
+                  else memoRef.current?.focus();
+                }
+              }}
+              disabled={isSaving}
+            />
             <CategorySelect
+              ref={categoryRef}
               initialCategory={category}
               categories={categoriesData}
-              selectCategory={setCategory}
+              selectCategory={(selectedCategory) => {
+                setCategory(selectedCategory);
+                if (selectedCategory) {
+                  if (!account) accountRef.current?.focus();
+                  else memoRef.current?.focus();
+                }
+              }}
               disabled={isSaving}
             />
             <AccountSelect
+              ref={accountRef}
               currentAccount={account}
               accounts={accountsData}
-              selectAccount={setAccount}
+              selectAccount={(selectedAccount) => {
+                setAccount(selectedAccount);
+                if (selectedAccount) memoRef.current?.focus();
+              }}
               disabled={isSaving}
             />
           </>
@@ -283,16 +309,22 @@ export default function TransactionAdd() {
                   ? accountsData?.find((a) => a.id === payee.transferId) || null
                   : null
               }
-              selectAccount={(account) => {
-                if (!account || !account.transfer_payee_id) {
+              selectAccount={(selectedAccount) => {
+                if (!selectedAccount || !selectedAccount.transfer_payee_id) {
                   setPayee(null);
                   return;
                 }
                 setPayee({
-                  id: account.transfer_payee_id,
-                  name: account.name,
-                  transferId: account.id
+                  id: selectedAccount.transfer_payee_id,
+                  name: selectedAccount.name,
+                  transferId: selectedAccount.id
                 });
+                if (selectedAccount) {
+                  if (!account) accountRef.current?.focus();
+                  else if (!selectedAccount.on_budget && account.on_budget && !category)
+                    setTimeout(() => categoryRef.current?.focus(), 50);
+                  else memoRef.current?.focus();
+                }
               }}
               isTransfer="to"
               disabled={isSaving}
@@ -329,17 +361,36 @@ export default function TransactionAdd() {
               />
             </div>
             <AccountSelect
+              ref={accountRef}
               currentAccount={account}
               accounts={accountsData}
-              selectAccount={setAccount}
+              selectAccount={(selectedAccount) => {
+                setAccount(selectedAccount);
+                if (selectedAccount) {
+                  if (
+                    !category &&
+                    selectedAccount.on_budget &&
+                    payee &&
+                    "transferId" in payee &&
+                    accountsData?.find((a) => a.id === payee.transferId)?.on_budget ===
+                      false
+                  )
+                    setTimeout(() => categoryRef.current?.focus(), 50);
+                  else memoRef.current?.focus();
+                }
+              }}
               isTransfer="from"
               disabled={isSaving}
             />
             {isBudgetToTrackingTransfer && (
               <CategorySelect
+                ref={categoryRef}
                 initialCategory={category}
                 categories={categoriesData}
-                selectCategory={setCategory}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) memoRef.current?.focus();
+                }}
                 disabled={isSaving}
               />
             )}
@@ -349,6 +400,7 @@ export default function TransactionAdd() {
           Memo
           <div className="flex-row">
             <input
+              ref={memoRef}
               id="memo-input"
               aria-label="Memo"
               className="flex-grow"

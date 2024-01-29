@@ -1,11 +1,19 @@
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import {
+  type ForwardedRef,
+  Fragment,
+  forwardRef,
+  useCallback,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CurrencyFormat } from "ynab";
 
 import { useYNABContext } from "~lib/context";
-import { formatCurrency } from "~lib/utils";
+import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   initialCategory?: Category | null;
@@ -14,12 +22,10 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function CategorySelect({
-  initialCategory,
-  categories,
-  selectCategory,
-  disabled
-}: Props) {
+function CategorySelect(
+  { initialCategory, categories, selectCategory, disabled }: Props,
+  ref: ForwardedRef<HTMLInputElement | null>
+) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
 
   /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
@@ -36,7 +42,7 @@ export default function CategorySelect({
     (inputValue?: string) => {
       return (category: Category) =>
         !ignoredCategoryIds?.has(category.id) &&
-        (!inputValue || category.name.toLowerCase().includes(inputValue.toLowerCase()));
+        (!inputValue || searchWithinString(category.name, inputValue));
     },
     [ignoredCategoryIds]
   );
@@ -45,7 +51,7 @@ export default function CategorySelect({
     categories ? categories.filter(getFilter()) : []
   );
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
@@ -76,7 +82,6 @@ export default function CategorySelect({
     onSelectedItemChange({ selectedItem }) {
       if (selectedItem) {
         selectCategory(selectedItem);
-        setTimeout(() => clearButtonRef.current?.focus(), 20);
       }
     }
   });
@@ -86,7 +91,12 @@ export default function CategorySelect({
       <label {...getLabelProps()}>Category</label>
       <div className="flex-col">
         <input
-          {...getInputProps({ ref: inputRef })}
+          {...getInputProps({
+            ref: (node) => {
+              inputRef.current = node;
+              ref && (ref instanceof Function ? ref(node) : (ref.current = node));
+            }
+          })}
           className={selectedItem ? "item-selected" : ""}
           placeholder="(Leave blank to auto-categorize)"
           disabled={disabled || !!selectedItem}
@@ -186,3 +196,5 @@ function formatCategoryWithBalance(category: Category, currencyFormat?: Currency
     </>
   );
 }
+
+export default forwardRef(CategorySelect);
