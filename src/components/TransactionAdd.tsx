@@ -278,7 +278,7 @@ export default function TransactionAdd() {
             />
             <CategorySelect
               ref={categoryRef}
-              initialCategory={category}
+              currentCategory={category}
               categories={categoriesData}
               selectCategory={(selectedCategory) => {
                 setCategory(selectedCategory);
@@ -385,7 +385,7 @@ export default function TransactionAdd() {
             {isBudgetToTrackingTransfer && (
               <CategorySelect
                 ref={categoryRef}
-                initialCategory={category}
+                currentCategory={category}
                 categories={categoriesData}
                 selectCategory={(selectedCategory) => {
                   setCategory(selectedCategory);

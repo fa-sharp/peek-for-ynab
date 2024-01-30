@@ -16,7 +16,7 @@ import { useYNABContext } from "~lib/context";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
-  initialCategory?: Category | null;
+  currentCategory?: Category | null;
   categories?: Category[];
   selectCategory: (category: Category | null) => void;
   label?: string;
@@ -25,7 +25,7 @@ interface Props {
 }
 
 function CategorySelect(
-  { initialCategory, categories, label, disabled, movingMoney, selectCategory }: Props,
+  { currentCategory, categories, label, disabled, movingMoney, selectCategory }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
@@ -70,7 +70,7 @@ function CategorySelect(
     selectedItem
   } = useCombobox<Category | null>({
     items: categoryList,
-    initialSelectedItem: initialCategory,
+    selectedItem: currentCategory,
     itemToString(category) {
       if (!category) return "";
       if (category.name === "Inflow: Ready to Assign") return category.name;

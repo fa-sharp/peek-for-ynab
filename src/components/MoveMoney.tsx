@@ -1,10 +1,12 @@
-import { type FormEventHandler, useState } from "react";
+import { type FormEventHandler, useCallback, useState } from "react";
+import { SwitchVertical } from "tabler-icons-react";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { millisToStringValue } from "~lib/utils";
 
 import CategorySelect from "./CategorySelect";
 import CurrencyView from "./CurrencyView";
+import IconButton from "./IconButton";
 
 /** Form that lets user budget funds to/from category, or between categories */
 export default function MoveMoney() {
@@ -26,6 +28,12 @@ export default function MoveMoney() {
       null
     );
   });
+
+  const switchToFromCategories = useCallback(() => {
+    const newFromCategory = toCategory;
+    setToCategory(fromCategory);
+    setFromCategory(newFromCategory);
+  }, [fromCategory, toCategory]);
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -81,7 +89,7 @@ export default function MoveMoney() {
           label="From"
           movingMoney
           categories={categoriesData}
-          initialCategory={fromCategory}
+          currentCategory={fromCategory}
           selectCategory={setFromCategory}
         />
         {!fromCategory && monthData ? (
@@ -129,11 +137,18 @@ export default function MoveMoney() {
             </button>
           </div>
         ) : null}
+        <div className="flex-row">
+          <IconButton
+            icon={<SwitchVertical />}
+            label="Switch 'To' and 'From' categories"
+            onClick={switchToFromCategories}
+          />
+        </div>
         <CategorySelect
           label="To"
           movingMoney
           categories={categoriesData}
-          initialCategory={toCategory}
+          currentCategory={toCategory}
           selectCategory={setToCategory}
         />
 
