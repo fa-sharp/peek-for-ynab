@@ -1,4 +1,4 @@
-import { type FormEventHandler, useCallback, useState } from "react";
+import { type FormEventHandler, useCallback, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -8,7 +8,7 @@ import CategorySelect from "./CategorySelect";
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 
-/** Form that lets user budget funds to/from category, or between categories */
+/** Form that lets user move money to/from category, or between categories */
 export default function MoveMoney() {
   const { popupState, setPopupState } = useStorageContext();
   const { categoriesData, monthData, selectedBudgetData, moveMoney } = useYNABContext();
@@ -28,6 +28,11 @@ export default function MoveMoney() {
       null
     );
   });
+
+  const amountRef = useRef<HTMLInputElement>(null);
+  const fromCategoryRef = useRef<HTMLInputElement>(null);
+  const toCategoryRef = useRef<HTMLInputElement>(null);
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
 
   const switchToFromCategories = useCallback(() => {
     const newFromCategory = toCategory;
@@ -70,7 +75,7 @@ export default function MoveMoney() {
         <label className="form-input">
           Amount
           <input
-            id="amount-input"
+            ref={amountRef}
             required
             autoFocus
             aria-label="Amount"
@@ -86,11 +91,19 @@ export default function MoveMoney() {
           />
         </label>
         <CategorySelect
+          ref={fromCategoryRef}
           label="From"
           movingMoney
           categories={categoriesData}
           currentCategory={fromCategory}
-          selectCategory={setFromCategory}
+          selectCategory={(selectedCategory) => {
+            setFromCategory(selectedCategory);
+            if (selectedCategory) {
+              if (!toCategory) toCategoryRef.current?.focus();
+              else if (!amount) amountRef.current?.focus();
+              else saveButtonRef.current?.focus();
+            }
+          }}
         />
         {!fromCategory && monthData ? (
           <div>
@@ -145,16 +158,25 @@ export default function MoveMoney() {
           />
         </div>
         <CategorySelect
+          ref={toCategoryRef}
           label="To"
           movingMoney
           categories={categoriesData}
           currentCategory={toCategory}
-          selectCategory={setToCategory}
+          selectCategory={(selectedCategory) => {
+            setToCategory(selectedCategory);
+            if (selectedCategory) {
+              if (!amount) amountRef.current?.focus();
+              else if (!fromCategory) fromCategoryRef.current?.focus();
+              else saveButtonRef.current?.focus();
+            }
+          }}
         />
 
         <div className="error-message">{errorMessage}</div>
         <div className="flex-row flex-row-reverse">
           <button
+            ref={saveButtonRef}
             type="submit"
             className="button rounded accent mt-lg flex-1"
             disabled={isSaving}>
