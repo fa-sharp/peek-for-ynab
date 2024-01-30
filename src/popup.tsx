@@ -1,4 +1,5 @@
 import { PopupLogin, TransactionAdd } from "~components";
+import MoveMoney from "~components/MoveMoney";
 import PopupMain from "~components/PopupMain";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
@@ -34,6 +35,8 @@ export function PopupView() {
         <PopupLogin />
       ) : popupState.view === "txAdd" ? (
         <TransactionAdd />
+      ) : popupState.view === "move" ? (
+        <MoveMoney />
       ) : (
         <PopupMain />
       )}

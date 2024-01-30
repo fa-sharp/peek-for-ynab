@@ -40,6 +40,13 @@ export interface TxAddInitialState {
   isTransfer?: boolean;
 }
 
+/** Initial state of the move money screen */
+export interface MoveMoneyInitialState {
+  amount?: string;
+  fromCategoryId?: string;
+  toCategoryId?: string;
+}
+
 /** Map of budget IDs to string arrays. Useful type for storage. */
 interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
@@ -70,9 +77,10 @@ const useStorageProvider = () => {
 
   /** Current popup state - not persisted */
   const [popupState, setPopupState] = useState<{
-    view: "main" | "txAdd";
+    view: "main" | "txAdd" | "move";
     editMode?: boolean;
     txAddState?: TxAddInitialState;
+    moveMoneyState?: MoveMoneyInitialState;
   }>({
     view: "main",
     editMode: false

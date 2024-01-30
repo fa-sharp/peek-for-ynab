@@ -239,6 +239,43 @@ const useYNABProvider = () => {
     [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
   );
 
+  const moveMoney = useCallback(
+    async ({
+      subtractFromCategoryId,
+      addToCategoryId,
+      amountInMillis
+    }: {
+      subtractFromCategoryId?: string;
+      addToCategoryId?: string;
+      amountInMillis: number;
+    }) => {
+      if (!ynabAPI || !selectedBudgetId) return;
+      const fromCategory = categoriesData?.find((c) => c.id === subtractFromCategoryId);
+      const toCategory = categoriesData?.find((c) => c.id === addToCategoryId);
+      const [subtractResponse, addResponse] = await Promise.all([
+        fromCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              selectedBudgetId,
+              "current",
+              fromCategory.id,
+              { category: { budgeted: fromCategory.budgeted - amountInMillis } }
+            )
+          : Promise.resolve("No 'from' category"),
+        toCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              selectedBudgetId,
+              "current",
+              toCategory.id,
+              { category: { budgeted: toCategory.budgeted + amountInMillis } }
+            )
+          : Promise.resolve("No 'to' category")
+      ]);
+      IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
+      setTimeout(() => refreshCategoriesAndAccounts(), 350);
+    },
+    [categoriesData, selectedBudgetId, ynabAPI, refreshCategoriesAndAccounts]
+  );
+
   return {
     /** API data: List of all user's budgets */
     budgetsData,
@@ -269,7 +306,9 @@ const useYNABProvider = () => {
     /** Get recent transactions for the specified category */
     useGetCategoryTxs,
     /** Add a new transaction to the current budget */
-    addTransaction
+    addTransaction,
+    /** Move money in the current budget */
+    moveMoney
   };
 };
 

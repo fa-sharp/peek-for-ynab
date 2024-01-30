@@ -19,11 +19,13 @@ interface Props {
   initialCategory?: Category | null;
   categories?: Category[];
   selectCategory: (category: Category | null) => void;
+  label?: string;
   disabled?: boolean;
+  movingMoney?: boolean;
 }
 
 function CategorySelect(
-  { initialCategory, categories, selectCategory, disabled }: Props,
+  { initialCategory, categories, label, disabled, movingMoney, selectCategory }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
@@ -34,9 +36,10 @@ function CategorySelect(
     const ignoredIds = new Set(
       categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
     );
-    ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
+    // Don't ignore Inflow: RTA category, unless we're moving money
+    if (!movingMoney) ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id);
     return ignoredIds;
-  }, [categoryGroupsData]);
+  }, [categoryGroupsData, movingMoney]);
 
   const getFilter = useCallback(
     (inputValue?: string) => {
@@ -88,7 +91,7 @@ function CategorySelect(
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>Category</label>
+      <label {...getLabelProps()}>{label || "Category"}</label>
       <div className="flex-col">
         <input
           {...getInputProps({
@@ -98,7 +101,11 @@ function CategorySelect(
             }
           })}
           className={selectedItem ? "item-selected" : ""}
-          placeholder="(Leave blank to auto-categorize)"
+          placeholder={
+            movingMoney
+              ? "(Leave blank for Ready to Assign)"
+              : "(Leave blank to auto-categorize)"
+          }
           disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (

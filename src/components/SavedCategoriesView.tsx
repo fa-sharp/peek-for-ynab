@@ -8,6 +8,7 @@ import { findCCAccount, millisToStringValue } from "~lib/utils";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  AddTransferIcon,
   PinnedItemIcon
 } from "./icons/ActionIcons";
 
@@ -109,6 +110,20 @@ export default function SavedCategoriesView() {
                               }
                             />
                           )}
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddTransferIcon />}
+                            label="Move money"
+                            onClick={() =>
+                              setPopupState({
+                                view: "move",
+                                moveMoneyState: {
+                                  toCategoryId: category.id
+                                }
+                              })
+                            }
+                          />
                         </aside>
                       }
                     />
