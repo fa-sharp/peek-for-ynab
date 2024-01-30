@@ -1,6 +1,7 @@
 import { type FormEventHandler, useState } from "react";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
+import { millisToStringValue } from "~lib/utils";
 
 import CategorySelect from "./CategorySelect";
 import CurrencyView from "./CurrencyView";
@@ -8,7 +9,7 @@ import CurrencyView from "./CurrencyView";
 /** Form that lets user budget funds to/from category, or between categories */
 export default function MoveMoney() {
   const { popupState, setPopupState } = useStorageContext();
-  const { categoriesData, selectedBudgetData, moveMoney } = useYNABContext();
+  const { categoriesData, monthData, selectedBudgetData, moveMoney } = useYNABContext();
 
   const [amount, setAmount] = useState(popupState.moveMoneyState?.amount || "");
   const [fromCategory, setFromCategory] = useState(() => {
@@ -83,17 +84,51 @@ export default function MoveMoney() {
           initialCategory={fromCategory}
           selectCategory={setFromCategory}
         />
-        {/* {fromCategory && (
+        {!fromCategory && monthData ? (
           <div>
-            (Budgeted:{" "}
-            <CurrencyView
-              milliUnits={fromCategory.budgeted}
-              currencyFormat={selectedBudgetData?.currencyFormat}
-              colorsEnabled
-            />
-            )
+            Ready to Assign:{" "}
+            <button
+              type="button"
+              className="button rounded gray"
+              onClick={() => {
+                if (monthData.to_be_budgeted < 0) return;
+                setAmount(
+                  millisToStringValue(
+                    monthData.to_be_budgeted,
+                    selectedBudgetData?.currencyFormat
+                  )
+                );
+              }}>
+              <CurrencyView
+                colorsEnabled
+                milliUnits={monthData.to_be_budgeted}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+              />
+            </button>
           </div>
-        )} */}
+        ) : fromCategory ? (
+          <div>
+            Available:{" "}
+            <button
+              type="button"
+              className="button rounded gray"
+              onClick={() => {
+                if (fromCategory.balance < 0) return;
+                setAmount(
+                  millisToStringValue(
+                    fromCategory.balance,
+                    selectedBudgetData?.currencyFormat
+                  )
+                );
+              }}>
+              <CurrencyView
+                colorsEnabled
+                milliUnits={fromCategory.balance}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+              />
+            </button>
+          </div>
+        ) : null}
         <CategorySelect
           label="To"
           movingMoney
@@ -101,17 +136,6 @@ export default function MoveMoney() {
           initialCategory={toCategory}
           selectCategory={setToCategory}
         />
-        {/* {toCategory && (
-          <div>
-            (Budgeted:{" "}
-            <CurrencyView
-              milliUnits={toCategory.budgeted}
-              currencyFormat={selectedBudgetData?.currencyFormat}
-              colorsEnabled
-            />
-            )
-          </div>
-        )} */}
 
         <div className="error-message">{errorMessage}</div>
         <div className="flex-row flex-row-reverse">
