@@ -497,6 +497,16 @@ export const category_groups = [
   }
 ];
 
+export const month = {
+  month: "2024-01-01",
+  income: 5_000_000,
+  budgeted: 3_000_000,
+  activity: -1_200_000,
+  to_be_budgeted: 0,
+  deleted: false,
+  categories: []
+};
+
 export const payees = [
   {
     id: "3bc99e6e-1359-4997-a3fc-da5564458cbe",
