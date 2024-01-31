@@ -206,16 +206,13 @@ export const CategoryView = ({
   actionElementsLeft?: ReactElement | null;
   settings: AppSettings;
 }) => {
-  let foundEmoji = null;
-  if (settings.emojiMode) foundEmoji = findEmoji(name);
+  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
   return (
     <div
       className="balance-display"
       title={
-        settings.emojiMode
-          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
-          : undefined
+        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
       <div className="flex-row min-w-0">
         {actionElementsLeft}

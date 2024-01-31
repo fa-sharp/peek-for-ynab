@@ -172,9 +172,7 @@ export const AccountView = ({
     <div
       className="balance-display"
       title={
-        settings.emojiMode
-          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
-          : undefined
+        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
