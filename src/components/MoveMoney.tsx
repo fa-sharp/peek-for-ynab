@@ -50,6 +50,10 @@ export default function MoveMoney() {
       setErrorMessage("Please select either a 'from' or 'to' category!");
       return;
     }
+    if (fromCategory?.id === toCategory?.id) {
+      setErrorMessage("Can't move money to the same category!");
+      return;
+    }
     setIsSaving(true);
     try {
       await moveMoney({
@@ -153,7 +157,7 @@ export default function MoveMoney() {
         <div className="flex-row">
           <IconButton
             icon={<SwitchVertical />}
-            label="Switch 'To' and 'From' categories"
+            label="Switch 'From' and 'To' categories"
             onClick={switchToFromCategories}
           />
         </div>
