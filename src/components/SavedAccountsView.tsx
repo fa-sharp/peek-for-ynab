@@ -1,10 +1,16 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { AccountType } from "ynab";
 
 import { IconButton } from "~components";
 import { AccountView } from "~components/AccountsView";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
-import { AddTransactionIcon, PinnedItemIcon } from "./icons/ActionIcons";
+import {
+  AddCCPaymentIcon,
+  AddTransactionIcon,
+  AddTransferIcon,
+  PinnedItemIcon
+} from "./icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -67,6 +73,45 @@ export default function SavedAccountsView() {
                             })
                           }
                         />
+                        {account.type === AccountType.CreditCard ||
+                        account.type === AccountType.LineOfCredit ? (
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddCCPaymentIcon />}
+                            label="Add credit card payment"
+                            onClick={() =>
+                              account.transfer_payee_id &&
+                              setPopupState({
+                                view: "txAdd",
+                                txAddState: {
+                                  isTransfer: true,
+                                  payee: {
+                                    id: account.transfer_payee_id,
+                                    name: account.name,
+                                    transferId: account.id
+                                  }
+                                }
+                              })
+                            }
+                          />
+                        ) : (
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddTransferIcon />}
+                            label="Add transfer"
+                            onClick={() =>
+                              setPopupState({
+                                view: "txAdd",
+                                txAddState: {
+                                  isTransfer: true,
+                                  accountId: account.id
+                                }
+                              })
+                            }
+                          />
+                        )}
                       </aside>
                     }
                   />
