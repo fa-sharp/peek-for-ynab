@@ -183,7 +183,7 @@ export default function TransactionAdd() {
   };
 
   return (
-    <section>
+    <section style={{ minWidth: 240 }}>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>
