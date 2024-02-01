@@ -20,7 +20,7 @@ import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
-  const { settings, popupState, setPopupState } = useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState } = useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(
     popupState.txAddState?.isTransfer ?? false
@@ -41,8 +41,11 @@ export default function TransactionAdd() {
     );
   });
   const [account, setAccount] = useState(() => {
-    if (!popupState.txAddState?.accountId) return null;
-    return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (popupState.txAddState?.accountId)
+      return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (budgetSettings?.defaultAccountId)
+      return accountsData?.find((a) => a.id === budgetSettings.defaultAccountId) || null;
+    return null;
   });
   const [memo, setMemo] = useState("");
   const [flag, setFlag] = useState("");
