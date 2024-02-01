@@ -328,6 +328,18 @@ export default function TransactionAdd() {
                 </button>
               </div>
             )} */}
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                ref={categoryRef}
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) memoRef.current?.focus();
+                }}
+                disabled={isSaving}
+              />
+            )}
             <AccountSelect
               ref={accountRef}
               currentAccount={account}
@@ -350,18 +362,6 @@ export default function TransactionAdd() {
               label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
-              <CategorySelect
-                ref={categoryRef}
-                initialCategory={category}
-                categories={categoriesData}
-                selectCategory={(selectedCategory) => {
-                  setCategory(selectedCategory);
-                  if (selectedCategory) memoRef.current?.focus();
-                }}
-                disabled={isSaving}
-              />
-            )}
           </>
         )}
         <label className="form-input" htmlFor="memo-input">
