@@ -139,7 +139,7 @@ function Devtools() {
                   {key}
                 </b>
                 <div>
-                  {typeof JSON.parse(value) !== "object" ? (
+                  {value === undefined || typeof JSON.parse(value) !== "object" ? (
                     value
                   ) : (
                     <FormattedJSON value={JSON.parse(value)} />

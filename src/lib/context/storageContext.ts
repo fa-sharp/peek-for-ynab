@@ -250,6 +250,8 @@ const useStorageProvider = () => {
         ...savedAccounts,
         [budgetId]: undefined
       });
+      // Clean up budget-specific settings
+      storageArea.remove(`budget-${budgetId}`);
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
