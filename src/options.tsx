@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
 
+import BudgetSettings from "~components/BudgetSettings";
 import {
   AppProvider,
   useAuthContext,
@@ -171,14 +172,7 @@ export function OptionsView() {
           </h3>
           <div className="flex-col">
             {budgetsData?.map((budget) => (
-              <label key={budget.id} className="flex-row">
-                <input
-                  type="checkbox"
-                  checked={shownBudgetIds?.includes(budget.id)}
-                  onChange={() => toggleShowBudget(budget.id)}
-                />
-                {budget.name}
-              </label>
+              <BudgetSettings key={budget.id} budget={budget} />
             ))}
           </div>
           <button

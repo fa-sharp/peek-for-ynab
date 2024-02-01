@@ -46,6 +46,12 @@ interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
 
+/** Budget-specific settings (e.g. default account for transactions) */
+interface BudgetSettings {
+  /** Default account for purchases */
+  defaultAccountId?: string;
+}
+
 const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
@@ -113,6 +119,27 @@ const useStorageProvider = () => {
       return data;
     }
   );
+
+  /** Budget-specific settings for the current budget. Is synced if the user chooses. */
+  const [budgetSettings, setBudgetSettings] = useExtensionStorage<
+    BudgetSettings | undefined
+  >(
+    {
+      key: `budget-${selectedBudgetId}`,
+      instance: storageArea
+    },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
+  );
+
+  /** Use budget-specific settings for a specific budget */
+  const useBudgetSettings = (budgetId: string) =>
+    useExtensionStorage<BudgetSettings | undefined>(
+      {
+        key: `budget-${budgetId}`,
+        instance: storageArea
+      },
+      (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
+    );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
   const [
@@ -260,6 +287,9 @@ const useStorageProvider = () => {
     removeCategory,
     savedAccounts,
     saveAccount,
+    budgetSettings,
+    setBudgetSettings,
+    useBudgetSettings,
     removeAccount,
     removeAllData
   };
