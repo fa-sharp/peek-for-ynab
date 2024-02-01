@@ -34,6 +34,7 @@ export interface AppSettings {
 /** Initial state of the add transaction screen */
 export interface TxAddInitialState {
   amount?: string;
+  amountType?: "Inflow" | "Outflow";
   accountId?: string;
   categoryId?: string;
   payee?: CachedPayee;

@@ -1,14 +1,7 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import {
-  Check,
-  CircleC,
-  Minus,
-  Plus,
-  SwitchVertical,
-  WorldWww
-} from "tabler-icons-react";
+import { Check, CircleC, Minus, Plus, WorldWww } from "tabler-icons-react";
 import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -35,7 +28,9 @@ export default function TransactionAdd() {
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
   const [cleared, setCleared] = useState(settings?.txCleared ? true : false);
-  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
+  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
+    popupState.txAddState?.amountType || "Outflow"
+  );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
     popupState.txAddState?.payee || null
   );
@@ -101,24 +96,6 @@ export default function TransactionAdd() {
   //   );
   // }, [account, accountsData, categoriesData, isTransfer, payee]);
 
-  /** Switch the To and From account for a transfer */
-  const switchToFromAccounts = useCallback(() => {
-    const newAccount =
-      payee && "transferId" in payee
-        ? accountsData?.find((a) => a.id === payee.transferId)
-        : null;
-    const newPayee =
-      account && account.transfer_payee_id
-        ? {
-            id: account.transfer_payee_id,
-            name: account.name,
-            transferId: account.id
-          }
-        : null;
-    setAccount(newAccount || null);
-    setPayee(newPayee);
-  }, [account, accountsData, payee]);
-
   // TODO find a better way to detect amounts
   // const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
   // const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
@@ -182,7 +159,7 @@ export default function TransactionAdd() {
       await addTransaction({
         date,
         amount:
-          amountType === "Outflow" || isTransfer
+          amountType === "Outflow"
             ? Math.round(+amount * -1000)
             : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
@@ -206,7 +183,7 @@ export default function TransactionAdd() {
   };
 
   return (
-    <section>
+    <section style={{ minWidth: 240 }}>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>
@@ -230,21 +207,19 @@ export default function TransactionAdd() {
         <label className="form-input" htmlFor="amount-input">
           Amount
           <div className="flex-row">
-            {!isTransfer && (
-              <IconButton
-                label={`${
-                  amountType === "Inflow" ? "Inflow" : "Outflow"
-                } (Click to switch)`}
-                icon={
-                  amountType === "Inflow" ? (
-                    <Plus color="var(--currency-green)" />
-                  ) : (
-                    <Minus color="var(--currency-red)" />
-                  )
-                }
-                onClick={flipAmountType}
-              />
-            )}
+            <IconButton
+              label={`${
+                amountType === "Inflow" ? "Inflow" : "Outflow"
+              } (Click to switch)`}
+              icon={
+                amountType === "Inflow" ? (
+                  <Plus color="var(--currency-green)" />
+                ) : (
+                  <Minus color="var(--currency-red)" />
+                )
+              }
+              onClick={flipAmountType}
+            />
             <input
               id="amount-input"
               required
@@ -326,7 +301,7 @@ export default function TransactionAdd() {
                   else memoRef.current?.focus();
                 }
               }}
-              isTransfer="to"
+              label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
               disabled={isSaving}
             />
             {/* {ccpCategory && (
@@ -353,13 +328,18 @@ export default function TransactionAdd() {
                 </button>
               </div>
             )} */}
-            <div className="flex-row">
-              <IconButton
-                icon={<SwitchVertical />}
-                label="Switch 'To' and 'From' accounts"
-                onClick={switchToFromAccounts}
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                ref={categoryRef}
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) memoRef.current?.focus();
+                }}
+                disabled={isSaving}
               />
-            </div>
+            )}
             <AccountSelect
               ref={accountRef}
               currentAccount={account}
@@ -379,21 +359,9 @@ export default function TransactionAdd() {
                   else memoRef.current?.focus();
                 }
               }}
-              isTransfer="from"
+              label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
-              <CategorySelect
-                ref={categoryRef}
-                initialCategory={category}
-                categories={categoriesData}
-                selectCategory={(selectedCategory) => {
-                  setCategory(selectedCategory);
-                  if (selectedCategory) memoRef.current?.focus();
-                }}
-                disabled={isSaving}
-              />
-            )}
           </>
         )}
         <label className="form-input" htmlFor="memo-input">

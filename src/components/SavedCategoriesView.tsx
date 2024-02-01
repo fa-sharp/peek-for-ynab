@@ -99,11 +99,8 @@ export default function SavedCategoriesView() {
                                             currencyFormat
                                           )
                                         : undefined,
-                                    payee: {
-                                      id: ccAccount.transfer_payee_id,
-                                      name: ccAccount.name,
-                                      transferId: ccAccount.id
-                                    }
+                                    amountType: "Inflow",
+                                    accountId: ccAccount.id
                                   }
                                 })
                               }

@@ -44,11 +44,10 @@ test("Can record credit card payment via CCP category", async () => {
   expect(result.current.storage.popupState).toMatchObject({
     view: "txAdd",
     txAddState: {
+      accountId: "509fec7a-f582-4fc7-8fa3-a133d6aae076",
       isTransfer: true,
       amount: "130.00",
-      payee: {
-        id: "90319ed5-6d0e-42dd-9e83-faeb2ab4523c"
-      }
+      amountType: "Inflow"
     }
   });
 });
