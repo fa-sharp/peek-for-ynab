@@ -127,7 +127,8 @@ button {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .form-input input:not(:disabled),
@@ -163,6 +164,12 @@ button {
   margin-block: var(--spacing-xs);
 
   font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.heading-small {
+  margin-block: var(--spacing-xs);
+  font-size: 0.85rem;
   font-weight: 600;
 }
 

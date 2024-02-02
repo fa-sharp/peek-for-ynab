@@ -48,6 +48,8 @@ interface BudgetToStringArrayMap {
 
 /** Budget-specific settings (e.g. default account for transactions) */
 interface BudgetSettings {
+  /** Whether to remember the last-used account for transaction entry. */
+  rememberAccount?: boolean;
   /** Default account for purchases */
   defaultAccountId?: string;
 }

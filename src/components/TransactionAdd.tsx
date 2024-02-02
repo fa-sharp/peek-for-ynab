@@ -20,7 +20,8 @@ import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
   const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
-  const { settings, budgetSettings, popupState, setPopupState } = useStorageContext();
+  const { settings, budgetSettings, setBudgetSettings, popupState, setPopupState } =
+    useStorageContext();
 
   const [isTransfer, setIsTransfer] = useState(
     popupState.txAddState?.isTransfer ?? false
@@ -149,7 +150,7 @@ export default function TransactionAdd() {
     }
     if (isTransfer) {
       if (!("transferId" in payee)) {
-        setErrorMessage("'To' account is not valid!");
+        setErrorMessage("'Payee' account is not valid!");
         return;
       }
       if (payee.transferId === account.id) {
@@ -157,6 +158,9 @@ export default function TransactionAdd() {
         return;
       }
     }
+    if (budgetSettings?.rememberAccount && account.id !== budgetSettings.defaultAccountId)
+      setBudgetSettings((prev) => ({ ...prev, defaultAccountId: account.id }));
+
     setIsSaving(true);
     try {
       await addTransaction({
@@ -268,6 +272,7 @@ export default function TransactionAdd() {
               disabled={isSaving}
             />
             <AccountSelect
+              required
               ref={accountRef}
               currentAccount={account}
               accounts={accountsData}
@@ -281,6 +286,7 @@ export default function TransactionAdd() {
         ) : (
           <>
             <AccountSelect
+              required
               accounts={accountsData}
               currentAccount={
                 payee && "transferId" in payee
@@ -344,6 +350,7 @@ export default function TransactionAdd() {
               />
             )}
             <AccountSelect
+              required
               ref={accountRef}
               currentAccount={account}
               accounts={accountsData}

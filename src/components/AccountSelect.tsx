@@ -20,10 +20,11 @@ interface Props {
   selectAccount: (account: Account | null) => void;
   label?: string;
   disabled?: boolean;
+  required?: boolean;
 }
 
 function AccountSelect(
-  { currentAccount, accounts, label, disabled, selectAccount }: Props,
+  { currentAccount, accounts, label, required, disabled, selectAccount }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { selectedBudgetData } = useYNABContext();
@@ -74,7 +75,7 @@ function AccountSelect(
       <label {...getLabelProps()}>{label || "Account"}</label>
       <div className="flex-col">
         <input
-          required
+          required={required}
           {...getInputProps({
             ref: (node) => {
               inputRef.current = node;

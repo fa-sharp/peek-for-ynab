@@ -30,11 +30,30 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
   const { data: accounts } = useGetAccountsForBudget(budget.id);
 
   return (
-    <div style={{ marginLeft: "2rem", marginBottom: "1rem", maxWidth: "15rem" }}>
+    <div
+      style={{
+        marginLeft: "2rem",
+        marginBottom: "1rem",
+        maxWidth: "15rem",
+        fontSize: ".95em"
+      }}>
+      <h4 className="heading-small mb-small">Transactions</h4>
       <div className="flex-col">
-        {accounts && (
+        <label
+          className="flex-row gap-xs"
+          title="Remember the last-used account when entering transactions">
+          <input
+            type="checkbox"
+            checked={settings?.rememberAccount ?? false}
+            onChange={(e) =>
+              setSettings((prev) => ({ ...prev, rememberAccount: e.target.checked }))
+            }
+          />
+          Remember last-used account
+        </label>
+        {!settings?.rememberAccount && accounts && (
           <AccountSelect
-            label="Default account"
+            label="Default account?"
             accounts={accounts}
             currentAccount={
               accounts?.find((a) => a.id === settings?.defaultAccountId) || null
