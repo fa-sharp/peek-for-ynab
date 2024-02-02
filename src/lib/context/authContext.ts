@@ -109,6 +109,7 @@ const useAuthProvider = () => {
     await removeAllData();
     queryClient.removeQueries();
     queryClient.clear();
+    queryClient.getQueryCache().clear();
   };
 
   return {
