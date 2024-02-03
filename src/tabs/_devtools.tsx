@@ -51,9 +51,7 @@ function Devtools() {
   const loadCache = () =>
     keys()
       .then(async (keys) => {
-        const entries = await Promise.all(
-          keys.map(async (key) => [key, JSON.parse((await get(key)) || "null")])
-        );
+        const entries = await Promise.all(keys.map(async (key) => [key, await get(key)]));
         return Object.fromEntries(entries);
       })
       .then(setCache);
