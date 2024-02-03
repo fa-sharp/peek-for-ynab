@@ -10,7 +10,7 @@ import { StorageProvider, useStorageContext } from "./storageContext";
 import { YNABProvider, useYNABContext } from "./ynabContext";
 
 /** Queries that should be cached */
-const cachedQueryKeys = new Set(["budgets", "payees"]);
+const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups"]);
 
 /** React Query client, default settings */
 const queryClient = new QueryClient({
