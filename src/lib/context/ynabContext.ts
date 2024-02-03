@@ -91,6 +91,7 @@ const useYNABProvider = () => {
   const {
     data: categoryGroupsData,
     dataUpdatedAt: categoriesLastUpdated,
+    error: categoriesError,
     refetch: refetchCategoryGroups
   } = useQuery({
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
@@ -135,6 +136,7 @@ const useYNABProvider = () => {
   const {
     data: accountsData,
     dataUpdatedAt: accountsLastUpdated,
+    error: accountsError,
     refetch: refetchAccounts
   } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
@@ -247,9 +249,13 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
+    /** API data: Error while fetching categories */
+    categoriesError,
     /** API data: List of all open accounts in current budget*/
     accountsData,
     accountsLastUpdated,
+    /** API data: Error while fetching accounts */
+    accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
     /** API data: Currently selected budget */

@@ -19,7 +19,8 @@ export default function PopupMain() {
     setPopupState,
     selectedBudgetId
   } = useStorageContext();
-  const { savedCategoriesData, savedAccountsData } = useYNABContext();
+  const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
+    useYNABContext();
 
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
@@ -52,12 +53,14 @@ export default function PopupMain() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <PopupNav />
-
-      <SavedCategoriesView />
-      <SavedAccountsView />
-
-      <CategoriesView />
-      <AccountsView />
+      {categoriesData && accountsData && (
+        <>
+          <SavedCategoriesView />
+          <SavedAccountsView />
+          <CategoriesView />
+          <AccountsView />
+        </>
+      )}
     </DragDropContext>
   );
 }
