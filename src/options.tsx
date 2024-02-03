@@ -167,7 +167,7 @@ export function OptionsView() {
           </ul>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Show/hide budgets
+            Budgets
           </h3>
           <div className="flex-col">
             {budgetsData?.map((budget) => (
