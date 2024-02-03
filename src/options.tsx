@@ -169,11 +169,11 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Budgets
           </h3>
-          <div className="flex-col">
+          <ul className="list flex-col">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />
             ))}
-          </div>
+          </ul>
           <button
             title="Refresh the list of budgets from YNAB"
             className="button rounded accent flex-row mb-small"

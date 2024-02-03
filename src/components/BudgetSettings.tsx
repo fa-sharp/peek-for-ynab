@@ -7,7 +7,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
   const { shownBudgetIds, toggleShowBudget } = useStorageContext();
 
   return (
-    <>
+    <li>
       <label
         className={shownBudgetIds?.includes(budget.id) ? "heading-medium" : "flex-row"}>
         <input
@@ -18,7 +18,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
         {budget.name}
       </label>
       {shownBudgetIds?.includes(budget.id) && <BudgetSettingsDetail budget={budget} />}
-    </>
+    </li>
   );
 }
 
@@ -35,9 +35,9 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
         marginLeft: "2rem",
         marginBottom: "1rem",
         maxWidth: "15rem",
-        fontSize: ".95em"
+        fontSize: ".9em"
       }}>
-      <h4 className="heading-small mb-small">Transactions</h4>
+      <h4 className="heading-small">Transaction settings</h4>
       <div className="flex-col">
         <label
           className="flex-row gap-xs"
@@ -54,6 +54,7 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
         {!settings?.rememberAccount && accounts && (
           <AccountSelect
             label="Default account?"
+            placeholder="Select a default account (optional)"
             accounts={accounts}
             currentAccount={
               accounts?.find((a) => a.id === settings?.defaultAccountId) || null

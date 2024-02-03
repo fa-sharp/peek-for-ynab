@@ -168,8 +168,8 @@ button {
 }
 
 .heading-small {
-  margin-block: var(--spacing-xs);
-  font-size: 0.85rem;
+  margin-block: var(--spacing-sm);
+  font-size: 0.8rem;
   font-weight: 600;
 }
 

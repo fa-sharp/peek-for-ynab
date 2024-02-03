@@ -19,12 +19,21 @@ interface Props {
   accounts?: Account[];
   selectAccount: (account: Account | null) => void;
   label?: string;
+  placeholder?: string;
   disabled?: boolean;
   required?: boolean;
 }
 
 function AccountSelect(
-  { currentAccount, accounts, label, required, disabled, selectAccount }: Props,
+  {
+    currentAccount,
+    accounts,
+    label,
+    placeholder,
+    required,
+    disabled,
+    selectAccount
+  }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { selectedBudgetData } = useYNABContext();
@@ -82,6 +91,7 @@ function AccountSelect(
               ref && (ref instanceof Function ? ref(node) : (ref.current = node));
             }
           })}
+          placeholder={placeholder}
           className={selectedItem ? "item-selected" : ""}
           disabled={disabled || !!selectedItem}
         />
