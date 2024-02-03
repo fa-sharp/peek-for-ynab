@@ -1,9 +1,17 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  type QueryFilters
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import {
+  type PersistedQuery,
+  experimental_createPersister
+} from "@tanstack/react-query-persist-client";
+import { del, get, set } from "idb-keyval";
 import type { ReactNode } from "react";
 
-import { createIdbPersister } from "~lib/indexedDBPersister";
-import { IS_PRODUCTION } from "~lib/utils";
+import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "~lib/utils";
 
 import { AuthProvider, useAuthContext } from "./authContext";
 import { StorageProvider, useStorageContext } from "./storageContext";
@@ -40,3 +48,20 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
 );
 
 export { AppProvider, useAuthContext, useYNABContext, useStorageContext };
+
+/** Creates an Indexed DB persister for React Query */
+function createIdbPersister(prefix: string, filters: QueryFilters) {
+  return experimental_createPersister<PersistedQuery>({
+    prefix,
+    filters,
+    maxAge: TWO_WEEKS_IN_MILLIS,
+    storage: {
+      getItem: (key) => get(key),
+      setItem: (key, val) => set(key, val),
+      removeItem: (key) => del(key)
+    },
+    serialize: (query) => query,
+    deserialize: (query) => query,
+    buster: "v1"
+  });
+}
