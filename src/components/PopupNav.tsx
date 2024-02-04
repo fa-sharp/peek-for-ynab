@@ -24,8 +24,14 @@ export default function PopupNav() {
     setPopupState,
     setSelectedBudgetId
   } = useStorageContext();
-  const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
-    useYNABContext();
+  const {
+    shownBudgetsData,
+    accountsLastUpdated,
+    accountsError,
+    categoriesError,
+    categoriesLastUpdated,
+    isRefreshingBudgets
+  } = useYNABContext();
   const globalIsFetching = useIsFetching();
   const isLoadingData = globalIsFetching || tokenRefreshNeeded;
 
@@ -52,14 +58,24 @@ export default function PopupNav() {
       }}>
       <IconButton
         label={
-          isLoadingData
-            ? "Status: Refreshing data..."
-            : `Status: Last updated ${new Date(categoriesLastUpdated).toLocaleString()}`
+          categoriesError || accountsError
+            ? "Error getting data from YNAB!"
+            : isLoadingData
+              ? "Status: Refreshing data..."
+              : `Status: Last updated ${new Date(
+                  categoriesLastUpdated < accountsLastUpdated
+                    ? categoriesLastUpdated
+                    : accountsLastUpdated
+                ).toLocaleString()}`
         }
         icon={
-          isLoadingData ? (
+          categoriesError || accountsError ? (
+            <AlertTriangle color="var(--stale)" /> // indicates error while fetching data
+          ) : isLoadingData ? (
             <Refresh />
-          ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
+          ) : !selectedBudgetId ||
+            (categoriesLastUpdated + 240_000 > Date.now() &&
+              accountsLastUpdated + 240_000 > Date.now()) ? (
             <Check color="var(--success)" />
           ) : (
             <AlertTriangle color="var(--stale)" /> // indicates data is stale/old

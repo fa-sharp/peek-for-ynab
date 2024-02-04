@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { clear } from "idb-keyval";
 import { nanoid } from "nanoid";
 import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
@@ -40,7 +41,7 @@ const useAuthProvider = () => {
       if (!process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
       // Clear API cache and local storage to avoid any leakage of data
       queryClient.removeQueries();
-      queryClient.clear();
+      clear();
       localStorage.clear();
 
       const authorizeState = nanoid();
@@ -107,8 +108,8 @@ const useAuthProvider = () => {
   /** Clears all data, including the user's token */
   const logout = async () => {
     await removeAllData();
+    await clear();
     queryClient.removeQueries();
-    queryClient.clear();
   };
 
   return {
