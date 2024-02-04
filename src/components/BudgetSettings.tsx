@@ -27,7 +27,7 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
   const { useGetAccountsForBudget } = useYNABContext();
 
   const [settings, setSettings] = useBudgetSettings(budget.id);
-  const { data: accounts } = useGetAccountsForBudget(budget.id);
+  const { data: accounts, error: accountsError } = useGetAccountsForBudget(budget.id);
 
   return (
     <div
@@ -51,21 +51,24 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
           />
           Remember last-used account
         </label>
-        {!settings?.rememberAccount && accounts && (
-          <AccountSelect
-            label="Default account?"
-            placeholder="Select a default account (optional)"
-            accounts={accounts}
-            currentAccount={
-              accounts?.find((a) => a.id === settings?.defaultAccountId) || null
-            }
-            selectAccount={(account) => {
-              if (account)
-                setSettings((prev) => ({ ...prev, defaultAccountId: account.id }));
-              else setSettings((prev) => ({ ...prev, defaultAccountId: undefined }));
-            }}
-          />
-        )}
+        {!settings?.rememberAccount &&
+          (accountsError ? (
+            <div className="error-message">Error getting accounts!</div>
+          ) : accounts ? (
+            <AccountSelect
+              label="Default account?"
+              placeholder="Select a default account (optional)"
+              accounts={accounts}
+              currentAccount={
+                accounts?.find((a) => a.id === settings?.defaultAccountId) || null
+              }
+              selectAccount={(account) => {
+                if (account)
+                  setSettings((prev) => ({ ...prev, defaultAccountId: account.id }));
+                else setSettings((prev) => ({ ...prev, defaultAccountId: undefined }));
+              }}
+            />
+          ) : null)}
       </div>
     </div>
   );
