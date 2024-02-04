@@ -12,10 +12,11 @@ import {
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
+  const { tokenExpired } = useAuthContext();
   const {
     selectedBudgetId,
     settings,
@@ -33,7 +34,6 @@ export default function PopupNav() {
     isRefreshingBudgets
   } = useYNABContext();
   const globalIsFetching = useIsFetching();
-  const isLoadingData = globalIsFetching || tokenRefreshNeeded;
 
   const switchBudget = useCallback(() => {
     if (!shownBudgetsData) return;
@@ -45,8 +45,10 @@ export default function PopupNav() {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
 
-  if (!shownBudgetsData && isRefreshingBudgets) return <p>Loading budgets...</p>;
-  if (!shownBudgetsData || !settings) return null;
+  if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
+  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
+  if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
+  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 
   return (
     <nav
@@ -60,7 +62,7 @@ export default function PopupNav() {
         label={
           categoriesError || accountsError
             ? "Error getting data from YNAB!"
-            : isLoadingData
+            : globalIsFetching
               ? "Status: Refreshing data..."
               : `Status: Last updated ${new Date(
                   categoriesLastUpdated < accountsLastUpdated
@@ -71,7 +73,7 @@ export default function PopupNav() {
         icon={
           categoriesError || accountsError ? (
             <AlertTriangle color="var(--stale)" /> // indicates error while fetching data
-          ) : isLoadingData ? (
+          ) : globalIsFetching ? (
             <Refresh />
           ) : !selectedBudgetId ||
             (categoriesLastUpdated + 240_000 > Date.now() &&
@@ -81,7 +83,7 @@ export default function PopupNav() {
             <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
           )
         }
-        spin={Boolean(isLoadingData)}
+        spin={Boolean(globalIsFetching)}
         disabled
         noAction
       />
