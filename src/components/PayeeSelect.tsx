@@ -62,7 +62,10 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
       if (selectedItem) selectPayee(selectedItem); // Select existing payee
     },
     onHighlightedIndexChange: ({ highlightedIndex, type }) => {
-      if (highlightedIndex && type !== useCombobox.stateChangeTypes.MenuMouseLeave)
+      if (
+        type !== useCombobox.stateChangeTypes.MenuMouseLeave &&
+        typeof highlightedIndex === "number"
+      )
         listVirtualizer.scrollToIndex(highlightedIndex);
     },
     scrollIntoView: () => {}
