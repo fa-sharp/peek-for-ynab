@@ -40,8 +40,17 @@ function HelpPage() {
           </p>
         </li>
         <li>
+          <h3>Are there keyboard shortcuts to open/use the extension?</h3>
+          <p>
+            Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
+            (you can change this by heading over to chrome://extensions/shortcuts in your
+            browser). From there, you can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>,{" "}
+            <kbd>Space</kbd>, and <kbd>Enter</kbd> keys to navigate the extension.
+          </p>
+        </li>
+        <li>
           <h3>
-            I use Direct Import (bank imports) in YNAB. How will that work with
+            I use Direct Import (linked accounts) in YNAB. How will that work with
             transactions I enter via the extension?
           </h3>
           <p>
@@ -60,31 +69,20 @@ function HelpPage() {
           </p>
         </li>
         <li>
-          <h3>Are there keyboard shortcuts to open/use the extension?</h3>
-          <p>
-            Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
-            (you can change this by heading over to chrome://extensions/shortcuts in your
-            browser). From there, you can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>,{" "}
-            <kbd>Space</kbd>, and <kbd>Enter</kbd> keys to navigate the extension.
-          </p>
-        </li>
-        <li>
           <h3>What does the icon in the upper left corner represent?</h3>
           <ul>
             <li>
               <Check color="var(--success)" />
-              &nbsp;Category and account data has been updated within the last 4 minutes.
+              &nbsp;Category and account data has been successfully retrieved from YNAB.
             </li>
             <li>
               <AlertTriangle color="var(--stale)" />
-              &nbsp;Category & account balances/data may be out of date, as they have not
-              been updated within the last 4 minutes. Close and re-open the extension to
-              refresh data.
+              &nbsp;There was an error fetching data from YNAB, and/or the data is out of
+              date. Close and re-open the extension to retry.
             </li>
             <li>
               <Refresh />
-              &nbsp;Data is being refreshed from YNAB. Balances may be out of date until
-              refreshing is complete.
+              &nbsp;Data is being retrieved/refreshed from YNAB.
             </li>
           </ul>
         </li>

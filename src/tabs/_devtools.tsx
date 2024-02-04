@@ -1,13 +1,11 @@
 import { type DehydratedState } from "@tanstack/react-query";
-import type { PersistedClient } from "@tanstack/react-query-persist-client";
-import { del, get } from "idb-keyval";
+import { get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
 import { useEffect, useRef, useState } from "react";
 
 import { Storage, type StorageAreaName } from "@plasmohq/storage";
 
 import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
-import { IDB_CACHE_KEY } from "~lib/indexedDBPersister";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
@@ -51,9 +49,13 @@ function Devtools() {
 
   // Get cache
   const loadCache = () =>
-    get<PersistedClient>(IDB_CACHE_KEY).then((client) =>
-      setCache(client?.clientState.queries)
-    );
+    keys()
+      .then(async (keys) => {
+        const entries = await Promise.all(keys.map(async (key) => [key, await get(key)]));
+        return Object.fromEntries(entries);
+      })
+      .then(setCache);
+
   useEffect(() => {
     loadCache();
   }, []);
@@ -152,7 +154,6 @@ function Devtools() {
       <h3>API Cache</h3>
       <div>
         <button onClick={loadCache}>Refresh</button>
-        <button onClick={() => del(IDB_CACHE_KEY).then(loadCache)}>Clear cache</button>
       </div>
       {cache && <FormattedJSON value={cache} />}
     </div>
