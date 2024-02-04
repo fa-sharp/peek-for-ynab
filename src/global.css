@@ -19,7 +19,7 @@
   --gray-hover: hsl(0, 0%, 89%);
 
   --border-radius: 4px;
-  --spacing-xs: 0.2rem;
+  --spacing-xs: 0.25rem;
   --spacing-sm: 0.35rem;
   --spacing-md: 0.45rem;
   --spacing-xl: 0.75rem;
@@ -238,18 +238,27 @@ button {
   z-index: 100;
 
   max-height: 8rem;
-  width: 97%;
+  width: 99%;
   margin: 0;
   padding: 0;
-  padding-left: 0.25rem;
 
   background-color: var(--background);
   overflow-y: auto;
   list-style: none;
 }
 
+.select-dropdown-heading {
+  padding-left: var(--spacing-xs);
+  margin-block: var(--spacing-xs);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .select-dropdown-item {
+  padding-left: var(--spacing-xs);
   padding-bottom: 3px;
+  width: auto;
   cursor: pointer;
 }
 .select-dropdown-item.highlighted {
@@ -257,6 +266,12 @@ button {
 }
 .select-dropdown-item.selected {
   font-weight: bold;
+}
+.select-dropdown-item.virtual {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 .select-button-right {

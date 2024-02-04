@@ -1,6 +1,7 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import type { CachedPayee } from "~lib/context/ynabContext";
 import { searchWithinString } from "~lib/utils";
@@ -18,10 +19,24 @@ function getFilter(inputValue?: string) {
     payee.transferId == null;
 }
 
+function estimateSize() {
+  return 22;
+}
+
 export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
   const [payeeList, setPayeeList] = useState(() => {
     if (!payees) return [];
     return [...payees.filter((payee) => payee.transferId == null)];
+  });
+  const getPayeeKey = useCallback((index: number) => payeeList[index].id, [payeeList]);
+
+  const listRef = useRef<HTMLUListElement>(null);
+  const listVirtualizer = useVirtualizer({
+    count: payeeList.length,
+    estimateSize,
+    getScrollElement: () => listRef.current,
+    getItemKey: getPayeeKey,
+    overscan: 2
   });
   const {
     isOpen,
@@ -45,7 +60,12 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     },
     onSelectedItemChange({ selectedItem }) {
       if (selectedItem) selectPayee(selectedItem); // Select existing payee
-    }
+    },
+    onHighlightedIndexChange: ({ highlightedIndex, type }) => {
+      if (highlightedIndex && type !== useCombobox.stateChangeTypes.MenuMouseLeave)
+        listVirtualizer.scrollToIndex(highlightedIndex);
+    },
+    scrollIntoView: () => {}
   });
 
   return (
@@ -54,24 +74,35 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
       <div className="flex-col">
         <input required {...getInputProps()} disabled={disabled} />
         <ul
-          className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
-          {...getMenuProps()}>
+          className={clsx("select-dropdown-list", { rounded: isOpen })}
+          {...getMenuProps({ ref: listRef })}>
           {!isOpen ? null : payeeList.length === 0 ? (
             <li className="select-dropdown-item">
               --New payee &apos;{inputValue}&apos;--
             </li>
           ) : (
-            payeeList.map((payee, index) => (
-              <li
-                className={clsx("select-dropdown-item", {
-                  highlighted: highlightedIndex === index,
-                  selected: selectedItem?.id === payee.id
-                })}
-                key={payee.id}
-                {...getItemProps({ item: payee, index })}>
-                {payee.name}
-              </li>
-            ))
+            <>
+              <li key="total-size" style={{ height: listVirtualizer.getTotalSize() }} />
+              {listVirtualizer.getVirtualItems().map((virtualItem) => (
+                <li
+                  key={virtualItem.key}
+                  data-index={virtualItem.index}
+                  className={clsx("select-dropdown-item virtual", {
+                    highlighted: highlightedIndex === virtualItem.index,
+                    selected: selectedItem?.id === virtualItem.key
+                  })}
+                  {...getItemProps({
+                    ref: listVirtualizer.measureElement,
+                    item: payeeList[virtualItem.index],
+                    index: virtualItem.index
+                  })}
+                  style={{
+                    transform: `translateY(${virtualItem.start}px)`
+                  }}>
+                  {payeeList[virtualItem.index].name}
+                </li>
+              ))}
+            </>
           )}
         </ul>
       </div>
