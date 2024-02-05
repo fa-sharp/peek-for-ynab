@@ -1,17 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap");
 
 :root {
-  --accent: hsl(204, 100%, 88%);
-  --accent-hover: hsl(204, 100%, 80%);
+  --accent: hsl(204, 63%, 84%);
+  --accent-hover: hsl(204, 60%, 76%);
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
   --warn-hover: hsl(0, 75%, 72%);
-  --highlight: hsl(204, 100%, 92%);
+  --highlight: hsl(204, 80%, 86%);
   --border: #4d4d4d;
   --border-light: #c4c4c4;
   --currency-green: #357f16;
   --currency-red: #a84646;
-  --action: gray;
+  --action: #525252;
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
@@ -30,15 +30,15 @@
   --border: #969696;
   --border-light: #6e6e6e;
   --action: #ffffff;
-  --accent: hsl(210, 40%, 39%);
-  --accent-hover: hsl(210, 43%, 50%);
+  --accent: hsl(210, 34%, 38%);
+  --accent-hover: hsl(210, 39%, 48%);
   --success: #63d035;
   --warn: hsl(0, 33%, 50%);
   --warn-hover: hsl(0, 33%, 59%);
   --error: #ff6c6c;
   --highlight: hsla(0, 0%, 91%, 0.2);
   --currency-green: #61d231;
-  --currency-red: #ff8888;
+  --currency-red: #ff9d9d;
   --gray: hsl(0, 0%, 26%);
   --gray-hover: hsl(0, 0%, 36%);
 
@@ -134,6 +134,11 @@ button {
 .form-input textarea:not(:disabled) {
   color: currentColor;
   background-color: var(--background);
+}
+
+.form-input input:focus,
+.form-input textarea:focus {
+  outline-color: var(--border);
 }
 
 .form-input input.item-selected {
