@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useMemo, useRef, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
@@ -206,7 +207,11 @@ export default function TransactionAdd() {
         </label>
         <label className="form-input" htmlFor="amount-input">
           Amount
-          <div className="flex-row">
+          <div
+            className={clsx("flex-row currency", {
+              positive: amountType === "Inflow",
+              negative: amountType === "Outflow"
+            })}>
             <IconButton
               label={`${
                 amountType === "Inflow" ? "Inflow" : "Outflow"
@@ -222,6 +227,7 @@ export default function TransactionAdd() {
             />
             <input
               id="amount-input"
+              className="currency"
               required
               autoFocus
               aria-label="Amount"
