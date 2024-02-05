@@ -19,8 +19,8 @@
   --gray-hover: hsl(0, 0%, 89%);
 
   --border-radius: 4px;
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.35rem;
+  --spacing-xs: 0.2rem;
+  --spacing-sm: 0.3rem;
   --spacing-md: 0.45rem;
   --spacing-xl: 0.75rem;
 }
@@ -51,7 +51,7 @@ html {
 
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   margin: 0;
   background-color: var(--background);
 }
@@ -181,7 +181,7 @@ button {
   align-items: center;
   gap: 0.5rem;
 
-  padding: 0.25rem 4px 0.25rem 6px;
+  padding: 0.2rem 4px 0.2rem 7px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
@@ -261,8 +261,7 @@ button {
 }
 
 .select-dropdown-item {
-  padding-left: var(--spacing-xs);
-  padding-bottom: 3px;
+  padding: 2px 0 2px var(--spacing-xs);
   width: auto;
   cursor: pointer;
 }
