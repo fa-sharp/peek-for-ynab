@@ -143,7 +143,7 @@ function CategorySelect(
                 <Fragment key={group.id}>
                   {group.name !== "Internal Master Category" && (
                     <li>
-                      <h3 className="heading-medium">{group.name}</h3>
+                      <h3 className="select-dropdown-heading">{group.name}</h3>
                     </li>
                   )}
                   {categoryList

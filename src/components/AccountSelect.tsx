@@ -125,7 +125,7 @@ function AccountSelect(
               .map((type) => (
                 <Fragment key={type}>
                   <li>
-                    <h3 className="heading-medium">{type}</h3>
+                    <h3 className="select-dropdown-heading">{type}</h3>
                   </li>
                   {accountList
                     .filter((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
