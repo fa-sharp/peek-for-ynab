@@ -25,6 +25,7 @@ export default function PopupMain() {
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
     if (
+      selectedBudgetId &&
       savedCategories &&
       savedAccounts &&
       !savedCategories[selectedBudgetId]?.length &&
