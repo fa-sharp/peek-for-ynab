@@ -39,9 +39,8 @@ function PrivacyPage() {
       <p>
         If tab access is allowed in the settings, {APP_NAME} will be able to read your
         current tab upon opening the extension, in order to enable additional features.
-        This data is only processed locally in your browser. The extension will{" "}
-        <em>not</em> be able to access your current tab unless you explicitly enable this
-        setting.
+        This data is only processed locally in your browser. The extension will not be
+        able to access your current tab unless you explicitly enable this setting.
       </p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
