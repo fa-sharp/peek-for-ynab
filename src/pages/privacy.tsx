@@ -50,7 +50,7 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Jan 8, 2024</em>
+        <em>Last updated: Feb 3, 2024</em>
       </p>
     </WebLayout>
   );
