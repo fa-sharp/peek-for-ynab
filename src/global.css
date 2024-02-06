@@ -207,9 +207,6 @@ button {
   line-height: 0;
   cursor: pointer;
 }
-.icon-button:hover:not(.noaction) {
-  transform: scale(1.05);
-}
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
 }
