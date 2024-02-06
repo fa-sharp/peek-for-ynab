@@ -156,7 +156,7 @@ button {
 
   margin-block: var(--spacing-sm);
 
-  font-size: 1.1rem;
+  font-size: 1.25em;
   font-weight: 600;
 }
 
@@ -167,7 +167,7 @@ button {
 
   margin-block: var(--spacing-xs);
 
-  font-size: 0.9rem;
+  font-size: 1.1em;
   font-weight: 600;
 }
 
@@ -181,7 +181,7 @@ button {
   align-items: center;
   gap: 0.5rem;
 
-  padding: 0.2rem 4px 0.2rem 7px;
+  padding: 0.2rem 4px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
@@ -253,7 +253,7 @@ button {
   padding-left: var(--spacing-xs);
   margin-block: var(--spacing-xs);
 
-  font-size: 0.9rem;
+  font-size: 1.05em;
   font-weight: 600;
 }
 
