@@ -6,7 +6,7 @@
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
   --warn-hover: hsl(0, 75%, 72%);
-  --highlight: hsl(204, 80%, 86%);
+  --highlight: hsl(203, 68%, 87%);
   --border: #4d4d4d;
   --border-light: #c4c4c4;
   --currency-green: #357f16;
@@ -128,6 +128,7 @@ button {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
   font-family: "Open Sans", sans-serif;
+  font-size: 1em;
 }
 
 .form-input input:not(:disabled),
@@ -209,6 +210,9 @@ button {
 }
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
+}
+.icon-button:focus-visible {
+  outline-color: var(--border);
 }
 .icon-button.rounded {
   border: none;
