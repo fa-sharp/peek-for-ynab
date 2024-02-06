@@ -438,16 +438,16 @@ export default function TransactionAdd() {
         </div>
 
         <div className="error-message">{errorMessage}</div>
-        <div className="flex-row flex-row-reverse">
+        <div className="flex-row flex-row-reverse mt-md">
           <button
             type="submit"
-            className="button rounded accent mt-lg flex-1"
+            className="button rounded accent flex-1"
             disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
-            className="button gray rounded mt-lg flex-1"
+            className="button gray rounded flex-1"
             onClick={() => setPopupState({ view: "main" })}
             disabled={isSaving}>
             Cancel
