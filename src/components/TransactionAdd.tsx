@@ -244,26 +244,28 @@ export default function TransactionAdd() {
               selectPayee={(selectedPayee) => {
                 setPayee(selectedPayee);
                 if ("id" in selectedPayee) {
-                  if (!category) categoryRef.current?.focus();
+                  if (!category && categoryRef.current) categoryRef.current.focus();
                   else if (!account) accountRef.current?.focus();
                   else memoRef.current?.focus();
                 }
               }}
               disabled={isSaving}
             />
-            <CategorySelect
-              ref={categoryRef}
-              initialCategory={category}
-              categories={categoriesData}
-              selectCategory={(selectedCategory) => {
-                setCategory(selectedCategory);
-                if (selectedCategory) {
-                  if (!account) accountRef.current?.focus();
-                  else memoRef.current?.focus();
-                }
-              }}
-              disabled={isSaving}
-            />
+            {(!account || account.on_budget) && (
+              <CategorySelect
+                ref={categoryRef}
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) {
+                    if (!account) accountRef.current?.focus();
+                    else memoRef.current?.focus();
+                  }
+                }}
+                disabled={isSaving}
+              />
+            )}
             <AccountSelect
               ref={accountRef}
               currentAccount={account}
