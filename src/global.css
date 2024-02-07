@@ -60,6 +60,9 @@ button {
   color: currentColor;
   font-family: "Open Sans", sans-serif;
 }
+button:focus-visible {
+  outline-color: var(--border);
+}
 
 .flex-row {
   display: flex;
@@ -210,9 +213,6 @@ button {
 }
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
-}
-.icon-button:focus-visible {
-  outline-color: var(--border);
 }
 .icon-button.rounded {
   border: none;
