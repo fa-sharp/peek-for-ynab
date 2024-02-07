@@ -406,7 +406,7 @@ export default function TransactionAdd() {
             {cleared ? (
               <IconButton
                 label="Cleared (click to switch)"
-                icon={<CircleC fill="var(--currency-green)" color="white" size={26} />}
+                icon={<CircleC fill="var(--currency-green)" color="white" />}
                 onClick={() => setCleared(false)}
               />
             ) : (
