@@ -388,19 +388,7 @@ export default function TransactionAdd() {
             )}
           </div>
         </label>
-
-        <label className="form-input">
-          Date
-          <input
-            required
-            type="date"
-            value={date}
-            max={getTodaysDateISO()}
-            onChange={(e) => setDate(e.target.value)}
-            disabled={isSaving}
-          />
-        </label>
-        <div className="flex-row justify-between">
+        <div className="flex-row justify-between mt-small">
           <label className="flex-row">
             Status:
             {cleared ? (
@@ -432,7 +420,17 @@ export default function TransactionAdd() {
             </select>
           </label>
         </div>
-
+        <label className="form-input">
+          Date
+          <input
+            required
+            type="date"
+            value={date}
+            max={getTodaysDateISO()}
+            onChange={(e) => setDate(e.target.value)}
+            disabled={isSaving}
+          />
+        </label>
         <div className="error-message">{errorMessage}</div>
         <div className="flex-row flex-row-reverse mt-md">
           <button
