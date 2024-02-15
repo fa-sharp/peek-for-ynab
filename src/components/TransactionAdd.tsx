@@ -27,7 +27,11 @@ export default function TransactionAdd() {
   );
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
-  const [cleared, setCleared] = useState(settings?.txCleared ? true : false);
+  const [cleared, setCleared] = useState(
+    () =>
+      accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
+        "cash" || !!settings?.txCleared
+  );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
     popupState.txAddState?.amountType || "Outflow"
   );
@@ -272,7 +276,10 @@ export default function TransactionAdd() {
               accounts={accountsData}
               selectAccount={(selectedAccount) => {
                 setAccount(selectedAccount);
-                if (selectedAccount) memoRef.current?.focus();
+                if (selectedAccount) {
+                  memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
+                }
               }}
               disabled={isSaving}
             />
@@ -359,6 +366,7 @@ export default function TransactionAdd() {
                   )
                     setTimeout(() => categoryRef.current?.focus(), 50);
                   else memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
                 }
               }}
               label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
