@@ -192,6 +192,10 @@ button:focus-visible {
   color: transparent;
 }
 
+li:last-child .balance-display {
+  border-bottom-color: transparent;
+}
+
 .balance-actions {
   display: flex;
   gap: 1px;
