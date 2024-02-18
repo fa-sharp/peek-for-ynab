@@ -27,7 +27,7 @@ import {
   ExpandListIconBold,
   PinItemIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {

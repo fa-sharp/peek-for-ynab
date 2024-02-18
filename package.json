@@ -1,10 +1,10 @@
 {
   "name": "ynab-chrome-widget",
   "displayName": "Peek for YNAB",
-  "version": "0.17.3",
+  "version": "0.17.4",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
-  "packageManager": "pnpm@8.14.1",
+  "packageManager": "pnpm@8.15.3",
   "homepage": "https://peek-for-ynab.vercel.app",
   "type": "module",
   "scripts": {

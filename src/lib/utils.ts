@@ -121,49 +121,6 @@ export const removeCurrentTabPermissions = () =>
     )
   );
 
-/** Extract any currency amounts on the page. Returns a sorted array of detected amounts, from highest to lowest */
-export const extractCurrencyAmounts = () => {
-  /** Get all text content from an element and its descendants, including shadow DOMs */
-  const getTextContent = (element: Element | ShadowRoot) => {
-    let content = element.textContent || "";
-
-    element.querySelectorAll("*").forEach((el) => {
-      if (el.shadowRoot) {
-        content += getTextContent(el.shadowRoot);
-      }
-    });
-    return content;
-  };
-
-  /** Parse decimal number according to user's locale */
-  const parseLocaleNumber = (value: string, locales = navigator.languages) => {
-    //@ts-expect-error shut up TS!
-    const example = Intl.NumberFormat(locales).format(1.1);
-    const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
-    const cleaned = value.replace(cleanPattern, "");
-    const normalized = cleaned.replace(example.charAt(1), ".");
-
-    return parseFloat(normalized);
-  };
-
-  const text = getTextContent(document.body);
-  const regex = /\p{Sc}\s?([\d,]+(?:\.\d{1,2})?)/gu; // TODO improve this regex for more currencies/locales (or find a different way)
-  let match;
-  const detected = new Set<number>(); // use a Set to eliminate duplicates
-  while ((match = regex.exec(text)) !== null) {
-    const amount = parseLocaleNumber(match[1]);
-    if (!isNaN(amount)) {
-      detected.add(amount);
-    }
-  }
-
-  // Sort amounts from highest to lowest
-  const amounts = Array.from(detected);
-  amounts.sort((a, b) => b - a);
-
-  return amounts;
-};
-
 export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
   if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
   if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";

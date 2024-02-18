@@ -1,7 +1,6 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { IconButton } from "~components";
-import { CategoryView } from "~components/CategoriesView";
+import { CategoryView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
@@ -9,7 +8,7 @@ import {
   AddCCPaymentIcon,
   AddTransactionIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
