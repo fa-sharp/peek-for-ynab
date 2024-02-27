@@ -1,5 +1,4 @@
-import { PopupLogin, TransactionAdd } from "~components";
-import PopupMain from "~components/PopupMain";
+import { PopupLogin, PopupMain, TransactionAdd } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 

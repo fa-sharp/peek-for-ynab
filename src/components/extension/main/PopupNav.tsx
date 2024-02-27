@@ -51,13 +51,7 @@ export default function PopupNav() {
   if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: 8,
-        marginBottom: "0.6rem"
-      }}>
+    <nav className="flex-row justify-between mb-small">
       <IconButton
         label={
           categoriesError || accountsError
@@ -87,13 +81,7 @@ export default function PopupNav() {
         disabled
         noAction
       />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 3
-        }}>
+      <div className="flex-row gap-xs">
         <BudgetSelect
           emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}

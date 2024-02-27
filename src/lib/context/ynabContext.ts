@@ -194,40 +194,6 @@ const useYNABProvider = () => {
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
-  const useGetAccountTxs = (accountId: string) =>
-    useQuery({
-      queryKey: ["txs", { budgetId: selectedBudgetId }, `accountId-${accountId}`],
-      queryFn: async () => {
-        if (!ynabAPI) return;
-        const {
-          data: { transactions }
-        } = await ynabAPI.transactions.getTransactionsByAccount(
-          selectedBudgetId,
-          accountId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
-        );
-        IS_DEV && console.log("Fetched transactions!", transactions);
-        return transactions;
-      }
-    });
-
-  const useGetCategoryTxs = (categoryId: string) =>
-    useQuery({
-      queryKey: ["txs", { budgetId: selectedBudgetId }, `categoryId-${categoryId}`],
-      queryFn: async () => {
-        if (!ynabAPI) return;
-        const {
-          data: { transactions }
-        } = await ynabAPI.transactions.getTransactionsByCategory(
-          selectedBudgetId,
-          categoryId,
-          new Date(Date.now() - 10 * ONE_DAY_IN_MILLIS).toISOString() // since 10 days ago
-        );
-        IS_DEV && console.log("Fetched transactions!", transactions);
-        return transactions;
-      }
-    });
-
   const addTransaction = useCallback(
     async (transaction: ynab.SaveTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
@@ -270,10 +236,6 @@ const useYNABProvider = () => {
     refreshBudgets,
     isRefreshingBudgets,
     refreshCategoriesAndAccounts,
-    /** Get recent transactions for the specified account */
-    useGetAccountTxs,
-    /** Get recent transactions for the specified category */
-    useGetCategoryTxs,
     /** Add a new transaction to the current budget */
     addTransaction
   };

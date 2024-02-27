@@ -15,7 +15,7 @@ import {
   requestCurrentTabPermissions
 } from "~lib/utils";
 
-import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
+import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from "../..";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
@@ -82,45 +82,6 @@ export default function TransactionAdd() {
     if (!transferToAccount) return false;
     return !transferToAccount.on_budget && account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
-
-  /** The CCP category if this is a credit card payment. We'll want to show the CCP balance. */
-  // const ccpCategory = useMemo(() => {
-  //   if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
-  //   const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
-  //   const isCreditCardPayment =
-  //     (!account || account.on_budget) &&
-  //     transferToAccount &&
-  //     (transferToAccount.type === "creditCard" ||
-  //       transferToAccount.type === "lineOfCredit");
-  //   if (!isCreditCardPayment) return;
-  //   return categoriesData?.find(
-  //     (c) =>
-  //       c.category_group_name === "Credit Card Payments" &&
-  //       c.name === transferToAccount.name
-  //   );
-  // }, [account, accountsData, categoriesData, isTransfer, payee]);
-
-  // TODO find a better way to detect amounts
-  // const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
-  // const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
-  // // const onDetectAmount = async () => {
-  //   if (!detectedAmounts) {
-  //     // Check permissions
-  //     if (!(await requestCurrentTabPermissions())) return;
-  //     // Try detecting any currency amounts on the page
-  //     const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
-  //     !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
-  //     setDetectedAmounts(amounts);
-  //     if (amounts[0]) setAmount(amounts[0].toString());
-  //   } else if (detectedAmounts[detectedAmountIdx + 1]) {
-  //     // Iterate through detected amounts
-  //     setAmount(detectedAmounts[detectedAmountIdx + 1].toString());
-  //     setDetectedAmountIdx((v) => v + 1);
-  //   } else {
-  //     if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
-  //     setDetectedAmountIdx(0);
-  //   }
-  // };
 
   const onCopyURLIntoMemo = async () => {
     if (!(await requestCurrentTabPermissions())) return;
@@ -313,30 +274,6 @@ export default function TransactionAdd() {
               label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
               disabled={isSaving}
             />
-            {/* {ccpCategory && (
-              <div>
-                Payment category:{" "}
-                <button
-                  type="button"
-                  className="button rounded gray"
-                  title="Set to the available amount in this credit card's payment category"
-                  onClick={() => {
-                    if (ccpCategory.balance < 0) return;
-                    setAmount(
-                      millisToStringValue(
-                        ccpCategory.balance,
-                        selectedBudgetData?.currencyFormat
-                      )
-                    );
-                  }}>
-                  <CurrencyView
-                    colorsEnabled
-                    milliUnits={ccpCategory.balance}
-                    currencyFormat={selectedBudgetData?.currencyFormat}
-                  />
-                </button>
-              </div>
-            )} */}
             {isBudgetToTrackingTransfer && (
               <CategorySelect
                 ref={categoryRef}
