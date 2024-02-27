@@ -6,7 +6,7 @@
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
   --warn-hover: hsl(0, 75%, 72%);
-  --highlight: hsl(203, 68%, 87%);
+  --highlight: hsl(204, 48%, 87%);
   --border: #4d4d4d;
   --border-light: #c4c4c4;
   --currency-green: #357f16;
@@ -19,10 +19,10 @@
   --gray-hover: hsl(0, 0%, 89%);
 
   --border-radius: 4px;
-  --spacing-xs: 0.2rem;
-  --spacing-sm: 0.3rem;
-  --spacing-md: 0.45rem;
-  --spacing-xl: 0.75rem;
+  --spacing-xs: 0.15em;
+  --spacing-sm: 0.3em;
+  --spacing-md: 0.4em;
+  --spacing-xl: 0.65em;
 }
 
 :root.dark {
@@ -38,7 +38,7 @@
   --error: #ff6c6c;
   --highlight: hsla(0, 0%, 91%, 0.2);
   --currency-green: #61d231;
-  --currency-red: #ff9d9d;
+  --currency-red: #ff9595;
   --gray: hsl(0, 0%, 26%);
   --gray-hover: hsl(0, 0%, 36%);
 
@@ -149,7 +149,7 @@ button:focus-visible {
   border: 1px solid transparent;
   background: var(--accent);
   color: currentColor;
-  padding-right: 1.4rem;
+  padding-right: 1.6em;
   text-overflow: ellipsis;
 }
 
@@ -183,9 +183,9 @@ button:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6em;
 
-  padding: 0.2rem 4px;
+  padding: 3px 4px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
@@ -203,7 +203,7 @@ li:last-child .balance-display {
 
 .button {
   cursor: pointer;
-  padding: var(--spacing-sm) 0.7rem;
+  padding: var(--spacing-sm) 0.7em;
   text-align: center;
 }
 
@@ -236,7 +236,7 @@ li:last-child .balance-display {
 }
 
 .select {
-  padding: 0.25rem;
+  padding: 0.3em;
   font-family: "Open Sans", sans-serif;
   background-color: var(--background);
   color: currentColor;
@@ -337,15 +337,15 @@ li:last-child .balance-display {
 }
 
 .mt-md {
-  margin-top: 1.2rem;
+  margin-top: 1em;
 }
 
 .mt-lg {
-  margin-top: 1.8rem;
+  margin-top: 1.5em;
 }
 
 .mt-xxl {
-  margin-top: 5rem;
+  margin-top: 5em;
 }
 
 .mb-small {
@@ -353,7 +353,7 @@ li:last-child .balance-display {
 }
 
 .font-big {
-  font-size: 1.8rem;
+  font-size: 2em;
 }
 
 .cursor-pointer {

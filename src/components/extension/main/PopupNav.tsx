@@ -56,7 +56,7 @@ export default function PopupNav() {
         display: "flex",
         justifyContent: "space-between",
         gap: 8,
-        marginBottom: "0.6rem"
+        marginBottom: "0.5em"
       }}>
       <IconButton
         label={
