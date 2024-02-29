@@ -333,7 +333,7 @@ export default function TransactionAdd() {
             )}
           </div>
         </label>
-        <div className="flex-row justify-between mt-small">
+        <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
             Status:
             {cleared ? (
@@ -377,7 +377,7 @@ export default function TransactionAdd() {
           />
         </label>
         <div className="error-message">{errorMessage}</div>
-        <div className="flex-row flex-row-reverse mt-md">
+        <div className="flex-row flex-row-reverse mt-lg">
           <button
             type="submit"
             className="button rounded accent flex-1"

@@ -145,7 +145,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Permissions
           </h3>
-          <label className="flex-row mb-small">
+          <label className="flex-row mb-sm">
             <input
               type="checkbox"
               checked={settings.currentTabAccess}
@@ -183,7 +183,7 @@ export function OptionsView() {
           </div>
           <button
             title="Refresh the list of budgets from YNAB"
-            className="button rounded accent flex-row mb-small"
+            className="button rounded accent flex-row mb-sm"
             style={{ width: "fit-content", marginBlock: 8 }}
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>

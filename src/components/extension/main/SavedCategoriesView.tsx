@@ -32,7 +32,7 @@ export default function SavedCategoriesView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned categories"
-          className="list">
+          className="list mb-lg">
           {savedCategoriesData.map((category, idx) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =

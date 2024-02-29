@@ -11,7 +11,7 @@ function IndexPage() {
       </Head>
       <h1>Peek for YNAB</h1>
       <h3>A Chrome extension to quickly check on your budget</h3>
-      <div className="flex-row gap-xl">
+      <div className="flex-row gap-lg">
         <Image
           src="/screenshots/light-pinned.png"
           alt={"Extension screenshot in light mode"}

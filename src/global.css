@@ -21,8 +21,8 @@
   --border-radius: 4px;
   --spacing-xs: 0.15em;
   --spacing-sm: 0.3em;
-  --spacing-md: 0.4em;
-  --spacing-xl: 0.65em;
+  --spacing-md: 0.5em;
+  --spacing-lg: 0.7em;
 }
 
 :root.dark {
@@ -115,8 +115,8 @@ button:focus-visible {
   gap: var(--spacing-sm);
 }
 
-.gap-xl {
-  gap: var(--spacing-xl);
+.gap-lg {
+  gap: var(--spacing-lg);
 }
 
 .form-input {
@@ -183,7 +183,7 @@ button:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.6em;
+  gap: var(--spacing-md);
 
   padding: 3px 4px;
   border-bottom: solid 1px var(--border-light);
@@ -332,24 +332,28 @@ li:last-child .balance-display {
   color: var(--currency-red);
 }
 
-.mt-small {
+.mt-sm {
   margin-top: var(--spacing-sm);
 }
 
 .mt-md {
-  margin-top: 1em;
+  margin-top: var(--spacing-md);
 }
 
 .mt-lg {
-  margin-top: 1.5em;
+  margin-top: var(--spacing-lg);
 }
 
 .mt-xxl {
   margin-top: 5em;
 }
 
-.mb-small {
+.mb-sm {
   margin-bottom: var(--spacing-sm);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
 }
 
 .font-big {
