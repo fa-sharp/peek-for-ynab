@@ -51,7 +51,7 @@ html {
 
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 0.83rem;
+  font-size: 0.8rem;
   margin: 0;
   background-color: var(--background);
 }
@@ -183,7 +183,7 @@ button:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 
   padding: 3px 4px;
   border-bottom: solid 1px var(--border-light);
@@ -258,15 +258,15 @@ li:last-child .balance-display {
 }
 
 .select-dropdown-heading {
-  padding-left: var(--spacing-xs);
-  margin-block: var(--spacing-xs);
+  padding-left: var(--spacing-sm);
+  margin-block: var(--spacing-sm);
 
   font-size: 1.05em;
   font-weight: 600;
 }
 
 .select-dropdown-item {
-  padding: 2px 0 2px var(--spacing-xs);
+  padding: 2px 0 2px var(--spacing-sm);
   width: auto;
   cursor: pointer;
 }

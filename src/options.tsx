@@ -120,7 +120,7 @@ export function OptionsView() {
           </h3>
           <div className="flex-col">
             <label
-              className="flex-row gap-xs"
+              className="flex-row gap-sm"
               title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
               <input
                 type="checkbox"
@@ -131,7 +131,7 @@ export function OptionsView() {
               Approved
             </label>
             <label
-              className="flex-row gap-xs"
+              className="flex-row gap-sm"
               title="Set transactions as Cleared by default">
               <input
                 type="checkbox"

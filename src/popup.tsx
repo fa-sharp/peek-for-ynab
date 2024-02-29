@@ -23,8 +23,7 @@ export function PopupView() {
   return (
     <div
       style={{
-        flexDirection: "column",
-        padding: 16,
+        padding: "1em",
         minWidth: settings.emojiMode ? "150px" : "240px",
         width: "max-content",
         maxWidth: "320px"
