@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
+import CurrencyViewAnimated from "~components/CurrencyViewAnimated";
 import { useYNABContext } from "~lib/context";
 import {
   type AppSettings,
@@ -186,11 +187,12 @@ export const AccountView = ({
         )}
       </div>
       <div className="flex-row">
-        <CurrencyView
+        <CurrencyViewAnimated
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
+          animationEnabled
         />
         {actionElementsRight}
       </div>
