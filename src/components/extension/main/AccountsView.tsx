@@ -191,6 +191,7 @@ export const AccountView = ({
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
+          animationEnabled={settings.animations ?? true}
         />
         {actionElementsRight}
       </div>

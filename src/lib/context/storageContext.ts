@@ -29,6 +29,8 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
+  /** Whether animations are enabled */
+  animations?: boolean;
 }
 
 /** Initial state of the add transaction screen */
