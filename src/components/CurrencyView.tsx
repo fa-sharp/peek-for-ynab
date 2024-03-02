@@ -57,8 +57,6 @@ function CurrencyView({
       end={currValue}
       duration={1.2}
       formattingFn={formatValue}
-      //@ts-expect-error missing TS type
-      startOnMount={false}
     />
   );
 }
