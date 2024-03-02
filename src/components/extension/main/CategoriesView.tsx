@@ -8,7 +8,6 @@ import type {
 } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
-import CurrencyViewAnimated from "~components/CurrencyViewAnimated";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
@@ -219,12 +218,11 @@ export const CategoryView = ({
         )}
       </div>
       <div className="flex-row">
-        <CurrencyViewAnimated
+        <CurrencyView
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
-          animationEnabled
         />
         {actionElementsRight}
       </div>
