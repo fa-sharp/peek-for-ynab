@@ -100,14 +100,6 @@ export function OptionsView() {
               />
               😉 Emoji mode
             </label>
-            <label className="flex-row" title="Animate changing balances">
-              <input
-                type="checkbox"
-                checked={settings.animations ?? true}
-                onChange={(e) => changeSetting("animations", e.target.checked)}
-              />
-              🪄 Animations
-            </label>
             <label className="flex-row">
               Theme:
               <select

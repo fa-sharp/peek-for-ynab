@@ -8,12 +8,14 @@ import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
-  const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
+  const { removeAccount, setPopupState, popupState, settings, prefersReducedMotion } =
+    useStorageContext();
 
   if (
     !savedAccountsData ||
     !selectedBudgetData ||
     !settings ||
+    prefersReducedMotion === undefined ||
     savedAccountsData.length === 0
   )
     return null;
@@ -43,6 +45,7 @@ export default function SavedAccountsView() {
                     account={account}
                     currencyFormat={selectedBudgetData?.currencyFormat}
                     settings={settings}
+                    animationEnabled={!prefersReducedMotion}
                     actionElementsLeft={
                       !popupState.editMode ? null : (
                         <IconButton

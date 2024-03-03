@@ -9,6 +9,5 @@ export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
   privateMode: false,
   emojiMode: false,
   currentTabAccess: false,
-  theme: "auto",
-  animations: true
+  theme: "auto"
 });

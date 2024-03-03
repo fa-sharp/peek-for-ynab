@@ -7,6 +7,7 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import { usePrefersReducedMotion } from "~lib/utils";
 
 import type { CachedPayee } from "./ynabContext";
 
@@ -29,8 +30,6 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled */
-  animations?: boolean;
 }
 
 /** Initial state of the add transaction screen */
@@ -80,6 +79,9 @@ const useStorageProvider = () => {
     view: "main",
     editMode: false
   });
+
+  /** Whether user prefers reduced motion. Is `undefined` if not loaded yet. */
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   /** Whether syncing is enabled */
   const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
@@ -247,6 +249,7 @@ const useStorageProvider = () => {
     setTokenRefreshNeeded,
     popupState,
     setPopupState,
+    prefersReducedMotion,
     settings,
     syncEnabled,
     changeSetting,
