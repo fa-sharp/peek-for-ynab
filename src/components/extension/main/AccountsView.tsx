@@ -30,13 +30,21 @@ function AccountsView() {
     saveAccount,
     setPopupState,
     popupState,
-    settings
+    settings,
+    prefersReducedMotion
   } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
+  if (
+    !selectedBudgetData ||
+    !accountsData ||
+    !savedAccounts ||
+    !settings ||
+    prefersReducedMotion === undefined
+  )
+    return null;
 
   return (
     <>
@@ -61,6 +69,7 @@ function AccountsView() {
             budgetData={selectedBudgetData}
             settings={settings}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            animationEnabled={!prefersReducedMotion}
           />
           <AccountTypeView
             accountType="Tracking"
@@ -71,6 +80,7 @@ function AccountsView() {
             budgetData={selectedBudgetData}
             settings={settings}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            animationEnabled={!prefersReducedMotion}
           />
         </>
       )}
@@ -87,7 +97,8 @@ function AccountTypeView({
   savedAccounts,
   settings,
   editMode,
-  onAddTx
+  onAddTx,
+  animationEnabled
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -97,6 +108,7 @@ function AccountTypeView({
   settings: AppSettings;
   editMode?: boolean;
   onAddTx: (initialState: TxAddInitialState) => void;
+  animationEnabled?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -120,6 +132,7 @@ function AccountTypeView({
                 account={account}
                 currencyFormat={budgetData.currencyFormat}
                 settings={settings}
+                animationEnabled={animationEnabled}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
                     <IconButton
@@ -161,13 +174,15 @@ export const AccountView = ({
   currencyFormat,
   actionElementsLeft,
   actionElementsRight,
-  settings
+  settings,
+  animationEnabled
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
   actionElementsLeft?: ReactElement | null;
   actionElementsRight?: ReactElement | null;
   settings: AppSettings;
+  animationEnabled?: boolean;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
@@ -191,6 +206,7 @@ export const AccountView = ({
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
+          animationEnabled={animationEnabled}
         />
         {actionElementsRight}
       </div>

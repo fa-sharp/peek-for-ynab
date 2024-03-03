@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import * as ynab from "ynab";
 
@@ -8,24 +8,30 @@ export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
-export const formatCurrency = (
-  millis: number,
+export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
-    millis,
-    currencyFormat.decimal_digits
-  );
-  const formattedString = new Intl.NumberFormat("default", {
+  const formatter = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
-  }).format(currencyAmount);
-
-  return formattedString;
+  });
+  return (millis: number) => {
+    const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
+      millis,
+      currencyFormat.decimal_digits
+    );
+    return formatter.format(currencyAmount);
+  };
 };
+
+export const formatCurrency = (
+  millis: number,
+  /** the budget's `currency_format` property from YNAB */
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
+) => getCurrencyFormatter(currencyFormat)(millis);
 
 /** Convert millis to a string value suitable for the HTML number input */
 export const millisToStringValue = (
@@ -161,4 +167,17 @@ export const useSetColorTheme = () => {
 
     return () => prefersDarkModeQuery?.removeEventListener("change", listener);
   }, [themeSetting]);
+};
+
+/** Check if user prefers less motion/animations. Will be `undefined` if not loaded yet.  */
+export const usePrefersReducedMotion = () => {
+  const [preference, setPreference] = useState<boolean | undefined>(undefined);
+  useEffect(() => {
+    const prefersReducedMotionQuery = window?.matchMedia
+      ? window.matchMedia("(prefers-reduced-motion)")
+      : null;
+    setPreference(!!prefersReducedMotionQuery?.matches);
+  }, []);
+
+  return preference;
 };

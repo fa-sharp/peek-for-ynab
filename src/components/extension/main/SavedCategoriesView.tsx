@@ -12,13 +12,15 @@ import {
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
+  const { removeCategory, settings, popupState, setPopupState, prefersReducedMotion } =
+    useStorageContext();
   const { accountsData, selectedBudgetData, savedCategoriesData } = useYNABContext();
 
   if (
     !selectedBudgetData ||
     !savedCategoriesData ||
     !settings ||
+    prefersReducedMotion === undefined ||
     savedCategoriesData.length === 0
   )
     return null;
@@ -55,6 +57,7 @@ export default function SavedCategoriesView() {
                       categoryData={category}
                       currencyFormat={currencyFormat}
                       settings={settings}
+                      animationEnabled={!prefersReducedMotion}
                       actionElementsLeft={
                         !popupState.editMode ? null : (
                           <IconButton

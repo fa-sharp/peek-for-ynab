@@ -37,13 +37,20 @@ function CategoriesView() {
     setPopupState,
     popupState,
     settings,
-    selectedBudgetId
+    selectedBudgetId,
+    prefersReducedMotion
   } = useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
+  if (
+    !selectedBudgetData ||
+    !categoryGroupsData ||
+    !savedCategories ||
+    !settings ||
+    prefersReducedMotion === undefined
+  )
     return null;
 
   return (
@@ -66,6 +73,7 @@ function CategoriesView() {
             savedCategories={savedCategories[selectedBudgetId]}
             editMode={popupState.editMode}
             settings={settings}
+            animationEnabled={!prefersReducedMotion}
             onSaveCategory={(categoryId) => saveCategory(categoryId)}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
           />
@@ -83,7 +91,8 @@ export function CategoryGroupView({
   onSaveCategory,
   editMode,
   settings,
-  onAddTx
+  onAddTx,
+  animationEnabled
 }: {
   categoryGroup: CategoryGroupWithCategories;
   accountsData?: Account[];
@@ -93,6 +102,7 @@ export function CategoryGroupView({
   editMode?: boolean;
   settings: AppSettings;
   onAddTx: (initialState: TxAddInitialState) => void;
+  animationEnabled?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -125,6 +135,7 @@ export function CategoryGroupView({
                   categoryData={category}
                   currencyFormat={budgetData.currencyFormat}
                   settings={settings}
+                  animationEnabled={animationEnabled}
                   actionElementsLeft={
                     !editMode ? null : savedCategories?.some(
                         (id) => id === category.id
@@ -193,13 +204,15 @@ export const CategoryView = ({
   currencyFormat,
   settings,
   actionElementsRight,
-  actionElementsLeft
+  actionElementsLeft,
+  animationEnabled
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
   actionElementsRight?: ReactElement | null;
   actionElementsLeft?: ReactElement | null;
   settings: AppSettings;
+  animationEnabled?: boolean;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
@@ -223,6 +236,7 @@ export const CategoryView = ({
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
+          animationEnabled={animationEnabled}
         />
         {actionElementsRight}
       </div>
