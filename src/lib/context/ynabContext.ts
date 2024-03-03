@@ -160,7 +160,7 @@ const useYNABProvider = () => {
   );
 
   /** Fetch payees for the selected budget */
-  const { data: payeesData } = useQuery({
+  const { data: payeesData, refetch: refetchPayees } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
@@ -202,9 +202,12 @@ const useYNABProvider = () => {
       });
       IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
-      setTimeout(() => refreshCategoriesAndAccounts(), 350);
+      setTimeout(() => {
+        refreshCategoriesAndAccounts();
+        if (!transaction.payee_id) refetchPayees();
+      }, 350);
     },
-    [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
+    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
   );
 
   return {
