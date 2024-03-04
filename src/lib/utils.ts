@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import * as ynab from "ynab";
 
@@ -167,17 +167,4 @@ export const useSetColorTheme = () => {
 
     return () => prefersDarkModeQuery?.removeEventListener("change", listener);
   }, [themeSetting]);
-};
-
-/** Check if user prefers less motion/animations. Will be `undefined` if not loaded yet.  */
-export const usePrefersReducedMotion = () => {
-  const [preference, setPreference] = useState<boolean | undefined>(undefined);
-  useEffect(() => {
-    const prefersReducedMotionQuery = window?.matchMedia
-      ? window.matchMedia("(prefers-reduced-motion)")
-      : null;
-    setPreference(!!prefersReducedMotionQuery?.matches);
-  }, []);
-
-  return preference;
 };
