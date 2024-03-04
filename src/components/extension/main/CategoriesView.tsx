@@ -222,7 +222,6 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          hideBalance={settings.privateMode}
           animationEnabled={settings.animations}
         />
         {actionElementsRight}
