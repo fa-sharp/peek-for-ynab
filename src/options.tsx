@@ -82,16 +82,6 @@ export function OptionsView() {
             </label>
             <label
               className="flex-row"
-              title="Only display balances when you hover over them with your mouse">
-              <input
-                type="checkbox"
-                checked={settings.privateMode}
-                onChange={(e) => changeSetting("privateMode", e.target.checked)}
-              />
-              🕶️ Show balances on hover only
-            </label>
-            <label
-              className="flex-row"
               title="Display category/account names as emojis only">
               <input
                 type="checkbox"
@@ -99,6 +89,14 @@ export function OptionsView() {
                 onChange={(e) => changeSetting("emojiMode", e.target.checked)}
               />
               😉 Emoji mode
+            </label>
+            <label className="flex-row" title="Animate changing balances">
+              <input
+                type="checkbox"
+                checked={!!settings.animations}
+                onChange={(e) => changeSetting("animations", e.target.checked)}
+              />
+              🪄 Animations
             </label>
             <label className="flex-row">
               Theme:

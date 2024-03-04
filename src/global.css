@@ -58,7 +58,8 @@ body {
 
 button {
   color: currentColor;
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: inherit;
 }
 button:focus-visible {
   outline-color: var(--border);
@@ -130,7 +131,7 @@ button:focus-visible {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
   font-size: 1em;
 }
 
@@ -237,7 +238,8 @@ li:last-child .balance-display {
 
 .select {
   padding: 0.3em;
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: inherit;
   background-color: var(--background);
   color: currentColor;
 }

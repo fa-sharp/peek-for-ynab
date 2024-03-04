@@ -223,6 +223,7 @@ export const CategoryView = ({
           currencyFormat={currencyFormat}
           colorsEnabled={true}
           hideBalance={settings.privateMode}
+          animationEnabled={settings.animations}
         />
         {actionElementsRight}
       </div>
