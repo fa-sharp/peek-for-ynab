@@ -29,34 +29,40 @@ function CurrencyView({
     [currencyFormatter]
   );
 
-  const [currValue, setCurrValue] = useState(() => milliUnits);
+  const currValueRef = useRef(milliUnits);
   const prevValueRef = useRef(milliUnits);
   useEffect(() => {
-    setCurrValue((prev) => {
-      prevValueRef.current = prev;
-      return milliUnits;
-    });
+    prevValueRef.current = currValueRef.current;
+    currValueRef.current = milliUnits;
   }, [milliUnits]);
+
+  const [isAnimating, setIsAnimating] = useState(false);
+  const hasValueChanged = prevValueRef.current !== milliUnits;
 
   const className = useMemo(
     () =>
       clsx("currency", {
-        positive: colorsEnabled && currValue > 0,
-        negative: colorsEnabled && currValue < 0,
+        positive: colorsEnabled && milliUnits > 0,
+        negative: colorsEnabled && milliUnits < 0,
         hidden: hideBalance
       }),
-    [colorsEnabled, currValue, hideBalance]
+    [colorsEnabled, milliUnits, hideBalance]
   );
 
-  return !animationEnabled ? (
+  return !animationEnabled || !hasValueChanged ? (
     <span className={className}>{formatValue(milliUnits)}</span>
   ) : (
     <CountUp
       className={className}
       start={prevValueRef.current}
-      end={currValue}
+      end={milliUnits}
       duration={1.2}
       formattingFn={formatValue}
+      onStart={() => setIsAnimating(true)}
+      onEnd={() => setIsAnimating(false)}
+      containerProps={{
+        "aria-busy": isAnimating
+      }}
     />
   );
 }
