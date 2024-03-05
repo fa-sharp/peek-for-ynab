@@ -14,29 +14,28 @@ const CategoryTxsView = () => {
   );
   const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id);
 
-  // Todo: Loading/error states
-  if (!category || !categoryTxs || !selectedBudgetData) return null;
+  if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2 className="heading-big mb-small">{category.name}</h2>
+      <div className="flex-row justify-between">
+        <h2 className="heading-big mb-lg">{category.name}</h2>
         <IconButton
           icon={<ArrowBack />}
           label="Back to main view"
           onClick={() => setPopupState({ view: "main" })}
         />
       </div>
-      <div className="flex-col">
+      <div className="flex-col gap-sm mb-lg">
         <div className="balance-display">
-          Current Balance:
+          Available Balance:
           <CurrencyView
             milliUnits={category.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
           />
         </div>
-        <div className="flex-row" style={{ justifyContent: "space-between" }}>
+        <div className="flex-row justify-between">
           <div className="balance-display">
             Budgeted:
             <CurrencyView
@@ -55,23 +54,27 @@ const CategoryTxsView = () => {
           </div>
         </div>
       </div>
-      <h3 className="heading-medium mt-md">Transactions</h3>
-      <div className="flex-col gap-sm">
-        {categoryTxs?.map((tx) => (
-          <TransactionView
-            key={tx.id}
-            tx={tx}
-            detailRight="account"
-            detailRightOnClick={() =>
-              setPopupState({
-                view: "detail",
-                detailState: { id: tx.account_id, type: "account" }
-              })
-            }
-            currencyFormat={selectedBudgetData.currencyFormat}
-          />
-        ))}
-      </div>
+      <h3 className="heading-medium">Transactions</h3>
+      {!categoryTxs ? (
+        <div>Loading transactions...</div>
+      ) : (
+        <div className="flex-col gap-sm">
+          {categoryTxs.map((tx) => (
+            <TransactionView
+              key={tx.id}
+              tx={tx}
+              detailRight="account"
+              detailRightOnClick={() =>
+                setPopupState({
+                  view: "detail",
+                  detailState: { id: tx.account_id, type: "account" }
+                })
+              }
+              currencyFormat={selectedBudgetData.currencyFormat}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

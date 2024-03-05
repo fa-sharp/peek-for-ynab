@@ -199,7 +199,7 @@ li:last-child .balance-display {
 
 .balance-actions {
   display: flex;
-  gap: 1px;
+  gap: 2px;
 }
 
 .button {
@@ -360,6 +360,10 @@ li:last-child .balance-display {
 
 .font-big {
   font-size: 2em;
+}
+
+.font-small {
+  font-size: 0.9em;
 }
 
 .cursor-pointer {

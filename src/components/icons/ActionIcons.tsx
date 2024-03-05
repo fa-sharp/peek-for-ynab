@@ -2,6 +2,7 @@ import {
   ChevronDown,
   ChevronUp,
   CreditCard,
+  List,
   Pinned,
   Plus,
   SwitchHorizontal
@@ -36,3 +37,5 @@ export const ExpandListIconBold = () => (
 export const CollapseListIconBold = () => (
   <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
 );
+
+export const DetailIcon = () => <List size={18} color="var(--action)" strokeWidth={1} />;

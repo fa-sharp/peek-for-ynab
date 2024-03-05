@@ -1,5 +1,4 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { List } from "tabler-icons-react";
 
 import { CategoryView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -8,6 +7,7 @@ import { findCCAccount, millisToStringValue } from "~lib/utils";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  DetailIcon,
   PinnedItemIcon
 } from "../../icons/ActionIcons";
 
@@ -107,13 +107,9 @@ export default function SavedCategoriesView() {
                             />
                           )}
                           <IconButton
-                            icon={
-                              <List
-                                size={"1.2rem"}
-                                color="var(--action)"
-                                strokeWidth={1}
-                              />
-                            }
+                            accent
+                            rounded
+                            icon={<DetailIcon />}
                             label={`List transactions in '${category.name}'`}
                             onClick={() =>
                               setPopupState({

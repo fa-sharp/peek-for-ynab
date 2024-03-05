@@ -9,14 +9,20 @@ type Props = {
 const TxStatusIcon = ({ status }: Props) =>
   status === TransactionClearedStatus.Cleared ? (
     <CircleC
+      size={20}
       fill="var(--currency-green)"
       stroke="var(--background)"
       aria-label="Cleared"
     />
   ) : status === TransactionClearedStatus.Reconciled ? (
-    <Lock stroke="var(--currency-green)" color="white" aria-label="Reconciled" />
+    <Lock
+      size={20}
+      stroke="var(--currency-green)"
+      color="white"
+      aria-label="Reconciled"
+    />
   ) : (
-    <CircleC aria-label="Uncleared" stroke="gray" />
+    <CircleC size={20} aria-label="Uncleared" stroke="gray" />
   );
 
 export default TxStatusIcon;

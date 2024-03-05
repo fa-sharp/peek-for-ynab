@@ -26,7 +26,9 @@ export default function TransactionView({
 
   return (
     <div
+      className="flex-col gap-xs"
       style={{
+        paddingBottom: "var(--spacing-sm)",
         borderBottom: "solid 1px var(--border-light)"
       }}>
       <div
@@ -49,15 +51,9 @@ export default function TransactionView({
           <TxStatusIcon status={tx.cleared} />
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "6px"
-        }}>
+      <div className="flex-row gap-lg justify-between font-small">
         <button
-          className="button accent cursor-pointer font-small"
+          className="button accent rounded cursor-pointer"
           style={{
             border: "none",
             flexShrink: 0,
@@ -71,7 +67,7 @@ export default function TransactionView({
               : tx.account_name}
         </button>
         {tx.memo && detailLeft === "memo" ? (
-          <div className="font-small hide-overflow">{tx.memo}</div>
+          <div className="hide-overflow">{tx.memo}</div>
         ) : (
           <div></div>
         )}

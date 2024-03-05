@@ -1,10 +1,9 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { List } from "tabler-icons-react";
 
 import { AccountView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
-import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
+import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -68,9 +67,9 @@ export default function SavedAccountsView() {
                           }
                         />
                         <IconButton
-                          icon={
-                            <List size={"1.3rem"} color="var(--action)" strokeWidth={1} />
-                          }
+                          accent
+                          rounded
+                          icon={<DetailIcon />}
                           label={`List transactions in '${account.name}'`}
                           onClick={() =>
                             setPopupState({
