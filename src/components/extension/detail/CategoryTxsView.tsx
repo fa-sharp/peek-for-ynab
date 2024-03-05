@@ -1,11 +1,8 @@
 import React, { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
+import { CurrencyView, IconButton, TransactionView } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-
-import CurrencyView from "./CurrencyView";
-import IconButton from "./IconButton";
-import TransactionView from "./TransactionView";
 
 const CategoryTxsView = () => {
   const { useGetCategoryTxs, categoriesData, selectedBudgetData } = useYNABContext();

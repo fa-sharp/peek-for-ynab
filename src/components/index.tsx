@@ -1,7 +1,9 @@
-import AccountTxsView from "./AccountTxsView";
-import CategoryTxsView from "./CategoryTxsView";
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
+import AccountTxsView from "./extension/detail/AccountTxsView";
+import CategoryTxsView from "./extension/detail/CategoryTxsView";
+import TransactionView from "./extension/detail/TransactionView";
+import TxStatusIcon from "./extension/detail/TxStatusIcon";
 import AccountsView, { AccountView } from "./extension/main/AccountsView";
 import BudgetSelect from "./extension/main/BudgetSelect";
 import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
@@ -32,6 +34,8 @@ export {
   IconButton,
   CurrencyView,
   TransactionAdd,
+  TransactionView,
   AccountTxsView,
-  CategoryTxsView
+  CategoryTxsView,
+  TxStatusIcon
 };

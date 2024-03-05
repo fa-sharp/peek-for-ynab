@@ -1,9 +1,7 @@
 import * as ynab from "ynab";
 
+import { CurrencyView, TxStatusIcon } from "~components";
 import { flagColorToEmoji } from "~lib/utils";
-
-import CurrencyView from "./CurrencyView";
-import TxStatusIcon from "./TxStatusIcon";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
@@ -68,8 +66,8 @@ export default function TransactionView({
           {tx.transfer_account_id
             ? "Transfer"
             : detailRight === "category"
-            ? tx.category_name
-            : tx.account_name}
+              ? tx.category_name
+              : tx.account_name}
         </button>
         {tx.memo && detailLeft === "memo" ? (
           <div className="font-small hide-overflow">{tx.memo}</div>
