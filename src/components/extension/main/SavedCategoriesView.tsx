@@ -106,21 +106,23 @@ export default function SavedCategoriesView() {
                               }
                             />
                           )}
-                          <IconButton
-                            accent
-                            rounded
-                            icon={<DetailIcon />}
-                            label={`List transactions in '${category.name}'`}
-                            onClick={() =>
-                              setPopupState({
-                                view: "detail",
-                                detailState: {
-                                  type: "category",
-                                  id: category.id
-                                }
-                              })
-                            }
-                          />
+                          {category.category_group_name !== "Credit Card Payments" && (
+                            <IconButton
+                              accent
+                              rounded
+                              icon={<DetailIcon />}
+                              label="Details/Activity"
+                              onClick={() =>
+                                setPopupState({
+                                  view: "detail",
+                                  detailState: {
+                                    type: "category",
+                                    id: category.id
+                                  }
+                                })
+                              }
+                            />
+                          )}
                         </aside>
                       }
                     />

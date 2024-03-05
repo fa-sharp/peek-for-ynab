@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, TransactionView } from "~components";
+import { AddTransactionIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
 const CategoryTxsView = () => {
@@ -18,8 +19,8 @@ const CategoryTxsView = () => {
 
   return (
     <div>
-      <div className="flex-row justify-between">
-        <h2 className="heading-big mb-lg">{category.name}</h2>
+      <div className="flex-row justify-between mb-sm">
+        <h2 className="heading-big">{category.name}</h2>
         <IconButton
           icon={<ArrowBack />}
           label="Back to main view"
@@ -27,7 +28,7 @@ const CategoryTxsView = () => {
         />
       </div>
       <div className="flex-col gap-sm mb-lg">
-        <div className="balance-display">
+        <div className="balance-display heading-medium">
           Available Balance:
           <CurrencyView
             milliUnits={category.balance}
@@ -35,26 +36,51 @@ const CategoryTxsView = () => {
             colorsEnabled
           />
         </div>
-        <div className="flex-row justify-between">
-          <div className="balance-display">
-            Budgeted:
-            <CurrencyView
-              milliUnits={category.budgeted}
-              currencyFormat={selectedBudgetData.currencyFormat}
-              colorsEnabled
-            />
-          </div>
-          <div className="balance-display">
-            Activity:
-            <CurrencyView
-              milliUnits={category.activity}
-              currencyFormat={selectedBudgetData.currencyFormat}
-              colorsEnabled
-            />
-          </div>
+        <div className="balance-display">
+          Leftover Last Month:
+          <CurrencyView
+            milliUnits={category.balance - category.activity - category.budgeted}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="balance-display">
+          Assigned This Month:
+          <CurrencyView
+            milliUnits={category.budgeted}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="balance-display">
+          Activity This Month:
+          <CurrencyView
+            milliUnits={category.activity}
+            currencyFormat={selectedBudgetData.currencyFormat}
+            colorsEnabled
+          />
         </div>
       </div>
-      <h3 className="heading-medium">Transactions</h3>
+      <div className="flex-row justify-between gap-lg mb-sm">
+        <h3 className="heading-medium">Activity</h3>
+        <div className="flex-row">
+          Actions:{" "}
+          <IconButton
+            rounded
+            accent
+            label="Add transaction"
+            icon={<AddTransactionIcon />}
+            onClick={() =>
+              setPopupState({
+                view: "txAdd",
+                txAddState: {
+                  categoryId: category.id
+                }
+              })
+            }
+          />
+        </div>
+      </div>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
       ) : (

@@ -70,7 +70,7 @@ export default function SavedAccountsView() {
                           accent
                           rounded
                           icon={<DetailIcon />}
-                          label={`List transactions in '${account.name}'`}
+                          label="Details/Activity"
                           onClick={() =>
                             setPopupState({
                               view: "detail",
