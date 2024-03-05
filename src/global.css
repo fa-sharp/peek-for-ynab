@@ -45,25 +45,6 @@
   color: white;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #252525;
-    --border: #969696;
-    --border-light: #6e6e6e;
-    --action: #ffffff;
-    --accent: hsl(210, 40%, 39%);
-    --accent-hover: hsl(210, 43%, 48%);
-    --success: #63d035;
-    --warn: hsl(0, 33%, 50%);
-    --warn-hover: hsl(0, 33%, 59%);
-    --highlight: hsla(0, 0%, 91%, 0.2);
-    --currency-green: #61d231;
-    --currency-red: #ff8888;
-
-    color: white;
-  }
-}
-
 html {
   font-size: 100%;
 }
@@ -163,12 +144,6 @@ button:focus-visible {
 .form-input input:focus,
 .form-input textarea:focus {
   outline-color: var(--border);
-}
-
-.form-input input:not(:disabled),
-.form-input textarea:not(:disabled) {
-  color: currentColor;
-  background-color: var(--background);
 }
 
 .form-input input.item-selected {
@@ -385,10 +360,6 @@ li:last-child .balance-display {
 
 .font-big {
   font-size: 2em;
-}
-
-.font-small {
-  font-size: 0.7rem;
 }
 
 .cursor-pointer {
