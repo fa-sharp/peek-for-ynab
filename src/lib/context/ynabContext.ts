@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
@@ -228,6 +228,8 @@ const useYNABProvider = () => {
       }
     });
 
+  const queryClient = useQueryClient();
+
   const addTransaction = useCallback(
     async (transaction: ynab.SaveTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
@@ -240,8 +242,28 @@ const useYNABProvider = () => {
         refreshCategoriesAndAccounts();
         if (!transaction.payee_id) refetchPayees();
       }, 350);
+      response.data.transaction?.category_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: selectedBudgetId,
+              categoryId: response.data.transaction.category_id
+            }
+          ]
+        });
+      response.data.transaction?.account_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: selectedBudgetId,
+              accountId: response.data.transaction.account_id
+            }
+          ]
+        });
     },
-    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
+    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI, queryClient]
   );
 
   return {

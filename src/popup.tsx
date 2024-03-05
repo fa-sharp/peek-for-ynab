@@ -45,7 +45,7 @@ export function PopupView() {
       ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
         <CategoryTxsView />
       ) : (
-        <div>"Something went wrong 😢!"</div>
+        <div>Something went wrong 😢!</div>
       )}
     </div>
   );
