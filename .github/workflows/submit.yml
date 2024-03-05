@@ -1,0 +1,36 @@
+name: "Submit to Web Store"
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Package the extension into a zip artifact
+        env:
+          PLASMO_PUBLIC_MAIN_URL: https://peek-for-ynab.vercel.app
+          PLASMO_PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
+        run: pnpm run build:plasmo:zip
+
+      - name: Browser Platform Publish
+        uses: PlasmoHQ/bpp@v3
+        with:
+          keys: ${{ secrets.SUBMIT_KEYS }}
+          artifact: build/chrome-mv3-prod.zip

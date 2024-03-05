@@ -15,11 +15,20 @@ function HelpPage() {
         <li>
           <h3>Which balances are displayed in the extension?</h3>
           <p>
-            For your categories, the extension displays the Available Balance in the
+            For your categories, the extension displays the Available amount in the
             current month. For your accounts, the extension displays the current Working
             Balance. Keep in mind the extension reflects what your budget looks like in
             YNAB <i>right now</i> - e.g. if transactions have not imported from your bank
             yet, they will not be reflected in the extension.
+          </p>
+        </li>
+        <li>
+          <h3>How do I pin/unpin or re-arrange my categories and accounts?</h3>
+          <p>
+            If you have already pinned some items, you will need to click the edit button
+            in the upper right in order to show the pin and unpin buttons next to each
+            category and account. You can also then drag and drop your pinned items to
+            re-arrange them how you like.
           </p>
         </li>
         <li>
@@ -31,33 +40,33 @@ function HelpPage() {
           </p>
         </li>
         <li>
+          <h3>Are there keyboard shortcuts to open/use the extension?</h3>
+          <p>
+            Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
+            (you can change this by heading over to{" "}
+            <code>chrome://extensions/shortcuts</code> in your browser). From there, you
+            can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Space</kbd>, and{" "}
+            <kbd>Enter</kbd> keys to navigate the extension.
+          </p>
+        </li>
+        <li>
           <h3>
-            I use bank imports in YNAB. How will that work with transactions I enter via
-            the extension?
+            I use Direct Import (linked accounts) in YNAB. How will that work with
+            transactions I enter via the extension?
           </h3>
           <p>
             The transactions will behave just as if you manually entered them in YNAB. If
-            the transaction later imports from the bank, and it matches the transaction
+            the transaction later imports from your bank, and it matches the transaction
             you entered, you will be prompted to approve that match in YNAB.
           </p>
         </li>
         <li>
-          <h3>I do not use bank imports in YNAB. Should I change any settings?</h3>
+          <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
-            If you usually enter transactions as Cleared in YNAB, you will want to check
-            the <b>Cleared</b> setting under <b>Transaction defaults</b>. This way, all
-            transactions entered via the extension will be marked as Cleared by default.
-          </p>
-        </li>
-        <li>
-          <h3>How do I get dark mode?</h3>
-          <p>
-            Dark mode is activated based on your system theme. This varies depending on
-            your OS: here are the instructions for{" "}
-            <a href="https://support.microsoft.com/en-us/windows/change-colors-in-windows-d26ef4d6-819a-581c-1581-493cfcc005fe">
-              Windows
-            </a>{" "}
-            and <a href="https://support.apple.com/en-us/HT208976">Mac</a>.
+            If you will enter a lot of your transactions using the extension, you may want
+            to uncheck the <b>Approved</b> setting under <b>Transaction defaults</b>, so
+            that you will be prompted to double-check and Approve the transactions in
+            YNAB.
           </p>
         </li>
         <li>
@@ -65,20 +74,22 @@ function HelpPage() {
           <ul>
             <li>
               <Check color="var(--success)" />
-              &nbsp;Category and account data has been updated within the last 4 minutes.
+              &nbsp;Category and account data has been successfully retrieved from YNAB.
             </li>
             <li>
               <AlertTriangle color="var(--stale)" />
-              &nbsp;Category & account balances/data may be out of date, as they have not
-              been updated within the last 4 minutes. Close and re-open the extension to
-              refresh data.
+              &nbsp;There was an error fetching data from YNAB, and/or the data is out of
+              date. Close and re-open the extension to retry.
             </li>
             <li>
               <Refresh />
-              &nbsp;Data is being refreshed from YNAB. Balances may be out of date until
-              refreshing is complete.
+              &nbsp;Data is being retrieved/refreshed from YNAB.
             </li>
           </ul>
+        </li>
+        <li>
+          <h3>I have an issue, bug report, or further questions.</h3>
+          <p>Please contact the developer at hello (at) fasharp (dot) io.</p>
         </li>
       </ul>
     </WebLayout>

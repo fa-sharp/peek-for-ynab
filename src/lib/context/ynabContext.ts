@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_PRODUCTION, ONE_DAY_IN_MILLIS, TWO_WEEKS_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -31,7 +31,6 @@ const useYNABProvider = () => {
     setShownBudgetIds
   } = useStorageContext();
 
-  const queryClient = useQueryClient();
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
 
   /** Initialize ynabAPI object if authenticated */
@@ -47,8 +46,7 @@ const useYNABProvider = () => {
     isFetching: isRefreshingBudgets
   } = useQuery({
     queryKey: ["budgets"],
-    staleTime: TWO_WEEKS_IN_MILLIS, // Budget data stays fresh in cache for two weeks
-    cacheTime: TWO_WEEKS_IN_MILLIS,
+    staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
@@ -68,13 +66,13 @@ const useYNABProvider = () => {
         setShownBudgetIds([budgets[0].id]);
         setSelectedBudgetId(budgets[0].id);
       }
+      IS_DEV && console.log("Fetched budgets!", budgets);
       return budgets.map((budgetSummary) => ({
         id: budgetSummary.id,
         name: budgetSummary.name,
         currencyFormat: budgetSummary.currency_format || undefined
       }));
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched budgets!", data)
+    }
   });
 
   /** Data from the currently selected budget */
@@ -90,7 +88,12 @@ const useYNABProvider = () => {
   );
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
-  const { data: categoryGroupsData, dataUpdatedAt: categoriesLastUpdated } = useQuery({
+  const {
+    data: categoryGroupsData,
+    dataUpdatedAt: categoriesLastUpdated,
+    error: categoriesError,
+    refetch: refetchCategoryGroups
+  } = useQuery({
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
@@ -103,9 +106,9 @@ const useYNABProvider = () => {
         // filter out hidden categories
         (group) => (group.categories = group.categories.filter((c) => !c.hidden))
       );
+      IS_DEV && console.log("Fetched categories!", categoryGroups);
       return categoryGroups;
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched categories!", data)
+    }
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
@@ -129,47 +132,52 @@ const useYNABProvider = () => {
     );
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
-  /** Fetch accounts for the selected budget (if user enables accounts and/or transactions). */
-  const { data: accountsData, dataUpdatedAt: accountsLastUpdated } = useQuery({
+  /** Fetch accounts for the selected budget */
+  const {
+    data: accountsData,
+    dataUpdatedAt: accountsLastUpdated,
+    error: accountsError,
+    refetch: refetchAccounts
+  } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
-      return response.data.accounts.filter((a) => a.closed === false); // only get open accounts
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched accounts!", data)
+      const accounts = response.data.accounts
+        .filter((a) => a.closed === false) // filter out closed accounts
+        .sort((a, b) =>
+          a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
+        ); // sort with Budget accounts first
+      IS_DEV && console.log("Fetched accounts!", accounts);
+      return accounts;
+    }
   });
 
-  const refreshCategoriesAndAccounts = useCallback(async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: ["categoryGroups", { budgetId: selectedBudgetId }]
-      }),
-      queryClient.invalidateQueries({
-        queryKey: ["accounts", { budgetId: selectedBudgetId }]
-      })
-    ]);
-  }, [queryClient, selectedBudgetId]);
+  const refreshCategoriesAndAccounts = useCallback(
+    () => Promise.all([refetchCategoryGroups(), refetchAccounts()]),
+    [refetchAccounts, refetchCategoryGroups]
+  );
 
-  /** Fetch payees for the selected budget (if user enables transactions) */
-  const { data: payeesData } = useQuery({
+  /** Fetch payees for the selected budget */
+  const { data: payeesData, refetch: refetchPayees } = useQuery({
     queryKey: ["payees", { budgetId: selectedBudgetId }],
-    staleTime: ONE_DAY_IN_MILLIS * 2, // Payees stay fresh in cache for two days
-    cacheTime: TWO_WEEKS_IN_MILLIS,
+    staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async (): Promise<CachedPayee[] | undefined> => {
       if (!ynabAPI) return;
       const response = await ynabAPI.payees.getPayees(selectedBudgetId);
-      return response.data.payees
+      const collator = Intl.Collator();
+      const payees = response.data.payees
         .map((payee) => ({
           id: payee.id,
           name: payee.name,
-          transferId: payee.transfer_account_id
+          ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
         }))
-        .sort((a, b) => (a.name < b.name ? -1 : 1)); // sort alphabetically
-    },
-    onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched payees!", data)
+        .sort((a, b) => collator.compare(a.name, b.name));
+      IS_DEV && console.log("Fetched payees!", payees);
+      return payees;
+    }
   });
 
   /** Select data of only saved accounts from `accountsData` */
@@ -197,9 +205,10 @@ const useYNABProvider = () => {
           accountId,
           ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
         );
-        return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
-      },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+        const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
+        IS_DEV && console.log("Fetched account transactions!", txs);
+        return txs;
+      }
     });
 
   const useGetCategoryTxs = (categoryId?: string) =>
@@ -213,9 +222,10 @@ const useYNABProvider = () => {
           categoryId,
           ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
         );
-        return response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
-      },
-      onSuccess: (data) => !IS_PRODUCTION && console.log("Fetched transactions!", data)
+        const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
+        IS_DEV && console.log("Fetched category transactions!", txs);
+        return txs;
+      }
     });
 
   const addTransaction = useCallback(
@@ -224,11 +234,14 @@ const useYNABProvider = () => {
       const response = await ynabAPI.transactions.createTransaction(selectedBudgetId, {
         transaction
       });
-      !IS_PRODUCTION &&
+      IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
-      setTimeout(() => refreshCategoriesAndAccounts(), 500);
+      setTimeout(() => {
+        refreshCategoriesAndAccounts();
+        if (!transaction.payee_id) refetchPayees();
+      }, 350);
     },
-    [refreshCategoriesAndAccounts, selectedBudgetId, ynabAPI]
+    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
   );
 
   return {
@@ -239,9 +252,13 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
+    /** API data: Error while fetching categories */
+    categoriesError,
     /** API data: List of all open accounts in current budget*/
     accountsData,
     accountsLastUpdated,
+    /** API data: Error while fetching accounts */
+    accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
     /** API data: Currently selected budget */
@@ -256,12 +273,10 @@ const useYNABProvider = () => {
     refreshBudgets,
     isRefreshingBudgets,
     refreshCategoriesAndAccounts,
-    /** Get recent transactions for the specified account */
-    useGetAccountTxs,
-    /** Get recent transactions for the specified category */
-    useGetCategoryTxs,
     /** Add a new transaction to the current budget */
-    addTransaction
+    addTransaction,
+    useGetAccountTxs,
+    useGetCategoryTxs
   };
 };
 

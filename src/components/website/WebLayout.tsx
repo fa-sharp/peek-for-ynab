@@ -17,18 +17,18 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
       <nav className={styles.nav}>
-        <Link href="/">
-          <a className={router.pathname === "/" ? styles.currentPage : ""}>Home</a>
+        <Link href="/" className={router.pathname === "/" ? styles.currentPage : ""}>
+          Home
         </Link>
-        <Link href="/help">
-          <a className={router.pathname === "/help" ? styles.currentPage : ""}>
-            Help/FAQ
-          </a>
+        <Link
+          href="/help"
+          className={router.pathname === "/help" ? styles.currentPage : ""}>
+          Help/FAQ
         </Link>
-        <Link href="/privacy">
-          <a className={router.pathname === "/privacy" ? styles.currentPage : ""}>
-            Privacy Policy
-          </a>
+        <Link
+          href="/privacy"
+          className={router.pathname === "/privacy" ? styles.currentPage : ""}>
+          Privacy Policy
         </Link>
       </nav>
       <div className={styles.pageContent}>{children}</div>

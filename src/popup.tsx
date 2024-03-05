@@ -1,22 +1,12 @@
-import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
-
 import {
   AccountTxsView,
-  AccountsView,
-  CategoriesView,
   CategoryTxsView,
   PopupLogin,
-  PopupNav,
-  SavedAccountsView,
-  SavedCategoriesView,
+  PopupMain,
   TransactionAdd
 } from "~components";
-import {
-  AppProvider,
-  useAuthContext,
-  useStorageContext,
-  useYNABContext
-} from "~lib/context";
+import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
+import { useSetColorTheme } from "~lib/utils";
 
 import "./global.css";
 
@@ -32,19 +22,22 @@ export function PopupView() {
   const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
 
+  useSetColorTheme();
+
+  if (authLoading || !settings) return null;
+
   return (
     <div
       style={{
-        flexDirection: "column",
-        padding: 16,
+        padding: "1em",
         minWidth: settings.emojiMode ? "150px" : "240px",
         width: "max-content",
-        maxWidth: "340px"
+        maxWidth: "320px"
       }}>
-      {authLoading ? null : !loggedIn ? (
+      {!loggedIn ? (
         <PopupLogin />
       ) : popupState.view === "main" ? (
-        <MainPopup />
+        <PopupMain />
       ) : popupState.view === "txAdd" ? (
         <TransactionAdd />
       ) : popupState.view === "detail" && popupState.detailState?.type === "account" ? (
@@ -52,44 +45,9 @@ export function PopupView() {
       ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
         <CategoryTxsView />
       ) : (
-        "Something went wrong 😢!"
+        <div>"Something went wrong 😢!"</div>
       )}
     </div>
-  );
-}
-
-function MainPopup() {
-  const { saveCategoriesForBudget, saveAccountsForBudget, selectedBudgetId } =
-    useStorageContext();
-  const { savedCategoriesData, savedAccountsData } = useYNABContext();
-
-  const onDragEnd: OnDragEndResponder = (result) => {
-    if (!result.destination) return;
-    if (result.source.droppableId === "savedCategories") {
-      if (!savedCategoriesData) return;
-      const savedCategoryIds = savedCategoriesData.map((c) => c.id);
-      const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
-      savedCategoryIds.splice(result.destination.index, 0, categoryId);
-      saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
-    } else if (result.source.droppableId === "savedAccounts") {
-      if (!savedAccountsData) return;
-      const savedAccountIds = savedAccountsData.map((a) => a.id);
-      const [accountId] = savedAccountIds.splice(result.source.index, 1);
-      savedAccountIds.splice(result.destination.index, 0, accountId);
-      saveAccountsForBudget(selectedBudgetId, savedAccountIds);
-    }
-  };
-
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <PopupNav />
-
-      <SavedCategoriesView />
-      <SavedAccountsView />
-
-      <CategoriesView />
-      <AccountsView />
-    </DragDropContext>
   );
 }
 

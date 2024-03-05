@@ -17,7 +17,7 @@ export default function BudgetSelect({
     return (
       <div
         style={{
-          maxWidth: emojiMode ? "5rem" : "9rem",
+          maxWidth: emojiMode ? "5em" : "11em",
           marginInline: 4,
           fontWeight: 500,
           whiteSpace: "nowrap",
@@ -35,7 +35,7 @@ export default function BudgetSelect({
       style={{
         flex: 1,
         width: "100%",
-        maxWidth: emojiMode ? "5rem" : "9rem",
+        maxWidth: emojiMode ? "5em" : "11em",
         fontWeight: 500,
         textOverflow: "ellipsis"
       }}

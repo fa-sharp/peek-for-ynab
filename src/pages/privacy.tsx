@@ -26,22 +26,21 @@ function PrivacyPage() {
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
         your extension settings and the list of categories and accounts you choose to pin.
-        The extension also caches data from your budgets, which allows the extension to
-        fetch and display your data quickly and efficiently. This cached data is only
+        The extension also caches some data from your budgets, which allows the extension
+        to fetch and display your data quickly and efficiently. This cached data is only
         stored locally in your browser, and all cached data is immediately deleted if you
         logout and/or uninstall the extension.
       </p>
       <p>
-        If you enable the setting to sync to your browser, {APP_NAME} will store the{" "}
-        <a href="https://developer.mozilla.org/en-US/docs/Glossary/UUID">UUIDs</a> of your
-        pinned categories, accounts, and budgets in your browser profile. No other
-        information is stored in the profile.
+        If you enable the sync option in the extension settings, {APP_NAME} will store
+        your settings and the IDs of your pinned categories, accounts, and budgets in your
+        browser profile. No other information is stored in the profile.
       </p>
       <p>
-        If you enable the setting to allow access to the current tab, {APP_NAME} will read
-        the contents of the current tab upon opening the extension, in order to enable
-        additional features. This data is only processed locally in your browser, and will
-        never be sent to any third party.
+        If tab access is allowed in the settings, {APP_NAME} will be able to read your
+        current tab upon opening the extension, in order to enable additional features.
+        This data is only processed locally in your browser. The extension will not be
+        able to access your current tab unless you explicitly enable this setting.
       </p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
@@ -50,7 +49,7 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Sep 18, 2023</em>
+        <em>Last updated: Feb 3, 2024</em>
       </p>
     </WebLayout>
   );

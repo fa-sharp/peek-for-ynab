@@ -1,25 +1,48 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap");
 
 :root {
-  --accent: hsl(204, 100%, 88%);
-  --accent-hover: hsl(204, 100%, 80%);
+  --accent: hsl(204, 63%, 84%);
+  --accent-hover: hsl(204, 60%, 76%);
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
   --warn-hover: hsl(0, 75%, 72%);
-  --highlight: hsl(204, 100%, 92%);
+  --highlight: hsl(204, 48%, 87%);
   --border: #4d4d4d;
   --border-light: #c4c4c4;
   --currency-green: #357f16;
   --currency-red: #a84646;
-  --action: gray;
+  --action: #525252;
   --error: #da2626;
   --success: #58be2d;
   --stale: #ff8c00;
+  --gray: hsl(0, 0%, 96%);
+  --gray-hover: hsl(0, 0%, 89%);
 
   --border-radius: 4px;
-  --spacing-xs: 0.2rem;
-  --spacing-sm: 0.35rem;
-  --spacing-md: 0.45rem;
+  --spacing-xs: 0.15em;
+  --spacing-sm: 0.3em;
+  --spacing-md: 0.5em;
+  --spacing-lg: 0.7em;
+}
+
+:root.dark {
+  --background: #252525;
+  --border: #969696;
+  --border-light: #6e6e6e;
+  --action: #ffffff;
+  --accent: hsl(210, 34%, 38%);
+  --accent-hover: hsl(210, 39%, 48%);
+  --success: #63d035;
+  --warn: hsl(0, 33%, 50%);
+  --warn-hover: hsl(0, 33%, 59%);
+  --error: #ff6c6c;
+  --highlight: hsla(0, 0%, 91%, 0.2);
+  --currency-green: #61d231;
+  --currency-red: #ff9595;
+  --gray: hsl(0, 0%, 26%);
+  --gray-hover: hsl(0, 0%, 36%);
+
+  color: white;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,14 +70,18 @@ html {
 
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   margin: 0;
   background-color: var(--background);
 }
 
 button {
   color: currentColor;
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: inherit;
+}
+button:focus-visible {
+  outline-color: var(--border);
 }
 
 .flex-row {
@@ -63,11 +90,27 @@ button {
   gap: var(--spacing-md);
 }
 
+.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
 .flex-col {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .min-w-0 {
@@ -92,6 +135,10 @@ button {
   gap: var(--spacing-sm);
 }
 
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
 .form-input {
   display: flex;
   flex-direction: column;
@@ -103,7 +150,19 @@ button {
   padding: 4px;
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
-  font-family: "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: 1em;
+}
+
+.form-input input:not(:disabled),
+.form-input textarea:not(:disabled) {
+  color: currentColor;
+  background-color: var(--background);
+}
+
+.form-input input:focus,
+.form-input textarea:focus {
+  outline-color: var(--border);
 }
 
 .form-input input:not(:disabled),
@@ -116,6 +175,8 @@ button {
   border: 1px solid transparent;
   background: var(--accent);
   color: currentColor;
+  padding-right: 1.6em;
+  text-overflow: ellipsis;
 }
 
 .heading-big {
@@ -125,7 +186,7 @@ button {
 
   margin-block: var(--spacing-sm);
 
-  font-size: 1.1rem;
+  font-size: 1.25em;
   font-weight: 600;
 }
 
@@ -136,7 +197,7 @@ button {
 
   margin-block: var(--spacing-xs);
 
-  font-size: 0.9rem;
+  font-size: 1.1em;
   font-weight: 600;
 }
 
@@ -148,13 +209,17 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-lg);
 
-  padding: 0.25rem 4px 0.25rem 6px;
+  padding: 3px 4px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
   color: transparent;
+}
+
+li:last-child .balance-display {
+  border-bottom-color: transparent;
 }
 
 .balance-actions {
@@ -164,7 +229,7 @@ button {
 
 .button {
   cursor: pointer;
-  padding: var(--spacing-sm) 0.7rem;
+  padding: var(--spacing-sm) 0.7em;
   text-align: center;
 }
 
@@ -175,9 +240,6 @@ button {
   border: none;
   line-height: 0;
   cursor: pointer;
-}
-.icon-button:hover:not(.noaction) {
-  transform: scale(1.05);
 }
 .icon-button:active:not(.noaction) {
   transform: scale(0.95);
@@ -193,31 +255,46 @@ button {
   cursor: initial;
 }
 
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .select {
-  padding: 0.25rem;
-  font-family: "Open Sans", sans-serif;
+  padding: 0.3em;
+  font-family: inherit;
+  font-size: inherit;
   background-color: var(--background);
   color: currentColor;
 }
 
 .select-dropdown-list {
   position: absolute;
+  top: 100%;
   z-index: 100;
 
   max-height: 8rem;
-  width: 97%;
+  width: 99%;
   margin: 0;
-  margin-top: 11%;
   padding: 0;
-  padding-left: 0.25rem;
 
   background-color: var(--background);
   overflow-y: auto;
   list-style: none;
 }
 
+.select-dropdown-heading {
+  padding-left: var(--spacing-sm);
+  margin-block: var(--spacing-sm);
+
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
 .select-dropdown-item {
-  padding-bottom: 3px;
+  padding: 2px 0 2px var(--spacing-sm);
+  width: auto;
   cursor: pointer;
 }
 .select-dropdown-item.highlighted {
@@ -225,6 +302,12 @@ button {
 }
 .select-dropdown-item.selected {
   font-weight: bold;
+}
+.select-dropdown-item.virtual {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 98%;
 }
 
 .select-button-right {
@@ -254,6 +337,14 @@ button {
   background-color: var(--warn-hover);
 }
 
+.gray:not(:disabled) {
+  background-color: var(--gray);
+}
+
+.gray:hover:not(:disabled) {
+  background-color: var(--gray-hover);
+}
+
 .error-message {
   color: var(--error);
 }
@@ -268,28 +359,32 @@ button {
   color: var(--currency-red);
 }
 
-.mt-small {
+.mt-sm {
   margin-top: var(--spacing-sm);
 }
 
 .mt-md {
-  margin-top: 1.2rem;
+  margin-top: var(--spacing-md);
 }
 
 .mt-lg {
-  margin-top: 1.8rem;
+  margin-top: var(--spacing-lg);
 }
 
 .mt-xxl {
-  margin-top: 5rem;
+  margin-top: 5em;
 }
 
-.mb-small {
+.mb-sm {
   margin-bottom: var(--spacing-sm);
 }
 
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
 .font-big {
-  font-size: 1.7rem;
+  font-size: 2em;
 }
 
 .font-small {
@@ -298,15 +393,6 @@ button {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.sep-line-h {
-  background-color: var(--border-light);
-  height: 1px;
-}
-
-.transparent {
-  background-color: transparent;
 }
 
 @keyframes spin {

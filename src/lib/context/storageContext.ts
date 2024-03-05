@@ -1,12 +1,14 @@
 import { createProvider } from "puro";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
-import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+
+import type { CachedPayee } from "./ynabContext";
 
 export interface TokenData {
   accessToken: string;
@@ -23,15 +25,12 @@ export interface AppSettings {
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
   privateMode: boolean;
-  /** Whether data is synced to the user's Chrome profile */
-  sync: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
-}
-
-export interface TxAddInitialState {
-  accountId?: string;
-  categoryId?: string;
+  /** The color theme for the extension. @default "auto" */
+  theme?: "auto" | "dark" | "light";
+  /** Whether animations are enabled. @default false */
+  animations?: boolean;
 }
 
 export interface DetailViewState {
@@ -39,45 +38,38 @@ export interface DetailViewState {
   id: string;
 }
 
-/** A category saved by the user */
-export interface SavedCategory {
-  categoryId: string;
-  budgetId: string;
+/** Initial state of the add transaction screen */
+export interface TxAddInitialState {
+  amount?: string;
+  amountType?: "Inflow" | "Outflow";
+  accountId?: string;
+  categoryId?: string;
+  payee?: CachedPayee;
+  isTransfer?: boolean;
 }
 
-/** An account saved by the user */
-export interface SavedAccount {
-  accountId: string;
-  budgetId: string;
+/** Map of budget IDs to string arrays. Useful type for storage. */
+interface BudgetToStringArrayMap {
+  [budgetId: string]: string[] | undefined;
 }
 
-const tokenStorage = new Storage({ area: "local" });
-const chromeLocalStorage = new Storage({ area: "local" });
-const chromeSyncStorage = new Storage({ area: "sync" });
+const TOKEN_STORAGE = new Storage({ area: "local" });
+const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
-  /** The token used to authenticate the YNAB user */
+  /** The token used to authenticate the YNAB user. Stored locally. */
   const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
     TokenData | null | undefined
-  >({ key: TOKEN_STORAGE_KEY, instance: tokenStorage }, (data, isHydrated) =>
+  >({ key: TOKEN_STORAGE_KEY, instance: TOKEN_STORAGE }, (data, isHydrated) =>
     !isHydrated ? undefined : !data ? null : data
   );
-  /** Whether the token needs to be refreshed */
+
+  /** Whether the token needs refreshing. Setting this to `true` will trigger a background job to refresh token. */
   const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
-    { key: REFRESH_NEEDED_KEY, instance: tokenStorage },
+    { key: REFRESH_NEEDED_KEY, instance: TOKEN_STORAGE },
     false
   );
-
-  const [settings, setSettings] = useLocalStorage<AppSettings>("settings", {
-    defaultValue: {
-      txApproved: true,
-      txCleared: false,
-      privateMode: false,
-      emojiMode: false,
-      sync: false,
-      currentTabAccess: false
-    }
-  });
 
   /** The budget currently in view */
   const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
@@ -95,10 +87,30 @@ const useStorageProvider = () => {
     editMode: false
   });
 
+  /** Whether syncing is enabled */
+  const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
+    defaultValue: false
+  });
+
   const storageArea = useMemo(
-    () => (settings.sync ? chromeSyncStorage : chromeLocalStorage),
-    [settings.sync]
+    () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
+    [syncEnabled]
   );
+
+  /** Extension settings. Is synced if the user chooses. */
+  const [settings, setSettings] = useExtensionStorage<AppSettings | undefined>(
+    { key: "settings", instance: storageArea },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
+  );
+
+  /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see also `public/scripts/theme.js` */
+  const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
+    "light" | "dark" | "auto"
+  >("theme", { defaultValue: "auto" });
+  useEffect(() => {
+    if (settings?.theme && themeLocalSetting !== settings.theme)
+      setThemeLocalSetting(settings.theme);
+  }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
 
   /** Budgets that the user has selected to show. Is synced if the user chooses. */
   const [shownBudgetIds, setShownBudgetIds] = useExtensionStorage<undefined | string[]>(
@@ -106,8 +118,6 @@ const useStorageProvider = () => {
     (data, isHydrated) => {
       if (!isHydrated) return undefined;
       else if (!data) return selectedBudgetId ? [selectedBudgetId] : [];
-      // select first budget if no budget is currently selected
-      if (data[0] && !selectedBudgetId) setSelectedBudgetId(data[0]);
       return data;
     }
   );
@@ -117,46 +127,44 @@ const useStorageProvider = () => {
     savedCategories,
     setSavedCategories,
     { setRenderValue: setSavedCategoriesRender }
-  ] = useExtensionStorage<
-    | undefined
-    | {
-        [budgetId: string]: string[] | undefined;
-      }
-  >({ key: "cats", instance: storageArea }, (data, isHydrated) =>
-    !isHydrated ? undefined : !data ? {} : data
+  ] = useExtensionStorage<BudgetToStringArrayMap | undefined>(
+    { key: "cats", instance: storageArea },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
   );
 
   /** The account IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
   const [savedAccounts, setSavedAccounts, { setRenderValue: setSavedAccountsRender }] =
-    useExtensionStorage<
-      | undefined
-      | {
-          [budgetId: string]: string[] | undefined;
-        }
-    >({ key: "accounts", instance: storageArea }, (data, isHydrated) =>
-      !isHydrated ? undefined : !data ? {} : data
+    useExtensionStorage<BudgetToStringArrayMap | undefined>(
+      { key: "accounts", instance: storageArea },
+      (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
     );
 
-  const changeSetting = <K extends keyof AppSettings>(
+  const changeSetting = <K extends keyof AppSettings | "sync">(
     key: K,
-    newValue: AppSettings[K]
+    newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
   ) => {
-    setSettings((prevSettings) => ({ ...prevSettings, [key]: newValue }));
+    if (key === "sync" && typeof newValue === "boolean") setSyncEnabled(newValue);
+    else
+      setSettings((prevSettings) =>
+        prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
+      );
   };
 
-  const saveCategory = (newCategory: SavedCategory) => {
-    const foundDuplicate = savedCategories?.[newCategory.budgetId]?.find(
-      (categoryId) => categoryId === newCategory.categoryId
+  /** Save/pin a category for the currently selected budget */
+  const saveCategory = (categoryIdToSave: string) => {
+    const foundDuplicate = savedCategories?.[selectedBudgetId]?.find(
+      (categoryId) => categoryId === categoryIdToSave
     );
-    if (!foundDuplicate)
-      setSavedCategories({
-        ...savedCategories,
-        [newCategory.budgetId]: [
-          ...(savedCategories?.[newCategory.budgetId] || []),
-          newCategory.categoryId
-        ]
-      });
+    if (foundDuplicate) return;
+    setSavedCategories({
+      ...savedCategories,
+      [selectedBudgetId]: [
+        ...(savedCategories?.[selectedBudgetId] || []),
+        categoryIdToSave
+      ]
+    });
   };
+
   const saveCategoriesForBudget = (budgetId: string, categoryIds: string[]) => {
     const newSavedCategories = {
       ...savedCategories,
@@ -165,27 +173,29 @@ const useStorageProvider = () => {
     setSavedCategoriesRender(newSavedCategories);
     setSavedCategories(newSavedCategories);
   };
-  const removeCategory = (savedCategory: SavedCategory) => {
+
+  /** Remove/unpin a category for the currently selected budget */
+  const removeCategory = (categoryIdToRemove: string) => {
     setSavedCategories({
       ...savedCategories,
-      [savedCategory.budgetId]: savedCategories?.[savedCategory.budgetId]?.filter(
-        (categoryId) => categoryId !== savedCategory.categoryId
+      [selectedBudgetId]: savedCategories?.[selectedBudgetId]?.filter(
+        (categoryId) => categoryId !== categoryIdToRemove
       )
     });
   };
-  const saveAccount = (newAccount: SavedAccount) => {
-    const foundDuplicate = savedAccounts?.[newAccount.budgetId]?.find(
-      (accountId) => accountId === newAccount.accountId
+
+  /** Save/pin an account for the currently selected budget */
+  const saveAccount = (accountIdToSave: string) => {
+    const foundDuplicate = savedAccounts?.[selectedBudgetId]?.find(
+      (accountId) => accountId === accountIdToSave
     );
-    if (!foundDuplicate)
-      setSavedAccounts({
-        ...savedAccounts,
-        [newAccount.budgetId]: [
-          ...(savedAccounts?.[newAccount.budgetId] || []),
-          newAccount.accountId
-        ]
-      });
+    if (foundDuplicate) return;
+    setSavedAccounts({
+      ...savedAccounts,
+      [selectedBudgetId]: [...(savedAccounts?.[selectedBudgetId] || []), accountIdToSave]
+    });
   };
+
   const saveAccountsForBudget = (budgetId: string, accountIds: string[]) => {
     const newSavedAccounts = {
       ...savedAccounts,
@@ -194,11 +204,13 @@ const useStorageProvider = () => {
     setSavedAccountsRender(newSavedAccounts);
     setSavedAccounts(newSavedAccounts);
   };
-  const removeAccount = (savedAccount: SavedAccount) => {
+
+  /** Remove/unpin an account for the currently selected budget */
+  const removeAccount = (accountIdToRemove: string) => {
     setSavedAccounts({
       ...savedAccounts,
-      [savedAccount.budgetId]: savedAccounts?.[savedAccount.budgetId]?.filter(
-        (accountId) => accountId !== savedAccount.accountId
+      [selectedBudgetId]: savedAccounts?.[selectedBudgetId]?.filter(
+        (accountId) => accountId !== accountIdToRemove
       )
     });
   };
@@ -210,7 +222,15 @@ const useStorageProvider = () => {
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
       if (selectedBudgetId === budgetId) setSelectedBudgetId("");
-      // TODO should we delete saved accounts and categories for this budget?
+      // Clean up saved categories and accounts for this budget
+      setSavedCategories({
+        ...savedCategories,
+        [budgetId]: undefined
+      });
+      setSavedAccounts({
+        ...savedAccounts,
+        [budgetId]: undefined
+      });
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
@@ -234,6 +254,7 @@ const useStorageProvider = () => {
     popupState,
     setPopupState,
     settings,
+    syncEnabled,
     changeSetting,
     selectedBudgetId,
     setSelectedBudgetId,

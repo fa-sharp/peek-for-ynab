@@ -1,28 +1,52 @@
+import { useLayoutEffect } from "react";
+import useLocalStorageState from "use-local-storage-state";
 import * as ynab from "ynab";
 
+export const IS_DEV = process.env.NODE_ENV === "development";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
-export const formatCurrency = (
-  millis: number,
+export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
-    millis,
-    currencyFormat.decimal_digits
-  );
-  const formattedString = new Intl.NumberFormat("default", {
+  const formatter = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
-  }).format(currencyAmount);
-
-  return formattedString;
+  });
+  return (millis: number) => {
+    const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
+      millis,
+      currencyFormat.decimal_digits
+    );
+    return formatter.format(currencyAmount);
+  };
 };
+
+export const formatCurrency = (
+  millis: number,
+  /** the budget's `currency_format` property from YNAB */
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
+) => getCurrencyFormatter(currencyFormat)(millis);
+
+/** Convert millis to a string value suitable for the HTML number input */
+export const millisToStringValue = (
+  millis: number,
+  currencyFormat = { decimal_digits: 2 }
+) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
+
+export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
+  accountsData?.find(
+    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
+  );
+
+/** Check if a search query is contained in a string, in the context of searching (i.e. ignore case) */
+export const searchWithinString = (str: string, query: string) =>
+  str.toLocaleLowerCase().includes(query.toLocaleLowerCase());
 
 /**
  * Get today's date (user's local timezone) in ISO format (i.e. for `input[type=date]` element)
@@ -103,57 +127,44 @@ export const removeCurrentTabPermissions = () =>
     )
   );
 
-/** Extract any currency amounts on the page. Returns a sorted array of detected amounts, from highest to lowest */
-export const extractCurrencyAmounts = () => {
-  /** Get all text content from an element and its descendants, including shadow DOMs */
-  const getTextContent = (element: Element | ShadowRoot) => {
-    let content = element.textContent || "";
-
-    element.querySelectorAll("*").forEach((el) => {
-      if (el.shadowRoot) {
-        content += getTextContent(el.shadowRoot);
-      }
-    });
-    return content;
-  };
-
-  /** Parse decimal number according to user's locale */
-  const parseLocaleNumber = (value: string, locales = navigator.languages) => {
-    //@ts-expect-error shut up TS!
-    const example = Intl.NumberFormat(locales).format(1.1);
-    const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
-    const cleaned = value.replace(cleanPattern, "");
-    const normalized = cleaned.replace(example.charAt(1), ".");
-
-    return parseFloat(normalized);
-  };
-
-  const text = getTextContent(document.body);
-  const regex = /[$£€¥]\s?([\d,]+(?:\.\d{1,2})?)/g; // TODO improve this regex for more currencies/locales (or find a different way)
-  let match;
-  const detected = new Set<number>(); // use a Set to eliminate duplicates
-  while ((match = regex.exec(text)) !== null) {
-    const amount = parseLocaleNumber(match[1]);
-    if (!isNaN(amount)) {
-      detected.add(amount);
-    }
-  }
-
-  // Sort amounts from highest to lowest
-  const amounts = Array.from(detected);
-  amounts.sort((a, b) => b - a);
-
-  return amounts;
+export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
+  if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
+  if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";
+  if (flagColor === ynab.TransactionFlagColor.Orange) return "🟠";
+  if (flagColor === ynab.TransactionFlagColor.Purple) return "🟣";
+  if (flagColor === ynab.TransactionFlagColor.Red) return "🔴";
+  if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
+  return null;
 };
 
-export const flagColorToEmoji = (
-  flagColor: ynab.SaveTransactionFlagColorEnum | string
-) => {
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Blue) return "🔵";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Green) return "🟢";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Orange) return "🟠";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Purple) return "🟣";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Red) return "🔴";
-  if (flagColor === ynab.SaveTransactionFlagColorEnum.Yellow) return "🟡";
-  return null;
+/**
+ * Sets the theme based on user setting in localStorage and media query.
+ * See also [theme.js](../../public/scripts/theme.js) which avoids the 'flash' on load.
+ */
+export const useSetColorTheme = () => {
+  const [themeSetting] = useLocalStorageState<"light" | "dark" | "auto">("theme", {
+    defaultValue: "auto"
+  });
+
+  useLayoutEffect(() => {
+    const prefersDarkModeQuery = window?.matchMedia
+      ? window.matchMedia("(prefers-color-scheme: dark)")
+      : null;
+
+    if (
+      (themeSetting === "auto" && prefersDarkModeQuery?.matches) ||
+      themeSetting === "dark"
+    )
+      document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+
+    const listener = (e: MediaQueryListEvent) => {
+      if ((themeSetting === "auto" && e.matches) || themeSetting === "dark")
+        document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
+    };
+    prefersDarkModeQuery?.addEventListener("change", listener);
+
+    return () => prefersDarkModeQuery?.removeEventListener("change", listener);
+  }, [themeSetting]);
 };

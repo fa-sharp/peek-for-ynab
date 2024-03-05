@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { clear } from "idb-keyval";
 import { nanoid } from "nanoid";
 import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
@@ -11,6 +12,8 @@ import { useStorageContext } from "./storageContext";
 const useAuthProvider = () => {
   const { tokenData, setTokenRefreshNeeded, setTokenData, removeAllData } =
     useStorageContext();
+
+  const queryClient = useQueryClient();
 
   /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
   const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
@@ -36,6 +39,11 @@ const useAuthProvider = () => {
   const loginWithOAuth = () =>
     new Promise<void>((resolve, reject) => {
       if (!process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+      // Clear API cache and local storage to avoid any leakage of data
+      queryClient.removeQueries();
+      clear();
+      localStorage.clear();
+
       const authorizeState = nanoid();
       const authorizeParams = new URLSearchParams({
         client_id: process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID,
@@ -97,22 +105,22 @@ const useAuthProvider = () => {
       );
     });
 
-  /** The current React Query client */
-  const queryClient = useQueryClient();
-
   /** Clears all data, including the user's token */
   const logout = async () => {
     await removeAllData();
+    await clear();
     queryClient.removeQueries();
-    queryClient.clear();
   };
 
   return {
     login,
     loginWithOAuth,
     logout,
+    /** Whether authentication/token data is loading */
     authLoading: tokenData === undefined,
+    /** Whether token data is present. Check `authLoading` first */
     loggedIn: tokenData != null,
+    /** Whether token is expired and needs to be refreshed. */
     tokenExpired
   };
 };

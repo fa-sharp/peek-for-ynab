@@ -13,3 +13,21 @@ p {
 li {
   margin-bottom: 0.1rem;
 }
+
+.screenshot {
+  border: solid 2px var(--border-light);
+  border-radius: 5px;
+  height: auto;
+}
+
+.browser-logos {
+  display: flex;
+  margin: 2rem 0;
+}
+
+.browser-logos > * {
+  background-color: white;
+  border: solid 1px var(--border);
+  border-radius: 5px;
+  line-height: 0;
+}
