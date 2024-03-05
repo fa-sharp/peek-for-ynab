@@ -1,12 +1,9 @@
 import { type FormEventHandler, useCallback, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
 
+import { CategorySelect, CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { millisToStringValue } from "~lib/utils";
-
-import CategorySelect from "./CategorySelect";
-import CurrencyView from "./CurrencyView";
-import IconButton from "./IconButton";
 
 /** Form that lets user move money to/from category, or between categories */
 export default function MoveMoney() {
@@ -176,7 +173,14 @@ export default function MoveMoney() {
             }
           }}
         />
-
+        {[fromCategory?.category_group_name, toCategory?.category_group_name].includes(
+          "Credit Card Payments"
+        ) && (
+          <div>
+            ⚠️ You are moving money to/from a Credit Card Payment category! Did you mean
+            to make a payment instead?
+          </div>
+        )}
         <div className="error-message">{errorMessage}</div>
         <div className="flex-row flex-row-reverse">
           <button

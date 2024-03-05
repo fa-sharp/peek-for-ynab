@@ -1,5 +1,5 @@
 import { PopupLogin, PopupMain, TransactionAdd } from "~components";
-import MoveMoney from "~components/MoveMoney";
+import MoveMoney from "~components/extension/transaction/MoveMoney";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 
