@@ -5,7 +5,8 @@ import { flagColorToEmoji } from "~lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
-  day: "numeric"
+  day: "numeric",
+  timeZone: "UTC"
 });
 
 export default function TransactionView({
