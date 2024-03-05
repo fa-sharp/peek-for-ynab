@@ -8,19 +8,19 @@ import {
 } from "tabler-icons-react";
 
 export const PinnedItemIcon = () => (
-  <Pinned size="1.2rem" color="var(--action)" fill="var(--action)" strokeWidth={1} />
+  <Pinned size={18} color="var(--action)" fill="var(--action)" strokeWidth={1} />
 );
 export const PinItemIcon = () => (
-  <Pinned size="1.2rem" color="var(--action)" strokeWidth={1} />
+  <Pinned size={18} color="var(--action)" strokeWidth={1} />
 );
 export const AddTransactionIcon = () => (
-  <Plus size="1.2rem" color="var(--action)" strokeWidth={1} />
+  <Plus size={18} color="var(--action)" strokeWidth={1} />
 );
 export const AddTransferIcon = () => (
-  <SwitchHorizontal size="1.2rem" color="var(--action)" strokeWidth={1} />
+  <SwitchHorizontal size={18} color="var(--action)" strokeWidth={1} />
 );
 export const AddCCPaymentIcon = () => (
-  <CreditCard size="1.2rem" color="var(--action)" strokeWidth={1} />
+  <CreditCard size={18} color="var(--action)" strokeWidth={1} />
 );
 
 export const ExpandListIcon = () => (

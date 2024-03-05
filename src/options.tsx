@@ -82,16 +82,6 @@ export function OptionsView() {
             </label>
             <label
               className="flex-row"
-              title="Only display balances when you hover over them with your mouse">
-              <input
-                type="checkbox"
-                checked={settings.privateMode}
-                onChange={(e) => changeSetting("privateMode", e.target.checked)}
-              />
-              🕶️ Show balances on hover only
-            </label>
-            <label
-              className="flex-row"
               title="Display category/account names as emojis only">
               <input
                 type="checkbox"
@@ -99,6 +89,14 @@ export function OptionsView() {
                 onChange={(e) => changeSetting("emojiMode", e.target.checked)}
               />
               😉 Emoji mode
+            </label>
+            <label className="flex-row" title="Animate changing balances">
+              <input
+                type="checkbox"
+                checked={!!settings.animations}
+                onChange={(e) => changeSetting("animations", e.target.checked)}
+              />
+              🪄 Animations
             </label>
             <label className="flex-row">
               Theme:
@@ -120,7 +118,7 @@ export function OptionsView() {
           </h3>
           <div className="flex-col">
             <label
-              className="flex-row gap-xs"
+              className="flex-row gap-sm"
               title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
               <input
                 type="checkbox"
@@ -131,7 +129,7 @@ export function OptionsView() {
               Approved
             </label>
             <label
-              className="flex-row gap-xs"
+              className="flex-row gap-sm"
               title="Set transactions as Cleared by default">
               <input
                 type="checkbox"
@@ -145,7 +143,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Permissions
           </h3>
-          <label className="flex-row mb-small">
+          <label className="flex-row mb-sm">
             <input
               type="checkbox"
               checked={settings.currentTabAccess}
@@ -183,7 +181,7 @@ export function OptionsView() {
           </div>
           <button
             title="Refresh the list of budgets from YNAB"
-            className="button rounded accent flex-row mb-small"
+            className="button rounded accent flex-row mb-sm"
             style={{ width: "fit-content", marginBlock: 8 }}
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>

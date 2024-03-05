@@ -1,8 +1,7 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { AccountType } from "ynab";
 
-import { IconButton } from "~components";
-import { AccountView } from "~components/AccountsView";
+import { AccountView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
 import {
@@ -10,7 +9,7 @@ import {
   AddTransactionIcon,
   AddTransferIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -32,7 +31,7 @@ export default function SavedAccountsView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned accounts"
-          className="list mt-md">
+          className="list mb-lg">
           {savedAccountsData.map((account, idx) => (
             <Draggable
               draggableId={account.id}

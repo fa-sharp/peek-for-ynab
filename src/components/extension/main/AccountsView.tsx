@@ -4,8 +4,11 @@ import { type Account, AccountType, type CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
-import { useStorageContext } from "~lib/context/storageContext";
+import {
+  type AppSettings,
+  type TxAddInitialState,
+  useStorageContext
+} from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
@@ -19,7 +22,7 @@ import {
   ExpandListIconBold,
   PinItemIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
@@ -207,9 +210,7 @@ export const AccountView = ({
     <div
       className="balance-display"
       title={
-        settings.emojiMode
-          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
-          : undefined
+        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
@@ -224,7 +225,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          hideBalance={settings.privateMode}
+          animationEnabled={settings.animations}
         />
         {actionElementsRight}
       </div>

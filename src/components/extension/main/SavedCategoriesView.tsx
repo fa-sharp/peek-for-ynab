@@ -1,7 +1,6 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { IconButton } from "~components";
-import { CategoryView } from "~components/CategoriesView";
+import { CategoryView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
@@ -10,7 +9,7 @@ import {
   AddTransactionIcon,
   AddTransferIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
@@ -34,7 +33,7 @@ export default function SavedCategoriesView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned categories"
-          className="list">
+          className="list mb-lg">
           {savedCategoriesData.map((category, idx) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
@@ -100,11 +99,8 @@ export default function SavedCategoriesView() {
                                             currencyFormat
                                           )
                                         : undefined,
-                                    payee: {
-                                      id: ccAccount.transfer_payee_id,
-                                      name: ccAccount.name,
-                                      transferId: ccAccount.id
-                                    }
+                                    amountType: "Inflow",
+                                    accountId: ccAccount.id
                                   }
                                 })
                               }

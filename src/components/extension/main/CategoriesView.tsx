@@ -32,7 +32,7 @@ import {
   ExpandListIconBold,
   PinItemIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
@@ -53,9 +53,7 @@ function CategoriesView() {
 
   return (
     <>
-      <div
-        className="heading-big cursor-pointer mt-md"
-        onClick={() => setExpanded(!expanded)}>
+      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -182,11 +180,8 @@ export function CategoryGroupView({
                                       budgetData.currencyFormat
                                     )
                                   : undefined,
-                              payee: {
-                                id: ccAccount.transfer_payee_id,
-                                name: ccAccount.name,
-                                transferId: ccAccount.id
-                              }
+                              amountType: "Inflow",
+                              accountId: ccAccount.id
                             })
                           }
                         />
@@ -229,16 +224,13 @@ export const CategoryView = ({
   actionElementsLeft?: ReactElement | null;
   settings: AppSettings;
 }) => {
-  let foundEmoji = null;
-  if (settings.emojiMode) foundEmoji = findEmoji(name);
+  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
   return (
     <div
       className="balance-display"
       title={
-        settings.emojiMode
-          ? `${name}: ${formatCurrency(balance, currencyFormat)}`
-          : undefined
+        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
@@ -253,7 +245,7 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          hideBalance={settings.privateMode}
+          animationEnabled={settings.animations}
         />
         {actionElementsRight}
       </div>

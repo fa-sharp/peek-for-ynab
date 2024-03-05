@@ -1,6 +1,5 @@
-import { PopupLogin, TransactionAdd } from "~components";
+import { PopupLogin, PopupMain, TransactionAdd } from "~components";
 import MoveMoney from "~components/MoveMoney";
-import PopupMain from "~components/PopupMain";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 
@@ -25,8 +24,7 @@ export function PopupView() {
   return (
     <div
       style={{
-        flexDirection: "column",
-        padding: 16,
+        padding: "1em",
         minWidth: settings.emojiMode ? "150px" : "240px",
         width: "max-content",
         maxWidth: "320px"

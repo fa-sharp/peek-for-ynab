@@ -1,14 +1,7 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { FormEventHandler, MouseEventHandler } from "react";
 import { useEffect } from "react";
-import {
-  Check,
-  CircleC,
-  Minus,
-  Plus,
-  SwitchVertical,
-  WorldWww
-} from "tabler-icons-react";
+import { Check, CircleC, Minus, Plus, WorldWww } from "tabler-icons-react";
 import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -22,7 +15,7 @@ import {
   requestCurrentTabPermissions
 } from "~lib/utils";
 
-import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from ".";
+import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from "../..";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
@@ -34,8 +27,14 @@ export default function TransactionAdd() {
   );
   const [date, setDate] = useState(getTodaysDateISO);
   const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
-  const [cleared, setCleared] = useState(settings?.txCleared ? true : false);
-  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">("Outflow");
+  const [cleared, setCleared] = useState(
+    () =>
+      accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
+        "cash" || !!settings?.txCleared
+  );
+  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
+    popupState.txAddState?.amountType || "Outflow"
+  );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
     popupState.txAddState?.payee || null
   );
@@ -84,63 +83,6 @@ export default function TransactionAdd() {
     return !transferToAccount.on_budget && account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
 
-  /** The CCP category if this is a credit card payment. We'll want to show the CCP balance. */
-  // const ccpCategory = useMemo(() => {
-  //   if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return;
-  //   const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
-  //   const isCreditCardPayment =
-  //     (!account || account.on_budget) &&
-  //     transferToAccount &&
-  //     (transferToAccount.type === "creditCard" ||
-  //       transferToAccount.type === "lineOfCredit");
-  //   if (!isCreditCardPayment) return;
-  //   return categoriesData?.find(
-  //     (c) =>
-  //       c.category_group_name === "Credit Card Payments" &&
-  //       c.name === transferToAccount.name
-  //   );
-  // }, [account, accountsData, categoriesData, isTransfer, payee]);
-
-  /** Switch the To and From account for a transfer */
-  const switchToFromAccounts = useCallback(() => {
-    const newAccount =
-      payee && "transferId" in payee
-        ? accountsData?.find((a) => a.id === payee.transferId)
-        : null;
-    const newPayee =
-      account && account.transfer_payee_id
-        ? {
-            id: account.transfer_payee_id,
-            name: account.name,
-            transferId: account.id
-          }
-        : null;
-    setAccount(newAccount || null);
-    setPayee(newPayee);
-  }, [account, accountsData, payee]);
-
-  // TODO find a better way to detect amounts
-  // const [detectedAmounts, setDetectedAmounts] = useState<number[] | null>(null);
-  // const [detectedAmountIdx, setDetectedAmountIdx] = useState(0);
-  // // const onDetectAmount = async () => {
-  //   if (!detectedAmounts) {
-  //     // Check permissions
-  //     if (!(await requestCurrentTabPermissions())) return;
-  //     // Try detecting any currency amounts on the page
-  //     const amounts = await executeScriptInCurrentTab(extractCurrencyAmounts);
-  //     !IS_PRODUCTION && console.log({ detectedAmounts: amounts });
-  //     setDetectedAmounts(amounts);
-  //     if (amounts[0]) setAmount(amounts[0].toString());
-  //   } else if (detectedAmounts[detectedAmountIdx + 1]) {
-  //     // Iterate through detected amounts
-  //     setAmount(detectedAmounts[detectedAmountIdx + 1].toString());
-  //     setDetectedAmountIdx((v) => v + 1);
-  //   } else {
-  //     if (detectedAmounts[0]) setAmount(detectedAmounts[0].toString());
-  //     setDetectedAmountIdx(0);
-  //   }
-  // };
-
   const onCopyURLIntoMemo = async () => {
     if (!(await requestCurrentTabPermissions())) return;
     const url = await executeScriptInCurrentTab(() => location.href);
@@ -182,7 +124,7 @@ export default function TransactionAdd() {
       await addTransaction({
         date,
         amount:
-          amountType === "Outflow" || isTransfer
+          amountType === "Outflow"
             ? Math.round(+amount * -1000)
             : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
@@ -206,7 +148,7 @@ export default function TransactionAdd() {
   };
 
   return (
-    <section>
+    <section style={{ minWidth: 240 }}>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>
@@ -230,21 +172,19 @@ export default function TransactionAdd() {
         <label className="form-input" htmlFor="amount-input">
           Amount
           <div className="flex-row">
-            {!isTransfer && (
-              <IconButton
-                label={`${
-                  amountType === "Inflow" ? "Inflow" : "Outflow"
-                } (Click to switch)`}
-                icon={
-                  amountType === "Inflow" ? (
-                    <Plus color="var(--currency-green)" />
-                  ) : (
-                    <Minus color="var(--currency-red)" />
-                  )
-                }
-                onClick={flipAmountType}
-              />
-            )}
+            <IconButton
+              label={`${
+                amountType === "Inflow" ? "Inflow" : "Outflow"
+              } (Click to switch)`}
+              icon={
+                amountType === "Inflow" ? (
+                  <Plus color="var(--currency-green)" />
+                ) : (
+                  <Minus color="var(--currency-red)" />
+                )
+              }
+              onClick={flipAmountType}
+            />
             <input
               id="amount-input"
               required
@@ -269,33 +209,38 @@ export default function TransactionAdd() {
               selectPayee={(selectedPayee) => {
                 setPayee(selectedPayee);
                 if ("id" in selectedPayee) {
-                  if (!category) categoryRef.current?.focus();
+                  if (!category && categoryRef.current) categoryRef.current.focus();
                   else if (!account) accountRef.current?.focus();
                   else memoRef.current?.focus();
                 }
               }}
               disabled={isSaving}
             />
-            <CategorySelect
-              ref={categoryRef}
-              currentCategory={category}
-              categories={categoriesData}
-              selectCategory={(selectedCategory) => {
-                setCategory(selectedCategory);
-                if (selectedCategory) {
-                  if (!account) accountRef.current?.focus();
-                  else memoRef.current?.focus();
-                }
-              }}
-              disabled={isSaving}
-            />
+            {(!account || account.on_budget) && (
+              <CategorySelect
+                ref={categoryRef}
+                currentCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) {
+                    if (!account) accountRef.current?.focus();
+                    else memoRef.current?.focus();
+                  }
+                }}
+                disabled={isSaving}
+              />
+            )}
             <AccountSelect
               ref={accountRef}
               currentAccount={account}
               accounts={accountsData}
               selectAccount={(selectedAccount) => {
                 setAccount(selectedAccount);
-                if (selectedAccount) memoRef.current?.focus();
+                if (selectedAccount) {
+                  memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
+                }
               }}
               disabled={isSaving}
             />
@@ -326,40 +271,21 @@ export default function TransactionAdd() {
                   else memoRef.current?.focus();
                 }
               }}
-              isTransfer="to"
+              label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
               disabled={isSaving}
             />
-            {/* {ccpCategory && (
-              <div>
-                Payment category:{" "}
-                <button
-                  type="button"
-                  className="button rounded gray"
-                  title="Set to the available amount in this credit card's payment category"
-                  onClick={() => {
-                    if (ccpCategory.balance < 0) return;
-                    setAmount(
-                      millisToStringValue(
-                        ccpCategory.balance,
-                        selectedBudgetData?.currencyFormat
-                      )
-                    );
-                  }}>
-                  <CurrencyView
-                    colorsEnabled
-                    milliUnits={ccpCategory.balance}
-                    currencyFormat={selectedBudgetData?.currencyFormat}
-                  />
-                </button>
-              </div>
-            )} */}
-            <div className="flex-row">
-              <IconButton
-                icon={<SwitchVertical />}
-                label="Switch 'To' and 'From' accounts"
-                onClick={switchToFromAccounts}
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                ref={categoryRef}
+                currentCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) memoRef.current?.focus();
+                }}
+                disabled={isSaving}
               />
-            </div>
+            )}
             <AccountSelect
               ref={accountRef}
               currentAccount={account}
@@ -377,23 +303,12 @@ export default function TransactionAdd() {
                   )
                     setTimeout(() => categoryRef.current?.focus(), 50);
                   else memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
                 }
               }}
-              isTransfer="from"
+              label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
-              <CategorySelect
-                ref={categoryRef}
-                currentCategory={category}
-                categories={categoriesData}
-                selectCategory={(selectedCategory) => {
-                  setCategory(selectedCategory);
-                  if (selectedCategory) memoRef.current?.focus();
-                }}
-                disabled={isSaving}
-              />
-            )}
           </>
         )}
         <label className="form-input" htmlFor="memo-input">
@@ -418,25 +333,13 @@ export default function TransactionAdd() {
             )}
           </div>
         </label>
-
-        <label className="form-input">
-          Date
-          <input
-            required
-            type="date"
-            value={date}
-            max={getTodaysDateISO()}
-            onChange={(e) => setDate(e.target.value)}
-            disabled={isSaving}
-          />
-        </label>
-        <div className="flex-row justify-between">
+        <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
             Status:
             {cleared ? (
               <IconButton
                 label="Cleared (click to switch)"
-                icon={<CircleC fill="var(--currency-green)" color="white" size={26} />}
+                icon={<CircleC fill="var(--currency-green)" color="white" />}
                 onClick={() => setCleared(false)}
               />
             ) : (
@@ -462,18 +365,28 @@ export default function TransactionAdd() {
             </select>
           </label>
         </div>
-
+        <label className="form-input">
+          Date
+          <input
+            required
+            type="date"
+            value={date}
+            max={getTodaysDateISO()}
+            onChange={(e) => setDate(e.target.value)}
+            disabled={isSaving}
+          />
+        </label>
         <div className="error-message">{errorMessage}</div>
-        <div className="flex-row flex-row-reverse">
+        <div className="flex-row flex-row-reverse mt-lg">
           <button
             type="submit"
-            className="button rounded accent mt-lg flex-1"
+            className="button rounded accent flex-1"
             disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
-            className="button gray rounded mt-lg flex-1"
+            className="button gray rounded flex-1"
             onClick={() => setPopupState({ view: "main" })}
             disabled={isSaving}>
             Cancel

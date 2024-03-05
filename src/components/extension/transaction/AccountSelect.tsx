@@ -18,12 +18,12 @@ interface Props {
   currentAccount?: Account | null;
   accounts?: Account[];
   selectAccount: (account: Account | null) => void;
-  isTransfer?: "from" | "to";
+  label?: string;
   disabled?: boolean;
 }
 
 function AccountSelect(
-  { currentAccount, accounts, isTransfer, disabled, selectAccount }: Props,
+  { currentAccount, accounts, label, disabled, selectAccount }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { selectedBudgetData } = useYNABContext();
@@ -71,13 +71,7 @@ function AccountSelect(
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>
-        {!isTransfer
-          ? "Account"
-          : isTransfer === "from"
-            ? "Account (From)"
-            : "Payee (To)"}
-      </label>
+      <label {...getLabelProps()}>{label || "Account"}</label>
       <div className="flex-col">
         <input
           required
@@ -131,7 +125,7 @@ function AccountSelect(
               .map((type) => (
                 <Fragment key={type}>
                   <li>
-                    <h3 className="heading-medium">{type}</h3>
+                    <h3 className="select-dropdown-heading">{type}</h3>
                   </li>
                   {accountList
                     .filter((a) => (type === "Budget" ? a.on_budget : !a.on_budget))

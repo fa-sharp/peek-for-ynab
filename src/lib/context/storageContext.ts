@@ -29,11 +29,14 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
+  /** Whether animations are enabled. @default false */
+  animations?: boolean;
 }
 
 /** Initial state of the add transaction screen */
 export interface TxAddInitialState {
   amount?: string;
+  amountType?: "Inflow" | "Outflow";
   accountId?: string;
   categoryId?: string;
   payee?: CachedPayee;

@@ -19,11 +19,13 @@ export default function PopupMain() {
     setPopupState,
     selectedBudgetId
   } = useStorageContext();
-  const { savedCategoriesData, savedAccountsData } = useYNABContext();
+  const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
+    useYNABContext();
 
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
     if (
+      selectedBudgetId &&
       savedCategories &&
       savedAccounts &&
       !savedCategories[selectedBudgetId]?.length &&
@@ -34,13 +36,19 @@ export default function PopupMain() {
 
   const onDragEnd: OnDragEndResponder = (result) => {
     if (!result.destination) return;
-    if (result.source.droppableId === "savedCategories") {
+    if (
+      result.source.droppableId === "savedCategories" &&
+      result.destination.droppableId === "savedCategories"
+    ) {
       if (!savedCategoriesData) return;
       const savedCategoryIds = savedCategoriesData.map((c) => c.id);
       const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
       savedCategoryIds.splice(result.destination.index, 0, categoryId);
       saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
-    } else if (result.source.droppableId === "savedAccounts") {
+    } else if (
+      result.source.droppableId === "savedAccounts" &&
+      result.destination.droppableId === "savedAccounts"
+    ) {
       if (!savedAccountsData) return;
       const savedAccountIds = savedAccountsData.map((a) => a.id);
       const [accountId] = savedAccountIds.splice(result.source.index, 1);
@@ -52,12 +60,14 @@ export default function PopupMain() {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <PopupNav />
-
-      <SavedCategoriesView />
-      <SavedAccountsView />
-
-      <CategoriesView />
-      <AccountsView />
+      {categoriesData && accountsData && (
+        <>
+          <SavedCategoriesView />
+          <SavedAccountsView />
+          <CategoriesView />
+          <AccountsView />
+        </>
+      )}
     </DragDropContext>
   );
 }

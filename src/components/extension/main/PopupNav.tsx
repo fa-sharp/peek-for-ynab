@@ -12,10 +12,11 @@ import {
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
+  const { tokenExpired } = useAuthContext();
   const {
     selectedBudgetId,
     settings,
@@ -24,10 +25,15 @@ export default function PopupNav() {
     setPopupState,
     setSelectedBudgetId
   } = useStorageContext();
-  const { shownBudgetsData, categoriesLastUpdated, isRefreshingBudgets } =
-    useYNABContext();
+  const {
+    shownBudgetsData,
+    accountsLastUpdated,
+    accountsError,
+    categoriesError,
+    categoriesLastUpdated,
+    isRefreshingBudgets
+  } = useYNABContext();
   const globalIsFetching = useIsFetching();
-  const isLoadingData = globalIsFetching || tokenRefreshNeeded;
 
   const switchBudget = useCallback(() => {
     if (!shownBudgetsData) return;
@@ -39,43 +45,43 @@ export default function PopupNav() {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
 
-  if (!shownBudgetsData && isRefreshingBudgets) return <p>Loading budgets...</p>;
-  if (!shownBudgetsData || !settings) return null;
+  if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
+  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
+  if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
+  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: 8,
-        marginBottom: "0.6rem"
-      }}>
+    <nav className="flex-row justify-between mb-lg">
       <IconButton
         label={
-          isLoadingData
-            ? "Status: Refreshing data..."
-            : `Status: Last updated ${new Date(categoriesLastUpdated).toLocaleString()}`
+          categoriesError || accountsError
+            ? "Error getting data from YNAB!"
+            : globalIsFetching
+              ? "Status: Refreshing data..."
+              : `Status: Last updated ${new Date(
+                  categoriesLastUpdated < accountsLastUpdated
+                    ? categoriesLastUpdated
+                    : accountsLastUpdated
+                ).toLocaleString()}`
         }
         icon={
-          isLoadingData ? (
+          categoriesError || accountsError ? (
+            <AlertTriangle color="var(--stale)" /> // indicates error while fetching data
+          ) : globalIsFetching ? (
             <Refresh />
-          ) : !selectedBudgetId || categoriesLastUpdated + 240_000 > Date.now() ? (
+          ) : !selectedBudgetId ||
+            (categoriesLastUpdated + 240_000 > Date.now() &&
+              accountsLastUpdated + 240_000 > Date.now()) ? (
             <Check color="var(--success)" />
           ) : (
             <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
           )
         }
-        spin={Boolean(isLoadingData)}
+        spin={Boolean(globalIsFetching)}
         disabled
         noAction
       />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 3
-        }}>
+      <div className="flex-row gap-xs">
         <BudgetSelect
           emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
