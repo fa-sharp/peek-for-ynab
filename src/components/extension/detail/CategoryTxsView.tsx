@@ -7,7 +7,7 @@ import { useStorageContext, useYNABContext } from "~lib/context";
 
 const CategoryTxsView = () => {
   const { useGetCategoryTxs, categoriesData, selectedBudgetData } = useYNABContext();
-  const { popupState, setPopupState } = useStorageContext();
+  const { settings, popupState, setPopupState } = useStorageContext();
 
   const category = useMemo(
     () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
@@ -34,6 +34,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
         <div className="balance-display">
@@ -42,6 +43,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance - category.activity - category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
         <div className="balance-display">
@@ -50,6 +52,7 @@ const CategoryTxsView = () => {
             milliUnits={category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
         <div className="balance-display">
@@ -58,6 +61,7 @@ const CategoryTxsView = () => {
             milliUnits={category.activity}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
       </div>
@@ -74,7 +78,14 @@ const CategoryTxsView = () => {
               setPopupState({
                 view: "txAdd",
                 txAddState: {
-                  categoryId: category.id
+                  categoryId: category.id,
+                  returnTo: {
+                    view: "detail",
+                    detailState: {
+                      type: "category",
+                      id: category.id
+                    }
+                  }
                 }
               })
             }

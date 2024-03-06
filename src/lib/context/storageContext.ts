@@ -46,6 +46,10 @@ export interface TxAddInitialState {
   categoryId?: string;
   payee?: CachedPayee;
   isTransfer?: boolean;
+  returnTo?: {
+    view: "main" | "detail";
+    detailState?: DetailViewState;
+  };
 }
 
 /** Map of budget IDs to string arrays. Useful type for storage. */

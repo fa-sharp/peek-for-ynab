@@ -138,7 +138,7 @@ export default function TransactionAdd() {
         memo,
         flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined
       });
-      setPopupState({ view: "main" });
+      setPopupState(popupState.txAddState?.returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
@@ -387,7 +387,9 @@ export default function TransactionAdd() {
           <button
             type="button"
             className="button gray rounded flex-1"
-            onClick={() => setPopupState({ view: "main" })}
+            onClick={() =>
+              setPopupState(popupState.txAddState?.returnTo || { view: "main" })
+            }
             disabled={isSaving}>
             Cancel
           </button>

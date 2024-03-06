@@ -19,7 +19,7 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 });
 
 const AccountTxsView = () => {
-  const { selectedBudgetId, popupState, setPopupState } = useStorageContext();
+  const { settings, selectedBudgetId, popupState, setPopupState } = useStorageContext();
   const { useGetAccountTxs, accountsData, categoriesData, selectedBudgetData } =
     useYNABContext();
 
@@ -73,25 +73,45 @@ const AccountTxsView = () => {
         <div className="balance-display heading-medium">
           Working Balance:
           <CurrencyView
+            key={`working-${account.id}`}
             milliUnits={account.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
+        {(account.type === AccountType.CreditCard ||
+          account.type === AccountType.LineOfCredit) &&
+          ccpCategory && (
+            <div className="balance-display heading-medium">
+              Payment Category:
+              <CurrencyView
+                key={`ccp-${account.id}`}
+                milliUnits={ccpCategory.balance}
+                currencyFormat={selectedBudgetData.currencyFormat}
+                colorsEnabled
+                animationEnabled={settings?.animations}
+              />
+            </div>
+          )}
         <div className="balance-display">
           Cleared Balance:
           <CurrencyView
+            key={`cleared-${account.id}`}
             milliUnits={account.cleared_balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
         <div className="balance-display">
           Uncleared Balance:
           <CurrencyView
+            key={`uncleared-${account.id}`}
             milliUnits={account.uncleared_balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
+            animationEnabled={settings?.animations}
           />
         </div>
         {account.last_reconciled_at && (
@@ -100,18 +120,6 @@ const AccountTxsView = () => {
             <div>{dateFormatter.format(new Date(account.last_reconciled_at))}</div>
           </div>
         )}
-        {(account.type === AccountType.CreditCard ||
-          account.type === AccountType.LineOfCredit) &&
-          ccpCategory && (
-            <div className="balance-display heading-medium">
-              Payment Category:
-              <CurrencyView
-                milliUnits={ccpCategory.balance}
-                currencyFormat={selectedBudgetData.currencyFormat}
-                colorsEnabled
-              />
-            </div>
-          )}
       </div>
       <div className="flex-row justify-between gap-lg mb-lg">
         <h3 className="heading-medium">Activity</h3>
@@ -126,7 +134,14 @@ const AccountTxsView = () => {
               setPopupState({
                 view: "txAdd",
                 txAddState: {
-                  accountId: account.id
+                  accountId: account.id,
+                  returnTo: {
+                    view: "detail",
+                    detailState: {
+                      type: "account",
+                      id: account.id
+                    }
+                  }
                 }
               })
             }
@@ -148,7 +163,14 @@ const AccountTxsView = () => {
                         ? millisToStringValue(ccpCategory.balance)
                         : undefined,
                     accountId: account.id,
-                    isTransfer: true
+                    isTransfer: true,
+                    returnTo: {
+                      view: "detail",
+                      detailState: {
+                        type: "account",
+                        id: account.id
+                      }
+                    }
                   }
                 })
               }
@@ -162,7 +184,7 @@ const AccountTxsView = () => {
             <IconButton
               rounded
               accent
-              label="Add payment to this account"
+              label="Add payment/transfer"
               icon={<AddTransferIcon />}
               onClick={() =>
                 account.transfer_payee_id &&
@@ -175,6 +197,13 @@ const AccountTxsView = () => {
                       id: account.transfer_payee_id,
                       name: account.name,
                       transferId: account.id
+                    },
+                    returnTo: {
+                      view: "detail",
+                      detailState: {
+                        type: "account",
+                        id: account.id
+                      }
                     }
                   }
                 })
@@ -184,14 +213,21 @@ const AccountTxsView = () => {
             <IconButton
               rounded
               accent
-              label="Add transfer from this account"
+              label="Add transfer"
               icon={<AddTransferIcon />}
               onClick={() =>
                 setPopupState({
                   view: "txAdd",
                   txAddState: {
                     accountId: account.id,
-                    isTransfer: true
+                    isTransfer: true,
+                    returnTo: {
+                      view: "detail",
+                      detailState: {
+                        type: "account",
+                        id: account.id
+                      }
+                    }
                   }
                 })
               }

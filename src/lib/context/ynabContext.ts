@@ -262,6 +262,16 @@ const useYNABProvider = () => {
             }
           ]
         });
+      response.data.transaction?.transfer_account_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: selectedBudgetId,
+              accountId: response.data.transaction.transfer_account_id
+            }
+          ]
+        });
     },
     [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI, queryClient]
   );
