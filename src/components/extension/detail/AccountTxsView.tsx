@@ -189,13 +189,19 @@ const AccountTxsView = () => {
             <TransactionView
               key={tx.id}
               tx={tx}
-              detailRight="category"
-              detailRightOnClick={() =>
-                tx.category_id &&
-                setPopupState({
-                  view: "detail",
-                  detailState: { id: tx.category_id, type: "category" }
-                })
+              detailLeft="category"
+              detailLeftOnClick={() =>
+                tx.category_id
+                  ? setPopupState({
+                      view: "detail",
+                      detailState: { id: tx.category_id, type: "category" }
+                    })
+                  : tx.transfer_account_id
+                    ? setPopupState({
+                        view: "detail",
+                        detailState: { id: tx.transfer_account_id, type: "account" }
+                      })
+                    : undefined
               }
               currencyFormat={selectedBudgetData.currencyFormat}
             />

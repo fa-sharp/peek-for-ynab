@@ -202,10 +202,23 @@ li:last-child .balance-display {
   gap: 2px;
 }
 
+.tx-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs) var(--spacing-sm);
+  border-bottom: solid 1px var(--border-light);
+}
+
 .button {
   cursor: pointer;
   padding: var(--spacing-sm) 0.7em;
   text-align: center;
+}
+.button.small {
+  padding: 2px 5px;
+  border: none;
+  flex-shrink: 0;
 }
 
 .icon-button {

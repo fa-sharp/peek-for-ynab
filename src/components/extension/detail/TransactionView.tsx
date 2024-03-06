@@ -11,32 +11,22 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 
 export default function TransactionView({
   tx,
-  detailLeft = "memo",
-  detailRight = "category",
-  detailRightOnClick,
+  detailRight = "memo",
+  detailLeft = "category",
+  detailLeftOnClick,
   currencyFormat
 }: {
   tx: ynab.TransactionDetail | ynab.HybridTransaction;
-  detailLeft?: "memo";
-  detailRight?: "category" | "account";
-  detailRightOnClick?: () => void;
+  detailRight?: "memo";
+  detailLeft?: "category" | "account";
+  detailLeftOnClick?: () => void;
   currencyFormat?: ynab.CurrencyFormat;
 }) {
   const date = ynab.utils.convertFromISODateString(tx.date);
 
   return (
-    <div
-      className="flex-col gap-xs"
-      style={{
-        paddingBottom: "var(--spacing-sm)",
-        borderBottom: "solid 1px var(--border-light)"
-      }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 6
-        }}>
+    <div className="tx-display">
+      <div className="flex-row justify-between gap-lg">
         <div className="flex-row">
           {tx.flag_color && flagColorToEmoji(tx.flag_color)}
           <div>{dateFormatter.format(date)}</div>
@@ -52,21 +42,18 @@ export default function TransactionView({
         </div>
       </div>
       <div className="flex-row gap-lg justify-between font-small">
-        <button
-          className="button accent rounded cursor-pointer"
-          style={{
-            border: "none",
-            flexShrink: 0,
-            padding: "2px 5px"
-          }}
-          onClick={detailRightOnClick}>
-          {tx.transfer_account_id
-            ? "Transfer"
-            : detailRight === "category"
-              ? tx.category_name
-              : tx.account_name}
+        <button className="button small accent rounded" onClick={detailLeftOnClick}>
+          {detailLeft === "category" &&
+          tx.category_name &&
+          tx.category_name !== "Uncategorized"
+            ? tx.category_name
+            : detailLeft === "account"
+              ? tx.account_name
+              : tx.transfer_account_id
+                ? tx.payee_name
+                : "No category"}
         </button>
-        {tx.memo && detailLeft === "memo" ? (
+        {tx.memo && detailRight === "memo" ? (
           <div className="hide-overflow">{tx.memo}</div>
         ) : (
           <div></div>

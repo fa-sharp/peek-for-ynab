@@ -89,8 +89,8 @@ const CategoryTxsView = () => {
             <TransactionView
               key={tx.id}
               tx={tx}
-              detailRight="account"
-              detailRightOnClick={() =>
+              detailLeft="account"
+              detailLeftOnClick={() =>
                 setPopupState({
                   view: "detail",
                   detailState: { id: tx.account_id, type: "account" }
