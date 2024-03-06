@@ -235,33 +235,34 @@ const AccountTxsView = () => {
           )}
         </div>
       </div>
-      <div className="flex-col gap-sm">
-        {!accountTxs ? (
-          <div>Loading transactions...</div>
-        ) : (
-          accountTxs.map((tx) => (
-            <TransactionView
-              key={tx.id}
-              tx={tx}
-              detailLeft="category"
-              detailLeftOnClick={() =>
-                tx.category_id
-                  ? setPopupState({
-                      view: "detail",
-                      detailState: { id: tx.category_id, type: "category" }
-                    })
-                  : tx.transfer_account_id
+      {!accountTxs ? (
+        <div>Loading transactions...</div>
+      ) : (
+        <ul className="list flex-col gap-sm">
+          {accountTxs.map((tx) => (
+            <li key={tx.id}>
+              <TransactionView
+                tx={tx}
+                detailLeft="category"
+                detailLeftOnClick={() =>
+                  tx.category_id
                     ? setPopupState({
                         view: "detail",
-                        detailState: { id: tx.transfer_account_id, type: "account" }
+                        detailState: { id: tx.category_id, type: "category" }
                       })
-                    : undefined
-              }
-              currencyFormat={selectedBudgetData.currencyFormat}
-            />
-          ))
-        )}
-      </div>
+                    : tx.transfer_account_id
+                      ? setPopupState({
+                          view: "detail",
+                          detailState: { id: tx.transfer_account_id, type: "account" }
+                        })
+                      : undefined
+                }
+                currencyFormat={selectedBudgetData.currencyFormat}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

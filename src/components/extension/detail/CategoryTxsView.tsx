@@ -95,22 +95,23 @@ const CategoryTxsView = () => {
       {!categoryTxs ? (
         <div>Loading transactions...</div>
       ) : (
-        <div className="flex-col gap-sm">
+        <ul className="list flex-col gap-sm">
           {categoryTxs.map((tx) => (
-            <TransactionView
-              key={tx.id}
-              tx={tx}
-              detailLeft="account"
-              detailLeftOnClick={() =>
-                setPopupState({
-                  view: "detail",
-                  detailState: { id: tx.account_id, type: "account" }
-                })
-              }
-              currencyFormat={selectedBudgetData.currencyFormat}
-            />
+            <li key={tx.id}>
+              <TransactionView
+                tx={tx}
+                detailLeft="account"
+                detailLeftOnClick={() =>
+                  setPopupState({
+                    view: "detail",
+                    detailState: { id: tx.account_id, type: "account" }
+                  })
+                }
+                currencyFormat={selectedBudgetData.currencyFormat}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
