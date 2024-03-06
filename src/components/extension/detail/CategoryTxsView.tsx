@@ -37,7 +37,7 @@ const CategoryTxsView = () => {
           />
         </div>
         <div className="balance-display">
-          Leftover Last Month:
+          Cash Leftover Last Month:
           <CurrencyView
             milliUnits={category.balance - category.activity - category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}

@@ -11,6 +11,13 @@ import {
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { millisToStringValue } from "~lib/utils";
 
+const dateFormatter = new Intl.DateTimeFormat("default", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC"
+});
+
 const AccountTxsView = () => {
   const { selectedBudgetId, popupState, setPopupState } = useStorageContext();
   const { useGetAccountTxs, accountsData, categoriesData, selectedBudgetData } =
@@ -48,19 +55,19 @@ const AccountTxsView = () => {
   return (
     <div>
       <div className="flex-row justify-between mb-sm">
-        <h2 className="heading-big">{account.name}</h2>
-        <div className="flex-row">
+        <h2 className="heading-big">
+          {account.name}
           <IconButton
             label="Open this account in YNAB"
             onClick={openAccount}
             icon={<ExternalLink />}
           />
-          <IconButton
-            icon={<ArrowBack />}
-            label="Back to main view"
-            onClick={() => setPopupState({ view: "main" })}
-          />
-        </div>
+        </h2>
+        <IconButton
+          icon={<ArrowBack />}
+          label="Back to main view"
+          onClick={() => setPopupState({ view: "main" })}
+        />
       </div>
       <div className="flex-col gap-sm mb-lg">
         <div className="balance-display heading-medium">
@@ -87,6 +94,12 @@ const AccountTxsView = () => {
             colorsEnabled
           />
         </div>
+        {account.last_reconciled_at && (
+          <div className="balance-display">
+            Last Reconciled:
+            <div>{dateFormatter.format(new Date(account.last_reconciled_at))}</div>
+          </div>
+        )}
         {(account.type === AccountType.CreditCard ||
           account.type === AccountType.LineOfCredit) &&
           ccpCategory && (
@@ -152,12 +165,17 @@ const AccountTxsView = () => {
               label="Add payment to this account"
               icon={<AddTransferIcon />}
               onClick={() =>
+                account.transfer_payee_id &&
                 setPopupState({
                   view: "txAdd",
                   txAddState: {
                     isTransfer: true,
-                    amountType: "Inflow",
-                    accountId: account.id
+                    amountType: "Outflow",
+                    payee: {
+                      id: account.transfer_payee_id,
+                      name: account.name,
+                      transferId: account.id
+                    }
                   }
                 })
               }
