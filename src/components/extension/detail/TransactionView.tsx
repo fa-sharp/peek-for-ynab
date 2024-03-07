@@ -1,7 +1,7 @@
+import { Flag3 } from "tabler-icons-react";
 import * as ynab from "ynab";
 
 import { CurrencyView, TxStatusIcon } from "~components";
-import { flagColorToEmoji } from "~lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
@@ -28,7 +28,14 @@ export default function TransactionView({
     <div className="tx-display">
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row">
-          {tx.flag_color && flagColorToEmoji(tx.flag_color)}
+          {tx.flag_color && (
+            <Flag3
+              aria-label={`${tx.flag_color} flag`}
+              fill={tx.flag_color}
+              stroke={tx.flag_color}
+              size={18}
+            />
+          )}
           <div>{dateFormatter.format(date)}</div>
           <div className="hide-overflow">{tx.payee_name}</div>
         </div>
