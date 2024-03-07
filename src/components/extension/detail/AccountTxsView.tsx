@@ -121,20 +121,41 @@ const AccountTxsView = () => {
           </div>
         )}
       </div>
-      <div className="flex-row justify-between gap-lg mb-lg">
-        <h3 className="heading-medium">Activity</h3>
-        <div className="flex-row">
-          Actions:
-          <IconButton
-            rounded
-            accent
-            label="Add transaction"
-            icon={<AddTransactionIcon />}
+      <div className="flex-row mb-lg">
+        <button
+          className="button rounded accent flex-row"
+          onClick={() =>
+            setPopupState({
+              view: "txAdd",
+              txAddState: {
+                accountId: account.id,
+                returnTo: {
+                  view: "detail",
+                  detailState: {
+                    type: "account",
+                    id: account.id
+                  }
+                }
+              }
+            })
+          }>
+          <AddTransactionIcon /> Transaction
+        </button>
+        {account.type === AccountType.CreditCard ||
+        account.type === AccountType.LineOfCredit ? (
+          <button
+            className="button rounded accent flex-row"
             onClick={() =>
               setPopupState({
                 view: "txAdd",
                 txAddState: {
+                  amountType: "Inflow",
+                  amount:
+                    ccpCategory && ccpCategory.balance >= 0
+                      ? millisToStringValue(ccpCategory.balance)
+                      : undefined,
                   accountId: account.id,
+                  isTransfer: true,
                   returnTo: {
                     view: "detail",
                     detailState: {
@@ -144,97 +165,65 @@ const AccountTxsView = () => {
                   }
                 }
               })
-            }
-          />
-          {account.type === AccountType.CreditCard ||
-          account.type === AccountType.LineOfCredit ? (
-            <IconButton
-              rounded
-              accent
-              label="Add credit card payment"
-              icon={<AddCCPaymentIcon />}
-              onClick={() =>
-                setPopupState({
-                  view: "txAdd",
-                  txAddState: {
-                    amountType: "Inflow",
-                    amount:
-                      ccpCategory && ccpCategory.balance >= 0
-                        ? millisToStringValue(ccpCategory.balance)
-                        : undefined,
-                    accountId: account.id,
-                    isTransfer: true,
-                    returnTo: {
-                      view: "detail",
-                      detailState: {
-                        type: "account",
-                        id: account.id
-                      }
+            }>
+            <AddCCPaymentIcon /> Payment
+          </button>
+        ) : account.type === AccountType.AutoLoan ||
+          account.type === AccountType.MedicalDebt ||
+          account.type === AccountType.Mortgage ||
+          account.type === AccountType.OtherDebt ||
+          account.type === AccountType.PersonalLoan ||
+          account.type === AccountType.StudentLoan ? (
+          <button
+            className="button rounded accent flex-row"
+            onClick={() =>
+              account.transfer_payee_id &&
+              setPopupState({
+                view: "txAdd",
+                txAddState: {
+                  isTransfer: true,
+                  amountType: "Outflow",
+                  payee: {
+                    id: account.transfer_payee_id,
+                    name: account.name,
+                    transferId: account.id
+                  },
+                  returnTo: {
+                    view: "detail",
+                    detailState: {
+                      type: "account",
+                      id: account.id
                     }
                   }
-                })
-              }
-            />
-          ) : account.type === AccountType.AutoLoan ||
-            account.type === AccountType.MedicalDebt ||
-            account.type === AccountType.Mortgage ||
-            account.type === AccountType.OtherDebt ||
-            account.type === AccountType.PersonalLoan ||
-            account.type === AccountType.StudentLoan ? (
-            <IconButton
-              rounded
-              accent
-              label="Add payment/transfer"
-              icon={<AddTransferIcon />}
-              onClick={() =>
-                account.transfer_payee_id &&
-                setPopupState({
-                  view: "txAdd",
-                  txAddState: {
-                    isTransfer: true,
-                    amountType: "Outflow",
-                    payee: {
-                      id: account.transfer_payee_id,
-                      name: account.name,
-                      transferId: account.id
-                    },
-                    returnTo: {
-                      view: "detail",
-                      detailState: {
-                        type: "account",
-                        id: account.id
-                      }
+                }
+              })
+            }>
+            <AddTransferIcon /> Payment/transfer
+          </button>
+        ) : (
+          <button
+            className="button rounded accent flex-row"
+            onClick={() =>
+              setPopupState({
+                view: "txAdd",
+                txAddState: {
+                  accountId: account.id,
+                  isTransfer: true,
+                  returnTo: {
+                    view: "detail",
+                    detailState: {
+                      type: "account",
+                      id: account.id
                     }
                   }
-                })
-              }
-            />
-          ) : (
-            <IconButton
-              rounded
-              accent
-              label="Add transfer"
-              icon={<AddTransferIcon />}
-              onClick={() =>
-                setPopupState({
-                  view: "txAdd",
-                  txAddState: {
-                    accountId: account.id,
-                    isTransfer: true,
-                    returnTo: {
-                      view: "detail",
-                      detailState: {
-                        type: "account",
-                        id: account.id
-                      }
-                    }
-                  }
-                })
-              }
-            />
-          )}
-        </div>
+                }
+              })
+            }>
+            <AddTransferIcon /> Transfer
+          </button>
+        )}
       </div>
+      <h3 className="heading-medium">Activity</h3>
       {!accountTxs ? (
         <div>Loading transactions...</div>
       ) : (
