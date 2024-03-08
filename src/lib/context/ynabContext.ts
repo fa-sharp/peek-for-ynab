@@ -3,7 +3,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, getXDaysAgoISO } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -194,16 +194,22 @@ const useYNABProvider = () => {
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
-  const useGetAccountTxs = (accountId?: string) =>
+  const useGetAccountTxs = (accountId?: string, sinceDaysAgo?: number) =>
     useQuery({
       enabled: !!accountId,
-      queryKey: ["txs", { budgetId: selectedBudgetId, accountId }],
+      queryKey: ["txs", { budgetId: selectedBudgetId, accountId, sinceDaysAgo }] as const,
+      placeholderData: (prevData, prevQuery) => {
+        if (prevQuery?.queryKey[1].accountId === accountId && prevData) return prevData;
+        return null;
+      },
       queryFn: async () => {
         if (!ynabAPI || !accountId) return null;
         const response = await ynabAPI.transactions.getTransactionsByAccount(
           selectedBudgetId,
           accountId,
-          ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
+          sinceDaysAgo
+            ? getXDaysAgoISO(sinceDaysAgo)
+            : ynab.utils.getCurrentMonthInISOFormat()
         );
         const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
         IS_DEV && console.log("Fetched account transactions!", txs);
@@ -211,16 +217,25 @@ const useYNABProvider = () => {
       }
     });
 
-  const useGetCategoryTxs = (categoryId?: string) =>
+  const useGetCategoryTxs = (categoryId?: string, sinceDaysAgo?: number) =>
     useQuery({
       enabled: !!categoryId,
-      queryKey: ["txs", { budgetId: selectedBudgetId, categoryId }],
+      queryKey: [
+        "txs",
+        { budgetId: selectedBudgetId, categoryId, sinceDaysAgo }
+      ] as const,
+      placeholderData: (prevData, prevQuery) => {
+        if (prevQuery?.queryKey[1].categoryId === categoryId && prevData) return prevData;
+        return null;
+      },
       queryFn: async () => {
         if (!ynabAPI || !categoryId) return null;
         const response = await ynabAPI.transactions.getTransactionsByCategory(
           selectedBudgetId,
           categoryId,
-          ynab.utils.getCurrentMonthInISOFormat() // since beginning of this month
+          sinceDaysAgo
+            ? getXDaysAgoISO(sinceDaysAgo)
+            : ynab.utils.getCurrentMonthInISOFormat()
         );
         const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
         IS_DEV && console.log("Fetched category transactions!", txs);

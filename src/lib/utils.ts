@@ -57,6 +57,12 @@ export const getTodaysDateISO = () => {
   return date.toISOString().substring(0, 10);
 };
 
+export const getXDaysAgoISO = (days: number) => {
+  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().substring(0, 10);
+};
+
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
   //@ts-expect-error shut up TS!

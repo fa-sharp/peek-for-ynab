@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ArrowBack, ExternalLink } from "tabler-icons-react";
 import { AccountType } from "ynab";
 
@@ -20,14 +20,12 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 
 const AccountTxsView = () => {
   const { settings, selectedBudgetId, popupState, setPopupState } = useStorageContext();
-  const { useGetAccountTxs, accountsData, categoriesData, selectedBudgetData } =
-    useYNABContext();
+  const { accountsData, categoriesData, selectedBudgetData } = useYNABContext();
 
   const account = useMemo(
     () => accountsData?.find((a) => a.id === popupState.detailState?.id),
     [accountsData, popupState.detailState?.id]
   );
-  const { data: accountTxs } = useGetAccountTxs(popupState.detailState?.id);
 
   /** The corresponding CCP categoroy, if this is a credit card account */
   const ccpCategory = useMemo(
@@ -53,7 +51,7 @@ const AccountTxsView = () => {
   if (!account || !selectedBudgetData) return <div>Loading...</div>;
 
   return (
-    <div>
+    <section style={{ minWidth: 280 }}>
       <div className="flex-row justify-between mb-sm">
         <h2 className="heading-big">
           {account.name}
@@ -223,8 +221,27 @@ const AccountTxsView = () => {
           </button>
         )}
       </div>
-      <h3 className="heading-medium">Activity</h3>
-      {!accountTxs ? (
+      <AccountActivityView key={account.id} accountId={account.id} />
+    </section>
+  );
+};
+
+export default AccountTxsView;
+
+const AccountActivityView = ({ accountId }: { accountId: string }) => {
+  const { setPopupState } = useStorageContext();
+  const { useGetAccountTxs, selectedBudgetData } = useYNABContext();
+
+  const [sinceDaysAgo, setSinceDaysAgo] = useState(15);
+  const { data: accountTxs, isFetching: isFetchingTxs } = useGetAccountTxs(
+    accountId,
+    sinceDaysAgo
+  );
+
+  return (
+    <>
+      <h3 className="heading-medium mb-sm">Transactions</h3>
+      {!accountTxs || !selectedBudgetData ? (
         <div>Loading transactions...</div>
       ) : (
         <ul className="list flex-col gap-sm">
@@ -252,8 +269,20 @@ const AccountTxsView = () => {
           ))}
         </ul>
       )}
-    </div>
+      {accountTxs && (
+        <div className="flex-row font-small mt-md">
+          {sinceDaysAgo !== 31 ? (
+            <>
+              <div>(Showing up to 15 days ago)</div>
+              <button className="button gray rounded" onClick={() => setSinceDaysAgo(31)}>
+                Show more
+              </button>
+            </>
+          ) : sinceDaysAgo === 31 && isFetchingTxs ? (
+            <div>(Loading more...)</div>
+          ) : null}
+        </div>
+      )}
+    </>
   );
 };
-
-export default AccountTxsView;
