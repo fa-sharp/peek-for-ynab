@@ -57,7 +57,7 @@ export const getTodaysDateISO = () => {
   return date.toISOString().substring(0, 10);
 };
 
-export const getXDaysAgoISO = (days: number) => {
+export const getNDaysAgoISO = (days: number) => {
   const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return date.toISOString().substring(0, 10);

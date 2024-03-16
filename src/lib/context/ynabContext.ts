@@ -3,7 +3,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS, getXDaysAgoISO } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, getNDaysAgoISO } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -208,7 +208,7 @@ const useYNABProvider = () => {
           selectedBudgetId,
           accountId,
           sinceDaysAgo
-            ? getXDaysAgoISO(sinceDaysAgo)
+            ? getNDaysAgoISO(sinceDaysAgo)
             : ynab.utils.getCurrentMonthInISOFormat()
         );
         const txs = response.data.transactions.sort((a, b) =>
@@ -236,7 +236,7 @@ const useYNABProvider = () => {
           selectedBudgetId,
           categoryId,
           sinceDaysAgo
-            ? getXDaysAgoISO(sinceDaysAgo)
+            ? getNDaysAgoISO(sinceDaysAgo)
             : ynab.utils.getCurrentMonthInISOFormat()
         );
         const txs = response.data.transactions.sort((a, b) =>
