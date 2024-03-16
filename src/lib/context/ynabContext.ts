@@ -211,7 +211,9 @@ const useYNABProvider = () => {
             ? getXDaysAgoISO(sinceDaysAgo)
             : ynab.utils.getCurrentMonthInISOFormat()
         );
-        const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
+        const txs = response.data.transactions.sort((a, b) =>
+          a.date <= b.date ? 1 : -1
+        );
         IS_DEV && console.log("Fetched account transactions!", txs);
         return txs;
       }
@@ -237,7 +239,9 @@ const useYNABProvider = () => {
             ? getXDaysAgoISO(sinceDaysAgo)
             : ynab.utils.getCurrentMonthInISOFormat()
         );
-        const txs = response.data.transactions.sort((a, b) => (a.date < b.date ? 1 : -1));
+        const txs = response.data.transactions.sort((a, b) =>
+          a.date <= b.date ? 1 : -1
+        );
         IS_DEV && console.log("Fetched category transactions!", txs);
         return txs;
       }
