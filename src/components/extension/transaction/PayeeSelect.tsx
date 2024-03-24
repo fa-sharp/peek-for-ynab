@@ -11,6 +11,7 @@ interface Props {
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
   disabled?: boolean;
+  required?: boolean;
 }
 
 function getFilter(inputValue?: string) {
@@ -23,7 +24,12 @@ function estimateSize() {
   return 22;
 }
 
-export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
+export default function PayeeSelect({
+  payees,
+  selectPayee,
+  disabled,
+  required = true
+}: Props) {
   const [payeeList, setPayeeList] = useState(() => {
     if (!payees) return [];
     return [...payees.filter((payee) => payee.transferId == null)];
@@ -75,7 +81,7 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
       <div className="flex-col">
-        <input required {...getInputProps()} disabled={disabled} />
+        <input required={required} {...getInputProps()} disabled={disabled} />
         <ul
           className={clsx("select-dropdown-list", { rounded: isOpen })}
           {...getMenuProps({ ref: listRef })}>

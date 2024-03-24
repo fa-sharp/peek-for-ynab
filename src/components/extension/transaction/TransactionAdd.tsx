@@ -39,6 +39,15 @@ export default function TransactionAdd() {
       category: Category | null;
     }>
   >([{ amount: "", amountType: "Outflow", payee: null, category: null }]);
+  const onAddSubTx = () => {
+    setSubTxs((prev) => [
+      ...prev,
+      { amount: "", amountType: "Outflow", payee: null, category: null }
+    ]);
+  };
+  const onRemoveSubTx = () => {
+    setSubTxs((prev) => prev.slice(0, -1));
+  };
 
   const [isTransfer, setIsTransfer] = useState(
     popupState.txAddState?.isTransfer ?? false
@@ -148,13 +157,27 @@ export default function TransactionAdd() {
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
-        category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
+        category_id:
+          !isTransfer || (isBudgetToTrackingTransfer && !isSplit)
+            ? category?.id
+            : undefined,
         cleared: cleared
           ? TransactionClearedStatus.Cleared
           : TransactionClearedStatus.Uncleared,
         approved: settings?.txApproved,
         memo,
-        flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined
+        flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined,
+        subtransactions: isSplit
+          ? subTxs.map((subTx) => ({
+              amount: Math.round(
+                +subTx.amount * (subTx.amountType === "Outflow" ? -1000 : 1000)
+              ),
+              category_id: subTx.category?.id,
+              payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
+              payee_name:
+                subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name
+            }))
+          : undefined
       });
       setPopupState({ view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -188,43 +211,59 @@ export default function TransactionAdd() {
               />
             )}
           </label>
-          <label className="flex-row">
-            Transfer/Payment?
-            {isTransfer ? (
-              <IconButton
-                label="Transfer (click to switch)"
-                icon={<Check color="var(--currency-green)" />}
-                onClick={() => setIsTransfer(false)}
-              />
-            ) : (
-              <IconButton
-                label="Not a transfer (click to switch)"
-                icon={<Check color="#aaa" />}
-                onClick={() => setIsTransfer(true)}
-              />
-            )}
-          </label>
+          {!isSplit && (
+            <label className="flex-row">
+              Transfer/Payment?
+              {isTransfer ? (
+                <IconButton
+                  label="Transfer (click to switch)"
+                  icon={<Check color="var(--currency-green)" />}
+                  onClick={() => setIsTransfer(false)}
+                />
+              ) : (
+                <IconButton
+                  label="Not a transfer (click to switch)"
+                  icon={<Check color="#aaa" />}
+                  onClick={() => setIsTransfer(true)}
+                />
+              )}
+            </label>
+          )}
         </div>
         {isSplit ? (
           <>
+            <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
             <div className="heading-medium balance-display">
               Total Amount:
               <CurrencyView
-                milliUnits={50000}
-                colorsEnabled
-                animationEnabled
+                milliUnits={subTxs.reduce(
+                  (sum, tx) =>
+                    sum +
+                    Math.round(+tx.amount * (tx.amountType === "Outflow" ? -1000 : 1000)),
+                  0
+                )}
                 currencyFormat={selectedBudgetData?.currencyFormat}
+                colorsEnabled
               />
             </div>
             {subTxs.map((subTx, idx) => (
               <SubTransaction
                 key={idx}
                 amount={subTx.amount}
+                amountType={subTx.amountType}
                 setAmount={(newAmount) =>
                   setSubTxs((prev) =>
                     prev.with(idx, {
                       ...prev[idx],
                       amount: newAmount
+                    })
+                  )
+                }
+                setAmountType={(newAmountType) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      amountType: newAmountType
                     })
                   )
                 }
@@ -246,6 +285,30 @@ export default function TransactionAdd() {
                 }
               />
             ))}
+            <button type="button" className="button accent rounded" onClick={onAddSubTx}>
+              Add split
+            </button>
+            {subTxs.length > 1 && (
+              <button
+                type="button"
+                className="button warn rounded"
+                onClick={onRemoveSubTx}>
+                Remove split
+              </button>
+            )}
+            <AccountSelect
+              ref={accountRef}
+              currentAccount={account}
+              accounts={accountsData}
+              selectAccount={(selectedAccount) => {
+                setAccount(selectedAccount);
+                if (selectedAccount) {
+                  memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
+                }
+              }}
+              disabled={isSaving}
+            />
           </>
         ) : (
           <>

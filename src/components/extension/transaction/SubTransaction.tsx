@@ -1,16 +1,18 @@
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { MouseEventHandler } from "react";
 import { Minus, Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 
 import { CategorySelect, IconButton, PayeeSelect } from "../..";
 
 interface Props {
   amount: string;
+  amountType: "Inflow" | "Outflow";
   setAmount: (amount: string) => void;
+  setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
   setCategory: (category: Category | null) => void;
 }
@@ -18,30 +20,34 @@ interface Props {
 /** Form that lets user add a transaction. */
 export default function SubTransaction({
   amount,
+  amountType,
   setAmount,
+  setAmountType,
   setPayee,
   setCategory
 }: Props) {
   const { categoriesData, payeesData } = useYNABContext();
-  const { popupState } = useStorageContext();
 
-  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    popupState.txAddState?.amountType || "Outflow"
-  );
+  const amountFieldId = useId();
+
+  const [showPayee, setShowPayee] = useState(false);
 
   const categoryRef = useRef<HTMLInputElement>(null);
 
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
-    setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
+    setAmountType(amountType === "Inflow" ? "Outflow" : "Inflow");
   };
 
   return (
-    <section style={{ minWidth: 240 }}>
-      <div className="heading-big">
-        <div role="heading">Add Transaction</div>
-      </div>
-      <label className="form-input" htmlFor="amount-input">
+    <section
+      className="flex-col gap-xs"
+      style={{
+        paddingBottom: "var(--spacing-lg)",
+        borderBottom: "solid 1px var(--border)",
+        fontSize: ".95em"
+      }}>
+      <label className="form-input" htmlFor={amountFieldId}>
         Amount
         <div className="flex-row">
           <IconButton
@@ -56,7 +62,7 @@ export default function SubTransaction({
             onClick={flipAmountType}
           />
           <input
-            id="amount-input"
+            id={amountFieldId}
             required
             autoFocus
             aria-label="Amount"
@@ -71,11 +77,14 @@ export default function SubTransaction({
           />
         </div>
       </label>
-      <PayeeSelect payees={payeesData} selectPayee={setPayee} />
+      {showPayee && (
+        <PayeeSelect payees={payeesData} selectPayee={setPayee} required={false} />
+      )}
       <CategorySelect
         ref={categoryRef}
         categories={categoriesData}
         selectCategory={setCategory}
+        placeholder=""
       />
     </section>
   );
