@@ -346,7 +346,7 @@ export default function TransactionAdd() {
                 </button>
               )}
             </div>
-            <div className="heading-medium balance-display">
+            <div className="heading-medium balance-display mt-md">
               Total Amount:
               <CurrencyView
                 milliUnits={totalSubTxsAmount}
@@ -425,10 +425,14 @@ export default function TransactionAdd() {
                   else memoRef.current?.focus();
                 }
               }}
-              label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+              label={
+                (!isSplit ? amountType === "Outflow" : totalSubTxsAmount <= 0)
+                  ? "Payee (To)"
+                  : "Payee (From)"
+              }
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && !isSplit && (
+            {!isSplit && isBudgetToTrackingTransfer && (
               <CategorySelect
                 ref={categoryRef}
                 initialCategory={category}
@@ -460,7 +464,11 @@ export default function TransactionAdd() {
                   if (selectedAccount.type === "cash") setCleared(true);
                 }
               }}
-              label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
+              label={
+                (!isSplit ? amountType === "Outflow" : totalSubTxsAmount <= 0)
+                  ? "Account (From)"
+                  : "Account (To)"
+              }
               disabled={isSaving}
             />
           </>

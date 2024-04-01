@@ -35,6 +35,7 @@ export default function SubTransaction({
   const [showPayee, setShowPayee] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
 
+  const payeeRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLInputElement>(null);
   const memoRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +49,7 @@ export default function SubTransaction({
       className="flex-col gap-sm"
       style={{
         paddingBottom: "var(--spacing-lg)",
-        borderBottom: "solid 2px var(--border)"
+        borderBottom: "solid 3px var(--border)"
       }}>
       <label className="form-input" htmlFor={amountFieldId}>
         Amount
@@ -81,7 +82,12 @@ export default function SubTransaction({
         </div>
       </label>
       {showPayee && (
-        <PayeeSelect payees={payeesData} selectPayee={setPayee} required={false} />
+        <PayeeSelect
+          ref={payeeRef}
+          payees={payeesData}
+          selectPayee={setPayee}
+          required={false}
+        />
       )}
       <CategorySelect
         ref={categoryRef}
@@ -103,7 +109,10 @@ export default function SubTransaction({
         {!showPayee && (
           <button
             className="button gray rounded flex-row gap-xs"
-            onClick={() => setShowPayee(true)}>
+            onClick={() => {
+              setShowPayee(true);
+              setTimeout(() => payeeRef.current?.focus(), 50);
+            }}>
             <Plus size={12} /> Payee
           </button>
         )}

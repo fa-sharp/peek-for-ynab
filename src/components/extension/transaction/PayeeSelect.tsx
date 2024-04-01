@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { useCallback, useRef, useState } from "react";
+import { type ForwardedRef, forwardRef, useCallback, useRef, useState } from "react";
 
 import type { CachedPayee } from "~lib/context/ynabContext";
 import { searchWithinString } from "~lib/utils";
@@ -24,12 +24,10 @@ function estimateSize() {
   return 22;
 }
 
-export default function PayeeSelect({
-  payees,
-  selectPayee,
-  disabled,
-  required = true
-}: Props) {
+function PayeeSelect(
+  { payees, selectPayee, disabled, required = true }: Props,
+  ref: ForwardedRef<HTMLInputElement | null>
+) {
   const [payeeList, setPayeeList] = useState(() => {
     if (!payees) return [];
     return [...payees.filter((payee) => payee.transferId == null)];
@@ -81,7 +79,7 @@ export default function PayeeSelect({
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
       <div className="flex-col">
-        <input required={required} {...getInputProps()} disabled={disabled} />
+        <input required={required} {...getInputProps({ ref })} disabled={disabled} />
         <ul
           className={clsx("select-dropdown-list", { rounded: isOpen })}
           {...getMenuProps({ ref: listRef })}>
@@ -118,3 +116,5 @@ export default function PayeeSelect({
     </div>
   );
 }
+
+export default forwardRef(PayeeSelect);
