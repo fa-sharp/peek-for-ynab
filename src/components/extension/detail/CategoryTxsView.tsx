@@ -65,33 +65,28 @@ const CategoryTxsView = () => {
           />
         </div>
       </div>
-      <div className="flex-row justify-between gap-lg mb-sm">
-        <h3 className="heading-medium">Activity</h3>
-        <div className="flex-row">
-          Actions:{" "}
-          <IconButton
-            rounded
-            accent
-            label="Add transaction"
-            icon={<AddTransactionIcon />}
-            onClick={() =>
-              setPopupState({
-                view: "txAdd",
-                txAddState: {
-                  categoryId: category.id,
-                  returnTo: {
-                    view: "detail",
-                    detailState: {
-                      type: "category",
-                      id: category.id
-                    }
+      <div className="flex-row mb-lg">
+        <button
+          className="button rounded accent flex-row"
+          onClick={() =>
+            setPopupState({
+              view: "txAdd",
+              txAddState: {
+                categoryId: category.id,
+                returnTo: {
+                  view: "detail",
+                  detailState: {
+                    type: "category",
+                    id: category.id
                   }
                 }
-              })
-            }
-          />
-        </div>
+              }
+            })
+          }>
+          <AddTransactionIcon /> Transaction
+        </button>
       </div>
+      <h3 className="heading-medium mb-sm">Activity</h3>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
       ) : (
