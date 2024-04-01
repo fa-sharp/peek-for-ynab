@@ -48,8 +48,7 @@ export default function SubTransaction({
       className="flex-col gap-sm"
       style={{
         paddingBottom: "var(--spacing-lg)",
-        borderBottom: "solid 1px var(--border)",
-        fontSize: ".9em"
+        borderBottom: "solid 2px var(--border)"
       }}>
       <label className="form-input" htmlFor={amountFieldId}>
         Amount
