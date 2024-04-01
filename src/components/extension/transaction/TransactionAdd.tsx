@@ -286,6 +286,7 @@ export default function TransactionAdd() {
             {subTxs.map((subTx, idx) => (
               <SubTransaction
                 key={idx}
+                splitIndex={idx}
                 amount={subTx.amount}
                 amountType={subTx.amountType}
                 setAmount={(newAmount) =>

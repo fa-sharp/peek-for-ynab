@@ -9,6 +9,7 @@ import type { CachedPayee } from "~lib/context/ynabContext";
 import { CategorySelect, IconButton, PayeeSelect } from "../..";
 
 interface Props {
+  splitIndex: number;
   amount: string;
   amountType: "Inflow" | "Outflow";
   setAmount: (amount: string) => void;
@@ -20,6 +21,7 @@ interface Props {
 
 /** Form that lets user add a transaction. */
 export default function SubTransaction({
+  splitIndex,
   amount,
   amountType,
   setAmount,
@@ -46,6 +48,7 @@ export default function SubTransaction({
 
   return (
     <section
+      aria-label={`Split ${splitIndex + 1}`}
       className="flex-col gap-sm"
       style={{
         paddingBottom: "var(--spacing-lg)",
@@ -108,22 +111,24 @@ export default function SubTransaction({
       <div className="flex-row">
         {!showPayee && (
           <button
+            type="button"
             className="button gray rounded flex-row gap-xs"
             onClick={() => {
               setShowPayee(true);
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
-            <Plus size={12} /> Payee
+            <Plus aria-label="Add" size={12} /> Payee
           </button>
         )}
         {!showMemo && (
           <button
+            type="button"
             className="button gray rounded flex-row gap-xs"
             onClick={() => {
               setShowMemo(true);
               setTimeout(() => memoRef.current?.focus(), 50);
             }}>
-            <Plus size={12} /> Memo
+            <Plus aria-label="Add" size={12} /> Memo
           </button>
         )}
       </div>
