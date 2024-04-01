@@ -37,12 +37,15 @@ export default function TransactionAdd() {
       amountType: "Inflow" | "Outflow";
       payee: CachedPayee | { name: string } | null;
       category: Category | null;
+      memo?: string;
     }>
-  >([{ amount: "", amountType: "Outflow", payee: null, category: null }]);
+  >([
+    { amount: "", amountType: "Outflow", payee: null, category: null, memo: undefined }
+  ]);
   const onAddSubTx = () => {
     setSubTxs((prev) => [
       ...prev,
-      { amount: "", amountType: "Outflow", payee: null, category: null }
+      { amount: "", amountType: "Outflow", payee: null, category: null, memo: undefined }
     ]);
   };
   const onRemoveSubTx = () => {
@@ -155,6 +158,10 @@ export default function TransactionAdd() {
         setErrorMessage("Can't transfer to the same account!");
         return;
       }
+      if (isSplit && !isBudgetToTrackingTransfer) {
+        setErrorMessage("This transfer can't be a split transaction!");
+        return;
+      }
     }
     setIsSaving(true);
     try {
@@ -186,7 +193,8 @@ export default function TransactionAdd() {
               category_id: subTx.category?.id,
               payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
               payee_name:
-                subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name
+                subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name,
+              memo: subTx.memo
             }))
           : undefined
       });
@@ -275,14 +283,6 @@ export default function TransactionAdd() {
           </label>
         ) : (
           <>
-            <div className="heading-medium balance-display">
-              Total Amount:
-              <CurrencyView
-                milliUnits={totalSubTxsAmount}
-                currencyFormat={selectedBudgetData?.currencyFormat}
-                colorsEnabled
-              />
-            </div>
             {subTxs.map((subTx, idx) => (
               <SubTransaction
                 key={idx}
@@ -320,6 +320,14 @@ export default function TransactionAdd() {
                     })
                   )
                 }
+                setMemo={(newMemo) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      memo: newMemo
+                    })
+                  )
+                }
               />
             ))}
             <div className="flex-row mt-md">
@@ -337,6 +345,14 @@ export default function TransactionAdd() {
                   Remove split
                 </button>
               )}
+            </div>
+            <div className="heading-medium balance-display">
+              Total Amount:
+              <CurrencyView
+                milliUnits={totalSubTxsAmount}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+                colorsEnabled
+              />
             </div>
           </>
         )}
@@ -412,7 +428,7 @@ export default function TransactionAdd() {
               label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
+            {isBudgetToTrackingTransfer && !isSplit && (
               <CategorySelect
                 ref={categoryRef}
                 initialCategory={category}

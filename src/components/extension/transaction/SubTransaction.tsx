@@ -15,6 +15,7 @@ interface Props {
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
   setCategory: (category: Category | null) => void;
+  setMemo: (memo: string) => void;
 }
 
 /** Form that lets user add a transaction. */
@@ -24,15 +25,18 @@ export default function SubTransaction({
   setAmount,
   setAmountType,
   setPayee,
-  setCategory
+  setCategory,
+  setMemo
 }: Props) {
   const { categoriesData, payeesData } = useYNABContext();
 
   const amountFieldId = useId();
 
   const [showPayee, setShowPayee] = useState(false);
+  const [showMemo, setShowMemo] = useState(false);
 
   const categoryRef = useRef<HTMLInputElement>(null);
+  const memoRef = useRef<HTMLInputElement>(null);
 
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
@@ -41,7 +45,7 @@ export default function SubTransaction({
 
   return (
     <section
-      className="flex-col gap-xs"
+      className="flex-col gap-sm"
       style={{
         paddingBottom: "var(--spacing-lg)",
         borderBottom: "solid 1px var(--border)",
@@ -86,6 +90,35 @@ export default function SubTransaction({
         selectCategory={setCategory}
         placeholder=""
       />
+      {showMemo && (
+        <label className="form-input">
+          Memo
+          <input
+            ref={memoRef}
+            autoComplete="off"
+            onChange={(e) => setMemo(e.target.value)}
+          />
+        </label>
+      )}
+      <div className="flex-row">
+        {!showPayee && (
+          <button
+            className="button gray rounded flex-row gap-xs"
+            onClick={() => setShowPayee(true)}>
+            <Plus size={12} /> Payee
+          </button>
+        )}
+        {!showMemo && (
+          <button
+            className="button gray rounded flex-row gap-xs"
+            onClick={() => {
+              setShowMemo(true);
+              setTimeout(() => memoRef.current?.focus(), 50);
+            }}>
+            <Plus size={12} /> Memo
+          </button>
+        )}
+      </div>
     </section>
   );
 }
