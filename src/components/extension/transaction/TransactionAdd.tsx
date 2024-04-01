@@ -121,6 +121,16 @@ export default function TransactionAdd() {
     setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
   };
 
+  const totalSubTxsAmount = useMemo(
+    () =>
+      subTxs.reduce(
+        (sum, tx) =>
+          sum + Math.round(+tx.amount * (tx.amountType === "Outflow" ? -1000 : 1000)),
+        0
+      ),
+    [subTxs]
+  );
+
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
     setErrorMessage("");
@@ -132,7 +142,7 @@ export default function TransactionAdd() {
       setErrorMessage("Please enter a payee!");
       return;
     }
-    if (!amount) {
+    if (!amount && !isSplit) {
       setErrorMessage("Please enter a valid amount!");
       return;
     }
@@ -150,15 +160,16 @@ export default function TransactionAdd() {
     try {
       await addTransaction({
         date,
-        amount:
-          amountType === "Outflow"
+        amount: isSplit
+          ? totalSubTxsAmount
+          : amountType === "Outflow"
             ? Math.round(+amount * -1000)
             : Math.round(+amount * 1000),
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
         category_id:
-          !isTransfer || (isBudgetToTrackingTransfer && !isSplit)
+          (!isTransfer || isBudgetToTrackingTransfer) && !isSplit
             ? category?.id
             : undefined,
         cleared: cleared
@@ -211,37 +222,63 @@ export default function TransactionAdd() {
               />
             )}
           </label>
-          {!isSplit && (
-            <label className="flex-row">
-              Transfer/Payment?
-              {isTransfer ? (
-                <IconButton
-                  label="Transfer (click to switch)"
-                  icon={<Check color="var(--currency-green)" />}
-                  onClick={() => setIsTransfer(false)}
-                />
-              ) : (
-                <IconButton
-                  label="Not a transfer (click to switch)"
-                  icon={<Check color="#aaa" />}
-                  onClick={() => setIsTransfer(true)}
-                />
-              )}
-            </label>
-          )}
+          <label className="flex-row">
+            Transfer/Payment?
+            {isTransfer ? (
+              <IconButton
+                label="Transfer (click to switch)"
+                icon={<Check color="var(--currency-green)" />}
+                onClick={() => setIsTransfer(false)}
+              />
+            ) : (
+              <IconButton
+                label="Not a transfer (click to switch)"
+                icon={<Check color="#aaa" />}
+                onClick={() => setIsTransfer(true)}
+              />
+            )}
+          </label>
         </div>
-        {isSplit ? (
+        {!isSplit ? (
+          <label className="form-input" htmlFor="amount-input">
+            Amount
+            <div className="flex-row">
+              <IconButton
+                label={`${
+                  amountType === "Inflow" ? "Inflow" : "Outflow"
+                } (Click to switch)`}
+                icon={
+                  amountType === "Inflow" ? (
+                    <Plus color="var(--currency-green)" />
+                  ) : (
+                    <Minus color="var(--currency-red)" />
+                  )
+                }
+                onClick={flipAmountType}
+              />
+              <input
+                id="amount-input"
+                required
+                autoFocus
+                aria-label="Amount"
+                type="number"
+                inputMode="decimal"
+                min="0.01"
+                step="0.001"
+                placeholder="0.00"
+                autoComplete="off"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                disabled={isSaving}
+              />
+            </div>
+          </label>
+        ) : (
           <>
-            <PayeeSelect payees={payeesData} selectPayee={setPayee} disabled={isSaving} />
             <div className="heading-medium balance-display">
               Total Amount:
               <CurrencyView
-                milliUnits={subTxs.reduce(
-                  (sum, tx) =>
-                    sum +
-                    Math.round(+tx.amount * (tx.amountType === "Outflow" ? -1000 : 1000)),
-                  0
-                )}
+                milliUnits={totalSubTxsAmount}
                 currencyFormat={selectedBudgetData?.currencyFormat}
                 colorsEnabled
               />
@@ -285,16 +322,52 @@ export default function TransactionAdd() {
                 }
               />
             ))}
-            <button type="button" className="button accent rounded" onClick={onAddSubTx}>
-              Add split
-            </button>
-            {subTxs.length > 1 && (
+            <div className="flex-row mt-md">
               <button
                 type="button"
-                className="button warn rounded"
-                onClick={onRemoveSubTx}>
-                Remove split
+                className="button accent rounded flex-1"
+                onClick={onAddSubTx}>
+                Add split
               </button>
+              {subTxs.length > 1 && (
+                <button
+                  type="button"
+                  className="button warn rounded flex-1"
+                  onClick={onRemoveSubTx}>
+                  Remove split
+                </button>
+              )}
+            </div>
+          </>
+        )}
+        {!isTransfer ? (
+          <>
+            <PayeeSelect
+              payees={payeesData}
+              selectPayee={(selectedPayee) => {
+                setPayee(selectedPayee);
+                if ("id" in selectedPayee) {
+                  if (!category && categoryRef.current) categoryRef.current.focus();
+                  else if (!account) accountRef.current?.focus();
+                  else memoRef.current?.focus();
+                }
+              }}
+              disabled={isSaving}
+            />
+            {!isSplit && (!account || account.on_budget) && (
+              <CategorySelect
+                ref={categoryRef}
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) {
+                    if (!account) accountRef.current?.focus();
+                    else memoRef.current?.focus();
+                  }
+                }}
+                disabled={isSaving}
+              />
             )}
             <AccountSelect
               ref={accountRef}
@@ -312,154 +385,71 @@ export default function TransactionAdd() {
           </>
         ) : (
           <>
-            <label className="form-input" htmlFor="amount-input">
-              Amount
-              <div className="flex-row">
-                <IconButton
-                  label={`${
-                    amountType === "Inflow" ? "Inflow" : "Outflow"
-                  } (Click to switch)`}
-                  icon={
-                    amountType === "Inflow" ? (
-                      <Plus color="var(--currency-green)" />
-                    ) : (
-                      <Minus color="var(--currency-red)" />
-                    )
-                  }
-                  onClick={flipAmountType}
-                />
-                <input
-                  id="amount-input"
-                  required
-                  autoFocus
-                  aria-label="Amount"
-                  type="number"
-                  inputMode="decimal"
-                  min="0.01"
-                  step="0.001"
-                  placeholder="0.00"
-                  autoComplete="off"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  disabled={isSaving}
-                />
-              </div>
-            </label>
-            {!isTransfer ? (
-              <>
-                <PayeeSelect
-                  payees={payeesData}
-                  selectPayee={(selectedPayee) => {
-                    setPayee(selectedPayee);
-                    if ("id" in selectedPayee) {
-                      if (!category && categoryRef.current) categoryRef.current.focus();
-                      else if (!account) accountRef.current?.focus();
-                      else memoRef.current?.focus();
-                    }
-                  }}
-                  disabled={isSaving}
-                />
-                {(!account || account.on_budget) && (
-                  <CategorySelect
-                    ref={categoryRef}
-                    initialCategory={category}
-                    categories={categoriesData}
-                    selectCategory={(selectedCategory) => {
-                      setCategory(selectedCategory);
-                      if (selectedCategory) {
-                        if (!account) accountRef.current?.focus();
-                        else memoRef.current?.focus();
-                      }
-                    }}
-                    disabled={isSaving}
-                  />
-                )}
-                <AccountSelect
-                  ref={accountRef}
-                  currentAccount={account}
-                  accounts={accountsData}
-                  selectAccount={(selectedAccount) => {
-                    setAccount(selectedAccount);
-                    if (selectedAccount) {
-                      memoRef.current?.focus();
-                      if (selectedAccount.type === "cash") setCleared(true);
-                    }
-                  }}
-                  disabled={isSaving}
-                />
-              </>
-            ) : (
-              <>
-                <AccountSelect
-                  accounts={accountsData}
-                  currentAccount={
-                    payee && "transferId" in payee
-                      ? accountsData?.find((a) => a.id === payee.transferId) || null
-                      : null
-                  }
-                  selectAccount={(selectedAccount) => {
-                    if (!selectedAccount || !selectedAccount.transfer_payee_id) {
-                      setPayee(null);
-                      return;
-                    }
-                    setPayee({
-                      id: selectedAccount.transfer_payee_id,
-                      name: selectedAccount.name,
-                      transferId: selectedAccount.id
-                    });
-                    if (selectedAccount) {
-                      if (!account) accountRef.current?.focus();
-                      else if (
-                        !selectedAccount.on_budget &&
-                        account.on_budget &&
-                        !category
-                      )
-                        setTimeout(() => categoryRef.current?.focus(), 50);
-                      else memoRef.current?.focus();
-                    }
-                  }}
-                  label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
-                  disabled={isSaving}
-                />
-                {isBudgetToTrackingTransfer && (
-                  <CategorySelect
-                    ref={categoryRef}
-                    initialCategory={category}
-                    categories={categoriesData}
-                    selectCategory={(selectedCategory) => {
-                      setCategory(selectedCategory);
-                      if (selectedCategory) memoRef.current?.focus();
-                    }}
-                    disabled={isSaving}
-                  />
-                )}
-                <AccountSelect
-                  ref={accountRef}
-                  currentAccount={account}
-                  accounts={accountsData}
-                  selectAccount={(selectedAccount) => {
-                    setAccount(selectedAccount);
-                    if (selectedAccount) {
-                      if (
-                        !category &&
-                        selectedAccount.on_budget &&
-                        payee &&
-                        "transferId" in payee &&
-                        accountsData?.find((a) => a.id === payee.transferId)
-                          ?.on_budget === false
-                      )
-                        setTimeout(() => categoryRef.current?.focus(), 50);
-                      else memoRef.current?.focus();
-                      if (selectedAccount.type === "cash") setCleared(true);
-                    }
-                  }}
-                  label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
-                  disabled={isSaving}
-                />
-              </>
+            <AccountSelect
+              accounts={accountsData}
+              currentAccount={
+                payee && "transferId" in payee
+                  ? accountsData?.find((a) => a.id === payee.transferId) || null
+                  : null
+              }
+              selectAccount={(selectedAccount) => {
+                if (!selectedAccount || !selectedAccount.transfer_payee_id) {
+                  setPayee(null);
+                  return;
+                }
+                setPayee({
+                  id: selectedAccount.transfer_payee_id,
+                  name: selectedAccount.name,
+                  transferId: selectedAccount.id
+                });
+                if (selectedAccount) {
+                  if (!account) accountRef.current?.focus();
+                  else if (!selectedAccount.on_budget && account.on_budget && !category)
+                    setTimeout(() => categoryRef.current?.focus(), 50);
+                  else memoRef.current?.focus();
+                }
+              }}
+              label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+              disabled={isSaving}
+            />
+            {isBudgetToTrackingTransfer && (
+              <CategorySelect
+                ref={categoryRef}
+                initialCategory={category}
+                categories={categoriesData}
+                selectCategory={(selectedCategory) => {
+                  setCategory(selectedCategory);
+                  if (selectedCategory) memoRef.current?.focus();
+                }}
+                disabled={isSaving}
+              />
             )}
+            <AccountSelect
+              ref={accountRef}
+              currentAccount={account}
+              accounts={accountsData}
+              selectAccount={(selectedAccount) => {
+                setAccount(selectedAccount);
+                if (selectedAccount) {
+                  if (
+                    !category &&
+                    selectedAccount.on_budget &&
+                    payee &&
+                    "transferId" in payee &&
+                    accountsData?.find((a) => a.id === payee.transferId)?.on_budget ===
+                      false
+                  )
+                    setTimeout(() => categoryRef.current?.focus(), 50);
+                  else memoRef.current?.focus();
+                  if (selectedAccount.type === "cash") setCleared(true);
+                }
+              }}
+              label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
+              disabled={isSaving}
+            />
           </>
         )}
+
         <label className="form-input" htmlFor="memo-input">
           Memo
           <div className="flex-row">

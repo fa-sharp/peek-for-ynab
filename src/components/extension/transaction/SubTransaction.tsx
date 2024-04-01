@@ -45,7 +45,7 @@ export default function SubTransaction({
       style={{
         paddingBottom: "var(--spacing-lg)",
         borderBottom: "solid 1px var(--border)",
-        fontSize: ".95em"
+        fontSize: ".9em"
       }}>
       <label className="form-input" htmlFor={amountFieldId}>
         Amount
