@@ -11,6 +11,7 @@ import SavedCategoriesView from "./extension/main/SavedCategoriesView";
 import AccountSelect from "./extension/transaction/AccountSelect";
 import CategorySelect from "./extension/transaction/CategorySelect";
 import PayeeSelect from "./extension/transaction/PayeeSelect";
+import SubTransaction from "./extension/transaction/SubTransaction";
 import TransactionAdd from "./extension/transaction/TransactionAdd";
 
 export {
@@ -29,5 +30,6 @@ export {
   BudgetSelect,
   IconButton,
   CurrencyView,
+  SubTransaction,
   TransactionAdd
 };

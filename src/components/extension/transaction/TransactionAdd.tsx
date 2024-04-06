@@ -20,9 +20,9 @@ import {
   CategorySelect,
   CurrencyView,
   IconButton,
-  PayeeSelect
+  PayeeSelect,
+  SubTransaction
 } from "../..";
-import SubTransaction from "./SubTransaction";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
