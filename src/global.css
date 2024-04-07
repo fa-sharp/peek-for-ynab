@@ -186,7 +186,7 @@ button:focus-visible {
   align-items: center;
   gap: var(--spacing-lg);
 
-  padding: 3px 4px;
+  padding: 3px 0px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {

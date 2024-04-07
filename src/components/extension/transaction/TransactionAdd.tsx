@@ -356,7 +356,7 @@ export default function TransactionAdd() {
                 </button>
               )}
             </div>
-            <div className="heading-medium balance-display mt-md">
+            <div className="heading-medium balance-display mt-sm mb-sm">
               Total Amount:
               <CurrencyView
                 milliUnits={totalSubTxsAmount}
