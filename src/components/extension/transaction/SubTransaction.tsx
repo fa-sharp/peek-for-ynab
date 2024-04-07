@@ -51,11 +51,7 @@ export default function SubTransaction({
   return (
     <section
       aria-label={`Split ${splitIndex + 1}`}
-      className="flex-col gap-sm"
-      style={{
-        paddingBottom: "var(--spacing-lg)",
-        borderBottom: "solid 2px var(--border)"
-      }}>
+      className="flex-col gap-sm pb-lg border-b">
       <label className="form-input" htmlFor={amountFieldId}>
         Amount
         <div className="flex-row">

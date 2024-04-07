@@ -222,12 +222,7 @@ export default function TransactionAdd() {
         <div role="heading">Add Transaction</div>
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
-        <div
-          className="flex-col gap-0"
-          style={{
-            paddingBottom: "var(--spacing-sm)",
-            borderBottom: "solid 2px var(--border)"
-          }}>
+        <div className="flex-col gap-0 pb-sm border-b">
           <label className="flex-row">
             Split transaction?
             {isSplit ? (
