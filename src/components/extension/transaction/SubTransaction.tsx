@@ -1,12 +1,11 @@
-import { useId, useRef, useState } from "react";
-import type { MouseEventHandler } from "react";
-import { Minus, Plus } from "tabler-icons-react";
+import { useRef, useState } from "react";
+import { Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
 import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 
-import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from "../..";
+import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
 interface Props {
   splitIndex: number;
@@ -34,8 +33,6 @@ export default function SubTransaction({
 }: Props) {
   const { accountsData, categoriesData, payeesData } = useYNABContext();
 
-  const amountFieldId = useId();
-
   const [showPayee, setShowPayee] = useState(false);
   const [showCategory, setShowCategory] = useState(true);
   const [showMemo, setShowMemo] = useState(false);
@@ -45,45 +42,16 @@ export default function SubTransaction({
   const categoryRef = useRef<HTMLInputElement>(null);
   const memoRef = useRef<HTMLInputElement>(null);
 
-  const flipAmountType: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setAmountType(amountType === "Inflow" ? "Outflow" : "Inflow");
-  };
-
   return (
     <section
       aria-label={`Split ${splitIndex + 1}`}
       className="flex-col gap-sm pb-lg border-b">
-      <label className="form-input" htmlFor={amountFieldId}>
-        Amount
-        <div className="flex-row">
-          <IconButton
-            label={`${amountType === "Inflow" ? "Inflow" : "Outflow"} (Click to switch)`}
-            icon={
-              amountType === "Inflow" ? (
-                <Plus color="var(--currency-green)" />
-              ) : (
-                <Minus color="var(--currency-red)" />
-              )
-            }
-            onClick={flipAmountType}
-          />
-          <input
-            id={amountFieldId}
-            required
-            autoFocus
-            aria-label="Amount"
-            type="number"
-            inputMode="decimal"
-            min="0.01"
-            step="0.001"
-            placeholder="0.00"
-            autoComplete="off"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-        </div>
-      </label>
+      <AmountField
+        amount={amount}
+        amountType={amountType}
+        setAmount={setAmount}
+        setAmountType={setAmountType}
+      />
       {showPayee &&
         (!isTransfer ? (
           <PayeeSelect

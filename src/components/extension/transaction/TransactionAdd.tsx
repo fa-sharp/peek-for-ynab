@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
-import type { FormEventHandler, MouseEventHandler } from "react";
+import type { FormEventHandler } from "react";
 import { useEffect } from "react";
-import { Check, CircleC, Minus, Plus, WorldWww } from "tabler-icons-react";
+import { Check, CircleC } from "tabler-icons-react";
 import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
@@ -17,9 +17,11 @@ import {
 
 import {
   AccountSelect,
+  AmountField,
   CategorySelect,
   CurrencyView,
   IconButton,
+  MemoField,
   PayeeSelect,
   SubTransaction
 } from "../..";
@@ -112,17 +114,6 @@ export default function TransactionAdd() {
     if (!transferToAccount) return false;
     return !transferToAccount.on_budget && account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
-
-  const onCopyURLIntoMemo = async () => {
-    if (!(await requestCurrentTabPermissions())) return;
-    const url = await executeScriptInCurrentTab(() => location.href);
-    setMemo((memo) => memo + url);
-  };
-
-  const flipAmountType: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
-  };
 
   const totalSubTxsAmount = useMemo(
     () =>
@@ -257,39 +248,12 @@ export default function TransactionAdd() {
           </label>
         </div>
         {!isSplit ? (
-          <label className="form-input" htmlFor="amount-input">
-            Amount
-            <div className="flex-row">
-              <IconButton
-                label={`${
-                  amountType === "Inflow" ? "Inflow" : "Outflow"
-                } (Click to switch)`}
-                icon={
-                  amountType === "Inflow" ? (
-                    <Plus color="var(--currency-green)" />
-                  ) : (
-                    <Minus color="var(--currency-red)" />
-                  )
-                }
-                onClick={flipAmountType}
-              />
-              <input
-                id="amount-input"
-                required
-                autoFocus
-                aria-label="Amount"
-                type="number"
-                inputMode="decimal"
-                min="0.01"
-                step="0.001"
-                placeholder="0.00"
-                autoComplete="off"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={isSaving}
-              />
-            </div>
-          </label>
+          <AmountField
+            amount={amount}
+            amountType={amountType}
+            setAmount={setAmount}
+            setAmountType={setAmountType}
+          />
         ) : (
           <>
             {subTxs.map((subTx, idx) => (
@@ -484,29 +448,13 @@ export default function TransactionAdd() {
             />
           </>
         )}
-
-        <label className="form-input" htmlFor="memo-input">
-          Memo
-          <div className="flex-row">
-            <input
-              ref={memoRef}
-              id="memo-input"
-              aria-label="Memo"
-              className="flex-grow"
-              autoComplete="off"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              disabled={isSaving}
-            />
-            {settings?.currentTabAccess && (
-              <IconButton
-                icon={<WorldWww strokeWidth={1} />}
-                label="Copy URL into memo field"
-                onClick={onCopyURLIntoMemo}
-              />
-            )}
-          </div>
-        </label>
+        <MemoField
+          ref={memoRef}
+          memo={memo}
+          setMemo={setMemo}
+          disabled={isSaving}
+          settings={settings}
+        />
         <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
             Status:
