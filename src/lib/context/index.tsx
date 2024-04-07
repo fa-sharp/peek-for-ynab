@@ -25,7 +25,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 60 * 5, // 30 seconds in prod, 5 minutes in dev
-      refetchOnWindowFocus: false, // don't refetch on window focus
       retry: 1, // only retry once if there's an error,
       persister: createIdbPersister("ynab", {
         predicate: ({ queryKey }) =>
