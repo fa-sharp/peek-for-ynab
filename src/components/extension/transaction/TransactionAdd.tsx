@@ -69,7 +69,7 @@ export default function TransactionAdd() {
       <form className="flex-col" onSubmit={onSaveTransaction}>
         <div className="flex-col gap-0 pb-sm border-b">
           <label className="flex-row">
-            Split transaction?
+            (BETA) Split transaction?
             {isSplit ? (
               <IconButton
                 label="Split (click to switch)"
