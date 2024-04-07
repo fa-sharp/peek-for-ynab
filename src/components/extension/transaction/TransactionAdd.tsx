@@ -163,6 +163,15 @@ export default function TransactionAdd() {
         return;
       }
     }
+    if (
+      isSplit &&
+      subTxs.some(
+        (tx) => tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id
+      )
+    ) {
+      setErrorMessage("Can't transfer to the same account!");
+      return;
+    }
     setIsSaving(true);
     try {
       await addTransaction({
@@ -213,7 +222,12 @@ export default function TransactionAdd() {
         <div role="heading">Add Transaction</div>
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
-        <div className="flex-col gap-0">
+        <div
+          className="flex-col gap-0"
+          style={{
+            paddingBottom: "var(--spacing-sm)",
+            borderBottom: "solid 2px var(--border)"
+          }}>
           <label className="flex-row">
             Split transaction?
             {isSplit ? (

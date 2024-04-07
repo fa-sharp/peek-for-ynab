@@ -6,7 +6,7 @@ import type { Category } from "ynab";
 import { useYNABContext } from "~lib/context";
 import type { CachedPayee } from "~lib/context/ynabContext";
 
-import { CategorySelect, IconButton, PayeeSelect } from "../..";
+import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from "../..";
 
 interface Props {
   splitIndex: number;
@@ -30,12 +30,14 @@ export default function SubTransaction({
   setCategory,
   setMemo
 }: Props) {
-  const { categoriesData, payeesData } = useYNABContext();
+  const { accountsData, categoriesData, payeesData } = useYNABContext();
 
   const amountFieldId = useId();
 
   const [showPayee, setShowPayee] = useState(false);
+  const [showCategory, setShowCategory] = useState(true);
   const [showMemo, setShowMemo] = useState(false);
+  const [isTransfer, setIsTransfer] = useState(false);
 
   const payeeRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLInputElement>(null);
@@ -52,7 +54,7 @@ export default function SubTransaction({
       className="flex-col gap-sm"
       style={{
         paddingBottom: "var(--spacing-lg)",
-        borderBottom: "solid 3px var(--border)"
+        borderBottom: "solid 2px var(--border)"
       }}>
       <label className="form-input" htmlFor={amountFieldId}>
         Amount
@@ -84,20 +86,47 @@ export default function SubTransaction({
           />
         </div>
       </label>
-      {showPayee && (
-        <PayeeSelect
-          ref={payeeRef}
-          payees={payeesData}
-          selectPayee={setPayee}
-          required={false}
+      {showPayee &&
+        (!isTransfer ? (
+          <PayeeSelect
+            ref={payeeRef}
+            payees={payeesData}
+            selectPayee={setPayee}
+            required={false}
+          />
+        ) : (
+          <AccountSelect
+            ref={payeeRef}
+            label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+            accounts={accountsData}
+            selectAccount={(account) => {
+              if (!account || !account.transfer_payee_id) {
+                setPayee(null);
+                setShowCategory(true);
+              } else {
+                setPayee({
+                  id: account.transfer_payee_id,
+                  name: account.name,
+                  transferId: account.id
+                });
+                if (account.on_budget) {
+                  setShowCategory(false);
+                  setCategory(null);
+                } else {
+                  setShowCategory(true);
+                }
+              }
+            }}
+          />
+        ))}
+      {showCategory && (
+        <CategorySelect
+          ref={categoryRef}
+          categories={categoriesData}
+          selectCategory={setCategory}
+          placeholder=""
         />
       )}
-      <CategorySelect
-        ref={categoryRef}
-        categories={categoriesData}
-        selectCategory={setCategory}
-        placeholder=""
-      />
       {showMemo && (
         <label className="form-input">
           Memo
@@ -118,6 +147,18 @@ export default function SubTransaction({
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
             <Plus aria-label="Add" size={12} /> Payee
+          </button>
+        )}
+        {!showPayee && (
+          <button
+            type="button"
+            className="button gray rounded flex-row gap-xs"
+            onClick={() => {
+              setShowPayee(true);
+              setIsTransfer(true);
+              setTimeout(() => payeeRef.current?.focus(), 50);
+            }}>
+            <Plus aria-label="Add" size={12} /> Transfer
           </button>
         )}
         {!showMemo && (
