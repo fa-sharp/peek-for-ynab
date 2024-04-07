@@ -133,7 +133,7 @@ export default function SubTransaction({
           />
         </label>
       )}
-      <div className="flex-row">
+      <div className="flex-row" style={{ fontSize: ".9em" }}>
         {!showPayee && (
           <button
             type="button"
@@ -143,6 +143,17 @@ export default function SubTransaction({
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
             <Plus aria-label="Add" size={12} /> Payee
+          </button>
+        )}
+        {!showMemo && (
+          <button
+            type="button"
+            className="button gray rounded flex-row gap-xs"
+            onClick={() => {
+              setShowMemo(true);
+              setTimeout(() => memoRef.current?.focus(), 50);
+            }}>
+            <Plus aria-label="Add" size={12} /> Memo
           </button>
         )}
         {!showPayee && (
@@ -155,17 +166,6 @@ export default function SubTransaction({
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
             <Plus aria-label="Add" size={12} /> Transfer
-          </button>
-        )}
-        {!showMemo && (
-          <button
-            type="button"
-            className="button gray rounded flex-row gap-xs"
-            onClick={() => {
-              setShowMemo(true);
-              setTimeout(() => memoRef.current?.focus(), 50);
-            }}>
-            <Plus aria-label="Add" size={12} /> Memo
           </button>
         )}
       </div>
