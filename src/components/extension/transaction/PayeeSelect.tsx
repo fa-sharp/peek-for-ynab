@@ -59,7 +59,7 @@ function PayeeSelect(
     onInputValueChange({ inputValue, selectedItem }) {
       setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
-      if (inputValue && (!selectedItem || inputValue !== selectedItem.name))
+      if (inputValue !== undefined && (!selectedItem || inputValue !== selectedItem.name))
         selectPayee({ name: inputValue });
     },
     onSelectedItemChange({ selectedItem }) {
