@@ -298,6 +298,7 @@ export default function TransactionAdd() {
                 splitIndex={idx}
                 amount={subTx.amount}
                 amountType={subTx.amountType}
+                allowTransfer={!isTransfer}
                 setAmount={(newAmount) =>
                   setSubTxs((prev) =>
                     prev.with(idx, {

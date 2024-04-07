@@ -12,6 +12,7 @@ interface Props {
   splitIndex: number;
   amount: string;
   amountType: "Inflow" | "Outflow";
+  allowTransfer?: boolean;
   setAmount: (amount: string) => void;
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
@@ -24,6 +25,7 @@ export default function SubTransaction({
   splitIndex,
   amount,
   amountType,
+  allowTransfer = true,
   setAmount,
   setAmountType,
   setPayee,
@@ -156,7 +158,7 @@ export default function SubTransaction({
             <Plus aria-label="Add" size={12} /> Memo
           </button>
         )}
-        {!showPayee && (
+        {!showPayee && allowTransfer && (
           <button
             type="button"
             className="button gray rounded flex-row gap-xs"
