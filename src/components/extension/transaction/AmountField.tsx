@@ -6,11 +6,18 @@ import IconButton from "~components/IconButton";
 type Props = {
   amount: string;
   amountType: "Inflow" | "Outflow";
+  disabled?: boolean;
   setAmount: (amount: string) => void;
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
 };
 
-const AmountField = ({ amount, amountType, setAmount, setAmountType }: Props) => {
+const AmountField = ({
+  amount,
+  amountType,
+  disabled,
+  setAmount,
+  setAmountType
+}: Props) => {
   const amountFieldId = useId();
   const flipAmountType: MouseEventHandler = (event) => {
     event.preventDefault();
@@ -45,6 +52,7 @@ const AmountField = ({ amount, amountType, setAmount, setAmountType }: Props) =>
           autoComplete="off"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          disabled={disabled}
         />
       </div>
     </label>
