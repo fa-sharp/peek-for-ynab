@@ -1,151 +1,65 @@
-import { useMemo, useRef, useState } from "react";
-import type { FormEventHandler, MouseEventHandler } from "react";
-import { useEffect } from "react";
-import { Check, CircleC, Minus, Plus, WorldWww } from "tabler-icons-react";
-import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
+import { useRef } from "react";
+import { Check, CircleC } from "tabler-icons-react";
+import { TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { CachedPayee } from "~lib/context/ynabContext";
-import {
-  IS_PRODUCTION,
-  executeScriptInCurrentTab,
-  flagColorToEmoji,
-  getTodaysDateISO,
-  parseLocaleNumber,
-  requestCurrentTabPermissions
-} from "~lib/utils";
+import useTransaction from "~lib/useTransaction";
+import { flagColorToEmoji, getTodaysDateISO } from "~lib/utils";
 
-import { AccountSelect, CategorySelect, IconButton, PayeeSelect } from "../..";
+import {
+  AccountSelect,
+  AmountField,
+  CategorySelect,
+  CurrencyView,
+  IconButton,
+  MemoField,
+  PayeeSelect,
+  SubTransaction
+} from "../..";
 
 /** Form that lets user add a transaction. */
 export default function TransactionAdd() {
-  const { accountsData, categoriesData, payeesData, addTransaction } = useYNABContext();
-  const { settings, popupState, setPopupState } = useStorageContext();
-
-  const [isTransfer, setIsTransfer] = useState(
-    popupState.txAddState?.isTransfer ?? false
-  );
-  const [date, setDate] = useState(getTodaysDateISO);
-  const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
-  const [cleared, setCleared] = useState(
-    () =>
-      accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
-        "cash" || !!settings?.txCleared
-  );
-  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    popupState.txAddState?.amountType || "Outflow"
-  );
-  const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    popupState.txAddState?.payee || null
-  );
-  const [category, setCategory] = useState(() => {
-    if (!popupState.txAddState?.categoryId) return null;
-    return (
-      categoriesData?.find((c) => c.id === popupState.txAddState?.categoryId) || null
-    );
-  });
-  const [account, setAccount] = useState(() => {
-    if (!popupState.txAddState?.accountId) return null;
-    return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
-  });
-  const [memo, setMemo] = useState("");
-  const [flag, setFlag] = useState("");
+  const { selectedBudgetData, accountsData, categoriesData, payeesData } =
+    useYNABContext();
+  const { settings, setPopupState } = useStorageContext();
 
   const categoryRef = useRef<HTMLInputElement>(null);
   const accountRef = useRef<HTMLInputElement>(null);
   const memoRef = useRef<HTMLInputElement>(null);
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  // Try parsing user's selection as the amount
-  useEffect(() => {
-    if (!settings?.currentTabAccess) return;
-    requestCurrentTabPermissions().then((granted) => {
-      if (!granted) return;
-      executeScriptInCurrentTab(() => getSelection()?.toString())
-        .then((selection) => {
-          if (!selection) return;
-          const parsedNumber = parseLocaleNumber(selection);
-          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
-        })
-        .catch((err) => {
-          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
-        });
-    });
-  }, [settings?.currentTabAccess]);
-
-  /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
-  const isBudgetToTrackingTransfer = useMemo(() => {
-    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
-    const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
-    if (!transferToAccount) return false;
-    return !transferToAccount.on_budget && account?.on_budget;
-  }, [account?.on_budget, accountsData, isTransfer, payee]);
-
-  const onCopyURLIntoMemo = async () => {
-    if (!(await requestCurrentTabPermissions())) return;
-    const url = await executeScriptInCurrentTab(() => location.href);
-    setMemo((memo) => memo + url);
-  };
-
-  const flipAmountType: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setAmountType((prev) => (prev === "Inflow" ? "Outflow" : "Inflow"));
-  };
-
-  const onSaveTransaction: FormEventHandler = async (event) => {
-    event.preventDefault();
-    setErrorMessage("");
-    if (!account) {
-      setErrorMessage("Please select an account!");
-      return;
-    }
-    if (!payee) {
-      setErrorMessage("Please enter a payee!");
-      return;
-    }
-    if (!amount) {
-      setErrorMessage("Please enter a valid amount!");
-      return;
-    }
-    if (isTransfer) {
-      if (!("transferId" in payee)) {
-        setErrorMessage("'To' account is not valid!");
-        return;
-      }
-      if (payee.transferId === account.id) {
-        setErrorMessage("Can't transfer to the same account!");
-        return;
-      }
-    }
-    setIsSaving(true);
-    try {
-      await addTransaction({
-        date,
-        amount:
-          amountType === "Outflow"
-            ? Math.round(+amount * -1000)
-            : Math.round(+amount * 1000),
-        payee_id: "id" in payee ? payee.id : undefined,
-        payee_name: "id" in payee ? undefined : payee.name,
-        account_id: account.id,
-        category_id: !isTransfer || isBudgetToTrackingTransfer ? category?.id : undefined,
-        cleared: cleared
-          ? TransactionClearedStatus.Cleared
-          : TransactionClearedStatus.Uncleared,
-        approved: settings?.txApproved,
-        memo,
-        flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined
-      });
-      setPopupState({ view: "main" });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error("Error while saving transaction: ", err);
-      setErrorMessage("Error adding transaction! " + (err?.error?.detail || ""));
-    }
-    setIsSaving(false);
-  };
+  const {
+    account,
+    amount,
+    amountType,
+    category,
+    cleared,
+    date,
+    errorMessage,
+    flag,
+    memo,
+    payee,
+    subTxs,
+    totalSubTxsAmount,
+    isSaving,
+    isSplit,
+    isTransfer,
+    isBudgetToTrackingTransfer,
+    onAddSubTx,
+    onRemoveSubTx,
+    onSaveTransaction,
+    setAccount,
+    setAmount,
+    setAmountType,
+    setCategory,
+    setCleared,
+    setDate,
+    setFlag,
+    setIsSplit,
+    setIsTransfer,
+    setMemo,
+    setPayee,
+    setSubTxs
+  } = useTransaction();
 
   return (
     <section style={{ minWidth: 240 }}>
@@ -153,55 +67,125 @@ export default function TransactionAdd() {
         <div role="heading">Add Transaction</div>
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
-        <label className="flex-row">
-          Transfer/Payment?
-          {isTransfer ? (
-            <IconButton
-              label="Transfer (click to switch)"
-              icon={<Check color="var(--currency-green)" />}
-              onClick={() => setIsTransfer(false)}
-            />
-          ) : (
-            <IconButton
-              label="Not a transfer (click to switch)"
-              icon={<Check color="#aaa" />}
-              onClick={() => setIsTransfer(true)}
-            />
-          )}
-        </label>
-        <label className="form-input" htmlFor="amount-input">
-          Amount
-          <div className="flex-row">
-            <IconButton
-              label={`${
-                amountType === "Inflow" ? "Inflow" : "Outflow"
-              } (Click to switch)`}
-              icon={
-                amountType === "Inflow" ? (
-                  <Plus color="var(--currency-green)" />
-                ) : (
-                  <Minus color="var(--currency-red)" />
-                )
-              }
-              onClick={flipAmountType}
-            />
-            <input
-              id="amount-input"
-              required
-              autoFocus
-              aria-label="Amount"
-              type="number"
-              inputMode="decimal"
-              min="0.01"
-              step="0.001"
-              placeholder="0.00"
-              autoComplete="off"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              disabled={isSaving}
-            />
-          </div>
-        </label>
+        <div className="flex-col gap-0 pb-sm border-b">
+          <label className="flex-row">
+            (BETA) Split transaction?
+            {isSplit ? (
+              <IconButton
+                label="Split (click to switch)"
+                icon={<Check color="var(--currency-green)" />}
+                onClick={() => setIsSplit(false)}
+              />
+            ) : (
+              <IconButton
+                label="Not a split (click to switch)"
+                icon={<Check color="#aaa" />}
+                onClick={() => setIsSplit(true)}
+              />
+            )}
+          </label>
+          <label className="flex-row">
+            Transfer/Payment?
+            {isTransfer ? (
+              <IconButton
+                label="Transfer (click to switch)"
+                icon={<Check color="var(--currency-green)" />}
+                onClick={() => setIsTransfer(false)}
+              />
+            ) : (
+              <IconButton
+                label="Not a transfer (click to switch)"
+                icon={<Check color="#aaa" />}
+                onClick={() => setIsTransfer(true)}
+              />
+            )}
+          </label>
+        </div>
+        {!isSplit ? (
+          <AmountField
+            amount={amount}
+            amountType={amountType}
+            disabled={isSaving}
+            setAmount={setAmount}
+            setAmountType={setAmountType}
+          />
+        ) : (
+          <>
+            {subTxs.map((subTx, idx) => (
+              <SubTransaction
+                key={idx}
+                splitIndex={idx}
+                amount={subTx.amount}
+                amountType={subTx.amountType}
+                allowTransfer={!isTransfer}
+                setAmount={(newAmount) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      amount: newAmount
+                    })
+                  )
+                }
+                setAmountType={(newAmountType) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      amountType: newAmountType
+                    })
+                  )
+                }
+                setCategory={(newCategory) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      category: newCategory
+                    })
+                  )
+                }
+                setPayee={(newPayee) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      payee: newPayee
+                    })
+                  )
+                }
+                setMemo={(newMemo) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      memo: newMemo
+                    })
+                  )
+                }
+              />
+            ))}
+            <div className="flex-row mt-md">
+              <button
+                type="button"
+                className="button accent rounded flex-1"
+                onClick={onAddSubTx}>
+                Add split
+              </button>
+              {subTxs.length > 1 && (
+                <button
+                  type="button"
+                  className="button warn rounded flex-1"
+                  onClick={onRemoveSubTx}>
+                  Remove split
+                </button>
+              )}
+            </div>
+            <div className="heading-medium balance-display mt-sm mb-sm">
+              Total Amount:
+              <CurrencyView
+                milliUnits={totalSubTxsAmount}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+                colorsEnabled
+              />
+            </div>
+          </>
+        )}
         {!isTransfer ? (
           <>
             <PayeeSelect
@@ -216,7 +200,7 @@ export default function TransactionAdd() {
               }}
               disabled={isSaving}
             />
-            {(!account || account.on_budget) && (
+            {!isSplit && (!account || account.on_budget) && (
               <CategorySelect
                 ref={categoryRef}
                 initialCategory={category}
@@ -271,10 +255,14 @@ export default function TransactionAdd() {
                   else memoRef.current?.focus();
                 }
               }}
-              label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+              label={
+                (!isSplit ? amountType === "Outflow" : totalSubTxsAmount <= 0)
+                  ? "Payee (To)"
+                  : "Payee (From)"
+              }
               disabled={isSaving}
             />
-            {isBudgetToTrackingTransfer && (
+            {!isSplit && isBudgetToTrackingTransfer && (
               <CategorySelect
                 ref={categoryRef}
                 initialCategory={category}
@@ -306,33 +294,22 @@ export default function TransactionAdd() {
                   if (selectedAccount.type === "cash") setCleared(true);
                 }
               }}
-              label={amountType === "Outflow" ? "Account (From)" : "Account (To)"}
+              label={
+                (!isSplit ? amountType === "Outflow" : totalSubTxsAmount <= 0)
+                  ? "Account (From)"
+                  : "Account (To)"
+              }
               disabled={isSaving}
             />
           </>
         )}
-        <label className="form-input" htmlFor="memo-input">
-          Memo
-          <div className="flex-row">
-            <input
-              ref={memoRef}
-              id="memo-input"
-              aria-label="Memo"
-              className="flex-grow"
-              autoComplete="off"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              disabled={isSaving}
-            />
-            {settings?.currentTabAccess && (
-              <IconButton
-                icon={<WorldWww strokeWidth={1} />}
-                label="Copy URL into memo field"
-                onClick={onCopyURLIntoMemo}
-              />
-            )}
-          </div>
-        </label>
+        <MemoField
+          ref={memoRef}
+          memo={memo}
+          setMemo={setMemo}
+          disabled={isSaving}
+          settings={settings}
+        />
         <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
             Status:

@@ -48,6 +48,7 @@ function IndexPage() {
         <li>View your current category and account balances</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
+        <li>Support for split transactions</li>
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>
       </ul>
