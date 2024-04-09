@@ -39,7 +39,7 @@ export default function TransactionView({
           <div>{dateFormatter.format(date)}</div>
           <div className="hide-overflow">{tx.payee_name}</div>
         </div>
-        <div className="flex-row">
+        <div className="flex-row gap-sm">
           <CurrencyView
             milliUnits={tx.amount}
             currencyFormat={currencyFormat}

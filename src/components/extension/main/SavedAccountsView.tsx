@@ -53,7 +53,7 @@ export default function SavedAccountsView() {
                       )
                     }
                     actionElementsRight={
-                      <aside className="balance-actions" aria-label="actions">
+                      <aside className="flex-row gap-xs" aria-label="actions">
                         <IconButton
                           rounded
                           accent

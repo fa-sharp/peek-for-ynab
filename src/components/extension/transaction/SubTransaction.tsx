@@ -103,7 +103,7 @@ export default function SubTransaction({
           />
         </label>
       )}
-      <div className="flex-row" style={{ fontSize: ".9em" }}>
+      <div className="flex-row font-small">
         {!showPayee && (
           <button
             type="button"

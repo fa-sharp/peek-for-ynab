@@ -13,7 +13,7 @@ const CategoryTxsView = () => {
     () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
     [categoriesData, popupState.detailState?.id]
   );
-  const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id);
+  const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 

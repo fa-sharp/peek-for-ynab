@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&display=swap");
 
 :root {
-  --accent: hsl(204, 63%, 84%);
+  --accent: hsl(204, 65%, 85%);
   --accent-hover: hsl(204, 60%, 76%);
   --background: #fff;
   --warn: hsl(0, 54%, 79%);
@@ -195,11 +195,6 @@ button:focus-visible {
 
 li:last-child .balance-display {
   border-bottom-color: transparent;
-}
-
-.balance-actions {
-  display: flex;
-  gap: 2px;
 }
 
 .tx-display {
