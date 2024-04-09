@@ -102,6 +102,13 @@ const CategoryTxsView = () => {
                     detailState: { id: tx.account_id, type: "account" }
                   })
                 }
+                transferOnClick={() =>
+                  tx.transfer_account_id &&
+                  setPopupState({
+                    view: "detail",
+                    detailState: { id: tx.transfer_account_id, type: "account" }
+                  })
+                }
                 currencyFormat={selectedBudgetData.currencyFormat}
               />
             </li>

@@ -251,17 +251,18 @@ const AccountActivityView = ({ accountId }: { accountId: string }) => {
                 tx={tx}
                 detailLeft="category"
                 detailLeftOnClick={() =>
-                  tx.category_id
-                    ? setPopupState({
-                        view: "detail",
-                        detailState: { id: tx.category_id, type: "category" }
-                      })
-                    : tx.transfer_account_id
-                      ? setPopupState({
-                          view: "detail",
-                          detailState: { id: tx.transfer_account_id, type: "account" }
-                        })
-                      : undefined
+                  tx.category_id &&
+                  setPopupState({
+                    view: "detail",
+                    detailState: { id: tx.category_id, type: "category" }
+                  })
+                }
+                transferOnClick={() =>
+                  tx.transfer_account_id &&
+                  setPopupState({
+                    view: "detail",
+                    detailState: { id: tx.transfer_account_id, type: "account" }
+                  })
                 }
                 currencyFormat={selectedBudgetData.currencyFormat}
               />

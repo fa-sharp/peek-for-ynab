@@ -2,6 +2,7 @@ import {
   ChevronDown,
   ChevronUp,
   CreditCard,
+  type IconProps,
   List,
   Pinned,
   Plus,
@@ -17,8 +18,8 @@ export const PinItemIcon = () => (
 export const AddTransactionIcon = () => (
   <Plus size={18} color="var(--action)" strokeWidth={1} />
 );
-export const AddTransferIcon = () => (
-  <SwitchHorizontal size={18} color="var(--action)" strokeWidth={1} />
+export const AddTransferIcon = (props?: IconProps) => (
+  <SwitchHorizontal size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 export const AddCCPaymentIcon = () => (
   <CreditCard size={18} color="var(--action)" strokeWidth={1} />
