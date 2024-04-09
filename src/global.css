@@ -186,7 +186,7 @@ button:focus-visible {
   align-items: center;
   gap: var(--spacing-lg);
 
-  padding: 3px 4px;
+  padding: 3px 0px;
   border-bottom: solid 1px var(--border-light);
 }
 .balance-display:not(:hover) span.hidden {
@@ -369,6 +369,18 @@ li:last-child .balance-display {
 
 .mb-lg {
   margin-bottom: var(--spacing-lg);
+}
+
+.pb-sm {
+  padding-bottom: var(--spacing-sm);
+}
+
+.pb-lg {
+  padding-bottom: var(--spacing-lg);
+}
+
+.border-b {
+  border-bottom: solid 2px var(--border);
 }
 
 .font-big {

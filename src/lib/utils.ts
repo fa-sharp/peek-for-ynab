@@ -65,7 +65,6 @@ export const getNDaysAgoISO = (days: number) => {
 
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
-  //@ts-expect-error shut up TS!
   const example = Intl.NumberFormat(locales).format(1.1);
   const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
   const cleaned = value.replace(cleanPattern, "");

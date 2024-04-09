@@ -20,10 +20,11 @@ interface Props {
   categories?: Category[];
   selectCategory: (category: Category | null) => void;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 function CategorySelect(
-  { initialCategory, categories, selectCategory, disabled }: Props,
+  { initialCategory, categories, selectCategory, disabled, placeholder }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
@@ -98,7 +99,7 @@ function CategorySelect(
             }
           })}
           className={selectedItem ? "item-selected" : ""}
-          placeholder="(Leave blank to auto-categorize)"
+          placeholder={placeholder ?? "(Leave blank to auto-categorize)"}
           disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (

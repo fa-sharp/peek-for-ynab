@@ -1,7 +1,7 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { useCallback, useRef, useState } from "react";
+import { type ForwardedRef, forwardRef, useCallback, useRef, useState } from "react";
 
 import type { CachedPayee } from "~lib/context/ynabContext";
 import { searchWithinString } from "~lib/utils";
@@ -11,6 +11,7 @@ interface Props {
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
   disabled?: boolean;
+  required?: boolean;
 }
 
 function getFilter(inputValue?: string) {
@@ -23,7 +24,10 @@ function estimateSize() {
   return 22;
 }
 
-export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
+function PayeeSelect(
+  { payees, selectPayee, disabled, required = true }: Props,
+  ref: ForwardedRef<HTMLInputElement | null>
+) {
   const [payeeList, setPayeeList] = useState(() => {
     if (!payees) return [];
     return [...payees.filter((payee) => payee.transferId == null)];
@@ -55,7 +59,7 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     onInputValueChange({ inputValue, selectedItem }) {
       setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
-      if (inputValue && (!selectedItem || inputValue !== selectedItem.name))
+      if (inputValue !== undefined && (!selectedItem || inputValue !== selectedItem.name))
         selectPayee({ name: inputValue });
     },
     onSelectedItemChange({ selectedItem }) {
@@ -75,7 +79,7 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
       <div className="flex-col">
-        <input required {...getInputProps()} disabled={disabled} />
+        <input required={required} {...getInputProps({ ref })} disabled={disabled} />
         <ul
           className={clsx("select-dropdown-list", { rounded: isOpen })}
           {...getMenuProps({ ref: listRef })}>
@@ -112,3 +116,5 @@ export default function PayeeSelect({ payees, selectPayee, disabled }: Props) {
     </div>
   );
 }
+
+export default forwardRef(PayeeSelect);

@@ -2,7 +2,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { useCallback } from "react";
 import {
   AlertTriangle,
-  ArrowsDownUp,
+  BoxMultiple,
   Check,
   ExternalLink,
   Pencil,
@@ -35,15 +35,18 @@ export default function PopupNav() {
   } = useYNABContext();
   const globalIsFetching = useIsFetching();
 
-  const switchBudget = useCallback(() => {
-    if (!shownBudgetsData) return;
-    const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
-    setSelectedBudgetId(shownBudgetsData[(currIndex + 1) % shownBudgetsData.length].id);
-  }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
-
   const openBudget = useCallback(() => {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
+
+  const openPopupWindow = useCallback(() => {
+    window.open(
+      chrome.runtime.getURL("popup.html"),
+      "peekWindow",
+      "width=340,height=500"
+    );
+    window.close();
+  }, []);
 
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
   if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
@@ -88,18 +91,18 @@ export default function PopupNav() {
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}
         />
-        {shownBudgetsData?.length > 1 && (
-          <IconButton
-            label="Next budget"
-            onClick={switchBudget}
-            icon={<ArrowsDownUp />}
-          />
-        )}
         <IconButton
           label="Open this budget in YNAB"
           onClick={openBudget}
           icon={<ExternalLink />}
         />
+        {window.name !== "peekWindow" && (
+          <IconButton
+            label="Open this extension in a separate window"
+            onClick={openPopupWindow}
+            icon={<BoxMultiple />}
+          />
+        )}
         <IconButton
           label="Settings"
           onClick={() => chrome?.runtime?.openOptionsPage()}
