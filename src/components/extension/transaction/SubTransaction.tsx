@@ -12,6 +12,7 @@ interface Props {
   amount: string;
   amountType: "Inflow" | "Outflow";
   allowTransfer?: boolean;
+  autoFocus?: boolean;
   setAmount: (amount: string) => void;
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
@@ -19,12 +20,12 @@ interface Props {
   setMemo: (memo: string) => void;
 }
 
-/** Form that lets user add a transaction. */
 export default function SubTransaction({
   splitIndex,
   amount,
   amountType,
   allowTransfer = true,
+  autoFocus = false,
   setAmount,
   setAmountType,
   setPayee,
@@ -43,12 +44,12 @@ export default function SubTransaction({
   const memoRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section
-      aria-label={`Split ${splitIndex + 1}`}
-      className="flex-col gap-sm pb-lg border-b">
+    <fieldset className="flex-col gap-sm rounded">
+      <legend>Split {splitIndex + 1}</legend>
       <AmountField
         amount={amount}
         amountType={amountType}
+        autoFocus={autoFocus}
         setAmount={setAmount}
         setAmountType={setAmountType}
       />
@@ -139,6 +140,6 @@ export default function SubTransaction({
           </button>
         )}
       </div>
-    </section>
+    </fieldset>
   );
 }

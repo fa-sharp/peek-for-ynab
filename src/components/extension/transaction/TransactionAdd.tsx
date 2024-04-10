@@ -101,7 +101,7 @@ export default function TransactionAdd() {
             )}
           </label>
         </div>
-        {!isSplit ? (
+        {!isSplit && (
           <AmountField
             amount={amount}
             amountType={amountType}
@@ -109,82 +109,6 @@ export default function TransactionAdd() {
             setAmount={setAmount}
             setAmountType={setAmountType}
           />
-        ) : (
-          <>
-            {subTxs.map((subTx, idx) => (
-              <SubTransaction
-                key={idx}
-                splitIndex={idx}
-                amount={subTx.amount}
-                amountType={subTx.amountType}
-                allowTransfer={!isTransfer}
-                setAmount={(newAmount) =>
-                  setSubTxs((prev) =>
-                    prev.with(idx, {
-                      ...prev[idx],
-                      amount: newAmount
-                    })
-                  )
-                }
-                setAmountType={(newAmountType) =>
-                  setSubTxs((prev) =>
-                    prev.with(idx, {
-                      ...prev[idx],
-                      amountType: newAmountType
-                    })
-                  )
-                }
-                setCategory={(newCategory) =>
-                  setSubTxs((prev) =>
-                    prev.with(idx, {
-                      ...prev[idx],
-                      category: newCategory
-                    })
-                  )
-                }
-                setPayee={(newPayee) =>
-                  setSubTxs((prev) =>
-                    prev.with(idx, {
-                      ...prev[idx],
-                      payee: newPayee
-                    })
-                  )
-                }
-                setMemo={(newMemo) =>
-                  setSubTxs((prev) =>
-                    prev.with(idx, {
-                      ...prev[idx],
-                      memo: newMemo
-                    })
-                  )
-                }
-              />
-            ))}
-            <div className="flex-row mt-md">
-              <button
-                type="button"
-                className="button accent rounded flex-1"
-                onClick={onAddSubTx}>
-                Add split
-              </button>
-              {subTxs.length > 1 && (
-                <button
-                  type="button"
-                  className="button warn rounded flex-1"
-                  onClick={onRemoveSubTx}>
-                  Remove split
-                </button>
-              )}
-            </div>
-            <div className="heading-medium balance-display mt-sm mb-sm">
-              Total Amount:
-              <CurrencyView
-                milliUnits={totalSubTxsAmount}
-                currencyFormat={selectedBudgetData?.currencyFormat}
-                colorsEnabled
-              />
-            </div>
-          </>
         )}
         {!isTransfer ? (
           <>
@@ -310,6 +234,84 @@ export default function TransactionAdd() {
           disabled={isSaving}
           settings={settings}
         />
+        {isSplit && (
+          <>
+            {subTxs.map((subTx, idx) => (
+              <SubTransaction
+                key={idx}
+                splitIndex={idx}
+                amount={subTx.amount}
+                amountType={subTx.amountType}
+                autoFocus={idx > 0}
+                allowTransfer={!isTransfer}
+                setAmount={(newAmount) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      amount: newAmount
+                    })
+                  )
+                }
+                setAmountType={(newAmountType) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      amountType: newAmountType
+                    })
+                  )
+                }
+                setCategory={(newCategory) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      category: newCategory
+                    })
+                  )
+                }
+                setPayee={(newPayee) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      payee: newPayee
+                    })
+                  )
+                }
+                setMemo={(newMemo) =>
+                  setSubTxs((prev) =>
+                    prev.with(idx, {
+                      ...prev[idx],
+                      memo: newMemo
+                    })
+                  )
+                }
+              />
+            ))}
+            <div className="flex-row mt-md">
+              <button
+                type="button"
+                className="button accent rounded flex-1"
+                onClick={onAddSubTx}>
+                Add split
+              </button>
+              {subTxs.length > 1 && (
+                <button
+                  type="button"
+                  className="button warn rounded flex-1"
+                  onClick={onRemoveSubTx}>
+                  Remove split
+                </button>
+              )}
+            </div>
+            <div className="heading-medium balance-display mt-sm mb-sm">
+              Total Amount:
+              <CurrencyView
+                milliUnits={totalSubTxsAmount}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+                colorsEnabled
+              />
+            </div>
+          </>
+        )}
         <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
             Status:
