@@ -23,6 +23,7 @@
   --spacing-sm: 0.25em;
   --spacing-md: 0.4em;
   --spacing-lg: 0.75em;
+  --spacing-xl: 1.5em;
 }
 
 :root.dark {
@@ -366,12 +367,24 @@ li:last-child .balance-display {
   margin-bottom: var(--spacing-lg);
 }
 
+.pt-sm {
+  padding-top: var(--spacing-sm);
+}
+
 .pb-sm {
   padding-bottom: var(--spacing-sm);
 }
 
 .pb-lg {
   padding-bottom: var(--spacing-lg);
+}
+
+.p-inline-xl {
+  padding-inline: var(--spacing-xl);
+}
+
+.border-t-light {
+  border-top: solid 1px var(--border-light);
 }
 
 .border-b {

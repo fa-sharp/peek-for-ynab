@@ -65,7 +65,7 @@ const CategoryTxsView = () => {
           />
         </div>
       </div>
-      <div className="flex-row mb-lg">
+      <div className="flex-row gap-lg mb-lg">
         <button
           className="button rounded accent flex-row"
           onClick={() =>
@@ -83,7 +83,7 @@ const CategoryTxsView = () => {
               }
             })
           }>
-          <AddTransactionIcon /> Transaction
+          <AddTransactionIcon aria-label="Add" /> Transaction
         </button>
       </div>
       <h3 className="heading-medium mb-sm">Activity</h3>
@@ -95,20 +95,10 @@ const CategoryTxsView = () => {
             <li key={tx.id}>
               <TransactionView
                 tx={tx}
+                goToDetailView={(detailState) =>
+                  setPopupState({ view: "detail", detailState })
+                }
                 detailLeft="account"
-                detailLeftOnClick={() =>
-                  setPopupState({
-                    view: "detail",
-                    detailState: { id: tx.account_id, type: "account" }
-                  })
-                }
-                transferOnClick={() =>
-                  tx.transfer_account_id &&
-                  setPopupState({
-                    view: "detail",
-                    detailState: { id: tx.transfer_account_id, type: "account" }
-                  })
-                }
                 currencyFormat={selectedBudgetData.currencyFormat}
               />
             </li>

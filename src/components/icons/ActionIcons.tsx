@@ -15,14 +15,14 @@ export const PinnedItemIcon = () => (
 export const PinItemIcon = () => (
   <Pinned size={18} color="var(--action)" strokeWidth={1} />
 );
-export const AddTransactionIcon = () => (
-  <Plus size={18} color="var(--action)" strokeWidth={1} />
+export const AddTransactionIcon = (props?: IconProps) => (
+  <Plus size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 export const AddTransferIcon = (props?: IconProps) => (
   <SwitchHorizontal size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
-export const AddCCPaymentIcon = () => (
-  <CreditCard size={18} color="var(--action)" strokeWidth={1} />
+export const AddCCPaymentIcon = (props?: IconProps) => (
+  <CreditCard size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 
 export const ExpandListIcon = () => (

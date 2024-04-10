@@ -1,8 +1,9 @@
-import { Flag3 } from "tabler-icons-react";
+import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
 import * as ynab from "ynab";
 
 import { CurrencyView, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
+import type { DetailViewState } from "~lib/context/storageContext";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
@@ -12,20 +13,19 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 
 export default function TransactionView({
   tx,
+  goToDetailView,
   detailRight = "memo",
   detailLeft = "category",
-  detailLeftOnClick,
-  transferOnClick,
   currencyFormat
 }: {
   tx: ynab.TransactionDetail | ynab.HybridTransaction;
+  goToDetailView: (detailState: DetailViewState) => void;
   detailRight?: "memo";
   detailLeft?: "category" | "account";
-  detailLeftOnClick?: () => void;
-  transferOnClick?: () => void;
   currencyFormat?: ynab.CurrencyFormat;
 }) {
   const date = ynab.utils.convertFromISODateString(tx.date);
+  const isSplit = "subtransactions" in tx && tx.subtransactions.length > 0;
 
   return (
     <div className="tx-display">
@@ -40,7 +40,10 @@ export default function TransactionView({
             />
           )}
           <div>{dateFormatter.format(date)}</div>
-          <div className="hide-overflow">{tx.payee_name}</div>
+          <div className="hide-overflow">
+            {"parent_transaction_id" in tx && !!tx.parent_transaction_id && "(Split) "}
+            {tx.payee_name}
+          </div>
         </div>
         <div className="flex-row gap-sm">
           <CurrencyView
@@ -53,34 +56,118 @@ export default function TransactionView({
       </div>
       <div className="flex-row gap-lg justify-between font-small">
         <div className="flex-row">
-          {tx.transfer_account_id && transferOnClick && (
+          {tx.transfer_account_id && (
             <button
               title="Go to transfer account"
               className="button small accent rounded flex-row gap-sm"
-              onClick={transferOnClick}>
-              <AddTransferIcon size={15} />
+              onClick={() =>
+                goToDetailView({
+                  id: tx.transfer_account_id!,
+                  type: "account"
+                })
+              }>
+              <AddTransferIcon aria-label="transfer" size={14} />
               Transfer
             </button>
           )}
           {detailLeft === "category" &&
-            tx.category_name !== "Split" &&
-            tx.category_name !== "Uncategorized" && (
-              <button className="button small accent rounded" onClick={detailLeftOnClick}>
-                {tx.category_name}
-              </button>
-            )}
+            (!isSplit ? (
+              tx.category_id &&
+              tx.category_name && (
+                <button
+                  className="button small accent rounded"
+                  onClick={() =>
+                    goToDetailView({ id: tx.category_id!, type: "category" })
+                  }>
+                  {tx.category_name}
+                </button>
+              )
+            ) : (
+              <div className="flex-row">
+                <ArrowsSplit2 aria-label="Split" size={14} />
+                Multiple Categories
+              </div>
+            ))}
           {detailLeft === "account" && (
-            <button className="button small accent rounded" onClick={detailLeftOnClick}>
+            <button
+              className="button small accent rounded"
+              onClick={() =>
+                goToDetailView({
+                  id: tx.account_id,
+                  type: "account"
+                })
+              }>
               {tx.account_name}
             </button>
           )}
         </div>
-        {tx.memo && detailRight === "memo" ? (
-          <div className="hide-overflow">{tx.memo}</div>
-        ) : (
-          <div></div>
-        )}
+        {detailRight === "memo" && <div className="hide-overflow">{tx.memo}</div>}
       </div>
+      {isSplit && (
+        <ul
+          aria-label="Split categories"
+          className="list flex-col gap-sm font-small p-inline-xl">
+          {tx.subtransactions.map((subTx) => (
+            <SubTransactionView
+              key={subTx.id}
+              subTx={subTx}
+              goToDetailView={goToDetailView}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
+
+const SubTransactionView = ({
+  subTx,
+  goToDetailView,
+  currencyFormat
+}: {
+  subTx: ynab.SubTransaction;
+  goToDetailView: (detailState: DetailViewState) => void;
+  currencyFormat?: ynab.CurrencyFormat;
+}) => (
+  <li className="pt-sm border-t-light">
+    <div className="flex-row justify-between">
+      <div className="flex-row gap-sm">
+        {subTx.transfer_account_id && (
+          <button
+            title="Go to transfer account"
+            className="button small accent rounded flex-row gap-sm"
+            onClick={() =>
+              goToDetailView({
+                id: subTx.transfer_account_id!,
+                type: "account"
+              })
+            }>
+            <AddTransferIcon aria-label="transfer" size={14} />
+            Transfer
+          </button>
+        )}
+        {subTx.category_id && (
+          <button
+            className="button small rounded accent"
+            onClick={() =>
+              goToDetailView({
+                id: subTx.category_id!,
+                type: "category"
+              })
+            }>
+            {subTx.category_name}
+          </button>
+        )}
+      </div>
+      <CurrencyView
+        milliUnits={subTx.amount}
+        currencyFormat={currencyFormat}
+        colorsEnabled
+      />
+    </div>
+    <div className="flex-row justify-between">
+      <div>{subTx.payee_name}</div>
+      <div className="hide-overflow">{subTx.memo}</div>
+    </div>
+  </li>
+);

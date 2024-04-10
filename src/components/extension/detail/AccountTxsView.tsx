@@ -119,7 +119,7 @@ const AccountTxsView = () => {
           </div>
         )}
       </div>
-      <div className="flex-row mb-lg">
+      <div className="flex-row gap-lg mb-lg">
         <button
           className="button rounded accent flex-row"
           onClick={() =>
@@ -137,7 +137,7 @@ const AccountTxsView = () => {
               }
             })
           }>
-          <AddTransactionIcon /> Transaction
+          <AddTransactionIcon aria-label="Add" /> Transaction
         </button>
         {account.type === AccountType.CreditCard ||
         account.type === AccountType.LineOfCredit ? (
@@ -164,7 +164,7 @@ const AccountTxsView = () => {
                 }
               })
             }>
-            <AddCCPaymentIcon /> Payment
+            <AddCCPaymentIcon aria-label="Add" /> Payment
           </button>
         ) : account.type === AccountType.AutoLoan ||
           account.type === AccountType.MedicalDebt ||
@@ -196,7 +196,7 @@ const AccountTxsView = () => {
                 }
               })
             }>
-            <AddTransferIcon /> Payment/transfer
+            <AddTransferIcon aria-label="Add" /> Payment/transfer
           </button>
         ) : (
           <button
@@ -217,7 +217,7 @@ const AccountTxsView = () => {
                 }
               })
             }>
-            <AddTransferIcon /> Transfer
+            <AddTransferIcon aria-label="Add" /> Transfer
           </button>
         )}
       </div>
@@ -249,21 +249,10 @@ const AccountActivityView = ({ accountId }: { accountId: string }) => {
             <li key={tx.id}>
               <TransactionView
                 tx={tx}
+                goToDetailView={(detailState) =>
+                  setPopupState({ view: "detail", detailState })
+                }
                 detailLeft="category"
-                detailLeftOnClick={() =>
-                  tx.category_id &&
-                  setPopupState({
-                    view: "detail",
-                    detailState: { id: tx.category_id, type: "category" }
-                  })
-                }
-                transferOnClick={() =>
-                  tx.transfer_account_id &&
-                  setPopupState({
-                    view: "detail",
-                    detailState: { id: tx.transfer_account_id, type: "account" }
-                  })
-                }
                 currencyFormat={selectedBudgetData.currencyFormat}
               />
             </li>
