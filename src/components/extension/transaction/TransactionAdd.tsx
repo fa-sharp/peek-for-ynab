@@ -40,6 +40,7 @@ export default function TransactionAdd() {
     payee,
     subTxs,
     totalSubTxsAmount,
+    leftOverSubTxsAmount,
     isSaving,
     isSplit,
     isTransfer,
@@ -67,9 +68,9 @@ export default function TransactionAdd() {
         <div role="heading">Add Transaction</div>
       </div>
       <form className="flex-col" onSubmit={onSaveTransaction}>
-        <div className="flex-col gap-0 pb-sm border-b">
+        <div className="flex-col gap-0">
           <label className="flex-row">
-            (BETA) Split transaction?
+            Split transaction?
             {isSplit ? (
               <IconButton
                 label="Split (click to switch)"
@@ -101,15 +102,13 @@ export default function TransactionAdd() {
             )}
           </label>
         </div>
-        {!isSplit && (
-          <AmountField
-            amount={amount}
-            amountType={amountType}
-            disabled={isSaving}
-            setAmount={setAmount}
-            setAmountType={setAmountType}
-          />
-        )}
+        <AmountField
+          amount={amount}
+          amountType={amountType}
+          disabled={isSaving}
+          setAmount={setAmount}
+          setAmountType={setAmountType}
+        />
         {!isTransfer ? (
           <>
             <PayeeSelect
@@ -244,6 +243,7 @@ export default function TransactionAdd() {
                 amountType={subTx.amountType}
                 autoFocus={idx > 0}
                 allowTransfer={!isTransfer}
+                disabled={isSaving}
                 setAmount={(newAmount) =>
                   setSubTxs((prev) =>
                     prev.with(idx, {
@@ -302,10 +302,18 @@ export default function TransactionAdd() {
                 </button>
               )}
             </div>
-            <div className="heading-medium balance-display mt-sm mb-sm">
-              Total Amount:
+            <div className="heading-medium balance-display mt-sm">
+              Total of splits:
               <CurrencyView
                 milliUnits={totalSubTxsAmount}
+                currencyFormat={selectedBudgetData?.currencyFormat}
+                colorsEnabled
+              />
+            </div>
+            <div className="heading-medium balance-display mb-sm">
+              Amount remaining:
+              <CurrencyView
+                milliUnits={leftOverSubTxsAmount}
                 currencyFormat={selectedBudgetData?.currencyFormat}
                 colorsEnabled
               />

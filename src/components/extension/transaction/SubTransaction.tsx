@@ -13,6 +13,7 @@ interface Props {
   amountType: "Inflow" | "Outflow";
   allowTransfer?: boolean;
   autoFocus?: boolean;
+  disabled?: boolean;
   setAmount: (amount: string) => void;
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
@@ -26,6 +27,7 @@ export default function SubTransaction({
   amountType,
   allowTransfer = true,
   autoFocus = false,
+  disabled = false,
   setAmount,
   setAmountType,
   setPayee,
@@ -44,7 +46,7 @@ export default function SubTransaction({
   const memoRef = useRef<HTMLInputElement>(null);
 
   return (
-    <fieldset className="flex-col gap-sm rounded">
+    <fieldset className="flex-col gap-sm rounded" disabled={disabled}>
       <legend>Split {splitIndex + 1}</legend>
       <AmountField
         amount={amount}

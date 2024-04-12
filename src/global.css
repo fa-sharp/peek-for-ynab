@@ -366,10 +366,6 @@ li:last-child .balance-display {
   padding-bottom: var(--spacing-lg);
 }
 
-.border-b {
-  border-bottom: solid 2px var(--border);
-}
-
 .font-big {
   font-size: 2em;
 }
