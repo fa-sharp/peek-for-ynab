@@ -18,7 +18,7 @@ const CategoryTxsView = () => {
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
   return (
-    <div>
+    <section>
       <div className="flex-row justify-between mb-sm">
         <h2 className="heading-big">{category.name}</h2>
         <IconButton
@@ -105,7 +105,7 @@ const CategoryTxsView = () => {
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 };
 

@@ -7,6 +7,7 @@ export default function IconButton({
   onClick,
   label,
   accent,
+  gray,
   rounded,
   spin,
   disabled,
@@ -16,6 +17,7 @@ export default function IconButton({
   onClick?: MouseEventHandler;
   icon: ReactElement;
   accent?: boolean;
+  gray?: boolean;
   rounded?: boolean;
   spin?: boolean;
   disabled?: boolean;
@@ -30,6 +32,7 @@ export default function IconButton({
         rounded,
         spin,
         accent,
+        gray,
         noaction: noAction
       })}
       onClick={onClick}

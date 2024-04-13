@@ -23,7 +23,6 @@
   --spacing-sm: 0.25em;
   --spacing-md: 0.4em;
   --spacing-lg: 0.75em;
-  --spacing-xl: 1.5em;
 }
 
 :root.dark {
@@ -85,6 +84,7 @@ button:focus-visible {
 
 .flex-grow {
   flex-grow: 1;
+  flex-shrink: 0;
 }
 
 .flex-1 {
@@ -379,8 +379,8 @@ li:last-child .balance-display {
   padding-bottom: var(--spacing-lg);
 }
 
-.p-inline-xl {
-  padding-inline: var(--spacing-xl);
+.p-inline-lg {
+  padding-inline: var(--spacing-lg);
 }
 
 .border-t-light {

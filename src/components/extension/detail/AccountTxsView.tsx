@@ -51,7 +51,7 @@ const AccountTxsView = () => {
   if (!account || !selectedBudgetData) return <div>Loading...</div>;
 
   return (
-    <section style={{ minWidth: 280 }}>
+    <section>
       <div className="flex-row justify-between mb-sm">
         <h2 className="heading-big">
           {account.name}

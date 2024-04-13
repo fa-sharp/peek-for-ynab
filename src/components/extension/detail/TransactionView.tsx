@@ -30,7 +30,7 @@ export default function TransactionView({
   return (
     <div className="tx-display">
       <div className="flex-row justify-between gap-lg">
-        <div className="flex-row">
+        <div className="flex-row min-w-0">
           {tx.flag_color && (
             <Flag3
               aria-label={`${tx.flag_color} flag`}
@@ -55,11 +55,11 @@ export default function TransactionView({
         </div>
       </div>
       <div className="flex-row gap-lg justify-between font-small">
-        <div className="flex-row">
+        <div className="flex-row flex-grow">
           {tx.transfer_account_id && (
             <button
               title="Go to transfer account"
-              className="button small accent rounded flex-row gap-sm"
+              className="button small gray rounded flex-row gap-sm"
               onClick={() =>
                 goToDetailView({
                   id: tx.transfer_account_id!,
@@ -106,7 +106,7 @@ export default function TransactionView({
       {isSplit && (
         <ul
           aria-label="Split categories"
-          className="list flex-col gap-sm font-small p-inline-xl">
+          className="list flex-col gap-sm font-small p-inline-lg">
           {tx.subtransactions.map((subTx) => (
             <SubTransactionView
               key={subTx.id}
