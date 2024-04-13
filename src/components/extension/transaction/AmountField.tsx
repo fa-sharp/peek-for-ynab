@@ -6,6 +6,7 @@ import IconButton from "~components/IconButton";
 type Props = {
   amount: string;
   amountType: "Inflow" | "Outflow";
+  autoFocus?: boolean;
   disabled?: boolean;
   setAmount: (amount: string) => void;
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
@@ -14,6 +15,7 @@ type Props = {
 const AmountField = ({
   amount,
   amountType,
+  autoFocus = true,
   disabled,
   setAmount,
   setAmountType
@@ -42,7 +44,7 @@ const AmountField = ({
         <input
           id={amountFieldId}
           required
-          autoFocus
+          autoFocus={autoFocus}
           aria-label="Amount"
           type="number"
           inputMode="decimal"

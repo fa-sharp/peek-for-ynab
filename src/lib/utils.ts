@@ -39,6 +39,10 @@ export const millisToStringValue = (
   currencyFormat = { decimal_digits: 2 }
 ) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
 
+/** Convert a string value (e.g. from HTML number input) to milliUnits */
+export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
+  type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
+
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name

@@ -8,7 +8,8 @@ import {
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,
-  requestCurrentTabPermissions
+  requestCurrentTabPermissions,
+  stringValueToMillis
 } from "./utils";
 
 /** Utility hook for transaction form logic */
@@ -68,12 +69,12 @@ export default function useTransaction() {
   };
   const totalSubTxsAmount = useMemo(
     () =>
-      subTxs.reduce(
-        (sum, tx) =>
-          sum + Math.round(+tx.amount * (tx.amountType === "Outflow" ? -1000 : 1000)),
-        0
-      ),
+      subTxs.reduce((sum, tx) => sum + stringValueToMillis(tx.amount, tx.amountType), 0),
     [subTxs]
+  );
+  const leftOverSubTxsAmount = useMemo(
+    () => stringValueToMillis(amount, amountType) - totalSubTxsAmount,
+    [amount, amountType, totalSubTxsAmount]
   );
 
   // Other form state
@@ -116,7 +117,7 @@ export default function useTransaction() {
       setErrorMessage("Please enter a payee!");
       return;
     }
-    if (!amount && !isSplit) {
+    if (!amount) {
       setErrorMessage("Please enter a valid amount!");
       return;
     }
@@ -134,25 +135,27 @@ export default function useTransaction() {
         return;
       }
     }
-    if (
-      isSplit &&
-      subTxs.some(
-        (tx) => tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id
-      )
-    ) {
-      setErrorMessage("Can't transfer to the same account!");
-      return;
+    if (isSplit) {
+      if (
+        subTxs.some(
+          (tx) =>
+            tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id
+        )
+      ) {
+        setErrorMessage("Can't transfer to the same account!");
+        return;
+      }
+      if (leftOverSubTxsAmount !== 0) {
+        setErrorMessage("Total of splits doesn't match amount!");
+        return;
+      }
     }
 
     setIsSaving(true);
     try {
       await addTransaction({
         date,
-        amount: isSplit
-          ? totalSubTxsAmount
-          : amountType === "Outflow"
-            ? Math.round(+amount * -1000)
-            : Math.round(+amount * 1000),
+        amount: stringValueToMillis(amount, amountType),
         payee_id: "id" in payee ? payee.id : undefined,
         payee_name: "id" in payee ? undefined : payee.name,
         account_id: account.id,
@@ -168,9 +171,7 @@ export default function useTransaction() {
         flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined,
         subtransactions: isSplit
           ? subTxs.map((subTx) => ({
-              amount: Math.round(
-                +subTx.amount * (subTx.amountType === "Outflow" ? -1000 : 1000)
-              ),
+              amount: stringValueToMillis(subTx.amount, subTx.amountType),
               category_id: subTx.category?.id,
               payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
               payee_name:
@@ -200,6 +201,7 @@ export default function useTransaction() {
     cleared,
     subTxs,
     totalSubTxsAmount,
+    leftOverSubTxsAmount,
     isTransfer,
     isBudgetToTrackingTransfer,
     isSplit,
