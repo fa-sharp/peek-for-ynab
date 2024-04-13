@@ -10,7 +10,7 @@ function IndexPage() {
         <title>Peek for YNAB</title>
       </Head>
       <h1>Peek for YNAB</h1>
-      <h3>A Chrome extension to quickly check on your budget</h3>
+      <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
         <Image
           src="/screenshots/light-pinned.png"
@@ -48,6 +48,7 @@ function IndexPage() {
         <li>View your current category and account balances</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
+        <li>Support for split transactions</li>
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>
       </ul>

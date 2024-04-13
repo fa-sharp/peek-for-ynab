@@ -32,15 +32,15 @@ function PrivacyPage() {
         logout and/or uninstall the extension.
       </p>
       <p>
-        If you enable the sync option in the extension settings, {APP_NAME} will store
-        your settings and the IDs of your pinned categories, accounts, and budgets in your
-        browser profile. No other information is stored in the profile.
+        If you enable the sync option in the extension settings, {APP_NAME} will save your
+        settings and the unique IDs of your pinned items to your browser profile, in order
+        to sync them to your other devices.
       </p>
       <p>
-        If tab access is allowed in the settings, {APP_NAME} will be able to read your
+        If tab access is allowed in the settings, {APP_NAME} will be able to read the
         current tab upon opening the extension, in order to enable additional features.
-        This data is only processed locally in your browser. The extension will not be
-        able to access your current tab unless you explicitly enable this setting.
+        This data is only processed locally in your browser. The extension will not access
+        the current tab unless you enable this setting.
       </p>
       <p>
         This privacy policy may be updated periodically to reflect changes in the
@@ -49,7 +49,7 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Feb 3, 2024</em>
+        <em>Last updated: Mar 16, 2024</em>
       </p>
     </WebLayout>
   );

@@ -94,7 +94,7 @@ export default function MoveMoney() {
         <CategorySelect
           ref={fromCategoryRef}
           label="From"
-          movingMoney
+          placeholder="(Leave blank for Ready to Assign)"
           categories={categoriesData}
           currentCategory={fromCategory}
           selectCategory={(selectedCategory) => {

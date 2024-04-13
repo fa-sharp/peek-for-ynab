@@ -21,11 +21,20 @@ interface Props {
   selectCategory: (category: Category | null) => void;
   label?: string;
   disabled?: boolean;
+  placeholder?: string;
   movingMoney?: boolean;
 }
 
 function CategorySelect(
-  { currentCategory, categories, label, disabled, movingMoney, selectCategory }: Props,
+  {
+    currentCategory,
+    categories,
+    selectCategory,
+    disabled,
+    label,
+    placeholder,
+    movingMoney
+  }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
@@ -36,7 +45,7 @@ function CategorySelect(
     const ignoredIds = new Set(
       categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
     );
-    // Don't ignore Inflow: RTA category, unless we're moving money
+    // Only ignore Inflow: RTA category if we're moving money
     if (!movingMoney) ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id);
     return ignoredIds;
   }, [categoryGroupsData, movingMoney]);
@@ -101,11 +110,7 @@ function CategorySelect(
             }
           })}
           className={selectedItem ? "item-selected" : ""}
-          placeholder={
-            movingMoney
-              ? "(Leave blank for Ready to Assign)"
-              : "(Leave blank to auto-categorize)"
-          }
+          placeholder={placeholder ?? "(Leave blank to auto-categorize)"}
           disabled={disabled || !!selectedItem}
         />
         {selectedItem ? (
