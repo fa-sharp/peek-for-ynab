@@ -1,6 +1,6 @@
 import {
-  AccountTxsView,
-  CategoryTxsView,
+  AccountDetailView,
+  CategoryDetailView,
   MoveMoney,
   PopupLogin,
   PopupMain,
@@ -41,9 +41,9 @@ export function PopupView() {
       ) : popupState.view === "txAdd" ? (
         <TransactionAdd />
       ) : popupState.view === "detail" && popupState.detailState?.type === "account" ? (
-        <AccountTxsView />
+        <AccountDetailView />
       ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
-        <CategoryTxsView />
+        <CategoryDetailView />
       ) : popupState.view === "move" ? (
         <MoveMoney />
       ) : (

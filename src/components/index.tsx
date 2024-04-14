@@ -1,7 +1,7 @@
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
-import AccountTxsView from "./extension/detail/AccountTxsView";
-import CategoryTxsView from "./extension/detail/CategoryTxsView";
+import AccountDetailView from "./extension/detail/AccountDetailView";
+import CategoryDetailView from "./extension/detail/CategoryDetailView";
 import TransactionView from "./extension/detail/TransactionView";
 import TxStatusIcon from "./extension/detail/TxStatusIcon";
 import AccountsView, { AccountView } from "./extension/main/AccountsView";
@@ -41,8 +41,8 @@ export {
   CurrencyView,
   TransactionAdd,
   TransactionView,
-  AccountTxsView,
-  CategoryTxsView,
+  AccountDetailView,
+  CategoryDetailView,
   TxStatusIcon,
   SubTransaction,
   MoveMoney
