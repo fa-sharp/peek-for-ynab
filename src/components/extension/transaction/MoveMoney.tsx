@@ -3,7 +3,7 @@ import { SwitchVertical } from "tabler-icons-react";
 
 import { CategorySelect, CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { millisToStringValue } from "~lib/utils";
+import { millisToStringValue, stringValueToMillis } from "~lib/utils";
 
 /** Form that lets user move money to/from category, or between categories */
 export default function MoveMoney() {
@@ -54,7 +54,7 @@ export default function MoveMoney() {
     setIsSaving(true);
     try {
       await moveMoney({
-        amountInMillis: Math.round(+amount * 1000),
+        amountInMillis: stringValueToMillis(amount, "Inflow"),
         subtractFromCategoryId: fromCategory?.id,
         addToCategoryId: toCategory?.id
       });
