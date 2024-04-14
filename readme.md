@@ -11,8 +11,9 @@ A browser extension for YNAB that lets users see their category and account bala
   - `pages/` Website and server (Next.js)
     - `api/` API routes to fetch OAuth tokens from YNAB API
   - `lib/` Library and utility functions
-    - `context/` - React Context that provides auth, API data, and storage to the extension
+    - `context/` React Context that provides auth, API data, and storage to the extension
   - `components/` View components
+  - `styles/` CSS files
 
 ## Building and running locally
 
