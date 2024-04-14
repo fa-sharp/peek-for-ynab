@@ -3,7 +3,7 @@ import MoveMoney from "~components/extension/transaction/MoveMoney";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 
-import "./global.css";
+import "./styles/global.css";
 
 function PopupWrapper() {
   return (
