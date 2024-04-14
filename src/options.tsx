@@ -13,7 +13,7 @@ import {
   useSetColorTheme
 } from "~lib/utils";
 
-import "./global.css";
+import "./styles/global.css";
 
 const OptionsWrapper = () => (
   <AppProvider>
