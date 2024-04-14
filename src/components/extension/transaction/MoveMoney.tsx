@@ -58,7 +58,7 @@ export default function MoveMoney() {
         subtractFromCategoryId: fromCategory?.id,
         addToCategoryId: toCategory?.id
       });
-      setPopupState({ view: "main" });
+      setPopupState(popupState.moveMoneyState?.returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while moving money: ", err);
@@ -197,7 +197,9 @@ export default function MoveMoney() {
           <button
             type="button"
             className="button gray rounded mt-lg flex-1"
-            onClick={() => setPopupState({ view: "main" })}
+            onClick={() =>
+              setPopupState(popupState.moveMoneyState?.returnTo || { view: "main" })
+            }
             disabled={isSaving}>
             Cancel
           </button>

@@ -62,4 +62,8 @@ export interface MoveMoneyInitialState {
   amount?: string;
   fromCategoryId?: string;
   toCategoryId?: string;
+  returnTo?: {
+    view: "main" | "detail";
+    detailState?: DetailViewState;
+  };
 }

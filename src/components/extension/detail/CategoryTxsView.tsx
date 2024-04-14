@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, TransactionView } from "~components";
-import { AddTransactionIcon } from "~components/icons/ActionIcons";
+import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
 const CategoryTxsView = () => {
@@ -84,6 +84,25 @@ const CategoryTxsView = () => {
             })
           }>
           <AddTransactionIcon aria-label="Add" /> Transaction
+        </button>
+        <button
+          className="button rounded accent flex-row"
+          onClick={() =>
+            setPopupState({
+              view: "move",
+              moveMoneyState: {
+                toCategoryId: category.id,
+                returnTo: {
+                  view: "detail",
+                  detailState: {
+                    type: "category",
+                    id: category.id
+                  }
+                }
+              }
+            })
+          }>
+          <AddTransferIcon /> Move Money
         </button>
       </div>
       <h3 className="heading-medium mb-sm">Activity</h3>
