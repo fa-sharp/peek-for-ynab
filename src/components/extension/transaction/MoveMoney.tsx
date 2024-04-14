@@ -72,6 +72,10 @@ export default function MoveMoney() {
       <div className="heading-big">
         <div role="heading">Move money</div>
       </div>
+      <div className="mt-lg mb-lg">
+        ⚠️ Money moves made here will not show up in the &ldquo;Recent Moves&rdquo;
+        section in YNAB. ⚠️
+      </div>
       <form className="flex-col" onSubmit={onMoveMoney}>
         <label className="form-input">
           Amount
