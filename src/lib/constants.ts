@@ -1,4 +1,4 @@
-import type { AppSettings } from "./context/storageContext";
+import type { AppSettings } from "./types";
 
 export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_NEEDED_KEY = "tokenRefreshing";

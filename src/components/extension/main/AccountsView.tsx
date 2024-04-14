@@ -4,12 +4,8 @@ import { type Account, AccountType, type CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import {
-  type AppSettings,
-  type TxAddInitialState,
-  useStorageContext
-} from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import { useStorageContext } from "~lib/context/storageContext";
+import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
 import {

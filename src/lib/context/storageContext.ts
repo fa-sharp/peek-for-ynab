@@ -7,57 +7,13 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
-
-import type { CachedPayee } from "./ynabContext";
-
-export interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-  expires: number;
-}
-
-export interface AppSettings {
-  /** Whether transactions are marked Cleared by default */
-  txCleared: boolean;
-  /** Whether transactions are automatically marked Approved */
-  txApproved: boolean;
-  /** Category and account names are reduced to emojis */
-  emojiMode: boolean;
-  /** Balances are hidden unless you hover over them */
-  privateMode: boolean;
-  /** Whether access is allowed to current tab for extra features */
-  currentTabAccess: boolean;
-  /** The color theme for the extension. @default "auto" */
-  theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default false */
-  animations?: boolean;
-}
-
-export interface DetailViewState {
-  type: "account" | "category";
-  id: string;
-}
-
-/** Initial state of the add transaction screen */
-export interface TxAddInitialState {
-  amount?: string;
-  amountType?: "Inflow" | "Outflow";
-  accountId?: string;
-  categoryId?: string;
-  payee?: CachedPayee;
-  isTransfer?: boolean;
-  returnTo?: {
-    view: "main" | "detail";
-    detailState?: DetailViewState;
-  };
-}
-
-/** Initial state of the move money screen */
-export interface MoveMoneyInitialState {
-  amount?: string;
-  fromCategoryId?: string;
-  toCategoryId?: string;
-}
+import type {
+  AppSettings,
+  DetailViewState,
+  MoveMoneyInitialState,
+  TokenData,
+  TxAddInitialState
+} from "~lib/types";
 
 /** Map of budget IDs to string arrays. Useful type for storage. */
 interface BudgetToStringArrayMap {

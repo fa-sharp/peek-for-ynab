@@ -1,4 +1,4 @@
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 import { findEmoji } from "~lib/utils";
 
 /** Dropdown that lets the user select a budget to view */

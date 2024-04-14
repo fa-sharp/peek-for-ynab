@@ -3,7 +3,7 @@ import { Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
 import { useYNABContext } from "~lib/context";
-import type { CachedPayee } from "~lib/context/ynabContext";
+import type { CachedPayee } from "~lib/types";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 

@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 import { useCombobox } from "downshift";
 import { type ForwardedRef, forwardRef, useCallback, useRef, useState } from "react";
 
-import type { CachedPayee } from "~lib/context/ynabContext";
+import type { CachedPayee } from "~lib/types";
 import { searchWithinString } from "~lib/utils";
 
 interface Props {

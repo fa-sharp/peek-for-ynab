@@ -11,10 +11,10 @@ import { CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type {
   AppSettings,
+  CachedBudget,
   MoveMoneyInitialState,
   TxAddInitialState
-} from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+} from "~lib/types";
 import {
   findCCAccount,
   findEmoji,

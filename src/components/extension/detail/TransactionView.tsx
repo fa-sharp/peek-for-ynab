@@ -3,7 +3,7 @@ import * as ynab from "ynab";
 
 import { CurrencyView, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
-import type { DetailViewState } from "~lib/context/storageContext";
+import type { DetailViewState } from "~lib/types";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",

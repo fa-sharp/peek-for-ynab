@@ -4,7 +4,8 @@ import { expect, test } from "vitest";
 
 import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
-import { StorageProvider, type TokenData } from "~lib/context/storageContext";
+import { StorageProvider } from "~lib/context/storageContext";
+import type { TokenData } from "~lib/types";
 
 test("Can render storage hook successfully, with default settings", async () => {
   const { result } = renderHook(useStorageContext, {

@@ -1,8 +1,8 @@
 import type { NextApiHandler } from "next";
 import { URL } from "url";
 
-import type { TokenData } from "~lib/context/storageContext";
 import { corsMiddleware } from "~lib/nextCorsMiddleware";
+import type { TokenData } from "~lib/types";
 
 import { OAUTH_BASE_URL } from "./initial";
 

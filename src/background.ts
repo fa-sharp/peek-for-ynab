@@ -1,7 +1,7 @@
 import { Storage } from "@plasmohq/storage";
 
 import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
-import { type TokenData } from "~lib/context/storageContext";
+import type { TokenData } from "~lib/types";
 
 const tokenStorage = new Storage({ area: "local" });
 let isRefreshing = false;
