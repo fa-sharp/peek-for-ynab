@@ -126,7 +126,7 @@ export default function TransactionAdd() {
             {!isSplit && (!account || account.on_budget) && (
               <CategorySelect
                 ref={categoryRef}
-                initialCategory={category}
+                currentCategory={category}
                 categories={categoriesData}
                 selectCategory={(selectedCategory) => {
                   setCategory(selectedCategory);
@@ -188,7 +188,7 @@ export default function TransactionAdd() {
             {!isSplit && isBudgetToTrackingTransfer && (
               <CategorySelect
                 ref={categoryRef}
-                initialCategory={category}
+                currentCategory={category}
                 categories={categoriesData}
                 selectCategory={(selectedCategory) => {
                   setCategory(selectedCategory);

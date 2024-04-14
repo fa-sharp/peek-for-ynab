@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import type { Account, CurrencyFormat } from "ynab";
+import { type Account, AccountType, type CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
@@ -13,7 +13,9 @@ import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
 import {
+  AddCCPaymentIcon,
   AddTransactionIcon,
+  AddTransferIcon,
   CollapseListIcon,
   CollapseListIconBold,
   ExpandListIcon,
@@ -145,6 +147,39 @@ function AccountTypeView({
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />
+                    {account.type === AccountType.CreditCard ||
+                    account.type === AccountType.LineOfCredit ? (
+                      <IconButton
+                        rounded
+                        accent
+                        icon={<AddCCPaymentIcon />}
+                        label="Add credit card payment"
+                        onClick={() =>
+                          account.transfer_payee_id &&
+                          onAddTx({
+                            isTransfer: true,
+                            payee: {
+                              id: account.transfer_payee_id,
+                              name: account.name,
+                              transferId: account.id
+                            }
+                          })
+                        }
+                      />
+                    ) : (
+                      <IconButton
+                        rounded
+                        accent
+                        icon={<AddTransferIcon />}
+                        label="Add transfer"
+                        onClick={() =>
+                          onAddTx({
+                            isTransfer: true,
+                            accountId: account.id
+                          })
+                        }
+                      />
+                    )}
                   </aside>
                 }
               />

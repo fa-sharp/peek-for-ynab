@@ -16,6 +16,7 @@ import AccountSelect from "./extension/transaction/AccountSelect";
 import AmountField from "./extension/transaction/AmountField";
 import CategorySelect from "./extension/transaction/CategorySelect";
 import MemoField from "./extension/transaction/MemoField";
+import MoveMoney from "./extension/transaction/MoveMoney";
 import PayeeSelect from "./extension/transaction/PayeeSelect";
 import SubTransaction from "./extension/transaction/SubTransaction";
 import TransactionAdd from "./extension/transaction/TransactionAdd";
@@ -43,5 +44,6 @@ export {
   AccountTxsView,
   CategoryTxsView,
   TxStatusIcon,
-  SubTransaction
+  SubTransaction,
+  MoveMoney
 };

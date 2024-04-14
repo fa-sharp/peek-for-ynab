@@ -9,7 +9,11 @@ import type {
 
 import { CurrencyView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
+import type {
+  AppSettings,
+  MoveMoneyInitialState,
+  TxAddInitialState
+} from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import {
   findCCAccount,
@@ -21,6 +25,7 @@ import {
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  AddTransferIcon,
   CollapseListIcon,
   CollapseListIconBold,
   ExpandListIcon,
@@ -68,6 +73,9 @@ function CategoriesView() {
             settings={settings}
             onSaveCategory={(categoryId) => saveCategory(categoryId)}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            onMoveMoney={(moveMoneyState) =>
+              setPopupState({ view: "move", moveMoneyState })
+            }
           />
         ))}
     </>
@@ -83,7 +91,8 @@ export function CategoryGroupView({
   onSaveCategory,
   editMode,
   settings,
-  onAddTx
+  onAddTx,
+  onMoveMoney
 }: {
   categoryGroup: CategoryGroupWithCategories;
   accountsData?: Account[];
@@ -93,6 +102,7 @@ export function CategoryGroupView({
   editMode?: boolean;
   settings: AppSettings;
   onAddTx: (initialState: TxAddInitialState) => void;
+  onMoveMoney: (initialState: MoveMoneyInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -172,6 +182,19 @@ export function CategoryGroupView({
                                   : undefined,
                               amountType: "Inflow",
                               accountId: ccAccount.id
+                            })
+                          }
+                        />
+                      )}
+                      {!ccAccount && (
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddTransferIcon />}
+                          label="Move money"
+                          onClick={() =>
+                            onMoveMoney({
+                              toCategoryId: category.id
                             })
                           }
                         />

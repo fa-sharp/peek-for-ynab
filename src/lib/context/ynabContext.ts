@@ -132,6 +132,19 @@ const useYNABProvider = () => {
     );
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
+  /** Current month data (Ready to Assign, total activity, etc.) for the selected budget */
+  const { data: monthData, refetch: refetchMonth } = useQuery({
+    queryKey: ["month", { budgetId: selectedBudgetId }],
+    enabled: Boolean(ynabAPI && selectedBudgetId),
+    queryFn: async () => {
+      if (!ynabAPI) return;
+      const response = await ynabAPI.months.getBudgetMonth(selectedBudgetId, "current");
+      const { month } = response.data;
+      IS_DEV && console.log("Fetched month data!", month);
+      return month;
+    }
+  });
+
   /** Fetch accounts for the selected budget */
   const {
     data: accountsData,
@@ -155,8 +168,8 @@ const useYNABProvider = () => {
   });
 
   const refreshCategoriesAndAccounts = useCallback(
-    () => Promise.all([refetchCategoryGroups(), refetchAccounts()]),
-    [refetchAccounts, refetchCategoryGroups]
+    () => Promise.all([refetchCategoryGroups(), refetchAccounts(), refetchMonth()]),
+    [refetchAccounts, refetchCategoryGroups, refetchMonth]
   );
 
   /** Fetch payees for the selected budget */
@@ -295,6 +308,43 @@ const useYNABProvider = () => {
     [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI, queryClient]
   );
 
+  const moveMoney = useCallback(
+    async ({
+      subtractFromCategoryId,
+      addToCategoryId,
+      amountInMillis
+    }: {
+      subtractFromCategoryId?: string;
+      addToCategoryId?: string;
+      amountInMillis: number;
+    }) => {
+      if (!ynabAPI || !selectedBudgetId) return;
+      const fromCategory = categoriesData?.find((c) => c.id === subtractFromCategoryId);
+      const toCategory = categoriesData?.find((c) => c.id === addToCategoryId);
+      const [subtractResponse, addResponse] = await Promise.all([
+        fromCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              selectedBudgetId,
+              "current",
+              fromCategory.id,
+              { category: { budgeted: fromCategory.budgeted - amountInMillis } }
+            )
+          : Promise.resolve("No 'from' category"),
+        toCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              selectedBudgetId,
+              "current",
+              toCategory.id,
+              { category: { budgeted: toCategory.budgeted + amountInMillis } }
+            )
+          : Promise.resolve("No 'to' category")
+      ]);
+      IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
+      setTimeout(() => refreshCategoriesAndAccounts(), 350);
+    },
+    [categoriesData, selectedBudgetId, ynabAPI, refreshCategoriesAndAccounts]
+  );
+
   return {
     /** API data: List of all user's budgets */
     budgetsData,
@@ -303,6 +353,8 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
+    /** API data: Current month data, with Ready to Assign, total activity, etc. */
+    monthData,
     /** API data: Error while fetching categories */
     categoriesError,
     /** API data: List of all open accounts in current budget*/
@@ -327,7 +379,9 @@ const useYNABProvider = () => {
     /** Add a new transaction to the current budget */
     addTransaction,
     useGetAccountTxs,
-    useGetCategoryTxs
+    useGetCategoryTxs,
+    /** Move money in the current budget */
+    moveMoney
   };
 };
 

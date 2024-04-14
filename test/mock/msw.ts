@@ -3,7 +3,7 @@ import type { HttpRequestResolverExtras } from "msw/lib/core/handlers/HttpHandle
 import type { ResponseResolverInfo } from "msw/lib/core/handlers/RequestHandler";
 import { setupServer } from "msw/node";
 
-import { accounts, budgets, category_groups, payees } from "./ynabApiData";
+import { accounts, budgets, category_groups, month, payees } from "./ynabApiData";
 
 const BASE_URL = "https://api.ynab.com/v1";
 
@@ -20,6 +20,16 @@ export const mockServer = setupServer(
       return HttpResponse.json({
         data: {
           category_groups
+        }
+      });
+    })
+  ),
+  http.get(
+    BASE_URL + "/budgets/:budgetId/months/current",
+    withAuth(() => {
+      return HttpResponse.json({
+        data: {
+          month
         }
       });
     })

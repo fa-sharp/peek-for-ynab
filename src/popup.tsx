@@ -1,6 +1,7 @@
 import {
   AccountTxsView,
   CategoryTxsView,
+  MoveMoney,
   PopupLogin,
   PopupMain,
   TransactionAdd
@@ -43,6 +44,8 @@ export function PopupView() {
         <AccountTxsView />
       ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
         <CategoryTxsView />
+      ) : popupState.view === "move" ? (
+        <MoveMoney />
       ) : (
         <div>Something went wrong 😢!</div>
       )}

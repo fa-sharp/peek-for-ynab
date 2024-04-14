@@ -16,15 +16,25 @@ import { useYNABContext } from "~lib/context";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
-  initialCategory?: Category | null;
+  currentCategory?: Category | null;
   categories?: Category[];
   selectCategory: (category: Category | null) => void;
+  label?: string;
   disabled?: boolean;
   placeholder?: string;
+  movingMoney?: boolean;
 }
 
 function CategorySelect(
-  { initialCategory, categories, selectCategory, disabled, placeholder }: Props,
+  {
+    currentCategory,
+    categories,
+    selectCategory,
+    disabled,
+    label,
+    placeholder,
+    movingMoney
+  }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const { categoryGroupsData, selectedBudgetData } = useYNABContext();
@@ -35,9 +45,10 @@ function CategorySelect(
     const ignoredIds = new Set(
       categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
     );
-    ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
+    // Only ignore Inflow: RTA category if we're moving money
+    if (!movingMoney) ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id);
     return ignoredIds;
-  }, [categoryGroupsData]);
+  }, [categoryGroupsData, movingMoney]);
 
   const getFilter = useCallback(
     (inputValue?: string) => {
@@ -68,7 +79,7 @@ function CategorySelect(
     selectedItem
   } = useCombobox<Category | null>({
     items: categoryList,
-    initialSelectedItem: initialCategory,
+    selectedItem: currentCategory,
     itemToString(category) {
       if (!category) return "";
       if (category.name === "Inflow: Ready to Assign") return category.name;
@@ -89,7 +100,7 @@ function CategorySelect(
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>Category</label>
+      <label {...getLabelProps()}>{label || "Category"}</label>
       <div className="flex-col">
         <input
           {...getInputProps({
