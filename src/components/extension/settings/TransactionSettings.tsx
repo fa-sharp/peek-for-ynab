@@ -1,48 +1,11 @@
-import { clsx } from "clsx";
-import { useEffect, useState } from "react";
-import { CircleC, InfoCircle, Settings } from "tabler-icons-react";
+import { CircleC, InfoCircle } from "tabler-icons-react";
 
-import { AccountSelect, IconButton } from "~components";
+import { AccountSelect } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { BudgetSettings } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 
-export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
-  const { shownBudgetIds, toggleShowBudget } = useStorageContext();
-  const [showSettings, setShowSettings] = useState(false);
-
-  useEffect(() => {
-    if (!shownBudgetIds?.includes(budget.id)) setShowSettings(false);
-  }, [budget.id, shownBudgetIds]);
-
-  return (
-    <li>
-      <div className="flex-row">
-        <label
-          className={clsx("flex-row", {
-            "heading-medium": shownBudgetIds?.includes(budget.id)
-          })}>
-          <input
-            type="checkbox"
-            checked={shownBudgetIds?.includes(budget.id)}
-            onChange={() => toggleShowBudget(budget.id)}
-          />
-          {budget.name}
-        </label>
-        {shownBudgetIds?.includes(budget.id) && (
-          <IconButton
-            icon={<Settings size={18} />}
-            label={!showSettings ? "Show budget settings" : "Hide budget settings"}
-            onClick={() => setShowSettings((prev) => !prev)}
-          />
-        )}
-      </div>
-      {showSettings && <BudgetSettingsDetail budget={budget} />}
-    </li>
-  );
-}
-
-function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
+export default function TransactionSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();
   const { useGetAccountsForBudget } = useYNABContext();
 
@@ -62,14 +25,9 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
     });
 
   return (
-    <div
-      style={{
-        marginLeft: "2rem",
-        marginBottom: "1rem",
-        maxWidth: "15rem"
-      }}>
-      <h4 className="heading-small mb-lg">Transactions</h4>
-      <div className="flex-col">
+    <>
+      <h4 className="heading-small">Transactions</h4>
+      <div className="flex-col gap-sm mb-lg">
         <label
           className="flex-row gap-xs"
           title="Set transactions as Approved by default">
@@ -91,7 +49,7 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
         </label>
         <label
           className="flex-row gap-xs"
-          title="Remember the last-used account when entering transactions">
+          title="Remember the account you used last time">
           <input
             type="checkbox"
             checked={settings?.transactions.rememberAccount ?? false}
@@ -118,6 +76,6 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
             />
           ) : null)}
       </div>
-    </div>
+    </>
   );
 }

@@ -51,18 +51,19 @@ interface BudgetToStringArrayMap {
 
 export interface BudgetNotificationSettings {
   /** Notify when a category is overspent */
-  overspent?: boolean;
+  overspent: boolean;
   /** Notify when a bank connection is showing an error */
-  importError?: boolean;
+  importError: boolean;
   /** Reminders for reconciliation - stored as a map
    * of accountId to max # of days since last reconciliation */
-  reconcileAlerts?: {
+  reconcileAlerts: {
     [accountId: string]: number | undefined;
   };
 }
 
 /** Budget-specific settings */
 export interface BudgetSettings {
+  notifications: BudgetNotificationSettings;
   transactions: {
     /** Whether transactions are marked Cleared by default */
     cleared: boolean;

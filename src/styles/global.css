@@ -178,6 +178,7 @@ button:focus-visible {
 
 .heading-small {
   margin-block: var(--spacing-sm);
+  font-size: 1.05em;
   font-weight: 600;
 }
 
@@ -247,6 +248,9 @@ li:last-child .balance-display {
   font-size: inherit;
   background-color: var(--background);
   color: currentColor;
+}
+.select.small {
+  padding: 0.1em;
 }
 
 .select-dropdown-list {

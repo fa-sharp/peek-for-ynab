@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Refresh } from "tabler-icons-react";
 
-import BudgetSettings from "~components/BudgetSettings";
+import { BudgetSettings } from "~components";
 import {
   AppProvider,
   useAuthContext,
