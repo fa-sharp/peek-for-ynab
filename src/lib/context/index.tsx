@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "~lib/utils";
 
 import { AuthProvider, useAuthContext } from "./authContext";
+import { NotificationsProvider } from "./notificationsContext";
 import { StorageProvider, useStorageContext } from "./storageContext";
 import { YNABProvider, useYNABContext } from "./ynabContext";
 
@@ -40,7 +41,9 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
       <AuthProvider>
-        <YNABProvider>{children}</YNABProvider>
+        <YNABProvider>
+          <NotificationsProvider>{children}</NotificationsProvider>
+        </YNABProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StorageProvider>

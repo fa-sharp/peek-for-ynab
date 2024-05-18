@@ -1,9 +1,8 @@
-import type { QueryClient } from "@tanstack/react-query";
-import type { Account, Category, CategoryGroupWithCategories } from "ynab";
+import type { Account, Category } from "ynab";
 
 import type { BudgetNotificationSettings } from "./context/storageContext";
 import type { CachedBudget } from "./context/ynabContext";
-import { ONE_DAY_IN_MILLIS, formatCurrency, isEmptyObject } from "./utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, formatCurrency, isEmptyObject } from "./utils";
 
 export interface CurrentAlerts {
   [budgetId: string]: BudgetAlerts | undefined;
@@ -17,8 +16,10 @@ export interface BudgetAlerts {
 export interface AccountAlerts {
   [accountId: string]:
     | {
+        name: string;
         importError?: boolean;
         reconcile?: boolean;
+        lastReconciledAt?: string;
       }
     | undefined;
 }
@@ -26,6 +27,8 @@ export interface AccountAlerts {
 export interface CategoryAlerts {
   [categoryId: string]:
     | {
+        name: string;
+        balance: number;
         overspent?: boolean;
       }
     | undefined;
@@ -43,7 +46,10 @@ export const getBudgetAlerts = (
     cats: {}
   };
   data.accounts?.forEach((account) => {
-    const accountAlerts: AccountAlerts[string] = {};
+    const accountAlerts: Pick<
+      NonNullable<AccountAlerts[string]>,
+      "importError" | "reconcile"
+    > = {};
 
     // Check for bank import error
     if (notificationSettings.importError && account.direct_import_in_error)
@@ -59,33 +65,41 @@ export const getBudgetAlerts = (
     )
       accountAlerts.reconcile = true;
 
-    if (!isEmptyObject(accountAlerts)) budgetAlerts.accounts[account.id] = accountAlerts;
+    // Save all account alerts
+    if (!isEmptyObject(accountAlerts)) {
+      budgetAlerts.accounts[account.id] = {
+        name: account.name,
+        lastReconciledAt: account.last_reconciled_at || undefined,
+        ...accountAlerts
+      };
+    }
   });
   data.categories?.forEach((category) => {
-    const categoryAlerts: CategoryAlerts[string] = {};
+    const categoryAlerts: Pick<NonNullable<CategoryAlerts[string]>, "overspent"> = {};
 
     // Check for overspent
     if (notificationSettings.overspent && category.balance < 0)
       categoryAlerts.overspent = true;
 
-    if (!isEmptyObject(categoryAlerts)) budgetAlerts.cats[category.id] = categoryAlerts;
+    // Save all category alerts
+    if (!isEmptyObject(categoryAlerts)) {
+      budgetAlerts.cats[category.id] = {
+        name: category.name,
+        balance: category.balance,
+        ...categoryAlerts
+      };
+    }
   });
-  return isEmptyObject(budgetAlerts.accounts) && isEmptyObject(budgetAlerts.cats)
-    ? null
-    : budgetAlerts;
+  if (isEmptyObject(budgetAlerts.accounts) && isEmptyObject(budgetAlerts.cats))
+    return null;
+  else return budgetAlerts;
 };
 
 export const updateIconTooltipWithAlerts = (
   currentAlerts: CurrentAlerts,
-  queryClient: QueryClient
+  budgetsData: CachedBudget[]
 ) => {
-  const budgetsData = queryClient.getQueryData<CachedBudget[]>(["budgets"]);
-  if (!budgetsData) {
-    console.log("Can't update tooltip and icon - no budgets data found in cache");
-    return;
-  } else {
-    console.log("Updating tooltip and icon");
-  }
+  IS_DEV && console.log("Updating tooltip and icon");
   let tooltip = "";
   for (const [budgetId, budgetAlerts] of Object.entries(currentAlerts)) {
     const budget = budgetsData.find((b) => b.id === budgetId);
@@ -93,42 +107,30 @@ export const updateIconTooltipWithAlerts = (
 
     tooltip += `----${budget.name}----\n`;
     if (!isEmptyObject(budgetAlerts.cats)) {
-      const categoriesData = queryClient
-        .getQueryData<CategoryGroupWithCategories[]>(["categoryGroups", { budgetId }])
-        ?.flatMap((cg) => cg.categories);
-      for (const [categoryId, categoryAlerts] of Object.entries(budgetAlerts.cats)) {
-        const category = categoriesData?.find((c) => c.id === categoryId);
-        if (!category) continue;
-
-        tooltip += `${category.name}: `;
-        if (categoryAlerts?.overspent)
-          tooltip += formatCurrency(category.balance, budget.currencyFormat);
-
+      for (const categoryAlerts of Object.values(budgetAlerts.cats)) {
+        if (!categoryAlerts) return;
+        tooltip += `${categoryAlerts.name}: `;
+        if (categoryAlerts.overspent)
+          tooltip += formatCurrency(categoryAlerts.balance, budget.currencyFormat);
         tooltip += "\n";
       }
       tooltip += "\n";
     }
     if (!isEmptyObject(budgetAlerts.accounts)) {
-      const accountsData = queryClient.getQueryData<Account[]>([
-        "accounts",
-        { budgetId }
-      ]);
-      for (const [accountId, accountAlerts] of Object.entries(budgetAlerts.accounts)) {
-        const account = accountsData?.find((a) => a.id === accountId);
-        if (!account) continue;
-
-        tooltip += `${account.name}:\n`;
-        if (accountAlerts?.importError) tooltip += "Connection issue\n";
-        if (accountAlerts?.reconcile && account.last_reconciled_at)
+      for (const accountAlerts of Object.values(budgetAlerts.accounts)) {
+        if (!accountAlerts) return;
+        tooltip += `${accountAlerts.name}:\n`;
+        if (accountAlerts.importError) tooltip += "Connection issue\n";
+        if (accountAlerts.reconcile && accountAlerts.lastReconciledAt)
           tooltip += `Last reconciled ${new Date(
-            account.last_reconciled_at
+            accountAlerts.lastReconciledAt
           ).toLocaleDateString()}\n`;
-
         tooltip += "\n";
       }
     }
   }
-  chrome.action.setTitle({ title: tooltip });
+
+  chrome.action.setTitle({ title: tooltip.trimEnd() });
   chrome.action.setBadgeText({
     text: String(
       Object.keys(currentAlerts).reduce(
