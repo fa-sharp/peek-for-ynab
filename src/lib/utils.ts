@@ -43,6 +43,15 @@ export const millisToStringValue = (
 export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
   type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
 
+export const isEmptyObject = (objectName: object) => {
+  for (const prop in objectName) {
+    if (Object.prototype.hasOwnProperty.call(objectName, prop)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name

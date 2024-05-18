@@ -48,6 +48,18 @@ interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
 
+export interface BudgetNotificationSettings {
+  /** Notify when a category is overspent */
+  overspent?: boolean;
+  /** Notify when a bank connection is showing an error */
+  importError?: boolean;
+  /** Reminders for reconciliation - stored as a map
+   * of accountId to max # of days since last reconciliation */
+  reconcileAlerts?: {
+    [accountId: string]: number | undefined;
+  };
+}
+
 const TOKEN_STORAGE = new Storage({ area: "local" });
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
