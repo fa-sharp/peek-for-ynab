@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
+import { Refresh } from "tabler-icons-react";
 
 import BudgetSettings from "~components/BudgetSettings";
 import {
@@ -113,33 +113,6 @@ export function OptionsView() {
             </label>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Transaction defaults
-          </h3>
-          <div className="flex-col">
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
-              <input
-                type="checkbox"
-                checked={settings.txApproved}
-                onChange={(e) => changeSetting("txApproved", e.target.checked)}
-              />
-              <InfoCircle fill="#2ea1be" stroke="white" size={20} />
-              Approved
-            </label>
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Cleared by default">
-              <input
-                type="checkbox"
-                checked={settings.txCleared}
-                onChange={(e) => changeSetting("txCleared", e.target.checked)}
-              />
-              <CircleC stroke="white" fill="var(--currency-green)" size={20} />
-              Cleared
-            </label>
-          </div>
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Permissions
           </h3>

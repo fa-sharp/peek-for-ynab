@@ -27,7 +27,7 @@ export default function useTransaction() {
   const [cleared, setCleared] = useState(
     () =>
       accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
-        "cash" || !!settings?.txCleared
+        "cash" || !!budgetSettings?.transactions.cleared
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
     popupState.txAddState?.amountType || "Outflow"
@@ -44,8 +44,12 @@ export default function useTransaction() {
   const [account, setAccount] = useState(() => {
     if (popupState.txAddState?.accountId)
       return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
-    if (budgetSettings?.defaultAccountId)
-      return accountsData?.find((a) => a.id === budgetSettings.defaultAccountId) || null;
+    if (budgetSettings?.transactions.defaultAccountId)
+      return (
+        accountsData?.find(
+          (a) => a.id === budgetSettings.transactions.defaultAccountId
+        ) || null
+      );
     return null;
   });
   const [memo, setMemo] = useState("");
@@ -154,8 +158,17 @@ export default function useTransaction() {
         return;
       }
     }
-    if (budgetSettings?.rememberAccount && account.id !== budgetSettings.defaultAccountId)
-      setBudgetSettings((prev) => ({ ...prev, defaultAccountId: account.id }));
+    if (
+      budgetSettings?.transactions.rememberAccount &&
+      account.id !== budgetSettings.transactions.defaultAccountId
+    )
+      setBudgetSettings(
+        (prev) =>
+          prev && {
+            ...prev,
+            transactions: { ...prev.transactions, defaultAccountId: account.id }
+          }
+      );
 
     setIsSaving(true);
     try {
@@ -172,7 +185,7 @@ export default function useTransaction() {
         cleared: cleared
           ? TransactionClearedStatus.Cleared
           : TransactionClearedStatus.Uncleared,
-        approved: settings?.txApproved,
+        approved: budgetSettings?.transactions.approved,
         memo,
         flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined,
         subtransactions: isSplit

@@ -30,7 +30,7 @@ function AccountSelect(
     accounts,
     label,
     placeholder,
-    required,
+    required = true,
     disabled,
     selectAccount
   }: Props,

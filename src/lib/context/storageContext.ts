@@ -6,7 +6,12 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
-import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import {
+  DEFAULT_BUDGET_SETTINGS,
+  DEFAULT_SETTINGS,
+  REFRESH_NEEDED_KEY,
+  TOKEN_STORAGE_KEY
+} from "~lib/constants";
 
 import type { CachedPayee } from "./ynabContext";
 
@@ -17,10 +22,6 @@ export interface TokenData {
 }
 
 export interface AppSettings {
-  /** Whether transactions are marked Cleared by default */
-  txCleared: boolean;
-  /** Whether transactions are automatically marked Approved */
-  txApproved: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
@@ -48,12 +49,18 @@ interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
 
-/** Budget-specific settings (e.g. default account for transactions) */
-interface BudgetSettings {
-  /** Whether to remember the last-used account for transaction entry. */
-  rememberAccount?: boolean;
-  /** Default account for purchases */
-  defaultAccountId?: string;
+/** Budget-specific settings */
+export interface BudgetSettings {
+  transactions: {
+    /** Whether transactions are marked Cleared by default */
+    cleared: boolean;
+    /** Whether transactions are automatically marked Approved */
+    approved: boolean;
+    /** Whether to remember the last-used account for transaction entry. */
+    rememberAccount: boolean;
+    /** Default account for purchases */
+    defaultAccountId?: string;
+  };
 }
 
 const TOKEN_STORAGE = new Storage({ area: "local" });
@@ -132,7 +139,8 @@ const useStorageProvider = () => {
       key: `budget-${selectedBudgetId}`,
       instance: storageArea
     },
-    (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
+    (data, isHydrated) =>
+      !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
   );
 
   /** Use budget-specific settings for a specific budget */
@@ -142,7 +150,8 @@ const useStorageProvider = () => {
         key: `budget-${budgetId}`,
         instance: storageArea
       },
-      (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
+      (data, isHydrated) =>
+        !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
     );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
