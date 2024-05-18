@@ -1,7 +1,6 @@
+import { AccountSelect } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedBudget } from "~lib/context/ynabContext";
-
-import AccountSelect from "./AccountSelect";
 
 export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
   const { shownBudgetIds, toggleShowBudget } = useStorageContext();

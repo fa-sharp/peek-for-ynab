@@ -15,7 +15,8 @@ import {
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const { settings, popupState, setPopupState } = useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState, setBudgetSettings } =
+    useStorageContext();
 
   // Transaction state
   const [isTransfer, setIsTransfer] = useState(
@@ -41,8 +42,11 @@ export default function useTransaction() {
     );
   });
   const [account, setAccount] = useState(() => {
-    if (!popupState.txAddState?.accountId) return null;
-    return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (popupState.txAddState?.accountId)
+      return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (budgetSettings?.defaultAccountId)
+      return accountsData?.find((a) => a.id === budgetSettings.defaultAccountId) || null;
+    return null;
   });
   const [memo, setMemo] = useState("");
   const [flag, setFlag] = useState("");
@@ -150,6 +154,8 @@ export default function useTransaction() {
         return;
       }
     }
+    if (budgetSettings?.rememberAccount && account.id !== budgetSettings.defaultAccountId)
+      setBudgetSettings((prev) => ({ ...prev, defaultAccountId: account.id }));
 
     setIsSaving(true);
     try {
