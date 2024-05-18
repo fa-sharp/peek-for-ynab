@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
+import { Refresh } from "tabler-icons-react";
 
+import BudgetSettings from "~components/BudgetSettings";
 import {
   AppProvider,
   useAuthContext,
@@ -22,8 +23,7 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, syncEnabled, changeSetting, shownBudgetIds, toggleShowBudget } =
-    useStorageContext();
+  const { settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
@@ -114,33 +114,6 @@ export function OptionsView() {
           </div>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Transaction defaults
-          </h3>
-          <div className="flex-col">
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
-              <input
-                type="checkbox"
-                checked={settings.txApproved}
-                onChange={(e) => changeSetting("txApproved", e.target.checked)}
-              />
-              <InfoCircle fill="#2ea1be" stroke="white" size={20} />
-              Approved
-            </label>
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Cleared by default">
-              <input
-                type="checkbox"
-                checked={settings.txCleared}
-                onChange={(e) => changeSetting("txCleared", e.target.checked)}
-              />
-              <CircleC stroke="white" fill="var(--currency-green)" size={20} />
-              Cleared
-            </label>
-          </div>
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Permissions
           </h3>
           <label className="flex-row mb-sm">
@@ -165,20 +138,13 @@ export function OptionsView() {
           </ul>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Show/hide budgets
+            Budgets
           </h3>
-          <div className="flex-col">
+          <ul className="list flex-col">
             {budgetsData?.map((budget) => (
-              <label key={budget.id} className="flex-row">
-                <input
-                  type="checkbox"
-                  checked={shownBudgetIds?.includes(budget.id)}
-                  onChange={() => toggleShowBudget(budget.id)}
-                />
-                {budget.name}
-              </label>
+              <BudgetSettings key={budget.id} budget={budget} />
             ))}
-          </div>
+          </ul>
           <button
             title="Refresh the list of budgets from YNAB"
             className="button rounded accent flex-row mb-sm"

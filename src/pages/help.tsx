@@ -64,9 +64,9 @@ function HelpPage() {
           <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
             If you will enter a lot of your transactions using the extension, you may want
-            to uncheck the <b>Approved</b> setting under <b>Transaction defaults</b>, so
-            that you will be prompted to double-check and Approve the transactions in
-            YNAB.
+            to leave them Unapproved so that you will be prompted to double-check and
+            Approve the transactions in YNAB. In the settings page, click the gear ⚙️ icon
+            next to the budget name, and then uncheck the <b>Approved</b> setting.
           </p>
         </li>
         <li>

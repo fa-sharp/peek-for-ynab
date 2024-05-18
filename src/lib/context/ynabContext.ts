@@ -143,14 +143,7 @@ const useYNABProvider = () => {
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async () => {
       if (!ynabAPI) return;
-      const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
-      const accounts = response.data.accounts
-        .filter((a) => a.closed === false) // filter out closed accounts
-        .sort((a, b) =>
-          a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
-        ); // sort with Budget accounts first
-      IS_DEV && console.log("Fetched accounts!", accounts);
-      return accounts;
+      return await fetchAccountsForBudget(ynabAPI, selectedBudgetId);
     }
   });
 
@@ -193,6 +186,16 @@ const useYNABProvider = () => {
       []
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
+
+  const useGetAccountsForBudget = (budgetId: string) =>
+    useQuery({
+      queryKey: ["accounts", { budgetId }],
+      enabled: Boolean(ynabAPI),
+      queryFn: async () => {
+        if (!ynabAPI) return;
+        return await fetchAccountsForBudget(ynabAPI, budgetId);
+      }
+    });
 
   const addTransaction = useCallback(
     async (transaction: ynab.SaveTransaction) => {
@@ -239,6 +242,8 @@ const useYNABProvider = () => {
     refreshBudgets,
     isRefreshingBudgets,
     refreshCategoriesAndAccounts,
+    /** Get accounts for the specified budget */
+    useGetAccountsForBudget,
     /** Add a new transaction to the current budget */
     addTransaction
   };
@@ -249,3 +254,15 @@ const { BaseContext, Provider } = createProvider(useYNABProvider);
 /** Hook that provides user's budget data from YNAB */
 export const useYNABContext = () => useContext(BaseContext);
 export const YNABProvider = Provider;
+
+/** Fetch accounts for this budget from the YNAB API */
+async function fetchAccountsForBudget(ynabAPI: ynab.api, selectedBudgetId: string) {
+  const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
+  const accounts = response.data.accounts
+    .filter((a) => a.closed === false) // filter out closed accounts
+    .sort((a, b) =>
+      a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
+    ); // sort with Budget accounts first
+  IS_DEV && console.log("Fetched accounts!", accounts);
+  return accounts;
+}

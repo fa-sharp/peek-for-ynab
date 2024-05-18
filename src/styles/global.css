@@ -176,6 +176,11 @@ button:focus-visible {
   font-weight: 600;
 }
 
+.heading-small {
+  margin-block: var(--spacing-sm);
+  font-weight: 600;
+}
+
 .heading-bordered {
   border-bottom: solid 1px var(--border-light);
 }
