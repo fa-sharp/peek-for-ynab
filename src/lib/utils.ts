@@ -8,30 +8,40 @@ export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
-export const formatCurrency = (
-  millis: number,
+export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
-    millis,
-    currencyFormat.decimal_digits
-  );
-  const formattedString = new Intl.NumberFormat("default", {
+  const formatter = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
-  }).format(currencyAmount);
-
-  return formattedString;
+  });
+  return (millis: number) => {
+    const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
+      millis,
+      currencyFormat.decimal_digits
+    );
+    return formatter.format(currencyAmount);
+  };
 };
+
+export const formatCurrency = (
+  millis: number,
+  /** the budget's `currency_format` property from YNAB */
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
+) => getCurrencyFormatter(currencyFormat)(millis);
 
 /** Convert millis to a string value suitable for the HTML number input */
 export const millisToStringValue = (
   millis: number,
   currencyFormat = { decimal_digits: 2 }
 ) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
+
+/** Convert a string value (e.g. from HTML number input) to milliUnits */
+export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
+  type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
 
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
@@ -53,7 +63,6 @@ export const getTodaysDateISO = () => {
 
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
-  //@ts-expect-error shut up TS!
   const example = Intl.NumberFormat(locales).format(1.1);
   const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
   const cleaned = value.replace(cleanPattern, "");
@@ -120,49 +129,6 @@ export const removeCurrentTabPermissions = () =>
       }
     )
   );
-
-/** Extract any currency amounts on the page. Returns a sorted array of detected amounts, from highest to lowest */
-export const extractCurrencyAmounts = () => {
-  /** Get all text content from an element and its descendants, including shadow DOMs */
-  const getTextContent = (element: Element | ShadowRoot) => {
-    let content = element.textContent || "";
-
-    element.querySelectorAll("*").forEach((el) => {
-      if (el.shadowRoot) {
-        content += getTextContent(el.shadowRoot);
-      }
-    });
-    return content;
-  };
-
-  /** Parse decimal number according to user's locale */
-  const parseLocaleNumber = (value: string, locales = navigator.languages) => {
-    //@ts-expect-error shut up TS!
-    const example = Intl.NumberFormat(locales).format(1.1);
-    const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
-    const cleaned = value.replace(cleanPattern, "");
-    const normalized = cleaned.replace(example.charAt(1), ".");
-
-    return parseFloat(normalized);
-  };
-
-  const text = getTextContent(document.body);
-  const regex = /\p{Sc}\s?([\d,]+(?:\.\d{1,2})?)/gu; // TODO improve this regex for more currencies/locales (or find a different way)
-  let match;
-  const detected = new Set<number>(); // use a Set to eliminate duplicates
-  while ((match = regex.exec(text)) !== null) {
-    const amount = parseLocaleNumber(match[1]);
-    if (!isNaN(amount)) {
-      detected.add(amount);
-    }
-  }
-
-  // Sort amounts from highest to lowest
-  const amounts = Array.from(detected);
-  amounts.sort((a, b) => b - a);
-
-  return amounts;
-};
 
 export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
   if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";

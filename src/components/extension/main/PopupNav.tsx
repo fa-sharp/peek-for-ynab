@@ -2,7 +2,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { useCallback } from "react";
 import {
   AlertTriangle,
-  ArrowsDownUp,
+  BoxMultiple,
   Check,
   ExternalLink,
   Pencil,
@@ -12,10 +12,11 @@ import {
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
+  const { tokenExpired } = useAuthContext();
   const {
     selectedBudgetId,
     settings,
@@ -33,34 +34,32 @@ export default function PopupNav() {
     isRefreshingBudgets
   } = useYNABContext();
   const globalIsFetching = useIsFetching();
-  const isLoadingData = globalIsFetching || tokenRefreshNeeded;
-
-  const switchBudget = useCallback(() => {
-    if (!shownBudgetsData) return;
-    const currIndex = shownBudgetsData.findIndex((b) => b.id === selectedBudgetId);
-    setSelectedBudgetId(shownBudgetsData[(currIndex + 1) % shownBudgetsData.length].id);
-  }, [selectedBudgetId, setSelectedBudgetId, shownBudgetsData]);
 
   const openBudget = useCallback(() => {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
   }, [selectedBudgetId]);
 
-  if (!shownBudgetsData && isRefreshingBudgets) return <p>Loading budgets...</p>;
-  if (!shownBudgetsData || !settings) return null;
+  const openPopupWindow = useCallback(() => {
+    window.open(
+      chrome.runtime.getURL("popup.html"),
+      "peekWindow",
+      "width=340,height=500"
+    );
+    window.close();
+  }, []);
+
+  if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
+  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
+  if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
+  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: 8,
-        marginBottom: "0.6rem"
-      }}>
+    <nav className="flex-row justify-between mb-lg">
       <IconButton
         label={
           categoriesError || accountsError
             ? "Error getting data from YNAB!"
-            : isLoadingData
+            : globalIsFetching
               ? "Status: Refreshing data..."
               : `Status: Last updated ${new Date(
                   categoriesLastUpdated < accountsLastUpdated
@@ -71,7 +70,7 @@ export default function PopupNav() {
         icon={
           categoriesError || accountsError ? (
             <AlertTriangle color="var(--stale)" /> // indicates error while fetching data
-          ) : isLoadingData ? (
+          ) : globalIsFetching ? (
             <Refresh />
           ) : !selectedBudgetId ||
             (categoriesLastUpdated + 240_000 > Date.now() &&
@@ -81,35 +80,29 @@ export default function PopupNav() {
             <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
           )
         }
-        spin={Boolean(isLoadingData)}
+        spin={Boolean(globalIsFetching)}
         disabled
         noAction
       />
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 3
-        }}>
+      <div className="flex-row gap-xs">
         <BudgetSelect
           emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}
         />
-        {shownBudgetsData?.length > 1 && (
-          <IconButton
-            label="Next budget"
-            onClick={switchBudget}
-            icon={<ArrowsDownUp />}
-          />
-        )}
         <IconButton
           label="Open this budget in YNAB"
           onClick={openBudget}
           icon={<ExternalLink />}
         />
+        {window.name !== "peekWindow" && (
+          <IconButton
+            label="Open this extension in a separate window"
+            onClick={openPopupWindow}
+            icon={<BoxMultiple />}
+          />
+        )}
         <IconButton
           label="Settings"
           onClick={() => chrome?.runtime?.openOptionsPage()}

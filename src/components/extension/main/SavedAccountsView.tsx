@@ -1,10 +1,9 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { IconButton } from "~components";
-import { AccountView } from "~components/AccountsView";
+import { AccountView, IconButton } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 
-import { AddTransactionIcon, PinnedItemIcon } from "./icons/ActionIcons";
+import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -26,7 +25,7 @@ export default function SavedAccountsView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned accounts"
-          className="list mt-md">
+          className="list mb-lg">
           {savedAccountsData.map((account, idx) => (
             <Draggable
               draggableId={account.id}

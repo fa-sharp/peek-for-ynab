@@ -43,9 +43,10 @@ function HelpPage() {
           <h3>Are there keyboard shortcuts to open/use the extension?</h3>
           <p>
             Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
-            (you can change this by heading over to chrome://extensions/shortcuts in your
-            browser). From there, you can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>,{" "}
-            <kbd>Space</kbd>, and <kbd>Enter</kbd> keys to navigate the extension.
+            (you can change this by heading over to{" "}
+            <code>chrome://extensions/shortcuts</code> in your browser). From there, you
+            can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Space</kbd>, and{" "}
+            <kbd>Enter</kbd> keys to navigate the extension.
           </p>
         </li>
         <li>

@@ -27,7 +27,7 @@ import {
   ExpandListIconBold,
   PinItemIcon,
   PinnedItemIcon
-} from "./icons/ActionIcons";
+} from "../../icons/ActionIcons";
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
@@ -48,9 +48,7 @@ function CategoriesView() {
 
   return (
     <>
-      <div
-        className="heading-big cursor-pointer mt-md"
-        onClick={() => setExpanded(!expanded)}>
+      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
@@ -224,7 +222,7 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          hideBalance={settings.privateMode}
+          animationEnabled={settings.animations}
         />
         {actionElementsRight}
       </div>

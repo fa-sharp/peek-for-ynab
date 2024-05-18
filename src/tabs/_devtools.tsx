@@ -1,5 +1,5 @@
 import { type DehydratedState } from "@tanstack/react-query";
-import { get, keys } from "idb-keyval";
+import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
 import { useEffect, useRef, useState } from "react";
 
@@ -47,7 +47,6 @@ function Devtools() {
     };
   }, [area]);
 
-  // Get cache
   const loadCache = () =>
     keys()
       .then(async (keys) => {
@@ -55,6 +54,8 @@ function Devtools() {
         return Object.fromEntries(entries);
       })
       .then(setCache);
+
+  const clearCache = () => clear().then(() => loadCache());
 
   useEffect(() => {
     loadCache();
@@ -154,6 +155,7 @@ function Devtools() {
       <h3>API Cache</h3>
       <div>
         <button onClick={loadCache}>Refresh</button>
+        <button onClick={clearCache}>Clear cache</button>
       </div>
       {cache && <FormattedJSON value={cache} />}
     </div>

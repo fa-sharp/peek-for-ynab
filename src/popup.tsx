@@ -1,9 +1,8 @@
-import { PopupLogin, TransactionAdd } from "~components";
-import PopupMain from "~components/PopupMain";
+import { PopupLogin, PopupMain, TransactionAdd } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/utils";
 
-import "./global.css";
+import "./styles/global.css";
 
 function PopupWrapper() {
   return (
@@ -24,11 +23,9 @@ export function PopupView() {
   return (
     <div
       style={{
-        flexDirection: "column",
-        padding: 16,
-        minWidth: settings.emojiMode ? "150px" : "240px",
-        width: "max-content",
-        maxWidth: "320px"
+        padding: "1em",
+        minWidth: settings.emojiMode ? "150px" : "280px",
+        maxWidth: "360px"
       }}>
       {!loggedIn ? (
         <PopupLogin />
