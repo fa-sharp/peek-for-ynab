@@ -15,7 +15,8 @@ import {
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const { settings, popupState, setPopupState } = useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState, setBudgetSettings } =
+    useStorageContext();
 
   // Transaction state
   const [isTransfer, setIsTransfer] = useState(
@@ -26,7 +27,7 @@ export default function useTransaction() {
   const [cleared, setCleared] = useState(
     () =>
       accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
-        "cash" || !!settings?.txCleared
+        "cash" || !!budgetSettings?.transactions.cleared
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
     popupState.txAddState?.amountType || "Outflow"
@@ -41,8 +42,15 @@ export default function useTransaction() {
     );
   });
   const [account, setAccount] = useState(() => {
-    if (!popupState.txAddState?.accountId) return null;
-    return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (popupState.txAddState?.accountId)
+      return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (budgetSettings?.transactions.defaultAccountId)
+      return (
+        accountsData?.find(
+          (a) => a.id === budgetSettings.transactions.defaultAccountId
+        ) || null
+      );
+    return null;
   });
   const [memo, setMemo] = useState("");
   const [flag, setFlag] = useState("");
@@ -150,6 +158,17 @@ export default function useTransaction() {
         return;
       }
     }
+    if (
+      budgetSettings?.transactions.rememberAccount &&
+      account.id !== budgetSettings.transactions.defaultAccountId
+    )
+      setBudgetSettings(
+        (prev) =>
+          prev && {
+            ...prev,
+            transactions: { ...prev.transactions, defaultAccountId: account.id }
+          }
+      );
 
     setIsSaving(true);
     try {
@@ -166,7 +185,7 @@ export default function useTransaction() {
         cleared: cleared
           ? TransactionClearedStatus.Cleared
           : TransactionClearedStatus.Uncleared,
-        approved: settings?.txApproved,
+        approved: budgetSettings?.transactions.approved,
         memo,
         flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined,
         subtransactions: isSplit

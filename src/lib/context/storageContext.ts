@@ -6,7 +6,12 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
-import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import {
+  DEFAULT_BUDGET_SETTINGS,
+  DEFAULT_SETTINGS,
+  REFRESH_NEEDED_KEY,
+  TOKEN_STORAGE_KEY
+} from "~lib/constants";
 
 import type { CachedPayee } from "./ynabContext";
 
@@ -17,10 +22,6 @@ export interface TokenData {
 }
 
 export interface AppSettings {
-  /** Whether transactions are marked Cleared by default */
-  txCleared: boolean;
-  /** Whether transactions are automatically marked Approved */
-  txApproved: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
@@ -57,6 +58,20 @@ export interface BudgetNotificationSettings {
    * of accountId to max # of days since last reconciliation */
   reconcileAlerts?: {
     [accountId: string]: number | undefined;
+  };
+}
+
+/** Budget-specific settings */
+export interface BudgetSettings {
+  transactions: {
+    /** Whether transactions are marked Cleared by default */
+    cleared: boolean;
+    /** Whether transactions are automatically marked Approved */
+    approved: boolean;
+    /** Whether to remember the last-used account for transaction entry. */
+    rememberAccount: boolean;
+    /** Default account for purchases */
+    defaultAccountId?: string;
   };
 }
 
@@ -127,6 +142,29 @@ const useStorageProvider = () => {
       return data;
     }
   );
+
+  /** Budget-specific settings for the current budget. Is synced if the user chooses. */
+  const [budgetSettings, setBudgetSettings] = useExtensionStorage<
+    BudgetSettings | undefined
+  >(
+    {
+      key: `budget-${selectedBudgetId}`,
+      instance: storageArea
+    },
+    (data, isHydrated) =>
+      !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+  );
+
+  /** Use budget-specific settings for a specific budget */
+  const useBudgetSettings = (budgetId: string) =>
+    useExtensionStorage<BudgetSettings | undefined>(
+      {
+        key: `budget-${budgetId}`,
+        instance: storageArea
+      },
+      (data, isHydrated) =>
+        !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+    );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
   const [
@@ -237,6 +275,8 @@ const useStorageProvider = () => {
         ...savedAccounts,
         [budgetId]: undefined
       });
+      // Clean up budget-specific settings
+      storageArea.remove(`budget-${budgetId}`);
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
@@ -274,6 +314,9 @@ const useStorageProvider = () => {
     removeCategory,
     savedAccounts,
     saveAccount,
+    budgetSettings,
+    setBudgetSettings,
+    useBudgetSettings,
     removeAccount,
     removeAllData
   };
