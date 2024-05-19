@@ -148,8 +148,8 @@ export const updateIconTooltipWithAlerts = (
   }
   if (tooltip.length > 600) tooltip = tooltip.slice(0, 600) + "\n...";
 
-  chrome.action.setTitle({ title: tooltip.trimEnd() });
-  chrome.action.setBadgeText({
+  chrome.action?.setTitle({ title: tooltip.trimEnd() });
+  chrome.action?.setBadgeText({
     text: String(
       Object.keys(currentAlerts).reduce(
         (numAlerts, budgetId) =>

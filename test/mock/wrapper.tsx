@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
 import { AuthProvider } from "~lib/context/authContext";
+import { NotificationsProvider } from "~lib/context/notificationsContext";
 import { StorageProvider } from "~lib/context/storageContext";
 import { YNABProvider } from "~lib/context/ynabContext";
 
@@ -18,7 +19,9 @@ export const createTestAppWrapper = () => {
       <StorageProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <YNABProvider>{children}</YNABProvider>
+            <YNABProvider>
+              <NotificationsProvider>{children}</NotificationsProvider>
+            </YNABProvider>
           </AuthProvider>
         </QueryClientProvider>
       </StorageProvider>
