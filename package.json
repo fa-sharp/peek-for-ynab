@@ -76,7 +76,8 @@
   "manifest": {
     "key": "$CRX_PUBLIC_KEY",
     "permissions": [
-      "identity"
+      "identity",
+      "alarms"
     ],
     "host_permissions": [
       "https://api.ynab.com/*"

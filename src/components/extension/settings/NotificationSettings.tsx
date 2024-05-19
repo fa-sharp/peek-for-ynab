@@ -52,7 +52,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         <div className="flex-row gap-xs">
           Reconciliation alerts
           <IconButton
-            label={reconcileExpanded ? "Collapse settings" : "Expand settings"}
+            label={reconcileExpanded ? "Collapse" : "Expand"}
             icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
             onClick={() => setReconcileExpanded(!reconcileExpanded)}
           />
