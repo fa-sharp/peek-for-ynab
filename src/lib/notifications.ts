@@ -1,4 +1,3 @@
-import notificationImage from "data-base64:~../assets/notification.png";
 import type { Account, Category } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
@@ -12,6 +11,8 @@ import {
   formatCurrency,
   isEmptyObject
 } from "./utils";
+
+const notificationImage = new URL("../../assets/notification.png", import.meta.url);
 
 export interface CurrentAlerts {
   [budgetId: string]: BudgetAlerts | undefined;
@@ -176,7 +177,7 @@ const NOTIFICATION_ID = "peek";
 const onNotificationClick = (id: string) => {
   if (id === NOTIFICATION_ID) {
     chrome.notifications.clear(NOTIFICATION_ID);
-    chrome.tabs.create({ url: "https://app.ynab.com" })
+    chrome.tabs.create({ url: "https://app.ynab.com" });
   }
 };
 
@@ -224,7 +225,7 @@ export const createRichNotification = async (
   chrome.notifications?.onClicked.addListener(onNotificationClick);
 
   const notificationOptions: chrome.notifications.NotificationOptions<true> = {
-    iconUrl: notificationImage,
+    iconUrl: notificationImage.toString(),
     title: "Peek for YNAB",
     type: "basic",
     message,
