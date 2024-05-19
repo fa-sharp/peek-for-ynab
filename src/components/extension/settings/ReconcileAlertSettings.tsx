@@ -9,15 +9,22 @@ export default function ReconcileAlertSettings({ budget }: { budget: CachedBudge
   const [settings, setSettings] = useBudgetSettings(budget.id);
 
   const editReconcileNotification = (accountId: string, days?: number) => {
-    if (!settings) return;
+    if (!settings || !accountsData) return;
+    const newReconcileAlerts = {
+      ...settings.notifications.reconcileAlerts,
+      [accountId]: days
+    };
+    // clean up accounts in the `reconcileAlerts` object that have been closed/deleted
+    for (const accountId in newReconcileAlerts) {
+      if (!accountsData.find((a) => a.id === accountId))
+        newReconcileAlerts[accountId] = undefined;
+    }
+
     setSettings({
       ...settings,
       notifications: {
         ...settings.notifications,
-        reconcileAlerts: {
-          ...settings.notifications.reconcileAlerts,
-          [accountId]: days
-        }
+        reconcileAlerts: newReconcileAlerts
       }
     });
   };
