@@ -159,11 +159,14 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
   }
 };
 
-chrome.alarms.clearAll().then(() => {
-  chrome.alarms.onAlarm.removeListener(backgroundDataRefresh);
-  chrome.alarms.onAlarm.addListener(backgroundDataRefresh);
-  chrome.alarms.create(BACKGROUND_ALARM_NAME, {
-    periodInMinutes: 30,
-    delayInMinutes: IS_DEV ? 10 : 0
-  });
+chrome.alarms.onAlarm.removeListener(backgroundDataRefresh);
+chrome.alarms.onAlarm.addListener(backgroundDataRefresh);
+chrome.alarms.get(BACKGROUND_ALARM_NAME).then(async (alarm) => {
+  if (!alarm) {
+    await chrome.alarms.clearAll();
+    await chrome.alarms.create(BACKGROUND_ALARM_NAME, {
+      periodInMinutes: 30,
+      delayInMinutes: IS_DEV ? 10 : 0
+    });
+  }
 });
