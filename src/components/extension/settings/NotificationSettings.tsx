@@ -59,8 +59,12 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           />
           Import errors
         </label>
-        <div className="flex-row gap-xs">
-          Reconciliation alerts
+        <div
+          className="flex-row gap-xs cursor-pointer"
+          onClick={() => setReconcileExpanded(!reconcileExpanded)}>
+          <span title="Setup alerts for the last time you reconciled an account">
+            Reconciliation alerts
+          </span>
           <IconButton
             label={reconcileExpanded ? "Collapse" : "Expand"}
             icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}

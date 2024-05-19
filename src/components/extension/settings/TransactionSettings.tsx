@@ -49,7 +49,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
         </label>
         <label
           className="flex-row gap-xs"
-          title="Remember the account you used last time">
+          title="Remember the account you used last time you entered a transaction via the extension">
           <input
             type="checkbox"
             checked={settings?.transactions.rememberAccount ?? false}

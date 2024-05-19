@@ -105,7 +105,7 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
     const ynabAPI = new api(tokenData.accessToken);
     const budgetsData = await queryClient.fetchQuery({
       queryKey: ["budgets"],
-      staleTime: ONE_DAY_IN_MILLIS,
+      staleTime: ONE_DAY_IN_MILLIS * 2,
       queryFn: () => fetchBudgets(ynabAPI)
     });
 
