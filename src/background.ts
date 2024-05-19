@@ -12,7 +12,7 @@ import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
 import {
   type CurrentAlerts,
-  createRichNotification,
+  createDesktopNotifications,
   getBudgetAlerts,
   updateIconTooltipWithAlerts
 } from "~lib/notifications";
@@ -152,7 +152,7 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
     IS_DEV &&
       console.log("Background refresh: Got updated alerts, updating alerts...", alerts);
     updateIconTooltipWithAlerts(alerts, budgetsData);
-    createRichNotification(alerts, budgetsData);
+    createDesktopNotifications(alerts, budgetsData);
     await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
   } catch (err) {
     console.error("Background refresh: Error", err);

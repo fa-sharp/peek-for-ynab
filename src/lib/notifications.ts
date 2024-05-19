@@ -173,24 +173,24 @@ export const updateIconTooltipWithAlerts = (
   });
 };
 
-const NOTIFICATION_ID = "peek";
 const onNotificationClick = (id: string) => {
-  if (id === NOTIFICATION_ID) {
-    chrome.notifications.clear(NOTIFICATION_ID);
-    chrome.tabs.create({ url: "https://app.ynab.com" });
-  }
+  chrome.notifications.clear(id);
+  chrome.tabs.create({ url: `https://app.ynab.com/${id}/budget` });
 };
 
-export const createRichNotification = async (
+export const createDesktopNotifications = async (
   currentAlerts: CurrentAlerts,
   budgetsData: CachedBudget[]
 ) => {
   const notifPermission = await checkPermissions(["notifications"]);
   if (!notifPermission) return;
 
-  IS_DEV && console.log("Creating rich notification");
+  IS_DEV && console.log("Creating desktop notifications");
+  chrome.notifications?.onButtonClicked.removeListener(onNotificationClick);
+  chrome.notifications?.onButtonClicked.addListener(onNotificationClick);
+  chrome.notifications?.onClicked.removeListener(onNotificationClick);
+  chrome.notifications?.onClicked.addListener(onNotificationClick);
 
-  let message = "";
   for (const [budgetId, budgetAlerts] of Object.entries(currentAlerts)) {
     const budget = budgetsData.find((b) => b.id === budgetId);
     if (!budget || !budgetAlerts) continue;
@@ -209,44 +209,34 @@ export const createRichNotification = async (
       0
     );
 
-    message += `${budget.name}: `;
+    let message = "";
     if (numImportedTxs) message += `${numImportedTxs} new transactions. `;
     if (numOverspent) message += `${numOverspent} overspent categories. `;
     if (numToReconcile) message += `${numToReconcile} accounts to reconcile. `;
     if (numImportError) message += `${numImportError} import errors!`;
-    message += "\n\n";
-  }
-  message = message.trimEnd();
-  if (!message) return;
+    message = message.trimEnd();
+    if (!message) return;
 
-  chrome.notifications?.onButtonClicked.removeListener(onNotificationClick);
-  chrome.notifications?.onButtonClicked.addListener(onNotificationClick);
-  chrome.notifications?.onClicked.removeListener(onNotificationClick);
-  chrome.notifications?.onClicked.addListener(onNotificationClick);
+    const notificationOptions: chrome.notifications.NotificationOptions<true> = {
+      iconUrl: notificationImage.toString(),
+      title: budget.name,
+      type: "basic",
+      message,
+      isClickable: true,
+      buttons: [{ title: "Open budget" }]
+    };
 
-  const notificationOptions: chrome.notifications.NotificationOptions<true> = {
-    iconUrl: notificationImage.toString(),
-    title: "Peek for YNAB",
-    type: "basic",
-    message,
-    isClickable: true,
-    buttons: [{ title: "Open YNAB" }]
-  };
-
-  chrome.notifications?.update(
-    NOTIFICATION_ID,
-    notificationOptions,
-    async (wasUpdated) => {
+    chrome.notifications?.update(budget.id, notificationOptions, async (wasUpdated) => {
       const storage = new Storage({ area: "local" });
-      const lastNotificationTime = await storage.get<number>("lastRichNotification");
-      storage.set("lastRichNotification", Date.now());
+      const lastNotificationTime = await storage.get<number>(`lastNotif-${budgetId}`);
+      storage.set(`lastNotif-${budgetId}`, Date.now());
 
-      // Create a new notification, unless one was created in last hour
       if (!wasUpdated) {
+        // Create a new notification, unless one was created in last hour
         if (lastNotificationTime && Date.now() - lastNotificationTime < 1000 * 60 * 60)
           return;
-        chrome.notifications?.create(NOTIFICATION_ID, notificationOptions);
+        chrome.notifications?.create(budget.id, notificationOptions);
       }
-    }
-  );
+    });
+  }
 };

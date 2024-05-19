@@ -105,7 +105,10 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
 
 type OptionalPermissions = "activeTab" | "scripting" | "notifications";
 
-/** Request optional permissions. Use 'activeTab' and 'scripting' to access the current tab and execute scripts within it. */
+/**
+ * Request optional permissions. Use 'activeTab' and 'scripting' to access the current tab and execute scripts within it.
+ * Use 'notifications' to enable native desktop notifications.
+ */
 export const requestPermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) => {
     chrome.permissions.request({ permissions }, (granted) => {
