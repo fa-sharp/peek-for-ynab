@@ -5,7 +5,8 @@ import { Storage } from "@plasmohq/storage";
 import {
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget
+  fetchCategoryGroupsForBudget,
+  importTxsForBudget
 } from "~lib/api";
 import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
@@ -107,7 +108,6 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
       staleTime: ONE_DAY_IN_MILLIS,
       queryFn: () => fetchBudgets(ynabAPI)
     });
-    IS_DEV && console.log("Background refresh: Fetched budgets", budgetsData);
 
     const alerts: CurrentAlerts = {};
     for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
@@ -116,32 +116,34 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
       );
       if (!budgetSettings) continue;
 
+      let importedTxs: string[] | undefined;
       let accountsData: Account[] | undefined;
       let categoriesData: Category[] | undefined;
+
+      if (budgetSettings.notifications.checkImports) {
+        importedTxs = await queryClient.fetchQuery({
+          queryKey: ["import", { budgetId: budget.id }],
+          staleTime: 1000 * 60 * 25, // 25 minutes
+          queryFn: () => importTxsForBudget(ynabAPI, budget.id)
+        });
+      }
+
       if (
         budgetSettings.notifications.importError ||
         !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
       ) {
         accountsData = await fetchAccountsForBudget(ynabAPI, budget.id);
-        IS_DEV &&
-          console.log("Background refresh: Fetched accounts", {
-            budgetId: budget.id,
-            accountsData
-          });
       }
+
       if (budgetSettings.notifications.overspent) {
         const categoryGroupsData = await fetchCategoryGroupsForBudget(ynabAPI, budget.id);
         categoriesData = categoryGroupsData.flatMap((cg) => cg.categories);
-        IS_DEV &&
-          console.log("Background refresh: Fetched categories", {
-            budgetId: budget.id,
-            categoryGroupsData
-          });
       }
 
       const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
         accounts: accountsData,
-        categories: categoriesData
+        categories: categoriesData,
+        importedTxs
       });
       if (budgetAlerts) alerts[budget.id] = budgetAlerts;
     }

@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
 
 export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({
   notifications: {
+    checkImports: false,
     importError: false,
     overspent: false,
     reconcileAlerts: {}

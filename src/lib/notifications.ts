@@ -9,6 +9,7 @@ export interface CurrentAlerts {
 }
 
 export interface BudgetAlerts {
+  numImportedTxs?: number;
   accounts: AccountAlerts;
   cats: CategoryAlerts;
 }
@@ -37,6 +38,7 @@ export interface CategoryAlerts {
 export const getBudgetAlerts = (
   notificationSettings: BudgetNotificationSettings,
   data: {
+    importedTxs?: string[];
     accounts?: Account[];
     categories?: Category[];
   }
@@ -45,6 +47,9 @@ export const getBudgetAlerts = (
     accounts: {},
     cats: {}
   };
+  if (notificationSettings.checkImports)
+    budgetAlerts.numImportedTxs = data.importedTxs?.length;
+
   data.accounts?.forEach((account) => {
     const accountAlerts: Pick<
       NonNullable<AccountAlerts[string]>,
@@ -74,6 +79,7 @@ export const getBudgetAlerts = (
       };
     }
   });
+
   data.categories?.forEach((category) => {
     const categoryAlerts: Pick<NonNullable<CategoryAlerts[string]>, "overspent"> = {};
 
@@ -90,7 +96,11 @@ export const getBudgetAlerts = (
       };
     }
   });
-  if (isEmptyObject(budgetAlerts.accounts) && isEmptyObject(budgetAlerts.cats))
+  if (
+    !budgetAlerts.numImportedTxs &&
+    isEmptyObject(budgetAlerts.accounts) &&
+    isEmptyObject(budgetAlerts.cats)
+  )
     return null;
   else return budgetAlerts;
 };
@@ -106,6 +116,12 @@ export const updateIconTooltipWithAlerts = (
     if (!budget || !budgetAlerts) continue;
 
     tooltip += `----${budget.name}----\n`;
+
+    if (budgetAlerts.numImportedTxs)
+      tooltip += `${budgetAlerts.numImportedTxs} new ${
+        budgetAlerts.numImportedTxs === 1 ? "transaction" : "transactions"
+      }!\n\n`;
+
     if (!isEmptyObject(budgetAlerts.cats)) {
       for (const categoryAlerts of Object.values(budgetAlerts.cats)) {
         if (!categoryAlerts) return;
@@ -116,6 +132,7 @@ export const updateIconTooltipWithAlerts = (
       }
       tooltip += "\n";
     }
+
     if (!isEmptyObject(budgetAlerts.accounts)) {
       for (const accountAlerts of Object.values(budgetAlerts.accounts)) {
         if (!accountAlerts) return;
@@ -137,6 +154,7 @@ export const updateIconTooltipWithAlerts = (
       Object.keys(currentAlerts).reduce(
         (numAlerts, budgetId) =>
           numAlerts +
+          (currentAlerts[budgetId]?.numImportedTxs || 0) +
           Object.keys(currentAlerts[budgetId]?.accounts || {}).length +
           Object.keys(currentAlerts[budgetId]?.cats || {}).length,
         0

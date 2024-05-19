@@ -41,13 +41,23 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         </label>
         <label
           className="flex-row gap-xs"
-          title="Notify if one of your accounts has a bank import error/issue">
+          title="Check and notify for new imports from your linked accounts">
+          <input
+            type="checkbox"
+            checked={settings?.notifications.checkImports ?? false}
+            onChange={(e) => changeNotifSetting("checkImports", e.target.checked)}
+          />
+          New imported transactions
+        </label>
+        <label
+          className="flex-row gap-xs"
+          title="Notify if one of your linked accounts has a connection error/issue">
           <input
             type="checkbox"
             checked={settings?.notifications.importError ?? false}
             onChange={(e) => changeNotifSetting("importError", e.target.checked)}
           />
-          Direct import errors
+          Import errors
         </label>
         <div className="flex-row gap-xs">
           Reconciliation alerts

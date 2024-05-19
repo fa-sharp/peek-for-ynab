@@ -51,3 +51,12 @@ export async function fetchAccountsForBudget(ynabAPI: api, selectedBudgetId: str
   IS_DEV && console.log("Fetched accounts!", accounts);
   return accounts;
 }
+
+/** Check for newly imported transactions for this budget */
+export async function importTxsForBudget(ynabAPI: api, selectedBudgetId: string) {
+  const {
+    data: { transaction_ids }
+  } = await ynabAPI.transactions.importTransactions(selectedBudgetId);
+  IS_DEV && console.log("Checked for new imports!", transaction_ids);
+  return transaction_ids;
+}
