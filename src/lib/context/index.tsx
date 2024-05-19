@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { queryClient } from "~lib/queryClient";
 
 import { AuthProvider, useAuthContext } from "./authContext";
-import { NotificationsProvider } from "./notificationsContext";
+import { NotificationsProvider, useNotificationsContext } from "./notificationsContext";
 import { StorageProvider, useStorageContext } from "./storageContext";
 import { YNABProvider, useYNABContext } from "./ynabContext";
 
@@ -23,4 +23,10 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
   </StorageProvider>
 );
 
-export { AppProvider, useAuthContext, useYNABContext, useStorageContext };
+export {
+  AppProvider,
+  useAuthContext,
+  useYNABContext,
+  useNotificationsContext,
+  useStorageContext
+};

@@ -61,6 +61,6 @@ const useNotificationsProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useNotificationsProvider);
 
-/** Hook for storing and retrieving data from browser storage */
+/** Hook for retrieving current alerts and notifications */
 export const useNotificationsContext = () => useContext(BaseContext);
 export const NotificationsProvider = Provider;

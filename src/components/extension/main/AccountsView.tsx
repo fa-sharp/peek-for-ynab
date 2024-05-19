@@ -1,15 +1,17 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
+import { AlertTriangle, LockOpen } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
-import { useYNABContext } from "~lib/context";
+import { useNotificationsContext, useYNABContext } from "~lib/context";
 import {
   type AppSettings,
   type TxAddInitialState,
   useStorageContext
 } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
+import type { AccountAlerts } from "~lib/notifications";
 import { findEmoji, formatCurrency } from "~lib/utils";
 
 import {
@@ -33,6 +35,7 @@ function AccountsView() {
     settings
   } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
+  const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -55,6 +58,7 @@ function AccountsView() {
           <AccountTypeView
             accountType="Budget"
             accountsData={accountsData.filter((a) => a.on_budget)}
+            accountAlerts={currentAlerts?.[selectedBudgetId]?.accounts}
             savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
@@ -65,6 +69,7 @@ function AccountsView() {
           <AccountTypeView
             accountType="Tracking"
             accountsData={accountsData.filter((a) => !a.on_budget)}
+            accountAlerts={currentAlerts?.[selectedBudgetId]?.accounts}
             savedAccounts={savedAccounts[selectedBudgetId]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
@@ -83,6 +88,7 @@ function AccountTypeView({
   accountType,
   accountsData,
   budgetData,
+  accountAlerts,
   saveAccount,
   savedAccounts,
   settings,
@@ -92,6 +98,7 @@ function AccountTypeView({
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
   budgetData: CachedBudget;
+  accountAlerts?: AccountAlerts;
   savedAccounts?: string[];
   saveAccount: (accountId: string) => void;
   settings: AppSettings;
@@ -120,6 +127,7 @@ function AccountTypeView({
                 account={account}
                 currencyFormat={budgetData.currencyFormat}
                 settings={settings}
+                alerts={accountAlerts?.[account.id]}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
                     <IconButton
@@ -157,16 +165,18 @@ function AccountTypeView({
 }
 
 export const AccountView = ({
-  account: { name, balance },
+  account: { name, balance, last_reconciled_at },
   currencyFormat,
   actionElementsLeft,
   actionElementsRight,
+  alerts,
   settings
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
   actionElementsLeft?: ReactElement | null;
   actionElementsRight?: ReactElement | null;
+  alerts?: AccountAlerts[string];
   settings: AppSettings;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
@@ -183,6 +193,22 @@ export const AccountView = ({
           <span className="font-big">{foundEmoji}</span>
         ) : (
           <div className="hide-overflow">{name}</div>
+        )}
+        {alerts?.importError && (
+          <IconButton
+            noAction
+            disabled
+            label="Import issue/error"
+            icon={<AlertTriangle color="var(--stale)" size={18} />}
+          />
+        )}
+        {alerts?.reconcile && last_reconciled_at && (
+          <IconButton
+            noAction
+            disabled
+            label={`Last reconciled ${new Date(last_reconciled_at).toLocaleDateString()}`}
+            icon={<LockOpen color="var(--stale)" size={18} />}
+          />
         )}
       </div>
       <div className="flex-row">
