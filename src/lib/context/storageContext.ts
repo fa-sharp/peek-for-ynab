@@ -114,6 +114,13 @@ const useStorageProvider = () => {
     defaultValue: false
   });
 
+  /** Save the `syncEnabled` setting to Chrome local storage for background thread */
+  useEffect(() => {
+    CHROME_LOCAL_STORAGE.get<boolean>("sync").then((val) => {
+      if (val !== syncEnabled) CHROME_LOCAL_STORAGE.set("sync", syncEnabled);
+    });
+  }, [syncEnabled]);
+
   const storageArea = useMemo(
     () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
     [syncEnabled]

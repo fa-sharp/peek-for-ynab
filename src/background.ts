@@ -17,11 +17,11 @@ import {
 import { queryClient } from "~lib/queryClient";
 import { IS_DEV, ONE_DAY_IN_MILLIS, isEmptyObject } from "~lib/utils";
 
-const chromeLocalStorage = new Storage({ area: "local" });
-const tokenStorage = new Storage({ area: "local" });
+const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+const TOKEN_STORAGE = new Storage({ area: "local" });
 let isRefreshing = false;
 
-tokenStorage.watch({
+TOKEN_STORAGE.watch({
   [REFRESH_NEEDED_KEY]: async (c) => {
     if (c.newValue !== true || isRefreshing) return;
     await refreshToken();
@@ -32,7 +32,7 @@ async function refreshToken(): Promise<TokenData | null> {
   isRefreshing = true;
 
   // check if token exists
-  const tokenData = await tokenStorage.get<TokenData | null>(TOKEN_STORAGE_KEY);
+  const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
   if (!tokenData) {
     console.error("Not refreshing - no existing token data found");
     isRefreshing = false;
@@ -49,7 +49,7 @@ async function refreshToken(): Promise<TokenData | null> {
       method: "POST"
     });
     if (!res.ok) {
-      if (res.status === 401) await tokenStorage.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
+      if (res.status === 401) await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
       throw {
         message: "Error from API while refreshing token",
         status: res.status,
@@ -58,14 +58,14 @@ async function refreshToken(): Promise<TokenData | null> {
     }
     newTokenData = await res.json();
     IS_DEV && console.log("Got a new token!");
-    await tokenStorage.set(TOKEN_STORAGE_KEY, newTokenData);
+    await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, newTokenData);
   } catch (err) {
     console.error("Failed to refresh token:", err);
   }
 
   // signal that refresh is complete
   try {
-    await tokenStorage.set(REFRESH_NEEDED_KEY, false);
+    await TOKEN_STORAGE.set(REFRESH_NEEDED_KEY, false);
   } finally {
     isRefreshing = false;
   }
@@ -81,9 +81,9 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
   IS_DEV && console.log("Background refresh: Starting...");
   try {
     // Check for existing token. If it's expired, refresh the token
-    let tokenData = await tokenStorage.get<TokenData | null>(TOKEN_STORAGE_KEY);
+    let tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
     if (!tokenData) {
-      console.error("Background refresh: no existing token data found");
+      IS_DEV && console.log("Background refresh: no existing token data found");
       return;
     }
     if (tokenData.expires < Date.now() + 60 * 1000) {
@@ -95,13 +95,13 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
       }
     }
 
-    // TODO figure out local vs sync storage (can't access localStorage here)
-    const storage = new Storage({ area: "local" });
+    const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
+    const storage = new Storage({ area: syncEnabled ? "sync" : "local" });
     const shownBudgetIds = await storage.get<string[]>("budgets");
     if (!shownBudgetIds) return;
-    const ynabAPI = new api(tokenData.accessToken);
 
     // Fetch new data and get updated alerts
+    const ynabAPI = new api(tokenData.accessToken);
     const budgetsData = await queryClient.fetchQuery({
       queryKey: ["budgets"],
       staleTime: ONE_DAY_IN_MILLIS,
@@ -152,7 +152,7 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
         alerts
       );
     updateIconTooltipWithAlerts(alerts, budgetsData);
-    await chromeLocalStorage.set("currentAlerts", alerts);
+    await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
   } catch (err) {
     console.error("Background refresh: Error", err);
   }

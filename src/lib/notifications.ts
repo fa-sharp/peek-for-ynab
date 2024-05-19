@@ -129,7 +129,7 @@ export const updateIconTooltipWithAlerts = (
       }
     }
   }
-  if (tooltip.length > 500) tooltip = tooltip.slice(0, 500) + "\n...";
+  if (tooltip.length > 600) tooltip = tooltip.slice(0, 600) + "\n...";
 
   chrome.action.setTitle({ title: tooltip.trimEnd() });
   chrome.action.setBadgeText({
