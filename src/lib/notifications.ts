@@ -115,7 +115,7 @@ export const getBudgetAlerts = (
   else return budgetAlerts;
 };
 
-export const updateIconTooltipWithAlerts = (
+export const updateIconAndTooltip = (
   currentAlerts: CurrentAlerts,
   budgetsData: CachedBudget[]
 ) => {
@@ -213,7 +213,7 @@ export const createDesktopNotifications = async (
     if (numImportedTxs) message += `${numImportedTxs} new transactions. `;
     if (numOverspent) message += `${numOverspent} overspent categories. `;
     if (numToReconcile) message += `${numToReconcile} accounts to reconcile. `;
-    if (numImportError) message += `${numImportError} import errors!`;
+    if (numImportError) message += `${numImportError} import issues!`;
     message = message.trimEnd();
     if (!message) return;
 

@@ -7,7 +7,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 import {
   type CurrentAlerts,
   getBudgetAlerts,
-  updateIconTooltipWithAlerts
+  updateIconAndTooltip
 } from "~lib/notifications";
 
 import { useStorageContext } from "./storageContext";
@@ -51,7 +51,7 @@ const useNotificationsProvider = () => {
   // Update tooltip with latest notifications
   useEffect(() => {
     if (!currentAlertsHydrated || !budgetsData) return;
-    updateIconTooltipWithAlerts(currentAlerts, budgetsData);
+    updateIconAndTooltip(currentAlerts, budgetsData);
   }, [budgetsData, currentAlerts, currentAlertsHydrated]);
 
   return {

@@ -162,14 +162,11 @@ export function OptionsView() {
               </label>
               <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
                 <li>
-                  This enables notifications on your device (based on the notifications
+                  Native desktop notifications on your device (based on the notifications
                   you setup for each budget below)
                 </li>
                 <li>
                   This setting is not synced and must be manually enabled on each device
-                </li>
-                <li>
-                  This feature is experimental and may disappear/break without warning
                 </li>
               </ul>
             </div>

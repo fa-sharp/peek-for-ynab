@@ -14,7 +14,7 @@ import {
   type CurrentAlerts,
   createDesktopNotifications,
   getBudgetAlerts,
-  updateIconTooltipWithAlerts
+  updateIconAndTooltip
 } from "~lib/notifications";
 import { queryClient } from "~lib/queryClient";
 import { IS_DEV, ONE_DAY_IN_MILLIS, isEmptyObject } from "~lib/utils";
@@ -151,7 +151,7 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
 
     IS_DEV &&
       console.log("Background refresh: Got updated alerts, updating alerts...", alerts);
-    updateIconTooltipWithAlerts(alerts, budgetsData);
+    updateIconAndTooltip(alerts, budgetsData);
     createDesktopNotifications(alerts, budgetsData);
     await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
   } catch (err) {
