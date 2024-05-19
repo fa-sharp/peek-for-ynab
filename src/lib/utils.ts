@@ -1,5 +1,3 @@
-import { useLayoutEffect } from "react";
-import useLocalStorageState from "use-local-storage-state";
 import * as ynab from "ynab";
 
 export const IS_DEV = process.env.NODE_ENV === "development";
@@ -105,38 +103,38 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
   return result as T;
 };
 
-/** Request permissions to access the current tab and execute scripts within it */
-export const requestCurrentTabPermissions = () =>
+type OptionalPermissions = "activeTab" | "scripting" | "notifications";
+
+/** Request optional permissions. Use 'activeTab' and 'scripting' to access the current tab and execute scripts within it. */
+export const requestPermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) => {
-    chrome.permissions.request(
-      {
-        permissions: ["activeTab", "scripting"]
-      },
-      (granted) => {
-        if (granted) resolve(true);
-        else {
-          console.error("Permission denied:", chrome.runtime.lastError);
-          resolve(false);
-        }
+    chrome.permissions.request({ permissions }, (granted) => {
+      if (granted) resolve(true);
+      else {
+        console.error("Permission denied:", chrome.runtime.lastError);
+        resolve(false);
       }
-    );
+    });
   });
 
-/** Remove permissions to access the current tab */
-export const removeCurrentTabPermissions = () =>
+/** Check if optional permissions exist */
+export const checkPermissions = (permissions: OptionalPermissions[]) =>
+  new Promise<boolean>((resolve) => {
+    chrome.permissions.contains({ permissions }, (granted) => {
+      resolve(granted);
+    });
+  });
+
+/** Remove optional permissions. */
+export const removePermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) =>
-    chrome.permissions.remove(
-      {
-        permissions: ["activeTab", "scripting"]
-      },
-      (removed) => {
-        if (removed) resolve(true);
-        else {
-          console.error("Error removing permissions:", chrome.runtime.lastError);
-          resolve(false);
-        }
+    chrome.permissions.remove({ permissions }, (removed) => {
+      if (removed) resolve(true);
+      else {
+        console.error("Error removing permissions:", chrome.runtime.lastError);
+        resolve(false);
       }
-    )
+    })
   );
 
 export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
@@ -147,36 +145,4 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
   if (flagColor === ynab.TransactionFlagColor.Red) return "🔴";
   if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
   return null;
-};
-
-/**
- * Sets the theme based on user setting in localStorage and media query.
- * See also [theme.js](../../public/scripts/theme.js) which avoids the 'flash' on load.
- */
-export const useSetColorTheme = () => {
-  const [themeSetting] = useLocalStorageState<"light" | "dark" | "auto">("theme", {
-    defaultValue: "auto"
-  });
-
-  useLayoutEffect(() => {
-    const prefersDarkModeQuery = window?.matchMedia
-      ? window.matchMedia("(prefers-color-scheme: dark)")
-      : null;
-
-    if (
-      (themeSetting === "auto" && prefersDarkModeQuery?.matches) ||
-      themeSetting === "dark"
-    )
-      document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-
-    const listener = (e: MediaQueryListEvent) => {
-      if ((themeSetting === "auto" && e.matches) || themeSetting === "dark")
-        document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-    };
-    prefersDarkModeQuery?.addEventListener("change", listener);
-
-    return () => prefersDarkModeQuery?.removeEventListener("change", listener);
-  }, [themeSetting]);
 };

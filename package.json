@@ -84,7 +84,8 @@
     ],
     "optional_permissions": [
       "scripting",
-      "activeTab"
+      "activeTab",
+      "notifications"
     ],
     "options_ui": {
       "open_in_tab": true

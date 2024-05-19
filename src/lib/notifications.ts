@@ -1,8 +1,17 @@
+import notificationImage from "data-base64:~../assets/notification.png";
 import type { Account, Category } from "ynab";
+
+import { Storage } from "@plasmohq/storage";
 
 import type { BudgetNotificationSettings } from "./context/storageContext";
 import type { CachedBudget } from "./context/ynabContext";
-import { IS_DEV, ONE_DAY_IN_MILLIS, formatCurrency, isEmptyObject } from "./utils";
+import {
+  IS_DEV,
+  ONE_DAY_IN_MILLIS,
+  checkPermissions,
+  formatCurrency,
+  isEmptyObject
+} from "./utils";
 
 export interface CurrentAlerts {
   [budgetId: string]: BudgetAlerts | undefined;
@@ -161,4 +170,82 @@ export const updateIconTooltipWithAlerts = (
       ) || ""
     )
   });
+};
+
+const NOTIFICATION_ID = "peek";
+const onNotificationClick = (id: string) => {
+  if (id === NOTIFICATION_ID) {
+    chrome.notifications.clear(NOTIFICATION_ID);
+    chrome.tabs.create({ url: "https://app.ynab.com" })
+  }
+};
+
+export const createRichNotification = async (
+  currentAlerts: CurrentAlerts,
+  budgetsData: CachedBudget[]
+) => {
+  const notifPermission = await checkPermissions(["notifications"]);
+  if (!notifPermission) return;
+
+  IS_DEV && console.log("Creating rich notification");
+
+  let message = "";
+  for (const [budgetId, budgetAlerts] of Object.entries(currentAlerts)) {
+    const budget = budgetsData.find((b) => b.id === budgetId);
+    if (!budget || !budgetAlerts) continue;
+
+    const { numImportedTxs, accounts, cats } = budgetAlerts;
+    const numOverspent = Object.values(cats).reduce(
+      (acc, curr) => (curr?.overspent ? acc + 1 : acc),
+      0
+    );
+    const numToReconcile = Object.values(accounts).reduce(
+      (acc, curr) => (curr?.reconcile ? acc + 1 : acc),
+      0
+    );
+    const numImportError = Object.values(accounts).reduce(
+      (acc, curr) => (curr?.importError ? acc + 1 : acc),
+      0
+    );
+
+    message += `${budget.name}: `;
+    if (numImportedTxs) message += `${numImportedTxs} new transactions. `;
+    if (numOverspent) message += `${numOverspent} overspent categories. `;
+    if (numToReconcile) message += `${numToReconcile} accounts to reconcile. `;
+    if (numImportError) message += `${numImportError} import errors!`;
+    message += "\n\n";
+  }
+  message = message.trimEnd();
+  if (!message) return;
+
+  chrome.notifications?.onButtonClicked.removeListener(onNotificationClick);
+  chrome.notifications?.onButtonClicked.addListener(onNotificationClick);
+  chrome.notifications?.onClicked.removeListener(onNotificationClick);
+  chrome.notifications?.onClicked.addListener(onNotificationClick);
+
+  const notificationOptions: chrome.notifications.NotificationOptions<true> = {
+    iconUrl: notificationImage,
+    title: "Peek for YNAB",
+    type: "basic",
+    message,
+    isClickable: true,
+    buttons: [{ title: "Open YNAB" }]
+  };
+
+  chrome.notifications?.update(
+    NOTIFICATION_ID,
+    notificationOptions,
+    async (wasUpdated) => {
+      const storage = new Storage({ area: "local" });
+      const lastNotificationTime = await storage.get<number>("lastRichNotification");
+      storage.set("lastRichNotification", Date.now());
+
+      // Create a new notification, unless one was created in last hour
+      if (!wasUpdated) {
+        if (lastNotificationTime && Date.now() - lastNotificationTime < 1000 * 60 * 60)
+          return;
+        chrome.notifications?.create(NOTIFICATION_ID, notificationOptions);
+      }
+    }
+  );
 };
