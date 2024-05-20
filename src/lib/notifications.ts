@@ -196,24 +196,27 @@ export const createDesktopNotifications = async (
     if (!budget || !budgetAlerts) continue;
 
     const { numImportedTxs, accounts, cats } = budgetAlerts;
-    const numOverspent = Object.values(cats).reduce(
-      (acc, curr) => (curr?.overspent ? acc + 1 : acc),
-      0
-    );
-    const numToReconcile = Object.values(accounts).reduce(
-      (acc, curr) => (curr?.reconcile ? acc + 1 : acc),
-      0
-    );
     const numImportError = Object.values(accounts).reduce(
       (acc, curr) => (curr?.importError ? acc + 1 : acc),
       0
     );
+    const overspentCategories = Object.values(cats)
+      .filter((c) => c?.overspent)
+      .map((c) => c?.name)
+      .join(", ");
+    const accountsToReconcile = Object.values(accounts)
+      .filter((a) => a?.reconcile)
+      .map((a) => a?.name)
+      .join(", ");
 
     let message = "";
-    if (numImportedTxs) message += `${numImportedTxs} new transactions. `;
-    if (numOverspent) message += `${numOverspent} overspent categories. `;
-    if (numToReconcile) message += `${numToReconcile} accounts to reconcile. `;
-    if (numImportError) message += `${numImportError} import issues!`;
+    if (numImportedTxs)
+      message += `${numImportedTxs} new transaction${numImportedTxs > 1 ? "s" : ""}. `;
+    if (numImportError)
+      message += `${numImportError} import issue${numImportError > 1 ? "s" : ""}!`;
+    if (message.length > 0) message += "\n";
+    if (accountsToReconcile) message += `Reconcile: ${accountsToReconcile}\n`;
+    if (overspentCategories) message += `Overspent: ${overspentCategories}\n`;
     message = message.trimEnd();
     if (!message) return;
 
