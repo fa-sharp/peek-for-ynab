@@ -139,7 +139,7 @@ const useYNABProvider = () => {
   /** Check for new imports for selected budget (if user wants notifications) */
   const { data: importedTxs } = useQuery({
     queryKey: ["import", { budgetId: selectedBudgetId }],
-    staleTime: 1000 * 60 * 25, // 25 minutes
+    staleTime: 1000 * 60 * 14, // 14 minutes
     enabled: Boolean(
       ynabAPI && selectedBudgetId && budgetSettings?.notifications.checkImports
     ),
@@ -227,7 +227,7 @@ const useYNABProvider = () => {
     accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
-    /** API data: IDs of newly imported transactions */
+    /** API data: IDs of newly imported/unapproved transactions */
     importedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,

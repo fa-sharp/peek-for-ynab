@@ -1,4 +1,4 @@
-import type { Account, Category } from "ynab";
+import type { Account, Category, TransactionDetail } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
@@ -48,7 +48,7 @@ export interface CategoryAlerts {
 export const getBudgetAlerts = (
   notificationSettings: BudgetNotificationSettings,
   data: {
-    importedTxs?: string[];
+    importedTxs?: TransactionDetail[];
     accounts?: Account[];
     categories?: Category[];
   }
@@ -128,7 +128,7 @@ export const updateIconAndTooltip = (
     tooltip += `----${budget.name}----\n`;
 
     if (budgetAlerts.numImportedTxs)
-      tooltip += `${budgetAlerts.numImportedTxs} new ${
+      tooltip += `${budgetAlerts.numImportedTxs} unapproved ${
         budgetAlerts.numImportedTxs === 1 ? "transaction" : "transactions"
       }!\n\n`;
 
@@ -186,8 +186,6 @@ export const createDesktopNotifications = async (
   if (!notifPermission) return;
 
   IS_DEV && console.log("Creating desktop notifications");
-  chrome.notifications?.onButtonClicked.removeListener(onNotificationClick);
-  chrome.notifications?.onButtonClicked.addListener(onNotificationClick);
   chrome.notifications?.onClicked.removeListener(onNotificationClick);
   chrome.notifications?.onClicked.addListener(onNotificationClick);
 
@@ -211,7 +209,7 @@ export const createDesktopNotifications = async (
 
     let message = "";
     if (numImportedTxs)
-      message += `${numImportedTxs} new transaction${numImportedTxs > 1 ? "s" : ""}. `;
+      message += `${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}. `;
     if (numImportError)
       message += `${numImportError} import issue${numImportError > 1 ? "s" : ""}!`;
     if (message.length > 0) message += "\n";
@@ -225,8 +223,7 @@ export const createDesktopNotifications = async (
       title: budget.name,
       type: "basic",
       message,
-      isClickable: true,
-      buttons: [{ title: "Open budget" }]
+      isClickable: true
     };
 
     chrome.notifications?.update(budget.id, notificationOptions, async (wasUpdated) => {

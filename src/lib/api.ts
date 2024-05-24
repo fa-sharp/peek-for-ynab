@@ -1,4 +1,4 @@
-import type { api } from "ynab";
+import { GetTransactionsTypeEnum, type api } from "ynab";
 
 import { IS_DEV } from "./utils";
 
@@ -52,11 +52,22 @@ export async function fetchAccountsForBudget(ynabAPI: api, selectedBudgetId: str
   return accounts;
 }
 
-/** Check for newly imported transactions for this budget */
+const getNDaysAgoISO = (days: number) => {
+  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().substring(0, 10);
+};
+
+/** Check for newly imported / unapproved transactions for this budget  */
 export async function importTxsForBudget(ynabAPI: api, selectedBudgetId: string) {
+  await ynabAPI.transactions.importTransactions(selectedBudgetId);
   const {
-    data: { transaction_ids }
-  } = await ynabAPI.transactions.importTransactions(selectedBudgetId);
-  IS_DEV && console.log("Checked for new imports!", transaction_ids);
-  return transaction_ids;
+    data: { transactions }
+  } = await ynabAPI.transactions.getTransactions(
+    selectedBudgetId,
+    getNDaysAgoISO(14), // fetch unapproved transactions from up to 2 weeks ago
+    GetTransactionsTypeEnum.Unapproved
+  );
+  IS_DEV && console.log("Checked for new imports!", transactions);
+  return transactions;
 }

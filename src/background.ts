@@ -1,4 +1,4 @@
-import { type Account, type Category, api } from "ynab";
+import { type Account, type Category, type TransactionDetail, api } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
@@ -20,24 +20,49 @@ import { queryClient } from "~lib/queryClient";
 import { IS_DEV, ONE_DAY_IN_MILLIS, isEmptyObject } from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
 const TOKEN_STORAGE = new Storage({ area: "local" });
-let isRefreshing = false;
 
+const IS_REFRESHING_KEY = "isRefreshing";
+
+// Listen for token refresh signal
 TOKEN_STORAGE.watch({
   [REFRESH_NEEDED_KEY]: async (c) => {
-    if (c.newValue !== true || isRefreshing) return;
+    if (
+      c.newValue !== true ||
+      (await CHROME_SESSION_STORAGE.get<boolean>(IS_REFRESHING_KEY))
+    )
+      return;
     await refreshToken();
   }
 });
 
+// Setup periodic background refresh
+const BACKGROUND_ALARM_NAME = "backgroundRefresh";
+chrome.alarms.onAlarm.addListener((alarm: chrome.alarms.Alarm) => {
+  if (alarm.name !== BACKGROUND_ALARM_NAME) return;
+  backgroundDataRefresh();
+});
+chrome.alarms.get(BACKGROUND_ALARM_NAME).then(async (alarm) => {
+  if (!alarm) {
+    IS_DEV && console.log("Setting up new alarm!");
+    await chrome.alarms.clearAll();
+    await chrome.alarms.create(BACKGROUND_ALARM_NAME, {
+      periodInMinutes: 15
+    });
+  } else {
+    IS_DEV && console.log("Alarm already exists!");
+  }
+});
+
 async function refreshToken(): Promise<TokenData | null> {
-  isRefreshing = true;
+  await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, true);
 
   // check if token exists
   const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
   if (!tokenData) {
     console.error("Not refreshing - no existing token data found");
-    isRefreshing = false;
+    await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, false);
     return null;
   }
 
@@ -68,18 +93,15 @@ async function refreshToken(): Promise<TokenData | null> {
   // signal that refresh is complete
   try {
     await TOKEN_STORAGE.set(REFRESH_NEEDED_KEY, false);
-  } finally {
-    isRefreshing = false;
+    await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, false);
+  } catch (err) {
+    console.error("Failed to signal refresh completion:", err);
   }
 
   return newTokenData;
 }
 
-const BACKGROUND_ALARM_NAME = "backgroundRefresh";
-
-const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
-  if (alarm.name !== BACKGROUND_ALARM_NAME) return;
-
+async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
   try {
     // Check for existing token. If it's expired, refresh the token
@@ -112,19 +134,17 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
 
     const alerts: CurrentAlerts = {};
     for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
-      const budgetSettings = await storage.get<BudgetSettings | undefined>(
-        `budget-${budget.id}`
-      );
+      const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
       if (!budgetSettings) continue;
 
-      let importedTxs: string[] | undefined;
+      let importedTxs: TransactionDetail[] | undefined;
       let accountsData: Account[] | undefined;
       let categoriesData: Category[] | undefined;
 
       if (budgetSettings.notifications.checkImports) {
         importedTxs = await queryClient.fetchQuery({
           queryKey: ["import", { budgetId: budget.id }],
-          staleTime: 1000 * 60 * 25, // 25 minutes
+          staleTime: 1000 * 60 * 14, // 14 minutes
           queryFn: () => importTxsForBudget(ynabAPI, budget.id)
         });
       }
@@ -157,16 +177,4 @@ const backgroundDataRefresh = async (alarm: chrome.alarms.Alarm) => {
   } catch (err) {
     console.error("Background refresh: Error", err);
   }
-};
-
-chrome.alarms.onAlarm.removeListener(backgroundDataRefresh);
-chrome.alarms.onAlarm.addListener(backgroundDataRefresh);
-chrome.alarms.get(BACKGROUND_ALARM_NAME).then(async (alarm) => {
-  if (!alarm) {
-    await chrome.alarms.clearAll();
-    await chrome.alarms.create(BACKGROUND_ALARM_NAME, {
-      periodInMinutes: 30,
-      delayInMinutes: IS_DEV ? 10 : 0
-    });
-  }
-});
+}

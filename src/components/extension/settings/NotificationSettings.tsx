@@ -41,13 +41,13 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         </label>
         <label
           className="flex-row gap-xs"
-          title="Check and notify for newly imported transactions from your linked accounts">
+          title="Check and notify for newly imported and/or unapproved transactions from your linked accounts">
           <input
             type="checkbox"
             checked={settings?.notifications.checkImports ?? false}
             onChange={(e) => changeNotifSetting("checkImports", e.target.checked)}
           />
-          New transactions
+          New/unapproved transactions
         </label>
         <label
           className="flex-row gap-xs"

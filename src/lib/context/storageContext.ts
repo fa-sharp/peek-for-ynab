@@ -52,7 +52,7 @@ interface BudgetToStringArrayMap {
 export interface BudgetNotificationSettings {
   /** Notify when a category is overspent */
   overspent: boolean;
-  /** Check for new bank imports and notify if there are new transactions  */
+  /** Check for new bank imports and notify if there are unapproved transactions  */
   checkImports: boolean;
   /** Notify when a bank connection is showing an error */
   importError: boolean;
