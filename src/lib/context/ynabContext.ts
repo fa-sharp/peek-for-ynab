@@ -139,7 +139,6 @@ const useYNABProvider = () => {
   /** Check for new imports for selected budget (if user wants notifications) */
   const { data: importedTxs } = useQuery({
     queryKey: ["import", { budgetId: selectedBudgetId }],
-    staleTime: 1000 * 60 * 14, // 14 minutes
     enabled: Boolean(
       ynabAPI && selectedBudgetId && budgetSettings?.notifications.checkImports
     ),

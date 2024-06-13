@@ -142,11 +142,7 @@ async function backgroundDataRefresh() {
       let categoriesData: Category[] | undefined;
 
       if (budgetSettings.notifications.checkImports) {
-        importedTxs = await queryClient.fetchQuery({
-          queryKey: ["import", { budgetId: budget.id }],
-          staleTime: 1000 * 60 * 14, // 14 minutes
-          queryFn: () => importTxsForBudget(ynabAPI, budget.id)
-        });
+        importedTxs = await importTxsForBudget(ynabAPI, budget.id);
       }
 
       if (

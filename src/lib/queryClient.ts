@@ -7,7 +7,7 @@ import { del, get, set } from "idb-keyval";
 
 import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "./utils";
 
-const cachedQueryKeys = new Set(["budgets", "payees", "import"]);
+const cachedQueryKeys = new Set(["budgets", "payees"]);
 
 /** React Query client, default settings */
 export const queryClient = new QueryClient({
