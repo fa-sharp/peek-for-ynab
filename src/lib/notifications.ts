@@ -216,7 +216,11 @@ export const createDesktopNotifications = async (
     if (accountsToReconcile) message += `Reconcile: ${accountsToReconcile}\n`;
     if (overspentCategories) message += `Overspent: ${overspentCategories}\n`;
     message = message.trimEnd();
-    if (!message) return;
+
+    if (!message) {
+      chrome.notifications?.clear(budget.id);
+      return;
+    }
 
     const notificationOptions: chrome.notifications.NotificationOptions<true> = {
       iconUrl: notificationImage.toString(),
