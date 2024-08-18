@@ -3,6 +3,7 @@ import IconButton from "./IconButton";
 import AccountsView, { AccountView } from "./extension/main/AccountsView";
 import BudgetSelect from "./extension/main/BudgetSelect";
 import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
+import NotificationsView from "./extension/main/NotificationsView";
 import PopupLogin from "./extension/main/PopupLogin";
 import PopupMain from "./extension/main/PopupMain";
 import PopupNav from "./extension/main/PopupNav";
@@ -30,6 +31,7 @@ export {
   CurrencyView,
   IconButton,
   MemoField,
+  NotificationsView,
   PayeeSelect,
   PopupLogin,
   PopupMain,

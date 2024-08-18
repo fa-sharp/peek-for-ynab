@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import {
   AccountsView,
   CategoriesView,
+  NotificationsView,
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView
@@ -62,6 +63,7 @@ export default function PopupMain() {
       <PopupNav />
       {categoriesData && accountsData && (
         <>
+          <NotificationsView />
           <SavedCategoriesView />
           <SavedAccountsView />
           <CategoriesView />

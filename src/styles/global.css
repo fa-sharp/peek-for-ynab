@@ -94,6 +94,10 @@ button:focus-visible {
   justify-content: space-between;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .min-w-0 {
   min-width: 0;
 }
