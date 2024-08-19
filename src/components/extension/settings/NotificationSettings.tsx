@@ -41,7 +41,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         </label>
         <label
           className="flex-row gap-xs"
-          title="Check and notify for newly imported and/or unapproved transactions from your linked accounts">
+          title="Check and notify for newly imported and/or unapproved transactions from your accounts">
           <input
             type="checkbox"
             checked={settings?.notifications.checkImports ?? false}
@@ -60,7 +60,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           Import errors
         </label>
         <div
-          className="flex-row gap-xs cursor-pointer"
+          className="heading-small flex-row gap-xs cursor-pointer"
           onClick={() => setReconcileExpanded(!reconcileExpanded)}>
           <span title="Setup alerts for the last time you reconciled an account">
             Reconciliation alerts

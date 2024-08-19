@@ -29,9 +29,9 @@ export function OptionsView() {
   const [loggingIn, setLoggingIn] = useState(false);
 
   const {
-    enabled: notifEnabled,
-    request: requestNotifPermission,
-    remove: removeNotifPermission
+    enabled: notificationEnabled,
+    request: requestNotificationPermission,
+    remove: removeNotificationPermission
   } = useNotificationPermission();
 
   if (!settings) return null;
@@ -149,12 +149,12 @@ export function OptionsView() {
               <label className="flex-row mb-sm">
                 <input
                   type="checkbox"
-                  checked={notifEnabled}
+                  checked={notificationEnabled}
                   onChange={async (e) => {
                     if (e.target.checked) {
-                      requestNotifPermission();
+                      requestNotificationPermission();
                     } else {
-                      removeNotifPermission();
+                      removeNotificationPermission();
                     }
                   }}
                 />
