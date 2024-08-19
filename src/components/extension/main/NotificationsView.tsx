@@ -21,6 +21,11 @@ const NotificationsView = () => {
     [currentAlerts, selectedBudgetId]
   );
 
+  const numImportedTxs = useMemo(
+    () => currentAlerts?.[selectedBudgetId]?.numImportedTxs ?? 0,
+    [currentAlerts, selectedBudgetId]
+  );
+
   const overspentCategories = useMemo(
     () =>
       Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {})
@@ -52,9 +57,9 @@ const NotificationsView = () => {
   return (
     <div className="mb-sm">
       <div
-        className="flex-row gap-sm justify-center cursor-pointer"
+        className="heading-small flex-row gap-sm justify-center cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
-        <AlertCircle color="var(--stale)" size={16} />
+        <AlertCircle color="var(--stale)" size={16} aria-label="Alert" />
         {`${numNotifications} notification${numNotifications > 1 ? "s" : ""}`}
         <IconButton
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
@@ -65,6 +70,10 @@ const NotificationsView = () => {
 
       {expanded && (
         <ul className="list flex-col gap-xs">
+          {numImportedTxs > 0 && (
+            <li>{`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}</li>
+          )}
+
           {overspentCategories.length > 0 &&
             overspentCategories.map((category) => (
               <li key={`overspent-${category.id}`} className="flex-row justify-center">
@@ -92,7 +101,9 @@ const NotificationsView = () => {
             accountsWithImportError.map(
               (account) =>
                 account.last_reconciled_at && (
-                  <li key={`import-${account.id}`} className="flex-row justify-center">
+                  <li
+                    key={`importError-${account.id}`}
+                    className="flex-row justify-center">
                     {account.name}: Import issue/error
                   </li>
                 )
