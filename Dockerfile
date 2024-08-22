@@ -28,12 +28,12 @@ COPY --link . .
 RUN pnpm run build:next
 
 # Final stage for app image
-FROM gcr.io/distroless/nodejs20-debian12:nonroot as runner
+FROM gcr.io/distroless/nodejs20-debian12 as runner
 
 # Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 EXPOSE 3000
 ENV NODE_ENV=production

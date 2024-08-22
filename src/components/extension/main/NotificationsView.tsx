@@ -71,7 +71,9 @@ const NotificationsView = () => {
       {expanded && (
         <ul className="list flex-col gap-xs">
           {numImportedTxs > 0 && (
-            <li>{`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}</li>
+            <li className="flex-row justify-center">
+              {`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}
+            </li>
           )}
 
           {overspentCategories.length > 0 &&
