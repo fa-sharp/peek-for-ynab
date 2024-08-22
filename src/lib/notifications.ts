@@ -45,6 +45,7 @@ export interface CategoryAlerts {
     | undefined;
 }
 
+/** Get the up-to-date alerts for the current budget, based on the given notification settings */
 export const getBudgetAlerts = (
   notificationSettings: BudgetNotificationSettings,
   data: {
@@ -158,19 +159,17 @@ export const updateIconAndTooltip = (
   }
   if (tooltip.length > 600) tooltip = tooltip.slice(0, 600) + "\n...";
 
+  const numNotifications = Object.keys(currentAlerts).reduce(
+    (numAlerts, budgetId) =>
+      numAlerts +
+      (currentAlerts[budgetId]?.numImportedTxs || 0) +
+      Object.keys(currentAlerts[budgetId]?.accounts || {}).length +
+      Object.keys(currentAlerts[budgetId]?.cats || {}).length,
+    0
+  );
+
   chrome.action?.setTitle({ title: tooltip.trimEnd() });
-  chrome.action?.setBadgeText({
-    text: String(
-      Object.keys(currentAlerts).reduce(
-        (numAlerts, budgetId) =>
-          numAlerts +
-          (currentAlerts[budgetId]?.numImportedTxs || 0) +
-          Object.keys(currentAlerts[budgetId]?.accounts || {}).length +
-          Object.keys(currentAlerts[budgetId]?.cats || {}).length,
-        0
-      ) || ""
-    )
-  });
+  chrome.action?.setBadgeText({ text: String(numNotifications || "") });
 };
 
 const onNotificationClick = (id: string) => {

@@ -55,6 +55,7 @@ const useNotificationsProvider = () => {
   }, [budgetsData, currentAlerts, currentAlertsHydrated]);
 
   return {
+    /** The up-to-date alerts for the currently selected budget */
     currentAlerts
   };
 };
