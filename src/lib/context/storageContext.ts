@@ -30,7 +30,7 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default false */
+  /** Whether animations are enabled. @default true */
   animations?: boolean;
 }
 
