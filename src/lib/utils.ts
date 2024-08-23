@@ -68,6 +68,26 @@ export const getTodaysDateISO = () => {
   return date.toISOString().substring(0, 10);
 };
 
+const dateFormatter = new Intl.DateTimeFormat("default", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC"
+});
+
+const dateFormatterWithYear = new Intl.DateTimeFormat("default", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC"
+});
+
+/** Format a date with just the month and day. If not in the current year, include the year. */
+export const formatDateMonthAndDay = (date: Date) => {
+  if (date.getUTCFullYear() === new Date().getUTCFullYear())
+    return dateFormatter.format(date);
+  else return dateFormatterWithYear.format(date);
+};
+
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
   const example = Intl.NumberFormat(locales).format(1.1);

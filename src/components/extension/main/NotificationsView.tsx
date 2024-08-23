@@ -5,6 +5,7 @@ import CurrencyView from "~components/CurrencyView";
 import IconButton from "~components/IconButton";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import { formatDateMonthAndDay } from "~lib/utils";
 
 const NotificationsView = () => {
   const { selectedBudgetId } = useStorageContext();
@@ -93,8 +94,7 @@ const NotificationsView = () => {
               (account) =>
                 account.last_reconciled_at && (
                   <li key={`reconcile-${account.id}`} className="flex-row justify-center">
-                    {account.name}: Reconciled{` `}
-                    {new Date(account.last_reconciled_at).toLocaleDateString()}
+                    {`${account.name}: Reconciled ${formatDateMonthAndDay(new Date(account.last_reconciled_at))}`}
                   </li>
                 )
             )}

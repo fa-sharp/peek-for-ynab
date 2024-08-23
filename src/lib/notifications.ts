@@ -9,6 +9,7 @@ import {
   ONE_DAY_IN_MILLIS,
   checkPermissions,
   formatCurrency,
+  formatDateMonthAndDay,
   isEmptyObject
 } from "./utils";
 
@@ -150,9 +151,7 @@ export const updateIconAndTooltip = (
         tooltip += `${accountAlerts.name}:\n`;
         if (accountAlerts.importError) tooltip += "Connection issue\n";
         if (accountAlerts.reconcile && accountAlerts.lastReconciledAt)
-          tooltip += `Last reconciled ${new Date(
-            accountAlerts.lastReconciledAt
-          ).toLocaleDateString()}\n`;
+          tooltip += `Last reconciled ${formatDateMonthAndDay(new Date(accountAlerts.lastReconciledAt))}\n`;
         tooltip += "\n";
       }
     }
@@ -232,13 +231,14 @@ export const createDesktopNotifications = async (
     chrome.notifications?.update(budget.id, notificationOptions, async (wasUpdated) => {
       const storage = new Storage({ area: "local" });
       const lastNotificationTime = await storage.get<number>(`lastNotif-${budgetId}`);
-      storage.set(`lastNotif-${budgetId}`, Date.now());
 
-      if (!wasUpdated) {
-        // Create a new notification, unless one was created in last hour
-        if (lastNotificationTime && Date.now() - lastNotificationTime < 1000 * 60 * 60)
-          return;
+      // Create a new notification if there hasn't been one in last hour
+      if (
+        !wasUpdated &&
+        (!lastNotificationTime || Date.now() - lastNotificationTime > 1000 * 60 * 60)
+      ) {
         chrome.notifications?.create(budget.id, notificationOptions);
+        storage.set(`lastNotif-${budgetId}`, Date.now());
       }
     });
   }
