@@ -26,6 +26,11 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
           Help/FAQ
         </Link>
         <Link
+          href="/releases"
+          className={router.pathname === "/releases" ? styles.currentPage : ""}>
+          Release Notes
+        </Link>
+        <Link
           href="/privacy"
           className={router.pathname === "/privacy" ? styles.currentPage : ""}>
           Privacy Policy

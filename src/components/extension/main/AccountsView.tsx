@@ -12,7 +12,7 @@ import {
 } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AccountAlerts } from "~lib/notifications";
-import { findEmoji, formatCurrency } from "~lib/utils";
+import { findEmoji, formatCurrency, formatDateMonthAndDay } from "~lib/utils";
 
 import {
   AddTransactionIcon,
@@ -206,7 +206,7 @@ export const AccountView = ({
           <IconButton
             noAction
             disabled
-            label={`Last reconciled ${new Date(last_reconciled_at).toLocaleDateString()}`}
+            label={`Last reconciled on ${formatDateMonthAndDay(new Date(last_reconciled_at))}`}
             icon={<LockOpen color="var(--stale)" size={18} />}
           />
         )}
