@@ -3,6 +3,7 @@ import * as ynab from "ynab";
 
 import { CurrencyView, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
+import { UnapprovedAlertIcon } from "~components/icons/AlertIcons";
 import type { DetailViewState } from "~lib/types";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
@@ -31,6 +32,7 @@ export default function TransactionView({
     <div className="tx-display">
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
+          {!tx.approved && <UnapprovedAlertIcon aria-label="Unapproved" />}
           {tx.flag_color && (
             <Flag3
               aria-label={`${tx.flag_color} flag`}
