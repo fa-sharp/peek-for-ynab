@@ -48,6 +48,9 @@ function IndexPage() {
         <li>View your current category and account balances</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
+        <li>
+          Customizable alerts for overspending, new imports, and reconciliation reminders
+        </li>
         <li>Support for split transactions</li>
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>

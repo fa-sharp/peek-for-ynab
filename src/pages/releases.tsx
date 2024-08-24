@@ -24,8 +24,15 @@ function IndexPage() {
           The OAuth token now refreshes in the background, which should improve loading
           times.
         </li>
-        <li>Website migrated from Vercel to Fly.io</li>
       </ul>
+      <Image
+        src="/screenshots/notification-settings.gif"
+        alt={"Demo of notification settings"}
+        className="screenshot"
+        width={220}
+        height={240}
+        unoptimized
+      />
       <h3>0.19.1 - Apr 12, 2024</h3>
       <ul>
         <li>Split transaction support!</li>
