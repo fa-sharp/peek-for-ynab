@@ -5,6 +5,7 @@ import CurrencyView from "~components/CurrencyView";
 import IconButton from "~components/IconButton";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import { getNumAlertsForBudget } from "~lib/notifications";
 import { formatDateMonthAndDay } from "~lib/utils";
 
 const NotificationsView = () => {
@@ -16,11 +17,9 @@ const NotificationsView = () => {
 
   const numNotifications = useMemo(
     () =>
-      (currentAlerts?.[selectedBudgetId]?.numImportedTxs || 0) +
-      Object.values(currentAlerts?.[selectedBudgetId]?.accounts || {}).filter(
-        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
-      ).length +
-      Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {}).length,
+      currentAlerts?.[selectedBudgetId]
+        ? getNumAlertsForBudget(currentAlerts[selectedBudgetId])
+        : 0,
     [currentAlerts, selectedBudgetId]
   );
 
@@ -102,16 +101,11 @@ const NotificationsView = () => {
             )}
 
           {accountsWithImportError.length > 0 &&
-            accountsWithImportError.map(
-              (account) =>
-                account.last_reconciled_at && (
-                  <li
-                    key={`importError-${account.id}`}
-                    className="flex-row justify-center">
-                    {account.name}: Import issue
-                  </li>
-                )
-            )}
+            accountsWithImportError.map((account) => (
+              <li key={`importError-${account.id}`} className="flex-row justify-center">
+                {account.name}: Import issue
+              </li>
+            ))}
         </ul>
       )}
     </div>

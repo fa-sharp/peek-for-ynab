@@ -126,6 +126,20 @@ export const getBudgetAlerts = (
   else return budgetAlerts;
 };
 
+/** Count number of alerts for this budget */
+export const getNumAlertsForBudget = (budgetAlerts: BudgetAlerts) =>
+  budgetAlerts.numImportedTxs ||
+  0 +
+    Object.values(budgetAlerts.accounts || {}).reduce(
+      (numAccountAlerts, accountAlerts) => {
+        accountAlerts?.importError && (numAccountAlerts += 1);
+        accountAlerts?.reconcile && (numAccountAlerts += 1);
+        return numAccountAlerts;
+      },
+      0
+    ) +
+    Object.keys(budgetAlerts.cats || {}).length;
+
 export const updateIconAndTooltip = (
   currentAlerts: CurrentAlerts,
   budgetsData: CachedBudget[]
@@ -171,11 +185,7 @@ export const updateIconAndTooltip = (
   const numNotifications = Object.keys(currentAlerts).reduce(
     (numAlerts, budgetId) =>
       numAlerts +
-      (currentAlerts[budgetId]?.numImportedTxs || 0) +
-      Object.values(currentAlerts[budgetId]?.accounts || {}).filter(
-        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
-      ).length +
-      Object.keys(currentAlerts[budgetId]?.cats || {}).length,
+      (currentAlerts[budgetId] ? getNumAlertsForBudget(currentAlerts[budgetId]) : 0),
     0
   );
 
