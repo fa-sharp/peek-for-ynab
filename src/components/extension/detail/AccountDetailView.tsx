@@ -86,11 +86,11 @@ const AccountTxsView = () => {
           <IconButton
             label="Open this account in YNAB"
             onClick={openAccount}
-            icon={<ExternalLink />}
+            icon={<ExternalLink aria-hidden />}
           />
         </h2>
         <IconButton
-          icon={<ArrowBack />}
+          icon={<ArrowBack aria-hidden />}
           label="Back to main view"
           onClick={() => setPopupState({ view: "main" })}
         />
