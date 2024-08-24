@@ -1,6 +1,6 @@
 # Peek for YNAB
 
-A browser extension for YNAB that lets users see their category and account balances at a glance, and add transactions.
+An open-source browser extension for YNAB that lets users see their category and account balances at a glance, add transactions, and setup customizable notifications. See full feature list and installation links on the [extension website](https://peek-for-ynab.fly.dev).
 
 ## Project layout
 
@@ -14,7 +14,6 @@ A browser extension for YNAB that lets users see their category and account bala
     - `context/` React Context that provides auth, API data, and storage to the extension
   - `components/` View components
   - `styles/` CSS files
-
 
 ## Principles
 
@@ -39,7 +38,7 @@ Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.c
 
 ### Extension
 
-Run ```pnpm install``` or ```npm install``` to install all dependencies.
+Run `pnpm install` or `npm install` to install all dependencies.
 
 This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). You can run the extension's development server via:
 

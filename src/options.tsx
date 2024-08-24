@@ -175,22 +175,27 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Budgets
           </h3>
-          <ul className="list flex-col">
+          <ul className="list flex-col mb-lg">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />
             ))}
           </ul>
           <button
             title="Refresh the list of budgets from YNAB"
-            className="button rounded accent flex-row mb-sm"
-            style={{ width: "fit-content", marginBlock: 8 }}
+            className="button rounded accent flex-row mb-lg"
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>
             <Refresh size={14} aria-hidden />
             {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
           </button>
           <button
-            style={{ marginTop: 12 }}
+            className="button rounded accent flex-row mb-lg"
+            onClick={() =>
+              window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
+            }>
+            Help/FAQ
+          </button>
+          <button
             className="button rounded warn"
             onClick={async () => {
               const confirmed = confirm(
