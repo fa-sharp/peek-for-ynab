@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
+import { AlertTriangle } from "tabler-icons-react";
 import type {
   Account,
   Category,
@@ -8,7 +9,8 @@ import type {
 } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import type { CategoryAlerts } from "~lib/notifications";
 import type {
   AppSettings,
   CachedBudget,
@@ -45,6 +47,7 @@ function CategoriesView() {
     selectedBudgetId
   } = useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
+  const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
 
@@ -66,6 +69,7 @@ function CategoriesView() {
           <CategoryGroupView
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
+            categoryAlerts={currentAlerts?.[selectedBudgetId]?.cats}
             budgetData={selectedBudgetData}
             accountsData={accountsData}
             savedCategories={savedCategories[selectedBudgetId]}
@@ -83,6 +87,7 @@ function CategoriesView() {
 /** View of a category group - can expand to show all categories and balances */
 export function CategoryGroupView({
   categoryGroup,
+  categoryAlerts,
   budgetData,
   accountsData,
   savedCategories,
@@ -93,6 +98,7 @@ export function CategoryGroupView({
   onOpenDetail
 }: {
   categoryGroup: CategoryGroupWithCategories;
+  categoryAlerts?: CategoryAlerts;
   accountsData?: Account[];
   budgetData: CachedBudget;
   savedCategories?: string[];
@@ -132,6 +138,7 @@ export function CategoryGroupView({
                 <CategoryView
                   categoryData={category}
                   currencyFormat={budgetData.currencyFormat}
+                  alerts={categoryAlerts?.[category.id]}
                   settings={settings}
                   actionElementsLeft={
                     !editMode ? null : savedCategories?.some(
@@ -214,6 +221,7 @@ export const CategoryView = ({
   categoryData: { name, balance },
   currencyFormat,
   settings,
+  alerts,
   actionElementsRight,
   actionElementsLeft
 }: {
@@ -221,6 +229,7 @@ export const CategoryView = ({
   currencyFormat?: CurrencyFormat;
   actionElementsRight?: ReactElement | null;
   actionElementsLeft?: ReactElement | null;
+  alerts?: CategoryAlerts[string];
   settings: AppSettings;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
@@ -237,6 +246,14 @@ export const CategoryView = ({
           <span className="font-big">{foundEmoji}</span>
         ) : (
           <div className="hide-overflow">{name}</div>
+        )}
+        {alerts?.overspent && (
+          <IconButton
+            noAction
+            disabled
+            label="Overspent"
+            icon={<AlertTriangle color="var(--stale)" size={18} />}
+          />
         )}
       </div>
       <div className="flex-row">

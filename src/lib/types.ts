@@ -7,10 +7,6 @@ export interface TokenData {
 }
 
 export interface AppSettings {
-  /** Whether transactions are marked Cleared by default */
-  txCleared: boolean;
-  /** Whether transactions are automatically marked Approved */
-  txApproved: boolean;
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
   /** Balances are hidden unless you hover over them */
@@ -21,6 +17,36 @@ export interface AppSettings {
   theme?: "auto" | "dark" | "light";
   /** Whether animations are enabled. @default false */
   animations?: boolean;
+}
+
+/** Budget-specific settings */
+export interface BudgetSettings {
+  notifications: BudgetNotificationSettings;
+  transactions: {
+    /** Whether transactions are marked Cleared by default */
+    cleared: boolean;
+    /** Whether transactions are automatically marked Approved */
+    approved: boolean;
+    /** Whether to remember the last-used account for transaction entry. */
+    rememberAccount: boolean;
+    /** Default account for purchases */
+    defaultAccountId?: string;
+  };
+}
+
+/** Notification settings for a specific budget */
+export interface BudgetNotificationSettings {
+  /** Notify when a category is overspent */
+  overspent: boolean;
+  /** Check for new bank imports and notify if there are unapproved transactions  */
+  checkImports: boolean;
+  /** Notify when a bank connection is showing an error */
+  importError: boolean;
+  /** Reminders for reconciliation - stored as a map
+   * of accountId to max # of days since last reconciliation */
+  reconcileAlerts: {
+    [accountId: string]: number | undefined;
+  };
 }
 
 /** Budget data cached by the app */

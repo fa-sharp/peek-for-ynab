@@ -1,12 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { clear } from "idb-keyval";
-import { nanoid } from "nanoid";
+import { customAlphabet, urlAlphabet } from "nanoid";
 import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
+import { IS_PRODUCTION } from "../constants";
 import type { TokenData } from "../types";
-import { IS_PRODUCTION } from "../utils";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
@@ -39,21 +39,20 @@ const useAuthProvider = () => {
   const loginWithOAuth = () =>
     new Promise<void>((resolve, reject) => {
       if (!process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+
       // Clear API cache and local storage to avoid any leakage of data
       queryClient.removeQueries();
       clear();
       localStorage.clear();
 
-      const authorizeState = nanoid();
-      const authorizeParams = new URLSearchParams({
+      const authorizeUrl = new URL("https://app.ynab.com/oauth/authorize");
+      const authorizeState = customAlphabet(urlAlphabet, 15)();
+      authorizeUrl.search = new URLSearchParams({
         client_id: process.env.PLASMO_PUBLIC_YNAB_CLIENT_ID,
-        redirect_uri:
-          chrome?.identity?.getRedirectURL() || "http://localhost:3000/testLogin",
+        redirect_uri: chrome?.identity?.getRedirectURL(),
         response_type: "code",
         state: authorizeState
-      });
-      const authorizeUrl = new URL("https://app.ynab.com/oauth/authorize");
-      authorizeUrl.search = authorizeParams.toString();
+      }).toString();
 
       // if no chrome API available, assume we're testing/developing in a regular web browser context
       if (!chrome || !chrome.identity) {

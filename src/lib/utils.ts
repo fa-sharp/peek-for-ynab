@@ -1,12 +1,4 @@
-import { useLayoutEffect } from "react";
-import useLocalStorageState from "use-local-storage-state";
 import * as ynab from "ynab";
-
-export const IS_DEV = process.env.NODE_ENV === "development";
-export const IS_PRODUCTION = process.env.NODE_ENV === "production";
-
-export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
-export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
 export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
@@ -43,6 +35,15 @@ export const millisToStringValue = (
 export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
   type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
 
+export const isEmptyObject = (objectName: object) => {
+  for (const prop in objectName) {
+    if (Object.prototype.hasOwnProperty.call(objectName, prop)) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
@@ -65,6 +66,26 @@ export const getNDaysAgoISO = (days: number) => {
   const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return date.toISOString().substring(0, 10);
+};
+
+const dateFormatter = new Intl.DateTimeFormat("default", {
+  month: "numeric",
+  day: "numeric",
+  timeZone: "UTC"
+});
+
+const dateFormatterWithYear = new Intl.DateTimeFormat("default", {
+  month: "numeric",
+  day: "numeric",
+  year: "2-digit",
+  timeZone: "UTC"
+});
+
+/** Format a date with just the month and day. If not in the current year, include the year. */
+export const formatDateMonthAndDay = (date: Date) => {
+  if (date.getUTCFullYear() === new Date().getUTCFullYear())
+    return dateFormatter.format(date);
+  else return dateFormatterWithYear.format(date);
 };
 
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
@@ -102,38 +123,41 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
   return result as T;
 };
 
-/** Request permissions to access the current tab and execute scripts within it */
-export const requestCurrentTabPermissions = () =>
+type OptionalPermissions = "activeTab" | "scripting" | "notifications";
+
+/**
+ * Request optional permissions. Use 'activeTab' and 'scripting' to access the current tab and execute scripts within it.
+ * Use 'notifications' to enable native desktop notifications.
+ */
+export const requestPermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) => {
-    chrome.permissions.request(
-      {
-        permissions: ["activeTab", "scripting"]
-      },
-      (granted) => {
-        if (granted) resolve(true);
-        else {
-          console.error("Permission denied:", chrome.runtime.lastError);
-          resolve(false);
-        }
+    chrome.permissions.request({ permissions }, (granted) => {
+      if (granted) resolve(true);
+      else {
+        console.error("Permission denied:", chrome.runtime.lastError);
+        resolve(false);
       }
-    );
+    });
   });
 
-/** Remove permissions to access the current tab */
-export const removeCurrentTabPermissions = () =>
+/** Check if optional permissions exist */
+export const checkPermissions = (permissions: OptionalPermissions[]) =>
+  new Promise<boolean>((resolve) => {
+    chrome.permissions.contains({ permissions }, (granted) => {
+      resolve(granted);
+    });
+  });
+
+/** Remove optional permissions. */
+export const removePermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) =>
-    chrome.permissions.remove(
-      {
-        permissions: ["activeTab", "scripting"]
-      },
-      (removed) => {
-        if (removed) resolve(true);
-        else {
-          console.error("Error removing permissions:", chrome.runtime.lastError);
-          resolve(false);
-        }
+    chrome.permissions.remove({ permissions }, (removed) => {
+      if (removed) resolve(true);
+      else {
+        console.error("Error removing permissions:", chrome.runtime.lastError);
+        resolve(false);
       }
-    )
+    })
   );
 
 export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
@@ -144,36 +168,4 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
   if (flagColor === ynab.TransactionFlagColor.Red) return "🔴";
   if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
   return null;
-};
-
-/**
- * Sets the theme based on user setting in localStorage and media query.
- * See also [theme.js](../../public/scripts/theme.js) which avoids the 'flash' on load.
- */
-export const useSetColorTheme = () => {
-  const [themeSetting] = useLocalStorageState<"light" | "dark" | "auto">("theme", {
-    defaultValue: "auto"
-  });
-
-  useLayoutEffect(() => {
-    const prefersDarkModeQuery = window?.matchMedia
-      ? window.matchMedia("(prefers-color-scheme: dark)")
-      : null;
-
-    if (
-      (themeSetting === "auto" && prefersDarkModeQuery?.matches) ||
-      themeSetting === "dark"
-    )
-      document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-
-    const listener = (e: MediaQueryListEvent) => {
-      if ((themeSetting === "auto" && e.matches) || themeSetting === "dark")
-        document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-    };
-    prefersDarkModeQuery?.addEventListener("change", listener);
-
-    return () => prefersDarkModeQuery?.removeEventListener("change", listener);
-  }, [themeSetting]);
 };

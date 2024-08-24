@@ -95,6 +95,10 @@ button:focus-visible {
   justify-content: space-between;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .min-w-0 {
   min-width: 0;
 }
@@ -177,6 +181,12 @@ button:focus-visible {
   font-weight: 600;
 }
 
+.heading-small {
+  margin-block: var(--spacing-sm);
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
 .heading-bordered {
   border-bottom: solid 1px var(--border-light);
 }
@@ -251,6 +261,9 @@ li:last-child .balance-display {
   font-size: inherit;
   background-color: var(--background);
   color: currentColor;
+}
+.select.small {
+  padding: 0.1em;
 }
 
 .select-dropdown-list {

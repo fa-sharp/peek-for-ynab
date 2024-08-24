@@ -6,16 +6,22 @@ import useLocalStorage from "use-local-storage-state";
 import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
-import { DEFAULT_SETTINGS, REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import {
+  DEFAULT_BUDGET_SETTINGS,
+  DEFAULT_SETTINGS,
+  REFRESH_NEEDED_KEY,
+  TOKEN_STORAGE_KEY
+} from "~lib/constants";
 import type {
   AppSettings,
+  BudgetSettings,
   DetailViewState,
   MoveMoneyInitialState,
   TokenData,
   TxAddInitialState
 } from "~lib/types";
 
-/** Map of budget IDs to string arrays. Useful type for storage. */
+/** Map of budget IDs to string arrays. */
 interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
@@ -60,6 +66,13 @@ const useStorageProvider = () => {
     defaultValue: false
   });
 
+  /** Save the `syncEnabled` setting to Chrome local storage for background thread */
+  useEffect(() => {
+    CHROME_LOCAL_STORAGE.get<boolean>("sync").then((val) => {
+      if (val !== syncEnabled) CHROME_LOCAL_STORAGE.set("sync", syncEnabled);
+    });
+  }, [syncEnabled]);
+
   const storageArea = useMemo(
     () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
     [syncEnabled]
@@ -89,6 +102,29 @@ const useStorageProvider = () => {
       return data;
     }
   );
+
+  /** Budget-specific settings for the current budget. Is synced if the user chooses. */
+  const [budgetSettings, setBudgetSettings] = useExtensionStorage<
+    BudgetSettings | undefined
+  >(
+    {
+      key: `budget-${selectedBudgetId}`,
+      instance: storageArea
+    },
+    (data, isHydrated) =>
+      !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+  );
+
+  /** Use budget-specific settings for a specific budget */
+  const useBudgetSettings = (budgetId: string) =>
+    useExtensionStorage<BudgetSettings | undefined>(
+      {
+        key: `budget-${budgetId}`,
+        instance: storageArea
+      },
+      (data, isHydrated) =>
+        !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+    );
 
   /** The category IDs pinned by the user, grouped by budgetId. Is synced if the user chooses. */
   const [
@@ -199,6 +235,8 @@ const useStorageProvider = () => {
         ...savedAccounts,
         [budgetId]: undefined
       });
+      // Clean up budget-specific settings
+      storageArea.remove(`budget-${budgetId}`);
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
@@ -236,6 +274,9 @@ const useStorageProvider = () => {
     removeCategory,
     savedAccounts,
     saveAccount,
+    budgetSettings,
+    setBudgetSettings,
+    useBudgetSettings,
     removeAccount,
     removeAllData
   };

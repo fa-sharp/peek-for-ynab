@@ -1,7 +1,7 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 import { CategoryView, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
@@ -15,6 +15,7 @@ import {
 export default function SavedCategoriesView() {
   const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
   const { accountsData, selectedBudgetData, savedCategoriesData } = useYNABContext();
+  const { currentAlerts } = useNotificationsContext();
 
   if (
     !selectedBudgetData ||
@@ -55,6 +56,7 @@ export default function SavedCategoriesView() {
                     <CategoryView
                       categoryData={category}
                       currencyFormat={currencyFormat}
+                      alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
                       settings={settings}
                       actionElementsLeft={
                         !popupState.editMode ? null : (

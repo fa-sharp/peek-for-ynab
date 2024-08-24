@@ -64,9 +64,9 @@ function HelpPage() {
           <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
             If you will enter a lot of your transactions using the extension, you may want
-            to uncheck the <b>Approved</b> setting under <b>Transaction defaults</b>, so
-            that you will be prompted to double-check and Approve the transactions in
-            YNAB.
+            to leave them Unapproved so that you will be prompted to double-check and
+            Approve the transactions in YNAB. In the settings page, click the gear ⚙️ icon
+            next to the budget name, and then uncheck the <b>Approved</b> setting.
           </p>
         </li>
         <li>
@@ -88,8 +88,19 @@ function HelpPage() {
           </ul>
         </li>
         <li>
+          <h3>I am a nerd and I want nerdy things.</h3>
+          <p>
+            Absolutely! There is a devtools page where you can see exactly what is being
+            stored, what the API cache looks like, browser permissions, etc... Copy this
+            URL into your browser:{" "}
+            <code>
+              chrome-extension://oakibhlecegcmjcjppmjkiaeedoljbmk/tabs/_devtools.html
+            </code>
+          </p>
+        </li>
+        <li>
           <h3>I have an issue, bug report, or further questions.</h3>
-          <p>Please contact the developer at hello (at) fasharp (dot) io.</p>
+          <p>Please contact the developer at peek (at) fasharp (dot) io.</p>
         </li>
       </ul>
     </WebLayout>

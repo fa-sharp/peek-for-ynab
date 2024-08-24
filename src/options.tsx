@@ -1,17 +1,15 @@
-import { useState } from "react";
-import { CircleC, InfoCircle, Refresh } from "tabler-icons-react";
+import { useCallback, useEffect, useState } from "react";
+import { Refresh } from "tabler-icons-react";
 
+import { BudgetSettings } from "~components";
 import {
   AppProvider,
   useAuthContext,
   useStorageContext,
   useYNABContext
 } from "~lib/context";
-import {
-  removeCurrentTabPermissions,
-  requestCurrentTabPermissions,
-  useSetColorTheme
-} from "~lib/utils";
+import { useSetColorTheme } from "~lib/hooks";
+import { checkPermissions, removePermissions, requestPermissions } from "~lib/utils";
 
 import "./styles/global.css";
 
@@ -22,14 +20,19 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, syncEnabled, changeSetting, shownBudgetIds, toggleShowBudget } =
-    useStorageContext();
+  const { settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   useSetColorTheme();
 
   const [loggingIn, setLoggingIn] = useState(false);
+
+  const {
+    enabled: notificationEnabled,
+    request: requestNotificationPermission,
+    remove: removeNotificationPermission
+  } = useNotificationPermission();
 
   if (!settings) return null;
 
@@ -114,71 +117,69 @@ export function OptionsView() {
           </div>
 
           <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Transaction defaults
-          </h3>
-          <div className="flex-col">
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Approved (uncheck this if you want to double-check and Approve them in YNAB)">
-              <input
-                type="checkbox"
-                checked={settings.txApproved}
-                onChange={(e) => changeSetting("txApproved", e.target.checked)}
-              />
-              <InfoCircle fill="#2ea1be" stroke="white" size={20} />
-              Approved
-            </label>
-            <label
-              className="flex-row gap-sm"
-              title="Set transactions as Cleared by default">
-              <input
-                type="checkbox"
-                checked={settings.txCleared}
-                onChange={(e) => changeSetting("txCleared", e.target.checked)}
-              />
-              <CircleC stroke="white" fill="var(--currency-green)" size={20} />
-              Cleared
-            </label>
-          </div>
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
             Permissions
           </h3>
-          <label className="flex-row mb-sm">
-            <input
-              type="checkbox"
-              checked={settings.currentTabAccess}
-              onChange={async (e) => {
-                if (e.target.checked) {
-                  const granted = await requestCurrentTabPermissions();
-                  if (granted) changeSetting("currentTabAccess", true);
-                } else {
-                  await removeCurrentTabPermissions();
-                  changeSetting("currentTabAccess", false);
-                }
-              }}
-            />
-            Allow access to the currently open tab, to enable these features:
-          </label>
-          <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
-            <li>Automatically copy the selected amount into the transaction form</li>
-            <li>Copy the current URL into the memo field of the transaction</li>
-          </ul>
-
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Show/hide budgets
-          </h3>
           <div className="flex-col">
-            {budgetsData?.map((budget) => (
-              <label key={budget.id} className="flex-row">
+            <div>
+              <label className="flex-row mb-sm">
                 <input
                   type="checkbox"
-                  checked={shownBudgetIds?.includes(budget.id)}
-                  onChange={() => toggleShowBudget(budget.id)}
+                  checked={settings.currentTabAccess}
+                  onChange={async (e) => {
+                    if (e.target.checked) {
+                      const granted = await requestPermissions([
+                        "activeTab",
+                        "scripting"
+                      ]);
+                      if (granted) changeSetting("currentTabAccess", true);
+                    } else {
+                      await removePermissions(["activeTab", "scripting"]);
+                      changeSetting("currentTabAccess", false);
+                    }
+                  }}
                 />
-                {budget.name}
+                Allow access to the currently open tab, to enable these features:
               </label>
-            ))}
+              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
+                <li>Automatically copy the selected amount into the transaction form</li>
+                <li>Copy the current URL into the memo field of the transaction</li>
+              </ul>
+            </div>
+            <div>
+              <label className="flex-row mb-sm">
+                <input
+                  type="checkbox"
+                  checked={notificationEnabled}
+                  onChange={async (e) => {
+                    if (e.target.checked) {
+                      requestNotificationPermission();
+                    } else {
+                      removeNotificationPermission();
+                    }
+                  }}
+                />
+                Enable desktop notifications (⚠️ Experimental ⚠️)
+              </label>
+              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
+                <li>
+                  Native desktop notifications on your device (based on the notifications
+                  you setup for each budget below)
+                </li>
+                <li>
+                  This setting is not synced and must be manually enabled on each device
+                </li>
+              </ul>
+            </div>
           </div>
+
+          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
+            Budgets
+          </h3>
+          <ul className="list flex-col">
+            {budgetsData?.map((budget) => (
+              <BudgetSettings key={budget.id} budget={budget} />
+            ))}
+          </ul>
           <button
             title="Refresh the list of budgets from YNAB"
             className="button rounded accent flex-row mb-sm"
@@ -208,3 +209,22 @@ export function OptionsView() {
 }
 
 export default OptionsWrapper;
+
+const useNotificationPermission = () => {
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    checkPermissions(["notifications"]).then(setEnabled);
+  }, []);
+
+  const request = useCallback(() => {
+    requestPermissions(["notifications"]).then(setEnabled);
+  }, []);
+
+  const remove = useCallback(() => {
+    removePermissions(["notifications"]).then((removed) => {
+      if (removed) setEnabled(false);
+    });
+  }, []);
+
+  return { enabled, request, remove };
+};

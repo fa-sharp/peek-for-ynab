@@ -7,7 +7,7 @@ import {
   TransactionAdd
 } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
-import { useSetColorTheme } from "~lib/utils";
+import { useSetColorTheme } from "~lib/hooks";
 
 import "./styles/global.css";
 
