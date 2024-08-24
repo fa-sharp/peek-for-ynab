@@ -1,17 +1,15 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import { useEffect } from "react";
-import { ExternalLink, Rocket, X } from "tabler-icons-react";
 
 import {
   AccountsView,
   CategoriesView,
-  IconButton,
+  NewVersionAlert,
   NotificationsView,
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView
 } from "~components";
-import { LATEST_VERSION_ALERT_TEXT } from "~lib/constants";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupMain() {
@@ -25,7 +23,7 @@ export default function PopupMain() {
   } = useStorageContext();
   const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
     useYNABContext();
-  const { newVersionAlert, resetVersionAlert } = useNotificationsContext();
+  const { newVersionAlert } = useNotificationsContext();
 
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
@@ -62,29 +60,9 @@ export default function PopupMain() {
     }
   };
 
-  const onOpenReleaseNotes = async () => {
-    await resetVersionAlert();
-    window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/releases`, "_blank");
-  };
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {newVersionAlert && (
-        <div className="heading-small flex-row gap-xs justify-center mb-lg">
-          <Rocket size={20} color="var(--error)" />
-          New update: {LATEST_VERSION_ALERT_TEXT}
-          <IconButton
-            label="See details"
-            icon={<ExternalLink size={20} aria-hidden />}
-            onClick={onOpenReleaseNotes}
-          />
-          <IconButton
-            label="Dismiss"
-            icon={<X size={20} aria-hidden />}
-            onClick={resetVersionAlert}
-          />
-        </div>
-      )}
+      {newVersionAlert && <NewVersionAlert />}
       <PopupNav />
       {categoriesData && accountsData && (
         <>

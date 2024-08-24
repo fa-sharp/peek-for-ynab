@@ -4,6 +4,7 @@ import IconSpan from "./IconSpan";
 import AccountsView, { AccountView } from "./extension/main/AccountsView";
 import BudgetSelect from "./extension/main/BudgetSelect";
 import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
+import NewVersionAlert from "./extension/main/NewVersionAlert";
 import NotificationsView from "./extension/main/NotificationsView";
 import PopupLogin from "./extension/main/PopupLogin";
 import PopupMain from "./extension/main/PopupMain";
@@ -33,6 +34,7 @@ export {
   IconButton,
   IconSpan,
   MemoField,
+  NewVersionAlert,
   NotificationsView,
   PayeeSelect,
   PopupLogin,
