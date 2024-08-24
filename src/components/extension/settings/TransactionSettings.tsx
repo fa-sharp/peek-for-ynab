@@ -1,7 +1,6 @@
-import { CircleC } from "tabler-icons-react";
+import { CircleC, InfoCircle } from "tabler-icons-react";
 
 import { AccountSelect } from "~components";
-import { UnapprovedAlertIcon } from "~components/icons/AlertIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { BudgetSettings, CachedBudget } from "~lib/types";
 
@@ -36,7 +35,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
             checked={settings?.transactions.approved ?? false}
             onChange={(e) => changeTxSetting("approved", e.target.checked)}
           />
-          <UnapprovedAlertIcon /> Approved
+          <InfoCircle aria-hidden fill="#2ea1be" stroke="white" size={16} /> Approved
         </label>
         <label className="flex-row gap-xs" title="Set transactions as Cleared by default">
           <input

@@ -1,13 +1,17 @@
-import { AlertTriangle, type IconProps, InfoCircle, LockOpen } from "tabler-icons-react";
+import { AlertTriangle, Circle, type IconProps, LockOpen } from "tabler-icons-react";
 
 export const OverspendingAlertIcon = () => (
-  <AlertTriangle color="var(--stale)" size={18} />
+  <AlertTriangle aria-hidden color="var(--stale)" size={18} />
 );
 
-export const ReconcileAlertIcon = () => <LockOpen color="var(--stale)" size={18} />;
+export const ReconcileAlertIcon = () => (
+  <LockOpen aria-hidden color="var(--stale)" size={18} />
+);
 
 export const UnapprovedAlertIcon = (props?: IconProps) => (
-  <InfoCircle fill="#2ea1be" stroke="white" size={16} {...props} />
+  <Circle aria-hidden fill="#2ea1be" stroke="transparent" size={18} {...props} />
 );
 
-export const ImportErrorIcon = () => <AlertTriangle color="var(--stale)" size={18} />;
+export const ImportErrorIcon = () => (
+  <AlertTriangle aria-hidden color="var(--stale)" size={18} />
+);

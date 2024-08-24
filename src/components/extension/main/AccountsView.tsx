@@ -1,10 +1,13 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { Circle } from "tabler-icons-react";
 import { type Account, type CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
-import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
+import {
+  ImportErrorIcon,
+  ReconcileAlertIcon,
+  UnapprovedAlertIcon
+} from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
 import type {
@@ -215,7 +218,7 @@ export const AccountView = ({
         {!!alerts?.numImportedTxs && (
           <IconSpan
             label={`${alerts.numImportedTxs} unapproved transaction${alerts.numImportedTxs > 1 ? "s" : ""}`}
-            icon={<Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} />}
+            icon={<UnapprovedAlertIcon />}
           />
         )}
         {alerts?.importError && (

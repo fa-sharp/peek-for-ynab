@@ -83,7 +83,7 @@ const CategoryTxsView = () => {
               }
             })
           }>
-          <AddTransactionIcon aria-label="Add" /> Transaction
+          <AddTransactionIcon /> Transaction
         </button>
         <button
           className="button rounded accent flex-row"

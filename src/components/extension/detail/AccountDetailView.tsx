@@ -10,6 +10,7 @@ import {
 } from "~components/icons/ActionIcons";
 import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import type { TxAddInitialState } from "~lib/types";
 import { millisToStringValue } from "~lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
@@ -49,6 +50,19 @@ const AccountTxsView = () => {
           c.category_group_name === "Credit Card Payments" && c.name === account?.name
       ),
     [account?.name, categoriesData]
+  );
+
+  /** The state to return to after entering a transaction */
+  const returnTo = useMemo<TxAddInitialState["returnTo"]>(
+    () =>
+      account && {
+        view: "detail",
+        detailState: {
+          type: "account",
+          id: account.id
+        }
+      },
+    [account]
   );
 
   /** Open account in YNAB */
@@ -157,17 +171,11 @@ const AccountTxsView = () => {
               view: "txAdd",
               txAddState: {
                 accountId: account.id,
-                returnTo: {
-                  view: "detail",
-                  detailState: {
-                    type: "account",
-                    id: account.id
-                  }
-                }
+                returnTo
               }
             })
           }>
-          <AddTransactionIcon aria-label="Add" /> Transaction
+          <AddTransactionIcon /> Transaction
         </button>
         {account.type === AccountType.CreditCard ||
         account.type === AccountType.LineOfCredit ? (
@@ -184,17 +192,11 @@ const AccountTxsView = () => {
                       : undefined,
                   accountId: account.id,
                   isTransfer: true,
-                  returnTo: {
-                    view: "detail",
-                    detailState: {
-                      type: "account",
-                      id: account.id
-                    }
-                  }
+                  returnTo
                 }
               })
             }>
-            <AddCCPaymentIcon aria-label="Add" /> Payment
+            <AddCCPaymentIcon /> Payment
           </button>
         ) : account.type === AccountType.AutoLoan ||
           account.type === AccountType.MedicalDebt ||
@@ -216,17 +218,11 @@ const AccountTxsView = () => {
                     name: account.name,
                     transferId: account.id
                   },
-                  returnTo: {
-                    view: "detail",
-                    detailState: {
-                      type: "account",
-                      id: account.id
-                    }
-                  }
+                  returnTo
                 }
               })
             }>
-            <AddTransferIcon aria-label="Add" /> Payment/transfer
+            <AddTransferIcon /> Payment/transfer
           </button>
         ) : (
           <button
@@ -237,13 +233,7 @@ const AccountTxsView = () => {
                 txAddState: {
                   accountId: account.id,
                   isTransfer: true,
-                  returnTo: {
-                    view: "detail",
-                    detailState: {
-                      type: "account",
-                      id: account.id
-                    }
-                  }
+                  returnTo
                 }
               })
             }>

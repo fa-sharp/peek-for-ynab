@@ -1,7 +1,7 @@
 import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
 import * as ynab from "ynab";
 
-import { CurrencyView, TxStatusIcon } from "~components";
+import { CurrencyView, IconSpan, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
 import { UnapprovedAlertIcon } from "~components/icons/AlertIcons";
 import type { DetailViewState } from "~lib/types";
@@ -32,13 +32,20 @@ export default function TransactionView({
     <div className="tx-display">
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
-          {!tx.approved && <UnapprovedAlertIcon aria-label="Unapproved" />}
+          {!tx.approved && (
+            <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon size={16} />} />
+          )}
           {tx.flag_color && (
-            <Flag3
-              aria-label={`${tx.flag_color} flag`}
-              fill={tx.flag_color}
-              stroke={tx.flag_color}
-              size={18}
+            <IconSpan
+              label={`${tx.flag_color} flag`}
+              icon={
+                <Flag3
+                  aria-hidden
+                  fill={tx.flag_color}
+                  stroke={tx.flag_color}
+                  size={18}
+                />
+              }
             />
           )}
           <div>{dateFormatter.format(date)}</div>
@@ -68,7 +75,7 @@ export default function TransactionView({
                   type: "account"
                 })
               }>
-              <AddTransferIcon aria-label="transfer" size={14} />
+              <AddTransferIcon size={14} />
               Transfer
             </button>
           )}
@@ -86,7 +93,7 @@ export default function TransactionView({
               )
             ) : (
               <div className="flex-row">
-                <ArrowsSplit2 aria-label="Split" size={14} />
+                <ArrowsSplit2 aria-hidden size={14} />
                 Multiple Categories
               </div>
             ))}
@@ -144,7 +151,7 @@ const SubTransactionView = ({
                 type: "account"
               })
             }>
-            <AddTransferIcon aria-label="transfer" size={14} />
+            <AddTransferIcon size={14} />
             Transfer
           </button>
         )}
