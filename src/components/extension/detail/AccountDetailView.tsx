@@ -8,7 +8,8 @@ import {
   AddTransactionIcon,
   AddTransferIcon
 } from "~components/icons/ActionIcons";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { millisToStringValue } from "~lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
@@ -19,12 +20,25 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 });
 
 const AccountTxsView = () => {
-  const { settings, selectedBudgetId, popupState, setPopupState } = useStorageContext();
+  const { settings, budgetSettings, selectedBudgetId, popupState, setPopupState } =
+    useStorageContext();
   const { accountsData, categoriesData, selectedBudgetData } = useYNABContext();
+  const { currentAlerts } = useNotificationsContext();
 
   const account = useMemo(
     () => accountsData?.find((a) => a.id === popupState.detailState?.id),
     [accountsData, popupState.detailState?.id]
+  );
+
+  const hasReconcileAlert = useMemo(
+    () => account && currentAlerts?.[selectedBudgetId]?.accounts?.[account.id]?.reconcile,
+    [account, currentAlerts, selectedBudgetId]
+  );
+
+  const hasImportError = useMemo(
+    () =>
+      account && currentAlerts?.[selectedBudgetId]?.accounts?.[account.id]?.importError,
+    [account, currentAlerts, selectedBudgetId]
   );
 
   /** The corresponding CCP categoroy, if this is a credit card account */
@@ -68,6 +82,12 @@ const AccountTxsView = () => {
         />
       </div>
       <div className="flex-col gap-sm mb-lg">
+        {hasImportError && (
+          <div className="flex-row">
+            <ImportErrorIcon />
+            Import issue/error!
+          </div>
+        )}
         <div className="balance-display heading-medium">
           Working Balance:
           <CurrencyView
@@ -115,7 +135,17 @@ const AccountTxsView = () => {
         {account.last_reconciled_at && (
           <div className="balance-display">
             Last Reconciled:
-            <div>{dateFormatter.format(new Date(account.last_reconciled_at))}</div>
+            <div className="flex-row">
+              {hasReconcileAlert && (
+                <IconButton
+                  noAction
+                  disabled
+                  label={`Reconciled more than ${budgetSettings?.notifications.reconcileAlerts[account.id]} days ago!`}
+                  icon={<ReconcileAlertIcon />}
+                />
+              )}
+              {dateFormatter.format(new Date(account.last_reconciled_at))}
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,5 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { AlertTriangle } from "tabler-icons-react";
 import type {
   Account,
   Category,
@@ -9,6 +8,7 @@ import type {
 } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
+import { OverspendingAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
 import type {
@@ -252,7 +252,7 @@ export const CategoryView = ({
             noAction
             disabled
             label="Overspent"
-            icon={<AlertTriangle color="var(--stale)" size={18} />}
+            icon={<OverspendingAlertIcon />}
           />
         )}
       </div>

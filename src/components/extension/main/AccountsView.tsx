@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { AlertTriangle, LockOpen } from "tabler-icons-react";
 import { type Account, type CurrencyFormat } from "ynab";
 
 import { CurrencyView, IconButton } from "~components";
+import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
 import type {
@@ -216,7 +216,7 @@ export const AccountView = ({
             noAction
             disabled
             label="Import issue/error"
-            icon={<AlertTriangle color="var(--stale)" size={18} />}
+            icon={<ImportErrorIcon />}
           />
         )}
         {alerts?.reconcile && last_reconciled_at && (
@@ -224,7 +224,7 @@ export const AccountView = ({
             noAction
             disabled
             label={`Last reconciled on ${formatDateMonthAndDay(new Date(last_reconciled_at))}`}
-            icon={<LockOpen color="var(--stale)" size={18} />}
+            icon={<ReconcileAlertIcon />}
           />
         )}
       </div>
