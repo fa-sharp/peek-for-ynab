@@ -75,12 +75,12 @@ export default function PopupMain() {
           New update: {LATEST_VERSION_ALERT_TEXT}
           <IconButton
             label="See details"
-            icon={<ExternalLink size={20} />}
+            icon={<ExternalLink size={20} aria-hidden />}
             onClick={onOpenReleaseNotes}
           />
           <IconButton
             label="Dismiss"
-            icon={<X size={20} />}
+            icon={<X size={20} aria-hidden />}
             onClick={resetVersionAlert}
           />
         </div>

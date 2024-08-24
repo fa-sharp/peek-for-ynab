@@ -100,7 +100,12 @@ function HelpPage() {
         </li>
         <li>
           <h3>I have an issue, bug report, or further questions.</h3>
-          <p>Please contact the developer at peek (at) fasharp (dot) io.</p>
+          <p>
+            Please keep in mind that Peek for YNAB is a third-party extension, and is not
+            officialy supported by YNAB (i.e. please <b>do not</b> reach out to their
+            support team for bug reports or feature requests). You may contact the
+            developer at peek (at) fasharp (dot) io.
+          </p>
         </li>
       </ul>
     </WebLayout>

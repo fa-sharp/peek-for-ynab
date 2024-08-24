@@ -368,6 +368,10 @@ li:last-child .balance-display {
   margin-bottom: var(--spacing-lg);
 }
 
+.pt-sm {
+  padding-top: var(--spacing-sm);
+}
+
 .pb-sm {
   padding-bottom: var(--spacing-sm);
 }
