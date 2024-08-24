@@ -150,7 +150,7 @@ function AccountTypeView({
                   )
                 }
                 actionElementsRight={
-                  <aside className="flex-row gap-xs" aria-label="actions">
+                  <aside className="flex-row gap-sm" aria-label="actions">
                     <IconButton
                       rounded
                       accent
