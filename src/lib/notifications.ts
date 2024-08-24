@@ -151,7 +151,7 @@ export const updateIconAndTooltip = (
         tooltip += `${accountAlerts.name}:\n`;
         if (accountAlerts.importError) tooltip += "Connection issue\n";
         if (accountAlerts.reconcile && accountAlerts.lastReconciledAt)
-          tooltip += `Last reconciled ${formatDateMonthAndDay(new Date(accountAlerts.lastReconciledAt))}\n`;
+          tooltip += `Last reconciled on ${formatDateMonthAndDay(new Date(accountAlerts.lastReconciledAt))}\n`;
         tooltip += "\n";
       }
     }
