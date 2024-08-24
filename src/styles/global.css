@@ -233,9 +233,6 @@ li:last-child .balance-display {
   border: none;
   border-radius: 50%;
 }
-.icon-button.spin {
-  animation: spin 1s linear infinite;
-}
 .icon-button.noaction {
   cursor: initial;
 }
@@ -385,6 +382,10 @@ li:last-child .balance-display {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
