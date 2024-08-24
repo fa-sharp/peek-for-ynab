@@ -202,7 +202,7 @@ export const AccountView = ({
         )}
         {alerts?.importError && (
           <IconSpan
-            label="Import issue/error"
+            label="Import issue"
             icon={<AlertTriangle aria-hidden color="var(--stale)" size={18} />}
           />
         )}

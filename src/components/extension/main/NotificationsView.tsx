@@ -58,12 +58,12 @@ const NotificationsView = () => {
   if (!currentAlerts || numNotifications === 0) return null;
 
   return (
-    <div className="mb-sm">
+    <div className="flex-col gap-0 rounded mb-sm">
       <div
-        className="heading-small flex-row gap-sm justify-center cursor-pointer"
+        className="flex-row gap-sm justify-center font-bold cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <AlertCircle color="var(--stale)" size={16} aria-hidden />
-        {`${numNotifications} notification${numNotifications > 1 ? "s" : ""}`}
+        {`${numNotifications} alert${numNotifications > 1 ? "s" : ""}`}
         <IconButton
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
           label={expanded ? "Collapse" : "Expand"}
@@ -72,7 +72,7 @@ const NotificationsView = () => {
       </div>
 
       {expanded && (
-        <ul className="list flex-col gap-xs">
+        <ul className="list flex-col gap-sm">
           {numImportedTxs > 0 && (
             <li className="flex-row justify-center">
               {`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}
@@ -108,7 +108,7 @@ const NotificationsView = () => {
                   <li
                     key={`importError-${account.id}`}
                     className="flex-row justify-center">
-                    {account.name}: Import issue/error
+                    {account.name}: Import issue
                   </li>
                 )
             )}
