@@ -252,7 +252,7 @@ const useYNABProvider = () => {
   const queryClient = useQueryClient();
 
   const addTransaction = useCallback(
-    async (transaction: ynab.SaveTransaction) => {
+    async (transaction: ynab.NewTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
       const response = await ynabAPI.transactions.createTransaction(selectedBudgetId, {
         transaction
