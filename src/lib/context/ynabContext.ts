@@ -226,7 +226,7 @@ const useYNABProvider = () => {
     accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
-    /** API data: IDs of newly imported/unapproved transactions */
+    /** API data: Imported/unapproved transactions */
     importedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,

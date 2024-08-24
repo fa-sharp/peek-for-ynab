@@ -17,7 +17,9 @@ const NotificationsView = () => {
   const numNotifications = useMemo(
     () =>
       (currentAlerts?.[selectedBudgetId]?.numImportedTxs || 0) +
-      Object.keys(currentAlerts?.[selectedBudgetId]?.accounts || {}).length +
+      Object.values(currentAlerts?.[selectedBudgetId]?.accounts || {}).filter(
+        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
+      ).length +
       Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {}).length,
     [currentAlerts, selectedBudgetId]
   );
