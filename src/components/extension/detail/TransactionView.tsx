@@ -32,9 +32,7 @@ export default function TransactionView({
     <div className="tx-display">
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
-          {!tx.approved && (
-            <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon size={16} />} />
-          )}
+          {!tx.approved && <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon />} />}
           {tx.flag_color && (
             <IconSpan
               label={`${tx.flag_color} flag`}
