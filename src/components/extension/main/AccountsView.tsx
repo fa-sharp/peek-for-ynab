@@ -1,8 +1,9 @@
 import type { ReactElement } from "react";
 import { useState } from "react";
+import { Circle } from "tabler-icons-react";
 import { type Account, type CurrencyFormat } from "ynab";
 
-import { CurrencyView, IconButton } from "~components";
+import { CurrencyView, IconButton, IconSpan } from "~components";
 import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
@@ -204,25 +205,24 @@ export const AccountView = ({
       title={
         foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
-      <div className="flex-row min-w-0">
+      <div className="flex-row gap-sm min-w-0">
         {actionElementsLeft}
         {foundEmoji ? (
           <span className="font-big">{foundEmoji}</span>
         ) : (
           <div className="hide-overflow">{name}</div>
         )}
-        {alerts?.importError && (
-          <IconButton
-            noAction
-            disabled
-            label="Import issue/error"
-            icon={<ImportErrorIcon />}
+        {!!alerts?.numImportedTxs && (
+          <IconSpan
+            label={`${alerts.numImportedTxs} unapproved transaction${alerts.numImportedTxs > 1 ? "s" : ""}`}
+            icon={<Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} />}
           />
         )}
+        {alerts?.importError && (
+          <IconSpan label="Import issue/error" icon={<ImportErrorIcon />} />
+        )}
         {alerts?.reconcile && last_reconciled_at && (
-          <IconButton
-            noAction
-            disabled
+          <IconSpan
             label={`Last reconciled on ${formatDateMonthAndDay(new Date(last_reconciled_at))}`}
             icon={<ReconcileAlertIcon />}
           />

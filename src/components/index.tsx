@@ -1,5 +1,6 @@
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
+import IconSpan from "./IconSpan";
 import AccountDetailView from "./extension/detail/AccountDetailView";
 import CategoryDetailView from "./extension/detail/CategoryDetailView";
 import TransactionView from "./extension/detail/TransactionView";
@@ -37,6 +38,7 @@ export {
   CategoryView,
   CurrencyView,
   IconButton,
+  IconSpan,
   MemoField,
   MoveMoney,
   NotificationsView,

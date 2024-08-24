@@ -7,7 +7,7 @@ import type {
   CurrencyFormat
 } from "ynab";
 
-import { CurrencyView, IconButton } from "~components";
+import { CurrencyView, IconButton, IconSpan } from "~components";
 import { OverspendingAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
@@ -248,12 +248,7 @@ export const CategoryView = ({
           <div className="hide-overflow">{name}</div>
         )}
         {alerts?.overspent && (
-          <IconButton
-            noAction
-            disabled
-            label="Overspent"
-            icon={<OverspendingAlertIcon />}
-          />
+          <IconSpan label="Overspent" icon={<OverspendingAlertIcon />} />
         )}
       </div>
       <div className="flex-row">

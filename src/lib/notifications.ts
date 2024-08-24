@@ -30,6 +30,7 @@ export interface AccountAlerts {
         importError?: boolean;
         reconcile?: boolean;
         lastReconciledAt?: string;
+        numImportedTxs?: number;
       }
     | undefined;
 }
@@ -63,14 +64,22 @@ export const getBudgetAlerts = (
   data.accounts?.forEach((account) => {
     const accountAlerts: Pick<
       NonNullable<AccountAlerts[string]>,
-      "importError" | "reconcile"
+      "importError" | "reconcile" | "numImportedTxs"
     > = {};
 
+    // Check for number of unapproved transactions in this account
+    if (notificationSettings.checkImports && data.importedTxs) {
+      const numImportedTxsInAccount = data.importedTxs.filter(
+        (tx) => tx.account_id === account.id
+      ).length;
+      if (numImportedTxsInAccount > 0)
+        accountAlerts.numImportedTxs = numImportedTxsInAccount;
+    }
     // Check for bank import error
     if (notificationSettings.importError && account.direct_import_in_error)
       accountAlerts.importError = true;
 
-    // Check for last reconciled
+    // Check last time the account was reconciled
     const maxReconcileDays = notificationSettings.reconcileAlerts?.[account.id];
     if (
       maxReconcileDays &&
@@ -145,12 +154,13 @@ export const updateIconAndTooltip = (
 
     if (!isEmptyObject(budgetAlerts.accounts)) {
       for (const accountAlerts of Object.values(budgetAlerts.accounts)) {
-        if (!accountAlerts) return;
-        tooltip += `${accountAlerts.name}:\n`;
-        if (accountAlerts.importError) tooltip += "Connection issue\n";
-        if (accountAlerts.reconcile && accountAlerts.lastReconciledAt)
-          tooltip += `Last reconciled on ${formatDateMonthAndDay(new Date(accountAlerts.lastReconciledAt))}\n`;
-        tooltip += "\n";
+        if (accountAlerts?.importError || accountAlerts?.reconcile) {
+          tooltip += `${accountAlerts.name}:\n`;
+          if (accountAlerts.importError) tooltip += "Import issue\n";
+          if (accountAlerts.reconcile && accountAlerts.lastReconciledAt)
+            tooltip += `Last reconciled on ${formatDateMonthAndDay(new Date(accountAlerts.lastReconciledAt))}\n`;
+          tooltip += "\n";
+        }
       }
     }
   }
@@ -160,7 +170,9 @@ export const updateIconAndTooltip = (
     (numAlerts, budgetId) =>
       numAlerts +
       (currentAlerts[budgetId]?.numImportedTxs || 0) +
-      Object.keys(currentAlerts[budgetId]?.accounts || {}).length +
+      Object.values(currentAlerts[budgetId]?.accounts || {}).filter(
+        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
+      ).length +
       Object.keys(currentAlerts[budgetId]?.cats || {}).length,
     0
   );

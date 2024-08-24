@@ -10,33 +10,45 @@ import {
 } from "tabler-icons-react";
 
 export const PinnedItemIcon = () => (
-  <Pinned size={18} color="var(--action)" fill="var(--action)" strokeWidth={1} />
+  <Pinned
+    aria-hidden
+    size={18}
+    color="var(--action)"
+    fill="var(--action)"
+    strokeWidth={1}
+  />
 );
 export const PinItemIcon = () => (
-  <Pinned size={18} color="var(--action)" strokeWidth={1} />
+  <Pinned aria-hidden size={18} color="var(--action)" strokeWidth={1} />
 );
 export const AddTransactionIcon = (props?: IconProps) => (
-  <Plus size={18} color="var(--action)" strokeWidth={1} {...props} />
+  <Plus aria-hidden size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 export const AddTransferIcon = (props?: IconProps) => (
-  <SwitchHorizontal size={18} color="var(--action)" strokeWidth={1} {...props} />
+  <SwitchHorizontal
+    aria-hidden
+    size={18}
+    color="var(--action)"
+    strokeWidth={1}
+    {...props}
+  />
 );
 export const AddCCPaymentIcon = (props?: IconProps) => (
-  <CreditCard size={18} color="var(--action)" strokeWidth={1} {...props} />
+  <CreditCard aria-hidden size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 
 export const ExpandListIcon = () => (
-  <ChevronDown size={24} color="var(--action)" strokeWidth={1} />
+  <ChevronDown aria-hidden size={24} color="var(--action)" strokeWidth={1} />
 );
 export const CollapseListIcon = () => (
-  <ChevronUp size={24} color="var(--action)" strokeWidth={1} />
+  <ChevronUp aria-hidden size={24} color="var(--action)" strokeWidth={1} />
 );
 
 export const ExpandListIconBold = () => (
-  <ChevronDown size={24} color="var(--action)" strokeWidth={2} />
+  <ChevronDown aria-hidden size={24} color="var(--action)" strokeWidth={2} />
 );
 export const CollapseListIconBold = () => (
-  <ChevronUp size={24} color="var(--action)" strokeWidth={2} />
+  <ChevronUp aria-hidden size={24} color="var(--action)" strokeWidth={2} />
 );
 
 export const DetailIcon = () => <List size={18} color="var(--action)" strokeWidth={1} />;

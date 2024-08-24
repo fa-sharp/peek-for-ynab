@@ -186,7 +186,7 @@ export function OptionsView() {
             style={{ width: "fit-content", marginBlock: 8 }}
             onClick={() => refreshBudgets()}
             disabled={isRefreshingBudgets}>
-            <Refresh size={14} />
+            <Refresh size={14} aria-hidden />
             {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
           </button>
           <button

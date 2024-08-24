@@ -33,7 +33,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
         </label>
         {shownBudgetIds?.includes(budget.id) && (
           <IconButton
-            icon={<Settings size={18} />}
+            icon={<Settings size={18} aria-hidden />}
             label={!showSettings ? "Show budget settings" : "Hide budget settings"}
             onClick={() => setShowSettings((prev) => !prev)}
           />

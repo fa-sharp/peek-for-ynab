@@ -44,7 +44,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
             checked={settings?.transactions.cleared ?? false}
             onChange={(e) => changeTxSetting("cleared", e.target.checked)}
           />
-          <CircleC stroke="white" fill="var(--currency-green)" size={16} />
+          <CircleC aria-hidden stroke="white" fill="var(--currency-green)" size={16} />
           Cleared
         </label>
         <label
