@@ -5,7 +5,7 @@
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
   "packageManager": "pnpm@9.1.1",
-  "homepage": "https://peek-for-ynab.vercel.app",
+  "homepage": "https://peek-for-ynab.fly.dev",
   "type": "module",
   "scripts": {
     "dev:plasmo": "plasmo dev --port 3001",
@@ -67,7 +67,7 @@
     "jsdom": "^24.0.0",
     "msw": "^2.3.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.4",
     "vite": "^5.2.11",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0",
@@ -76,14 +76,16 @@
   "manifest": {
     "key": "$CRX_PUBLIC_KEY",
     "permissions": [
-      "identity"
+      "identity",
+      "alarms"
     ],
     "host_permissions": [
       "https://api.ynab.com/*"
     ],
     "optional_permissions": [
       "scripting",
-      "activeTab"
+      "activeTab",
+      "notifications"
     ],
     "options_ui": {
       "open_in_tab": true

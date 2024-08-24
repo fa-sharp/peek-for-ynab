@@ -88,8 +88,19 @@ function HelpPage() {
           </ul>
         </li>
         <li>
+          <h3>I am a nerd and I want nerdy things.</h3>
+          <p>
+            Absolutely! There is a devtools page where you can see exactly what is being
+            stored, what the API cache looks like, browser permissions, etc... Copy this
+            URL into your browser:{" "}
+            <code>
+              chrome-extension://oakibhlecegcmjcjppmjkiaeedoljbmk/tabs/_devtools.html
+            </code>
+          </p>
+        </li>
+        <li>
           <h3>I have an issue, bug report, or further questions.</h3>
-          <p>Please contact the developer at hello (at) fasharp (dot) io.</p>
+          <p>Please contact the developer at peek (at) fasharp (dot) io.</p>
         </li>
       </ul>
     </WebLayout>

@@ -30,7 +30,7 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default false */
+  /** Whether animations are enabled. @default true */
   animations?: boolean;
 }
 
@@ -49,8 +49,23 @@ interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
 
+export interface BudgetNotificationSettings {
+  /** Notify when a category is overspent */
+  overspent: boolean;
+  /** Check for new bank imports and notify if there are unapproved transactions  */
+  checkImports: boolean;
+  /** Notify when a bank connection is showing an error */
+  importError: boolean;
+  /** Reminders for reconciliation - stored as a map
+   * of accountId to max # of days since last reconciliation */
+  reconcileAlerts: {
+    [accountId: string]: number | undefined;
+  };
+}
+
 /** Budget-specific settings */
 export interface BudgetSettings {
+  notifications: BudgetNotificationSettings;
   transactions: {
     /** Whether transactions are marked Cleared by default */
     cleared: boolean;
@@ -100,6 +115,13 @@ const useStorageProvider = () => {
   const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
     defaultValue: false
   });
+
+  /** Save the `syncEnabled` setting to Chrome local storage for background thread */
+  useEffect(() => {
+    CHROME_LOCAL_STORAGE.get<boolean>("sync").then((val) => {
+      if (val !== syncEnabled) CHROME_LOCAL_STORAGE.set("sync", syncEnabled);
+    });
+  }, [syncEnabled]);
 
   const storageArea = useMemo(
     () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),

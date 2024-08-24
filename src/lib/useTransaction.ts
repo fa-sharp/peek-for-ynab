@@ -8,7 +8,7 @@ import {
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,
-  requestCurrentTabPermissions,
+  requestPermissions,
   stringValueToMillis
 } from "./utils";
 
@@ -92,7 +92,7 @@ export default function useTransaction() {
   // Try parsing user's selection as the amount upon opening the form
   useEffect(() => {
     if (!settings?.currentTabAccess) return;
-    requestCurrentTabPermissions().then((granted) => {
+    requestPermissions(["activeTab", "scripting"]).then((granted) => {
       if (!granted) return;
       executeScriptInCurrentTab(() => getSelection()?.toString())
         .then((selection) => {
