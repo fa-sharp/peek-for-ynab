@@ -154,27 +154,31 @@ function AccountTypeView({
                   )
                 }
                 actionElementsRight={
-                  <aside className="flex-row gap-sm" aria-label="actions">
-                    <IconButton
-                      rounded
-                      accent
-                      icon={<AddTransactionIcon />}
-                      label="Add transaction"
-                      onClick={() => onAddTx({ accountId: account.id })}
-                    />
-                    <IconButton
-                      accent
-                      rounded
-                      icon={<DetailIcon />}
-                      label="Details/Activity"
-                      onClick={() =>
-                        onOpenDetail({
-                          type: "account",
-                          id: account.id
-                        })
-                      }
-                    />
-                  </aside>
+                  <menu className="list flex-row gap-sm" aria-label="actions">
+                    <li className="flex-row">
+                      <IconButton
+                        rounded
+                        accent
+                        icon={<AddTransactionIcon />}
+                        label="Add transaction"
+                        onClick={() => onAddTx({ accountId: account.id })}
+                      />
+                    </li>
+                    <li className="flex-row">
+                      <IconButton
+                        accent
+                        rounded
+                        icon={<DetailIcon />}
+                        label="Details/Activity"
+                        onClick={() =>
+                          onOpenDetail({
+                            type: "account",
+                            id: account.id
+                          })
+                        }
+                      />
+                    </li>
+                  </menu>
                 }
               />
             </li>

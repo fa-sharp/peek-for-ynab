@@ -159,53 +159,57 @@ export function CategoryGroupView({
                     )
                   }
                   actionElementsRight={
-                    <aside className="flex-row gap-sm" aria-label="actions">
-                      {!ccAccount ? (
-                        <IconButton
-                          rounded
-                          accent
-                          icon={<AddTransactionIcon />}
-                          label="Add transaction"
-                          onClick={() => onAddTx({ categoryId: category.id })}
-                        />
-                      ) : (
-                        <IconButton
-                          rounded
-                          accent
-                          icon={<AddCCPaymentIcon />}
-                          label="Add credit card payment"
-                          onClick={() =>
-                            ccAccount.transfer_payee_id &&
-                            onAddTx({
-                              isTransfer: true,
-                              amount:
-                                category.balance >= 0
-                                  ? millisToStringValue(
-                                      category.balance,
-                                      budgetData.currencyFormat
-                                    )
-                                  : undefined,
-                              amountType: "Inflow",
-                              accountId: ccAccount.id
-                            })
-                          }
-                        />
-                      )}
+                    <menu className="list flex-row gap-sm" aria-label="actions">
+                      <li className="flex-row">
+                        {!ccAccount ? (
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddTransactionIcon />}
+                            label="Add transaction"
+                            onClick={() => onAddTx({ categoryId: category.id })}
+                          />
+                        ) : (
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddCCPaymentIcon />}
+                            label="Add credit card payment"
+                            onClick={() =>
+                              ccAccount.transfer_payee_id &&
+                              onAddTx({
+                                isTransfer: true,
+                                amount:
+                                  category.balance >= 0
+                                    ? millisToStringValue(
+                                        category.balance,
+                                        budgetData.currencyFormat
+                                      )
+                                    : undefined,
+                                amountType: "Inflow",
+                                accountId: ccAccount.id
+                              })
+                            }
+                          />
+                        )}
+                      </li>
                       {category.category_group_name !== "Credit Card Payments" && (
-                        <IconButton
-                          accent
-                          rounded
-                          icon={<DetailIcon />}
-                          label="Details/Activity"
-                          onClick={() =>
-                            onOpenDetail({
-                              type: "category",
-                              id: category.id
-                            })
-                          }
-                        />
+                        <li className="flex-row">
+                          <IconButton
+                            accent
+                            rounded
+                            icon={<DetailIcon />}
+                            label="Details/Activity"
+                            onClick={() =>
+                              onOpenDetail({
+                                type: "category",
+                                id: category.id
+                              })
+                            }
+                          />
+                        </li>
                       )}
-                    </aside>
+                    </menu>
                   }
                 />
               </li>

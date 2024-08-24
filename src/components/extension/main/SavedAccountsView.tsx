@@ -55,32 +55,36 @@ export default function SavedAccountsView() {
                       )
                     }
                     actionElementsRight={
-                      <aside className="flex-row gap-sm" aria-label="actions">
-                        <IconButton
-                          rounded
-                          accent
-                          icon={<AddTransactionIcon />}
-                          label="Add transaction"
-                          onClick={() =>
-                            setPopupState({
-                              view: "txAdd",
-                              txAddState: { accountId: account.id }
-                            })
-                          }
-                        />
-                        <IconButton
-                          accent
-                          rounded
-                          icon={<DetailIcon />}
-                          label="Details/Activity"
-                          onClick={() =>
-                            setPopupState({
-                              view: "detail",
-                              detailState: { type: "account", id: account.id }
-                            })
-                          }
-                        />
-                      </aside>
+                      <menu className="list flex-row gap-sm" aria-label="actions">
+                        <li className="flex-row">
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddTransactionIcon />}
+                            label="Add transaction"
+                            onClick={() =>
+                              setPopupState({
+                                view: "txAdd",
+                                txAddState: { accountId: account.id }
+                              })
+                            }
+                          />
+                        </li>
+                        <li className="flex-row">
+                          <IconButton
+                            accent
+                            rounded
+                            icon={<DetailIcon />}
+                            label="Details/Activity"
+                            onClick={() =>
+                              setPopupState({
+                                view: "detail",
+                                detailState: { type: "account", id: account.id }
+                              })
+                            }
+                          />
+                        </li>
+                      </menu>
                     }
                   />
                 </li>

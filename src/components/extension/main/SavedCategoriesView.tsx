@@ -68,64 +68,70 @@ export default function SavedCategoriesView() {
                         )
                       }
                       actionElementsRight={
-                        <aside className="flex-row gap-sm" aria-label="actions">
+                        <menu className="list flex-row gap-sm" aria-label="actions">
                           {!ccAccount ? (
-                            <IconButton
-                              rounded
-                              accent
-                              icon={<AddTransactionIcon />}
-                              label="Add transaction"
-                              onClick={() =>
-                                setPopupState({
-                                  view: "txAdd",
-                                  txAddState: { categoryId: category.id }
-                                })
-                              }
-                            />
+                            <li className="flex-row">
+                              <IconButton
+                                rounded
+                                accent
+                                icon={<AddTransactionIcon />}
+                                label="Add transaction"
+                                onClick={() =>
+                                  setPopupState({
+                                    view: "txAdd",
+                                    txAddState: { categoryId: category.id }
+                                  })
+                                }
+                              />
+                            </li>
                           ) : (
-                            <IconButton
-                              rounded
-                              accent
-                              icon={<AddCCPaymentIcon />}
-                              label="Add credit card payment"
-                              onClick={() =>
-                                ccAccount.transfer_payee_id &&
-                                setPopupState({
-                                  view: "txAdd",
-                                  txAddState: {
-                                    isTransfer: true,
-                                    amount:
-                                      category.balance >= 0
-                                        ? millisToStringValue(
-                                            category.balance,
-                                            currencyFormat
-                                          )
-                                        : undefined,
-                                    amountType: "Inflow",
-                                    accountId: ccAccount.id
-                                  }
-                                })
-                              }
-                            />
+                            <li className="flex-row">
+                              <IconButton
+                                rounded
+                                accent
+                                icon={<AddCCPaymentIcon />}
+                                label="Add credit card payment"
+                                onClick={() =>
+                                  ccAccount.transfer_payee_id &&
+                                  setPopupState({
+                                    view: "txAdd",
+                                    txAddState: {
+                                      isTransfer: true,
+                                      amount:
+                                        category.balance >= 0
+                                          ? millisToStringValue(
+                                              category.balance,
+                                              currencyFormat
+                                            )
+                                          : undefined,
+                                      amountType: "Inflow",
+                                      accountId: ccAccount.id
+                                    }
+                                  })
+                                }
+                              />
+                            </li>
                           )}
                           {category.category_group_name !== "Credit Card Payments" && (
-                            <IconButton
-                              accent
-                              rounded
-                              icon={<DetailIcon />}
-                              label="Details/Activity"
-                              onClick={() =>
-                                setPopupState({
-                                  view: "detail",
-                                  detailState: {
-                                    type: "category",
-                                    id: category.id
-                                  }
-                                })
-                              }
-                            />
+                            <li className="flex-row">
+                              <IconButton
+                                accent
+                                rounded
+                                icon={<DetailIcon />}
+                                label="Details/Activity"
+                                onClick={() =>
+                                  setPopupState({
+                                    view: "detail",
+                                    detailState: {
+                                      type: "category",
+                                      id: category.id
+                                    }
+                                  })
+                                }
+                              />
+                            </li>
                           )}
-                        </aside>
+                        </menu>
                       }
                     />
                   </li>
