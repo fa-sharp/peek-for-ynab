@@ -62,7 +62,7 @@ const NotificationsView = () => {
       <div
         className="heading-small flex-row gap-sm justify-center cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
-        <AlertCircle color="var(--stale)" size={16} aria-label="Alert" />
+        <AlertCircle color="var(--stale)" size={16} aria-hidden />
         {`${numNotifications} notification${numNotifications > 1 ? "s" : ""}`}
         <IconButton
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}

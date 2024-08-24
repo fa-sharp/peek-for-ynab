@@ -11,7 +11,7 @@ import {
   Settings
 } from "tabler-icons-react";
 
-import { BudgetSelect, IconButton } from "~components";
+import { BudgetSelect, IconButton, IconSpan } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
@@ -55,7 +55,7 @@ export default function PopupNav() {
 
   return (
     <nav className="flex-row justify-between mb-lg">
-      <IconButton
+      <IconSpan
         label={
           categoriesError || accountsError
             ? "Error getting data from YNAB!"
@@ -69,20 +69,18 @@ export default function PopupNav() {
         }
         icon={
           categoriesError || accountsError ? (
-            <AlertTriangle color="var(--stale)" /> // indicates error while fetching data
+            <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
           ) : globalIsFetching ? (
-            <Refresh />
+            <Refresh aria-hidden />
           ) : !selectedBudgetId ||
             (categoriesLastUpdated + 240_000 > Date.now() &&
               accountsLastUpdated + 240_000 > Date.now()) ? (
-            <Check color="var(--success)" />
+            <Check aria-hidden color="var(--success)" />
           ) : (
-            <AlertTriangle color="var(--stale)" /> // indicates data is stale/old
+            <AlertTriangle aria-hidden color="var(--stale)" /> // indicates data is stale/old
           )
         }
         spin={Boolean(globalIsFetching)}
-        disabled
-        noAction
       />
       <div className="flex-row gap-xs">
         <BudgetSelect
@@ -94,24 +92,24 @@ export default function PopupNav() {
         <IconButton
           label="Open this budget in YNAB"
           onClick={openBudget}
-          icon={<ExternalLink />}
+          icon={<ExternalLink aria-hidden />}
         />
         {window.name !== "peekWindow" && (
           <IconButton
             label="Open this extension in a separate window"
             onClick={openPopupWindow}
-            icon={<BoxMultiple />}
+            icon={<BoxMultiple aria-hidden />}
           />
         )}
         <IconButton
           label="Settings"
           onClick={() => chrome?.runtime?.openOptionsPage()}
-          icon={<Settings />}
+          icon={<Settings aria-hidden />}
         />
         <IconButton
           label={popupState.editMode ? "Done editing" : "Edit pinned items"}
           onClick={() => setPopupState({ view: "main", editMode: !popupState.editMode })}
-          icon={popupState.editMode ? <PencilOff /> : <Pencil />}
+          icon={popupState.editMode ? <PencilOff aria-hidden /> : <Pencil aria-hidden />}
         />
       </div>
     </nav>

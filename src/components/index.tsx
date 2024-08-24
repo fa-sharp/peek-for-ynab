@@ -1,5 +1,6 @@
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
+import IconSpan from "./IconSpan";
 import AccountsView, { AccountView } from "./extension/main/AccountsView";
 import BudgetSelect from "./extension/main/BudgetSelect";
 import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
@@ -30,6 +31,7 @@ export {
   CategoryView,
   CurrencyView,
   IconButton,
+  IconSpan,
   MemoField,
   NotificationsView,
   PayeeSelect,

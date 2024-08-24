@@ -36,7 +36,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
             checked={settings?.transactions.approved ?? false}
             onChange={(e) => changeTxSetting("approved", e.target.checked)}
           />
-          <InfoCircle fill="#2ea1be" stroke="white" size={16} /> Approved
+          <InfoCircle aria-hidden fill="#2ea1be" stroke="white" size={16} /> Approved
         </label>
         <label className="flex-row gap-xs" title="Set transactions as Cleared by default">
           <input
@@ -44,7 +44,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
             checked={settings?.transactions.cleared ?? false}
             onChange={(e) => changeTxSetting("cleared", e.target.checked)}
           />
-          <CircleC stroke="white" fill="var(--currency-green)" size={16} />
+          <CircleC aria-hidden stroke="white" fill="var(--currency-green)" size={16} />
           Cleared
         </label>
         <label

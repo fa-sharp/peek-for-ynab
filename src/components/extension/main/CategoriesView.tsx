@@ -8,7 +8,7 @@ import type {
   CurrencyFormat
 } from "ynab";
 
-import { CurrencyView, IconButton } from "~components";
+import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
@@ -226,11 +226,9 @@ export const CategoryView = ({
           <div className="hide-overflow">{name}</div>
         )}
         {alerts?.overspent && (
-          <IconButton
-            noAction
-            disabled
+          <IconSpan
             label="Overspent"
-            icon={<AlertTriangle color="var(--stale)" size={18} />}
+            icon={<AlertTriangle color="var(--stale)" size={18} aria-hidden />}
           />
         )}
       </div>

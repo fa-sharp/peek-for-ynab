@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AlertTriangle, Circle, LockOpen } from "tabler-icons-react";
 import type { Account, CurrencyFormat } from "ynab";
 
-import { CurrencyView, IconButton } from "~components";
+import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useYNABContext } from "~lib/context";
 import {
   type AppSettings,
@@ -195,27 +195,21 @@ export const AccountView = ({
           <div className="hide-overflow">{name}</div>
         )}
         {!!alerts?.numImportedTxs && (
-          <IconButton
-            noAction
-            disabled
+          <IconSpan
             label={`${alerts.numImportedTxs} unapproved transaction${alerts.numImportedTxs > 1 ? "s" : ""}`}
-            icon={<Circle fill="#2ea1be" stroke="transparent" size={16} />}
+            icon={<Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} />}
           />
         )}
         {alerts?.importError && (
-          <IconButton
-            noAction
-            disabled
+          <IconSpan
             label="Import issue/error"
-            icon={<AlertTriangle color="var(--stale)" size={18} />}
+            icon={<AlertTriangle aria-hidden color="var(--stale)" size={18} />}
           />
         )}
         {alerts?.reconcile && last_reconciled_at && (
-          <IconButton
-            noAction
-            disabled
+          <IconSpan
             label={`Last reconciled on ${formatDateMonthAndDay(new Date(last_reconciled_at))}`}
-            icon={<LockOpen color="var(--stale)" size={18} />}
+            icon={<LockOpen aria-hidden color="var(--stale)" size={18} />}
           />
         )}
       </div>
