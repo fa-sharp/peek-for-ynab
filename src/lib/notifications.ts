@@ -1,7 +1,5 @@
 import type { Account, Category, TransactionDetail } from "ynab";
 
-import { Storage } from "@plasmohq/storage";
-
 import type { BudgetNotificationSettings } from "./context/storageContext";
 import type { CachedBudget } from "./context/ynabContext";
 import {
@@ -128,17 +126,13 @@ export const getBudgetAlerts = (
 
 /** Count number of alerts for this budget */
 export const getNumAlertsForBudget = (budgetAlerts: BudgetAlerts) =>
-  budgetAlerts.numImportedTxs ||
-  0 +
-    Object.values(budgetAlerts.accounts || {}).reduce(
-      (numAccountAlerts, accountAlerts) => {
-        accountAlerts?.importError && (numAccountAlerts += 1);
-        accountAlerts?.reconcile && (numAccountAlerts += 1);
-        return numAccountAlerts;
-      },
-      0
-    ) +
-    Object.keys(budgetAlerts.cats || {}).length;
+  (budgetAlerts.numImportedTxs ?? 0) +
+  Object.values(budgetAlerts.accounts).reduce((numAccountAlerts, accountAlerts) => {
+    accountAlerts?.importError && (numAccountAlerts += 1);
+    accountAlerts?.reconcile && (numAccountAlerts += 1);
+    return numAccountAlerts;
+  }, 0) +
+  Object.keys(budgetAlerts.cats).length;
 
 export const updateIconAndTooltip = (
   currentAlerts: CurrentAlerts,
@@ -242,26 +236,12 @@ export const createDesktopNotifications = async (
       return;
     }
 
-    const notificationOptions: chrome.notifications.NotificationOptions<true> = {
+    chrome.notifications?.create(budget.id, {
       iconUrl: notificationImage.toString(),
       title: budget.name,
       type: "basic",
       message,
       isClickable: true
-    };
-
-    chrome.notifications?.update(budget.id, notificationOptions, async (wasUpdated) => {
-      const storage = new Storage({ area: "local" });
-      const lastNotificationTime = await storage.get<number>(`lastNotif-${budgetId}`);
-
-      // Create a new notification if there hasn't been one in last hour
-      if (
-        !wasUpdated &&
-        (!lastNotificationTime || Date.now() - lastNotificationTime > 1000 * 60 * 60)
-      ) {
-        chrome.notifications?.create(budget.id, notificationOptions);
-        storage.set(`lastNotif-${budgetId}`, Date.now());
-      }
     });
   }
 };
