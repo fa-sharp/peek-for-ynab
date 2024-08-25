@@ -233,15 +233,14 @@ export const createDesktopNotifications = async (
 
     if (!message) {
       chrome.notifications?.clear(budget.id);
-      return;
+    } else {
+      chrome.notifications?.create(budget.id, {
+        iconUrl: notificationImage.toString(),
+        title: budget.name,
+        type: "basic",
+        message,
+        isClickable: true
+      });
     }
-
-    chrome.notifications?.create(budget.id, {
-      iconUrl: notificationImage.toString(),
-      title: budget.name,
-      type: "basic",
-      message,
-      isClickable: true
-    });
   }
 };
