@@ -162,7 +162,11 @@ const useStorageProvider = () => {
       instance: storageArea
     },
     (data, isHydrated) =>
-      !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+      !isHydrated || !selectedBudgetId
+        ? undefined
+        : !data
+          ? DEFAULT_BUDGET_SETTINGS
+          : data
   );
 
   /** Use budget-specific settings for a specific budget */
