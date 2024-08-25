@@ -158,12 +158,16 @@ export function OptionsView() {
                     }
                   }}
                 />
-                Enable desktop notifications (⚠️ Experimental ⚠️)
+                Enable system notifications (⚠️ Experimental ⚠️)
               </label>
               <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
                 <li>
-                  Native desktop notifications on your device (based on the notifications
-                  you setup for each budget below)
+                  Native notifications on your device (based on the notifications you
+                  setup for each budget below)
+                </li>
+                <li>
+                  You may also need to enable notifications for your browser in your
+                  system settings
                 </li>
                 <li>
                   This setting is not synced and must be manually enabled on each device

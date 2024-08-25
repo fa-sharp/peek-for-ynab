@@ -35,8 +35,8 @@ function PrivacyPage() {
       </p>
       <p>
         If you enable the sync option in the extension settings, {APP_NAME} will save your
-        settings and the unique IDs of your pinned items to your browser profile, in order
-        to sync them to your other devices.
+        settings and your pinned items to your browser profile, in order to sync them to
+        your other devices.
       </p>
       <p>
         If tab access is allowed in the settings, {APP_NAME} will be able to read the

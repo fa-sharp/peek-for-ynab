@@ -51,6 +51,23 @@ function HelpPage() {
         </li>
         <li>
           <h3>
+            I have enabled system notifications in the settings, but they are not showing
+            up on my device.
+          </h3>
+          <p>
+            You may need to enable notifications in your system settings: here are the
+            instructions to access those settings on{" "}
+            <a href="https://support.microsoft.com/en-us/windows/change-notification-settings-in-windows-8942c744-6198-fe56-4639-34320cf9444e">
+              Windows
+            </a>{" "}
+            and{" "}
+            <a href="https://support.apple.com/en-sa/guide/mac-help/mh40583/mac">Mac</a>.
+            Look for your browser and make sure notifications are enabled. Keep in mind
+            that this is currently an experimental feature and may not work as expected.
+          </p>
+        </li>
+        <li>
+          <h3>
             I use Direct Import (linked accounts) in YNAB. How will that work with
             transactions I enter via the extension?
           </h3>
@@ -86,17 +103,6 @@ function HelpPage() {
               &nbsp;Data is being retrieved/refreshed from YNAB.
             </li>
           </ul>
-        </li>
-        <li>
-          <h3>I am a nerd and I want nerdy things.</h3>
-          <p>
-            Absolutely! There is a devtools page where you can see exactly what is being
-            stored, what the API cache looks like, browser permissions, etc... Copy this
-            URL into your browser:{" "}
-            <code>
-              chrome-extension://oakibhlecegcmjcjppmjkiaeedoljbmk/tabs/_devtools.html
-            </code>
-          </p>
         </li>
         <li>
           <h3>I have an issue, bug report, or further questions.</h3>
