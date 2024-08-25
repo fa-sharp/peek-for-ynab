@@ -33,9 +33,10 @@ export default function TransactionView({
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
           {!tx.approved && <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon />} />}
+          {/* TODO file an issue with YNAB SDK: ESM not being updated https://github.com/ynab/ynab-sdk-js/tree/main/dist/esm  */}
           {tx.flag_color && (
             <IconSpan
-              label={`${tx.flag_color} flag`}
+              label={tx.flag_name ? `Flag: ${tx.flag_name}` : `${tx.flag_color} flag`}
               icon={
                 <Flag3
                   aria-hidden
