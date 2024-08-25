@@ -27,7 +27,7 @@ function IndexPage() {
         </li>
         <li>
           <Link href="/privacy">Privacy policy</Link> has been updated to clarify the role
-          of the authentication server used for OAuth.
+          of the website/authentication server.
         </li>
       </ul>
       <Image

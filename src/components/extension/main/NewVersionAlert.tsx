@@ -16,7 +16,7 @@ function NewVersionAlert() {
   return (
     <div className="heading-small flex-row gap-xs justify-center mb-lg">
       <Rocket size={20} color="var(--error)" aria-hidden />
-      New update: {LATEST_VERSION_ALERT_TEXT}
+      New version: {LATEST_VERSION_ALERT_TEXT}
       <IconButton
         label="See details"
         icon={<ExternalLink size={20} aria-hidden />}

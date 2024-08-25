@@ -189,11 +189,18 @@ export function OptionsView() {
             {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
           </button>
           <button
-            className="button rounded accent flex-row mb-lg"
+            className="button rounded gray flex-row mb-lg"
             onClick={() =>
               window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
             }>
             Help/FAQ
+          </button>
+          <button
+            className="button rounded gray flex-row mb-lg"
+            onClick={() =>
+              window.open(`${chrome.runtime.getURL("/tabs/_devtools.html")}`, "_blank")
+            }>
+            Devtools (for nerds)
           </button>
           <button
             className="button rounded warn"

@@ -21,9 +21,9 @@ function PrivacyPage() {
         YNAB through their API to access your budget data - including your budgets, budget
         settings, categories, accounts, payees, and balances. {APP_NAME} cannot access
         your YNAB login credentials, nor any credentials to your financial institution
-        accounts. The extension will occasionally communicate with a separate
-        authentication server in order to retrieve and exchange OAuth tokens from YNAB to
-        keep the user logged in. No other data is passed to the authentication server.
+        accounts. The extension also communicates with a separate authentication server in
+        order to retrieve and exchange OAuth tokens from YNAB to keep the user logged in.
+        No other data is passed to the authentication server.
       </p>
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
