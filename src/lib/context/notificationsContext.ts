@@ -63,7 +63,7 @@ const useNotificationsProvider = () => {
   }, [budgetsData, currentAlerts, currentAlertsHydrated]);
 
   return {
-    /** The up-to-date alerts for the currently selected budget */
+    /** The up-to-date alerts for all budgets */
     currentAlerts,
     /** Whether there's an alert for a new version/update */
     newVersionAlert:

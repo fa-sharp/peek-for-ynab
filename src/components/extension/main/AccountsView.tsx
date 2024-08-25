@@ -226,7 +226,7 @@ export const AccountView = ({
           />
         )}
         {alerts?.importError && (
-          <IconSpan label="Import issue/error" icon={<ImportErrorIcon />} />
+          <IconSpan label="Import issue" icon={<ImportErrorIcon />} />
         )}
         {alerts?.reconcile && last_reconciled_at && (
           <IconSpan

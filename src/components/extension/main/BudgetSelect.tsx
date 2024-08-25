@@ -34,7 +34,8 @@ export default function BudgetSelect({
       aria-label="Budget selection"
       style={{
         flex: 1,
-        maxWidth: emojiMode ? "5em" : "11em",
+        width: !emojiMode ? "100%" : undefined,
+        maxWidth: !emojiMode ? "11em" : "5em",
         fontWeight: 500,
         textOverflow: "ellipsis"
       }}

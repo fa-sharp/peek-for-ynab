@@ -397,6 +397,11 @@ li:last-child .balance-display {
   border-top: solid 1px var(--border-light);
 }
 
+.font-bold {
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
 .font-big {
   font-size: 2em;
 }

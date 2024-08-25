@@ -31,7 +31,7 @@ export function PopupView() {
     <div
       style={{
         padding: "1em",
-        minWidth: settings.emojiMode ? "150px" : "280px",
+        minWidth: settings.emojiMode ? "150px" : "270px",
         maxWidth: "360px"
       }}>
       {!loggedIn ? (

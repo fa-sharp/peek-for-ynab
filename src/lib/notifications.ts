@@ -1,7 +1,5 @@
 import type { Account, Category, TransactionDetail } from "ynab";
 
-import { Storage } from "@plasmohq/storage";
-
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "./constants";
 import type { BudgetNotificationSettings, CachedBudget } from "./types";
 import {
@@ -124,6 +122,16 @@ export const getBudgetAlerts = (
   else return budgetAlerts;
 };
 
+/** Count number of alerts for this budget */
+export const getNumAlertsForBudget = (budgetAlerts: BudgetAlerts) =>
+  (budgetAlerts.numImportedTxs ?? 0) +
+  Object.values(budgetAlerts.accounts).reduce((numAccountAlerts, accountAlerts) => {
+    accountAlerts?.importError && (numAccountAlerts += 1);
+    accountAlerts?.reconcile && (numAccountAlerts += 1);
+    return numAccountAlerts;
+  }, 0) +
+  Object.keys(budgetAlerts.cats).length;
+
 export const updateIconAndTooltip = (
   currentAlerts: CurrentAlerts,
   budgetsData: CachedBudget[]
@@ -169,11 +177,7 @@ export const updateIconAndTooltip = (
   const numNotifications = Object.keys(currentAlerts).reduce(
     (numAlerts, budgetId) =>
       numAlerts +
-      (currentAlerts[budgetId]?.numImportedTxs || 0) +
-      Object.values(currentAlerts[budgetId]?.accounts || {}).filter(
-        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
-      ).length +
-      Object.keys(currentAlerts[budgetId]?.cats || {}).length,
+      (currentAlerts[budgetId] ? getNumAlertsForBudget(currentAlerts[budgetId]) : 0),
     0
   );
 
@@ -227,29 +231,14 @@ export const createDesktopNotifications = async (
 
     if (!message) {
       chrome.notifications?.clear(budget.id);
-      return;
+    } else {
+      chrome.notifications?.create(budget.id, {
+        iconUrl: notificationImage.toString(),
+        title: budget.name,
+        type: "basic",
+        message,
+        isClickable: true
+      });
     }
-
-    const notificationOptions: chrome.notifications.NotificationOptions<true> = {
-      iconUrl: notificationImage.toString(),
-      title: budget.name,
-      type: "basic",
-      message,
-      isClickable: true
-    };
-
-    chrome.notifications?.update(budget.id, notificationOptions, async (wasUpdated) => {
-      const storage = new Storage({ area: "local" });
-      const lastNotificationTime = await storage.get<number>(`lastNotif-${budgetId}`);
-
-      // Create a new notification if there hasn't been one in last hour
-      if (
-        !wasUpdated &&
-        (!lastNotificationTime || Date.now() - lastNotificationTime > 1000 * 60 * 60)
-      ) {
-        chrome.notifications?.create(budget.id, notificationOptions);
-        storage.set(`lastNotif-${budgetId}`, Date.now());
-      }
-    });
   }
 };

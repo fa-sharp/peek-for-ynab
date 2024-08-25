@@ -170,11 +170,15 @@ async function backgroundDataRefresh() {
       if (budgetAlerts) alerts[budget.id] = budgetAlerts;
     }
 
-    IS_DEV &&
-      console.log("Background refresh: Got updated alerts, updating alerts...", alerts);
+    IS_DEV && console.log("Background refresh: updating alerts...", alerts);
     updateIconAndTooltip(alerts, budgetsData);
-    createDesktopNotifications(alerts, budgetsData);
-    await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
+    if (
+      JSON.stringify(alerts) !==
+      JSON.stringify(await CHROME_LOCAL_STORAGE.get("currentAlerts"))
+    ) {
+      createDesktopNotifications(alerts, budgetsData);
+      await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
+    }
   } catch (err) {
     console.error("Background refresh: Error", err);
   }

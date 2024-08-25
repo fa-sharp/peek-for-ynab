@@ -5,6 +5,7 @@ import CurrencyView from "~components/CurrencyView";
 import IconButton from "~components/IconButton";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import { getNumAlertsForBudget } from "~lib/notifications";
 import { formatDateMonthAndDay } from "~lib/utils";
 
 const NotificationsView = () => {
@@ -16,11 +17,9 @@ const NotificationsView = () => {
 
   const numNotifications = useMemo(
     () =>
-      (currentAlerts?.[selectedBudgetId]?.numImportedTxs || 0) +
-      Object.values(currentAlerts?.[selectedBudgetId]?.accounts || {}).filter(
-        (accountAlerts) => accountAlerts?.importError || accountAlerts?.reconcile
-      ).length +
-      Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {}).length,
+      currentAlerts?.[selectedBudgetId]
+        ? getNumAlertsForBudget(currentAlerts[selectedBudgetId])
+        : 0,
     [currentAlerts, selectedBudgetId]
   );
 
@@ -58,12 +57,12 @@ const NotificationsView = () => {
   if (!currentAlerts || numNotifications === 0) return null;
 
   return (
-    <div className="mb-sm">
+    <div className="flex-col gap-0 rounded mb-sm">
       <div
-        className="heading-small flex-row gap-sm justify-center cursor-pointer"
+        className="flex-row gap-sm justify-center font-bold cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <AlertCircle color="var(--stale)" size={16} aria-hidden />
-        {`${numNotifications} notification${numNotifications > 1 ? "s" : ""}`}
+        {`${numNotifications} alert${numNotifications > 1 ? "s" : ""}`}
         <IconButton
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
           label={expanded ? "Collapse" : "Expand"}
@@ -72,7 +71,7 @@ const NotificationsView = () => {
       </div>
 
       {expanded && (
-        <ul className="list flex-col gap-xs">
+        <ul className="list flex-col gap-sm">
           {numImportedTxs > 0 && (
             <li className="flex-row justify-center">
               {`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}
@@ -102,16 +101,11 @@ const NotificationsView = () => {
             )}
 
           {accountsWithImportError.length > 0 &&
-            accountsWithImportError.map(
-              (account) =>
-                account.last_reconciled_at && (
-                  <li
-                    key={`importError-${account.id}`}
-                    className="flex-row justify-center">
-                    {account.name}: Import issue/error
-                  </li>
-                )
-            )}
+            accountsWithImportError.map((account) => (
+              <li key={`importError-${account.id}`} className="flex-row justify-center">
+                {account.name}: Import issue
+              </li>
+            ))}
         </ul>
       )}
     </div>
