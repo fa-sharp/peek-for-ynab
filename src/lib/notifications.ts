@@ -187,60 +187,48 @@ export const updateIconAndTooltip = (
   chrome.action?.setBadgeText({ text: String(numNotifications || "") });
 };
 
-const onNotificationClick = (id: string) => {
-  chrome.notifications.clear(id);
-  chrome.tabs.create({ url: `https://app.ynab.com/${id}/budget` });
-};
-
-export const createDesktopNotifications = async (
-  currentAlerts: CurrentAlerts,
-  budgetsData: CachedBudget[]
+export const createSystemNotification = async (
+  budgetAlerts: BudgetAlerts,
+  budgetData: CachedBudget
 ) => {
   const notifPermission = await checkPermissions(["notifications"]);
   if (!notifPermission) return;
 
-  IS_DEV && console.log("Creating desktop notifications");
-  chrome.notifications?.onClicked.removeListener(onNotificationClick);
-  chrome.notifications?.onClicked.addListener(onNotificationClick);
+  IS_DEV && console.log("Creating system notification for budget: ", budgetData);
 
-  for (const [budgetId, budgetAlerts] of Object.entries(currentAlerts)) {
-    const budget = budgetsData.find((b) => b.id === budgetId);
-    if (!budget || !budgetAlerts) continue;
+  const { numImportedTxs, accounts, cats } = budgetAlerts;
+  const numImportError = Object.values(accounts).reduce(
+    (acc, curr) => (curr?.importError ? acc + 1 : acc),
+    0
+  );
+  const overspentCategories = Object.values(cats)
+    .filter((c) => c?.overspent)
+    .map((c) => c?.name)
+    .join(", ");
+  const accountsToReconcile = Object.values(accounts)
+    .filter((a) => a?.reconcile)
+    .map((a) => a?.name)
+    .join(", ");
 
-    const { numImportedTxs, accounts, cats } = budgetAlerts;
-    const numImportError = Object.values(accounts).reduce(
-      (acc, curr) => (curr?.importError ? acc + 1 : acc),
-      0
-    );
-    const overspentCategories = Object.values(cats)
-      .filter((c) => c?.overspent)
-      .map((c) => c?.name)
-      .join(", ");
-    const accountsToReconcile = Object.values(accounts)
-      .filter((a) => a?.reconcile)
-      .map((a) => a?.name)
-      .join(", ");
+  let message = "";
+  if (numImportedTxs)
+    message += `${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}. `;
+  if (numImportError)
+    message += `${numImportError} import issue${numImportError > 1 ? "s" : ""}!`;
+  if (message.length > 0) message += "\n";
+  if (accountsToReconcile) message += `Reconcile: ${accountsToReconcile}\n`;
+  if (overspentCategories) message += `Overspent: ${overspentCategories}\n`;
+  message = message.trimEnd();
 
-    let message = "";
-    if (numImportedTxs)
-      message += `${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}. `;
-    if (numImportError)
-      message += `${numImportError} import issue${numImportError > 1 ? "s" : ""}!`;
-    if (message.length > 0) message += "\n";
-    if (accountsToReconcile) message += `Reconcile: ${accountsToReconcile}\n`;
-    if (overspentCategories) message += `Overspent: ${overspentCategories}\n`;
-    message = message.trimEnd();
-
-    if (!message) {
-      chrome.notifications?.clear(budget.id);
-    } else {
-      chrome.notifications?.create(budget.id, {
-        iconUrl: notificationImage.toString(),
-        title: budget.name,
-        type: "basic",
-        message,
-        isClickable: true
-      });
-    }
+  if (!message) {
+    chrome.notifications?.clear(budgetData.id);
+  } else {
+    chrome.notifications?.create(budgetData.id, {
+      iconUrl: notificationImage.toString(),
+      title: budgetData.name,
+      type: "basic",
+      message,
+      isClickable: true
+    });
   }
 };

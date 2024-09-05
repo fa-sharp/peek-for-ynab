@@ -12,7 +12,7 @@ import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
 import {
   type CurrentAlerts,
-  createDesktopNotifications,
+  createSystemNotification,
   getBudgetAlerts,
   updateIconAndTooltip
 } from "~lib/notifications";
@@ -124,7 +124,7 @@ async function backgroundDataRefresh() {
     const shownBudgetIds = await storage.get<string[]>("budgets");
     if (!shownBudgetIds) return;
 
-    // Fetch new data and get updated alerts
+    IS_DEV && console.log("Background refresh: updating alerts...");
     const ynabAPI = new api(tokenData.accessToken);
     const budgetsData = await queryClient.fetchQuery({
       queryKey: ["budgets"],
@@ -133,6 +133,9 @@ async function backgroundDataRefresh() {
     });
 
     const alerts: CurrentAlerts = {};
+    const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
+
+    // Fetch new data for each budget and update alerts
     for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
       const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
       if (!budgetSettings) continue;
@@ -162,19 +165,24 @@ async function backgroundDataRefresh() {
         categories: categoriesData,
         importedTxs
       });
-      if (budgetAlerts) alerts[budget.id] = budgetAlerts;
+      if (budgetAlerts) {
+        alerts[budget.id] = budgetAlerts;
+        // create system notification if budget alerts have changed
+        if (JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id]))
+          createSystemNotification(budgetAlerts, budget);
+      }
     }
 
-    IS_DEV && console.log("Background refresh: updating alerts...", alerts);
     updateIconAndTooltip(alerts, budgetsData);
-    if (
-      JSON.stringify(alerts) !==
-      JSON.stringify(await CHROME_LOCAL_STORAGE.get("currentAlerts"))
-    ) {
-      createDesktopNotifications(alerts, budgetsData);
-      await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
-    }
   } catch (err) {
     console.error("Background refresh: Error", err);
   }
 }
+
+// Setup system notification click handler
+const onSystemNotificationClick = (id: string) => {
+  chrome.notifications.clear(id);
+  chrome.tabs.create({ url: `https://app.ynab.com/${id}/budget` });
+};
+chrome.notifications?.onClicked.removeListener(onSystemNotificationClick);
+chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
