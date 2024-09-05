@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { useMemo, useState } from "react";
 import { AlertCircle } from "tabler-icons-react";
 
@@ -57,7 +58,7 @@ const NotificationsView = () => {
   if (!currentAlerts || numNotifications === 0) return null;
 
   return (
-    <div className="flex-col gap-0 rounded mb-sm">
+    <div className={clsx("flex-col gap-0 rounded mb-sm", { "pb-sm": expanded })}>
       <div
         className="flex-row gap-sm justify-center font-bold cursor-pointer"
         onClick={() => setExpanded(!expanded)}>

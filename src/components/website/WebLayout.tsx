@@ -40,9 +40,9 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
       <div
         className="mt-xxl mb-lg pt-sm"
         style={{ borderTop: "solid 1px var(--border-light)" }}>
-        Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>. Peek
-        for YNAB is a third-party extension, and is not affiliated with or supported by
-        YNAB.
+        💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
+        Peek for YNAB is a third-party extension, and is not affiliated with or supported
+        by YNAB.
       </div>
     </main>
   );

@@ -16,7 +16,14 @@ function IndexPage() {
       <ul>
         <li>
           Setup customizable notifications and alerts in your settings! See the cool GIF
-          below.
+          below. Alerts will show up at the top of the extension popup window, as well as
+          when you hover over the extension icon (inspired by other extensions like the
+          awesome{" "}
+          <a href="https://jasonsavard.com/Checker-Plus-for-Google-Calendar">
+            Checker Plus
+          </a>
+          ). You can also optionally enable system notifications (currently an
+          experimental feature).
         </li>
         <li>
           Choose a default account, or remember the last account used for transactions.
@@ -41,7 +48,7 @@ function IndexPage() {
       <h3>0.19.1 - Apr 12, 2024</h3>
       <ul>
         <li>Split transaction support!</li>
-        <li>Open extension in a separate popup window</li>
+        <li>New button to open extension in a separate popup window</li>
         <li>Small bugfixes</li>
       </ul>
     </WebLayout>
