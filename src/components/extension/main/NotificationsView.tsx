@@ -24,8 +24,8 @@ const NotificationsView = () => {
     [currentAlerts, selectedBudgetId]
   );
 
-  const numImportedTxs = useMemo(
-    () => currentAlerts?.[selectedBudgetId]?.numImportedTxs ?? 0,
+  const numUnapprovedTxs = useMemo(
+    () => currentAlerts?.[selectedBudgetId]?.numUnapprovedTxs ?? 0,
     [currentAlerts, selectedBudgetId]
   );
 
@@ -73,9 +73,9 @@ const NotificationsView = () => {
 
       {expanded && (
         <ul className="list flex-col gap-sm">
-          {numImportedTxs > 0 && (
+          {numUnapprovedTxs > 0 && (
             <li className="flex-row justify-center">
-              {`${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}`}
+              {`${numUnapprovedTxs} unapproved transaction${numUnapprovedTxs > 1 ? "s" : ""}`}
             </li>
           )}
 

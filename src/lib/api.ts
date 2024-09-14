@@ -58,13 +58,13 @@ const getNDaysAgoISO = (days: number) => {
   return date.toISOString().substring(0, 10);
 };
 
-/** Check for newly imported / unapproved transactions for this budget  */
-export async function importTxsForBudget(ynabAPI: api, selectedBudgetId: string) {
-  await ynabAPI.transactions.importTransactions(selectedBudgetId);
+/** Check for new unapproved transactions in this budget  */
+export async function checkUnapprovedTxsForBudget(ynabAPI: api, budgetId: string) {
+  await ynabAPI.transactions.importTransactions(budgetId);
   const {
     data: { transactions }
   } = await ynabAPI.transactions.getTransactions(
-    selectedBudgetId,
+    budgetId,
     getNDaysAgoISO(14), // fetch unapproved transactions from up to 2 weeks ago
     GetTransactionsTypeEnum.Unapproved
   );
