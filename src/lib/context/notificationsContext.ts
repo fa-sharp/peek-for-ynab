@@ -19,7 +19,7 @@ const chromeSyncStorage = new Storage({ area: "sync" });
 
 const useNotificationsProvider = () => {
   const { budgetSettings, selectedBudgetId } = useStorageContext();
-  const { accountsData, budgetsData, categoriesData, importedTxs } = useYNABContext();
+  const { accountsData, budgetsData, categoriesData, unapprovedTxs } = useYNABContext();
 
   const [currentAlerts, setCurrentAlerts] = useStorage<CurrentAlerts | undefined>(
     { key: "currentAlerts", instance: chromeLocalStorage },
@@ -40,7 +40,7 @@ const useNotificationsProvider = () => {
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
       accounts: accountsData,
       categories: categoriesData,
-      importedTxs
+      unapprovedTxs
     });
     setCurrentAlerts((prev) => ({
       ...prev,
@@ -51,7 +51,7 @@ const useNotificationsProvider = () => {
     budgetSettings,
     categoriesData,
     currentAlertsHydrated,
-    importedTxs,
+    unapprovedTxs,
     selectedBudgetId,
     setCurrentAlerts
   ]);

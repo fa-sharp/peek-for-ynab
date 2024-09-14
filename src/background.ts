@@ -3,10 +3,10 @@ import { type Account, type Category, type TransactionDetail, api } from "ynab";
 import { Storage } from "@plasmohq/storage";
 
 import {
+  checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget,
-  importTxsForBudget
+  fetchCategoryGroupsForBudget
 } from "~lib/api";
 import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
@@ -140,12 +140,12 @@ async function backgroundDataRefresh() {
       const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
       if (!budgetSettings) continue;
 
-      let importedTxs: TransactionDetail[] | undefined;
+      let unapprovedTxs: TransactionDetail[] | undefined;
       let accountsData: Account[] | undefined;
       let categoriesData: Category[] | undefined;
 
       if (budgetSettings.notifications.checkImports) {
-        importedTxs = await importTxsForBudget(ynabAPI, budget.id);
+        unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
       }
 
       if (
@@ -163,7 +163,7 @@ async function backgroundDataRefresh() {
       const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
         accounts: accountsData,
         categories: categoriesData,
-        importedTxs
+        unapprovedTxs
       });
       if (budgetAlerts) {
         alerts[budget.id] = budgetAlerts;
@@ -174,6 +174,7 @@ async function backgroundDataRefresh() {
     }
 
     updateIconAndTooltip(alerts, budgetsData);
+    await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
   } catch (err) {
     console.error("Background refresh: Error", err);
   }

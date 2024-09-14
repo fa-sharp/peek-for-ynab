@@ -18,7 +18,7 @@ export interface CurrentAlerts {
 }
 
 export interface BudgetAlerts {
-  numImportedTxs?: number;
+  numUnapprovedTxs?: number;
   accounts: AccountAlerts;
   cats: CategoryAlerts;
 }
@@ -30,7 +30,7 @@ export interface AccountAlerts {
         importError?: boolean;
         reconcile?: boolean;
         lastReconciledAt?: string;
-        numImportedTxs?: number;
+        numUnapprovedTxs?: number;
       }
     | undefined;
 }
@@ -49,7 +49,7 @@ export interface CategoryAlerts {
 export const getBudgetAlerts = (
   notificationSettings: BudgetNotificationSettings,
   data: {
-    importedTxs?: TransactionDetail[];
+    unapprovedTxs?: TransactionDetail[];
     accounts?: Account[];
     categories?: Category[];
   }
@@ -59,21 +59,21 @@ export const getBudgetAlerts = (
     cats: {}
   };
   if (notificationSettings.checkImports)
-    budgetAlerts.numImportedTxs = data.importedTxs?.length;
+    budgetAlerts.numUnapprovedTxs = data.unapprovedTxs?.length;
 
   data.accounts?.forEach((account) => {
     const accountAlerts: Pick<
       NonNullable<AccountAlerts[string]>,
-      "importError" | "reconcile" | "numImportedTxs"
+      "importError" | "reconcile" | "numUnapprovedTxs"
     > = {};
 
     // Check for number of unapproved transactions in this account
-    if (notificationSettings.checkImports && data.importedTxs) {
-      const numImportedTxsInAccount = data.importedTxs.filter(
+    if (notificationSettings.checkImports && data.unapprovedTxs) {
+      const numUnapprovedTxsInAccount = data.unapprovedTxs.filter(
         (tx) => tx.account_id === account.id
       ).length;
-      if (numImportedTxsInAccount > 0)
-        accountAlerts.numImportedTxs = numImportedTxsInAccount;
+      if (numUnapprovedTxsInAccount > 0)
+        accountAlerts.numUnapprovedTxs = numUnapprovedTxsInAccount;
     }
     // Check for bank import error
     if (notificationSettings.importError && account.direct_import_in_error)
@@ -116,7 +116,7 @@ export const getBudgetAlerts = (
     }
   });
   if (
-    !budgetAlerts.numImportedTxs &&
+    !budgetAlerts.numUnapprovedTxs &&
     isEmptyObject(budgetAlerts.accounts) &&
     isEmptyObject(budgetAlerts.cats)
   )
@@ -126,7 +126,7 @@ export const getBudgetAlerts = (
 
 /** Count number of alerts for this budget */
 export const getNumAlertsForBudget = (budgetAlerts: BudgetAlerts) =>
-  (budgetAlerts.numImportedTxs ?? 0) +
+  (budgetAlerts.numUnapprovedTxs ?? 0) +
   Object.values(budgetAlerts.accounts).reduce((numAccountAlerts, accountAlerts) => {
     accountAlerts?.importError && (numAccountAlerts += 1);
     accountAlerts?.reconcile && (numAccountAlerts += 1);
@@ -146,9 +146,9 @@ export const updateIconAndTooltip = (
 
     tooltip += `----${budget.name}----\n`;
 
-    if (budgetAlerts.numImportedTxs)
-      tooltip += `${budgetAlerts.numImportedTxs} unapproved ${
-        budgetAlerts.numImportedTxs === 1 ? "transaction" : "transactions"
+    if (budgetAlerts.numUnapprovedTxs)
+      tooltip += `${budgetAlerts.numUnapprovedTxs} unapproved ${
+        budgetAlerts.numUnapprovedTxs === 1 ? "transaction" : "transactions"
       }!\n\n`;
 
     if (!isEmptyObject(budgetAlerts.cats)) {
@@ -196,7 +196,7 @@ export const createSystemNotification = async (
 
   IS_DEV && console.log("Creating system notification for budget: ", budgetData);
 
-  const { numImportedTxs, accounts, cats } = budgetAlerts;
+  const { numUnapprovedTxs, accounts, cats } = budgetAlerts;
   const numImportError = Object.values(accounts).reduce(
     (acc, curr) => (curr?.importError ? acc + 1 : acc),
     0
@@ -211,8 +211,8 @@ export const createSystemNotification = async (
     .join(", ");
 
   let message = "";
-  if (numImportedTxs)
-    message += `${numImportedTxs} unapproved transaction${numImportedTxs > 1 ? "s" : ""}. `;
+  if (numUnapprovedTxs)
+    message += `${numUnapprovedTxs} unapproved transaction${numUnapprovedTxs > 1 ? "s" : ""}. `;
   if (numImportError)
     message += `${numImportError} import issue${numImportError > 1 ? "s" : ""}!`;
   if (message.length > 0) message += "\n";

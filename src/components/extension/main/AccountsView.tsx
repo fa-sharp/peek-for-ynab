@@ -194,9 +194,9 @@ export const AccountView = ({
         ) : (
           <div className="hide-overflow">{name}</div>
         )}
-        {!!alerts?.numImportedTxs && (
+        {!!alerts?.numUnapprovedTxs && (
           <IconSpan
-            label={`${alerts.numImportedTxs} unapproved transaction${alerts.numImportedTxs > 1 ? "s" : ""}`}
+            label={`${alerts.numUnapprovedTxs} unapproved transaction${alerts.numUnapprovedTxs > 1 ? "s" : ""}`}
             icon={<Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} />}
           />
         )}

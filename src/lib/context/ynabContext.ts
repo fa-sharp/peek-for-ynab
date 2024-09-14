@@ -4,10 +4,10 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
 
 import {
+  checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget,
-  importTxsForBudget
+  fetchCategoryGroupsForBudget
 } from "~lib/api";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
@@ -136,15 +136,15 @@ const useYNABProvider = () => {
     [refetchAccounts, refetchCategoryGroups]
   );
 
-  /** Check for new imports for selected budget (if user wants notifications) */
-  const { data: importedTxs } = useQuery({
-    queryKey: ["import", { budgetId: selectedBudgetId }],
+  /** Check for new/unapproved transactions in selected budget (if user wants notifications) */
+  const { data: unapprovedTxs } = useQuery({
+    queryKey: ["unapproved", { budgetId: selectedBudgetId }],
     enabled: Boolean(
       ynabAPI && selectedBudgetId && budgetSettings?.notifications.checkImports
     ),
     queryFn: async () => {
       if (!ynabAPI) return;
-      return await importTxsForBudget(ynabAPI, selectedBudgetId);
+      return await checkUnapprovedTxsForBudget(ynabAPI, selectedBudgetId);
     }
   });
 
@@ -226,8 +226,8 @@ const useYNABProvider = () => {
     accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
-    /** API data: Imported/unapproved transactions */
-    importedTxs,
+    /** API data: Unapproved transactions in current budget */
+    unapprovedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,
     /** API data: List of budgets the user has selected to show */
