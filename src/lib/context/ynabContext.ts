@@ -22,6 +22,7 @@ const useYNABProvider = () => {
     tokenData,
     selectedBudgetId,
     budgetSettings,
+    popupState,
     savedAccounts,
     savedCategories,
     shownBudgetIds,
@@ -109,7 +110,7 @@ const useYNABProvider = () => {
   /** Current month data (Ready to Assign, total activity, etc.) for the selected budget */
   const { data: monthData, refetch: refetchMonth } = useQuery({
     queryKey: ["month", { budgetId: selectedBudgetId }],
-    enabled: Boolean(ynabAPI && selectedBudgetId),
+    enabled: Boolean(ynabAPI && selectedBudgetId && !!popupState.moveMoneyState),
     queryFn: async () => {
       if (!ynabAPI) return;
       const response = await ynabAPI.months.getBudgetMonth(selectedBudgetId, "current");
