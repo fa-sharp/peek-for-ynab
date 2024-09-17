@@ -20,7 +20,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 # Build Next.js app
 COPY --link . .
 ENV NODE_ENV=production
-ARG EXTENSION_ORIGIN
+ARG EXTENSION_ORIGIN=""
+ARG WEBSITE_DOMAIN=""
 RUN pnpm run build:next
 
 # Final stage for app image
