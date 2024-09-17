@@ -60,7 +60,6 @@ const getNDaysAgoISO = (days: number) => {
 
 /** Check for new unapproved transactions in this budget  */
 export async function checkUnapprovedTxsForBudget(ynabAPI: api, budgetId: string) {
-  await ynabAPI.transactions.importTransactions(budgetId);
   const {
     data: { transactions }
   } = await ynabAPI.transactions.getTransactions(

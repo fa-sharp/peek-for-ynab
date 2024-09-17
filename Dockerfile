@@ -13,10 +13,6 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-# Install packages needed to build node modules
-# RUN apt-get update -qq && \
-    # apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
-
 # Install node modules
 COPY --link package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile

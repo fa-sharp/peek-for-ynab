@@ -145,6 +145,7 @@ async function backgroundDataRefresh() {
       let categoriesData: Category[] | undefined;
 
       if (budgetSettings.notifications.checkImports) {
+        await ynabAPI.transactions.importTransactions(budget.id);
         unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
       }
 
