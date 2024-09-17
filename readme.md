@@ -1,5 +1,9 @@
 # Peek for YNAB
 
+[![CI status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml)
+[![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
+[![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
+
 An open-source browser extension for YNAB that lets users see their category and account balances at a glance, add transactions, and setup customizable notifications. See full feature list and installation links on the [extension website](https://peek-for-ynab.fly.dev).
 
 ## Project layout
