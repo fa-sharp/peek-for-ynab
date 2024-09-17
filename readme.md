@@ -38,14 +38,12 @@ Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.c
 
 ### Extension
 
-Run `pnpm install` or `npm install` to install all dependencies.
+Run `pnpm install` to install all dependencies.
 
 This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). You can run the extension's development server via:
 
 ```bash
 pnpm dev:plasmo
-# or
-npm run dev:plasmo
 ```
 
 Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
@@ -54,12 +52,10 @@ For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
 
 ### Website
 
-The website is created with [Next.js](https://nextjs.org/). Pages and API routes are located in the `src/pages/` folder. You can run the development server via:
+The website is created with [Next.js](https://nextjs.org/). Pages and API routes are located in the `src/app/` folder. You can run the development server via:
 
 ```bash
 pnpm dev:next
-# or
-npm run dev:next
 ```
 
 ## Making production build
@@ -68,14 +64,10 @@ Extension:
 
 ```bash
 pnpm build:plasmo
-# or
-npm run build:plasmo
 ```
 
 Website:
 
 ```bash
 pnpm build:next
-# or
-npm run build:next
 ```
