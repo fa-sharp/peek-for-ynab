@@ -1,27 +1,24 @@
-import type { NextApiHandler } from "next";
+import type { NextRequest } from "next/server";
 import { URL } from "url";
 
+import { OAUTH_BASE_URL } from "~lib/constants";
 import type { TokenData } from "~lib/context/storageContext";
-import { corsMiddleware } from "~lib/nextCorsMiddleware";
+import { logger } from "~lib/logger";
 
-import { OAUTH_BASE_URL } from "./initial";
+const { PLASMO_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 
-const { NEXT_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
-
-const handler: NextApiHandler = async (req, res) => {
-  await corsMiddleware(req, res);
-
+export const POST = async (req: NextRequest) => {
   if (!YNAB_CLIENT_ID || !YNAB_SECRET)
-    return res.status(500).json({ message: "Server error!" });
+    return Response.json({ message: "Server error!" }, { status: 500 });
 
-  if (typeof req.query.refreshToken !== "string" || req.method !== "POST")
-    return res.status(400).json({ message: "Invalid!" });
+  const refreshToken = req.nextUrl.searchParams.get("refreshToken");
+  if (!refreshToken) return Response.json({ message: "Invalid!" }, { status: 400 });
 
   const tokenUrlParams = new URLSearchParams({
+    refresh_token: refreshToken,
     client_id: YNAB_CLIENT_ID,
     client_secret: YNAB_SECRET,
-    grant_type: "refresh_token",
-    refresh_token: req.query.refreshToken
+    grant_type: "refresh_token"
   });
   const tokenUrl = new URL(OAUTH_BASE_URL);
   tokenUrl.search = tokenUrlParams.toString();
@@ -41,11 +38,9 @@ const handler: NextApiHandler = async (req, res) => {
       refreshToken: data.refresh_token,
       expires: (data.created_at + data.expires_in) * 1000
     };
-    return res.json(tokenData);
+    return Response.json(tokenData);
   } catch (err) {
-    console.log("Error during OAuth token refresh", err);
-    return res.status(401).json({ message: "Unauthorized" });
+    logger.info(err, "Error during OAuth token refresh");
+    return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 };
-
-export default handler;

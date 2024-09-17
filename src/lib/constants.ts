@@ -4,6 +4,7 @@ import { type AppSettings, type BudgetSettings } from "./context/storageContext"
 export const LATEST_VERSION_ALERT_NUM = 2;
 export const LATEST_VERSION_ALERT_TEXT = "New feature: Notifications!";
 
+export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_NEEDED_KEY = "tokenRefreshing";
 

@@ -1,25 +1,26 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Release Notes | Peek for YNAB"
+};
 
 function IndexPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>Peek for YNAB - Release Notes</title>
-      </Head>
+    <>
       <h1>Peek for YNAB</h1>
       <h2>Release Notes</h2>
-      <h3>0.20.0 - Aug 24, 2024</h3>
+      <h3>0.20.0 - Sep 17, 2024</h3>
       <ul>
         <li>
-          Setup customizable notifications and alerts in your settings! See the cool GIF
-          below. Alerts will show up at the top of the extension popup window, as well as
-          when you hover over the extension icon (inspired by other extensions like the
-          awesome{" "}
-          <a href="https://jasonsavard.com/Checker-Plus-for-Google-Calendar">
+          Setup customizable notifications and alerts in your settings! See the GIF below.
+          Alerts will show up at the top of the extension popup window, as well as when
+          you hover over the extension icon (inspired by other extensions like the awesome{" "}
+          <a
+            href="https://jasonsavard.com/Checker-Plus-for-Google-Calendar"
+            target="_blank"
+            rel="noreferrer">
             Checker Plus
           </a>
           ). You can also optionally enable system notifications (currently an
@@ -51,7 +52,7 @@ function IndexPage() {
         <li>New button to open extension in a separate popup window</li>
         <li>Small bugfixes</li>
       </ul>
-    </WebLayout>
+    </>
   );
 }
 

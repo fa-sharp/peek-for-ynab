@@ -1,14 +1,13 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import { AlertTriangle, Check, Refresh } from "tabler-icons-react";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Help | Peek for YNAB"
+};
 
 function HelpPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>Peek for YNAB - Help</title>
-      </Head>
+    <>
       <h1>Peek for YNAB</h1>
       <h2>Help/FAQ</h2>
       <ul>
@@ -114,7 +113,7 @@ function HelpPage() {
           </p>
         </li>
       </ul>
-    </WebLayout>
+    </>
   );
 }
 
