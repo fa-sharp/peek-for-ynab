@@ -200,13 +200,6 @@ export function OptionsView() {
             Help/FAQ
           </button>
           <button
-            className="button rounded gray flex-row mb-lg"
-            onClick={() =>
-              window.open(`${chrome.runtime.getURL("/tabs/_devtools.html")}`, "_blank")
-            }>
-            Devtools (for nerds)
-          </button>
-          <button
             className="button rounded warn"
             onClick={async () => {
               const confirmed = confirm(

@@ -8,23 +8,19 @@ LABEL fly_launch_runtime="Next.js"
 # Next.js app lives here
 WORKDIR /app
 
-# Set production environment
-ENV NODE_ENV="production"
-
 # Install pnpm
-ARG PNPM_VERSION=9.1.1
-RUN npm install -g pnpm@$PNPM_VERSION
-
-# Install packages needed to build node modules
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 # Install node modules
 COPY --link package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 # Build Next.js app
 COPY --link . .
+ENV NODE_ENV=production
+ARG EXTENSION_ORIGIN
 RUN pnpm run build:next
 
 # Final stage for app image

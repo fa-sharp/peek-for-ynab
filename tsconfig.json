@@ -7,7 +7,8 @@
     ".plasmo/index.d.ts",
     ".plasmo/**/*",
     "./**/*.ts",
-    "./**/*.tsx"
+    "./**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "compilerOptions": {
     "strict": true,
@@ -17,6 +18,11 @@
       ]
     },
     "baseUrl": ".",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   }
 }

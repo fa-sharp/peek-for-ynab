@@ -1,14 +1,13 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import Image from "next/image";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Peek for YNAB"
+};
 
 function IndexPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>Peek for YNAB</title>
-      </Head>
+    <>
       <h1>Peek for YNAB</h1>
       <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
@@ -55,7 +54,7 @@ function IndexPage() {
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>
       </ul>
-    </WebLayout>
+    </>
   );
 }
 

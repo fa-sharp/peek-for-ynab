@@ -6,17 +6,27 @@
 app = 'peek-for-ynab'
 primary_region = 'ewr'
 
-[build]
-
 [http_service]
-  internal_port = 3000
-  force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+internal_port = 3000
+force_https = true
+auto_stop_machines = 'stop'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
+
+[[statics]]
+guest_path = "/.next/static"
+url_prefix = "/_next/static"
+
+[[statics]]
+guest_path = "/public/screenshots"
+url_prefix = "/screenshots"
+
+[[statics]]
+guest_path = "/public/scripts"
+url_prefix = "/scripts"
 
 [[vm]]
-  memory = '512mb'
-  cpu_kind = 'shared'
-  cpus = 1
+memory = '512mb'
+cpu_kind = 'shared'
+cpus = 1

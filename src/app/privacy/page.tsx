@@ -1,17 +1,16 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import Link from "next/link";
 import packageJson from "package.json";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Privacy Policy | Peek for YNAB"
+};
 
 const { displayName: APP_NAME } = packageJson;
 
 function PrivacyPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>{APP_NAME} - Privacy Policy</title>
-      </Head>
+    <>
       <h1>{APP_NAME}</h1>
       <h2>Privacy Policy</h2>
       <p>
@@ -53,7 +52,7 @@ function PrivacyPage() {
       <p style={{ color: "gray" }}>
         <em>Last updated: Aug 24, 2024</em>
       </p>
-    </WebLayout>
+    </>
   );
 }
 
