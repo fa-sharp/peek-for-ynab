@@ -95,14 +95,14 @@ const AccountTxsView = () => {
           onClick={() => setPopupState({ view: "main" })}
         />
       </div>
-      <div className="flex-col gap-sm mb-lg">
+      <ul className="list flex-col gap-sm mb-lg" aria-label="Account details">
         {hasImportError && (
-          <div className="flex-row">
+          <li className="flex-row">
             <ImportErrorIcon />
             Import issue/error!
-          </div>
+          </li>
         )}
-        <div className="balance-display heading-medium">
+        <li className="balance-display heading-medium">
           Working Balance:
           <CurrencyView
             key={`working-${account.id}`}
@@ -111,11 +111,11 @@ const AccountTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
+        </li>
         {(account.type === AccountType.CreditCard ||
           account.type === AccountType.LineOfCredit) &&
           ccpCategory && (
-            <div className="balance-display heading-medium">
+            <li className="balance-display heading-medium">
               Payment Category:
               <CurrencyView
                 key={`ccp-${account.id}`}
@@ -124,9 +124,9 @@ const AccountTxsView = () => {
                 colorsEnabled
                 animationEnabled={settings?.animations}
               />
-            </div>
+            </li>
           )}
-        <div className="balance-display">
+        <li className="balance-display">
           Cleared Balance:
           <CurrencyView
             key={`cleared-${account.id}`}
@@ -135,8 +135,8 @@ const AccountTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
-        <div className="balance-display">
+        </li>
+        <li className="balance-display">
           Uncleared Balance:
           <CurrencyView
             key={`uncleared-${account.id}`}
@@ -145,9 +145,9 @@ const AccountTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
+        </li>
         {account.last_reconciled_at && (
-          <div className="balance-display">
+          <li className="balance-display">
             Last Reconciled:
             <div className="flex-row">
               {hasReconcileAlert && (
@@ -160,12 +160,12 @@ const AccountTxsView = () => {
               )}
               {dateFormatter.format(new Date(account.last_reconciled_at))}
             </div>
-          </div>
+          </li>
         )}
-      </div>
+      </ul>
       <div className="flex-row gap-lg mb-lg">
         <button
-          className="button rounded accent flex-row"
+          className="button rounded accent flex-row gap-sm"
           onClick={() =>
             setPopupState({
               view: "txAdd",
@@ -180,7 +180,7 @@ const AccountTxsView = () => {
         {account.type === AccountType.CreditCard ||
         account.type === AccountType.LineOfCredit ? (
           <button
-            className="button rounded accent flex-row"
+            className="button rounded accent flex-row gap-sm"
             onClick={() =>
               setPopupState({
                 view: "txAdd",
@@ -205,7 +205,7 @@ const AccountTxsView = () => {
           account.type === AccountType.PersonalLoan ||
           account.type === AccountType.StudentLoan ? (
           <button
-            className="button rounded accent flex-row"
+            className="button rounded accent flex-row gap-sm"
             onClick={() =>
               account.transfer_payee_id &&
               setPopupState({
@@ -226,7 +226,7 @@ const AccountTxsView = () => {
           </button>
         ) : (
           <button
-            className="button rounded accent flex-row"
+            className="button rounded accent flex-row gap-sm"
             onClick={() =>
               setPopupState({
                 view: "txAdd",

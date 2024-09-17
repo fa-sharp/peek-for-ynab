@@ -22,13 +22,13 @@ const CategoryTxsView = () => {
       <div className="flex-row justify-between mb-sm">
         <h2 className="heading-big">{category.name}</h2>
         <IconButton
-          icon={<ArrowBack />}
+          icon={<ArrowBack aria-hidden />}
           label="Back to main view"
           onClick={() => setPopupState({ view: "main" })}
         />
       </div>
-      <div className="flex-col gap-sm mb-lg">
-        <div className="balance-display heading-medium">
+      <ul className="list flex-col gap-sm mb-lg" aria-label="Category details">
+        <li className="balance-display heading-medium">
           Available Balance:
           <CurrencyView
             milliUnits={category.balance}
@@ -36,8 +36,8 @@ const CategoryTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
-        <div className="balance-display">
+        </li>
+        <li className="balance-display">
           Cash Leftover Last Month:
           <CurrencyView
             milliUnits={category.balance - category.activity - category.budgeted}
@@ -45,8 +45,8 @@ const CategoryTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
-        <div className="balance-display">
+        </li>
+        <li className="balance-display">
           Assigned This Month:
           <CurrencyView
             milliUnits={category.budgeted}
@@ -54,8 +54,8 @@ const CategoryTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
-        <div className="balance-display">
+        </li>
+        <li className="balance-display">
           Activity This Month:
           <CurrencyView
             milliUnits={category.activity}
@@ -63,11 +63,11 @@ const CategoryTxsView = () => {
             colorsEnabled
             animationEnabled={settings?.animations}
           />
-        </div>
-      </div>
+        </li>
+      </ul>
       <div className="flex-row gap-lg mb-lg">
         <button
-          className="button rounded accent flex-row"
+          className="button rounded accent flex-row gap-sm"
           onClick={() =>
             setPopupState({
               view: "txAdd",
@@ -86,7 +86,7 @@ const CategoryTxsView = () => {
           <AddTransactionIcon /> Transaction
         </button>
         <button
-          className="button rounded accent flex-row"
+          className="button rounded accent flex-row gap-sm"
           onClick={() =>
             setPopupState({
               view: "move",
