@@ -33,8 +33,8 @@ importers:
         specifier: ^2.8.5
         version: 2.8.5
       downshift:
-        specifier: ^8.5.0
-        version: 8.5.0(react@18.3.1)
+        specifier: ^9.0.8
+        version: 9.0.8(react@18.3.1)
       idb-keyval:
         specifier: ^6.2.1
         version: 6.2.1
@@ -313,10 +313,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-
-  '@babel/runtime@7.23.7':
-    resolution: {integrity: sha512-w06OXVOFso7LcbzMiDGt+3X7Rh7Ho8MmgPoWU3rarH+8upf+wSU/grlGbWzQyr3DkdN6ZeuMFjpdwW0Q+HxobA==}
-    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.24.4':
     resolution: {integrity: sha512-dkxf7+hn8mFBwKjs9bvBlArzLVxVbS8usaPUDd5p2a9JCL9tB8OaOVN1isD4+Xyk4ns89/xeOmbQvgdK7IIVdA==}
@@ -2735,8 +2731,8 @@ packages:
     resolution: {integrity: sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==}
     engines: {node: '>=6'}
 
-  downshift@8.5.0:
-    resolution: {integrity: sha512-BAr/KAZX8GGARwWl4aER6ABv8aAaRXZcVKP0m1oFPKpSIXCGuoqnhi6nRf87glHhYDd/CCPp9RVUK27JKJD/Fw==}
+  downshift@9.0.8:
+    resolution: {integrity: sha512-59BWD7+hSUQIM1DeNPLirNNnZIO9qMdIK5GQ/Uo8q34gT4B78RBlb9dhzgnh0HfQTJj4T/JKYD8KoLAlMWnTsA==}
     peerDependencies:
       react: '>=16.12.0'
 
@@ -5486,10 +5482,6 @@ snapshots:
       '@babel/core': 7.25.2
       '@babel/helper-plugin-utils': 7.24.8
 
-  '@babel/runtime@7.23.7':
-    dependencies:
-      regenerator-runtime: 0.14.1
-
   '@babel/runtime@7.24.4':
     dependencies:
       regenerator-runtime: 0.14.1
@@ -8216,14 +8208,14 @@ snapshots:
 
   dotenv@7.0.0: {}
 
-  downshift@8.5.0(react@18.3.1):
+  downshift@9.0.8(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.23.7
+      '@babel/runtime': 7.25.6
       compute-scroll-into-view: 3.1.0
       prop-types: 15.8.1
       react: 18.3.1
       react-is: 18.2.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   eastasianwidth@0.2.0: {}
 

@@ -31,7 +31,7 @@
     "@tanstack/react-virtual": "^3.10.8",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
-    "downshift": "^8.5.0",
+    "downshift": "^9.0.8",
     "idb-keyval": "^6.2.1",
     "json-formatter-js": "^2.5.18",
     "nanoid": "^5.0.7",
