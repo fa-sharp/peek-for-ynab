@@ -31,6 +31,7 @@ const useYNABProvider = () => {
   } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
+  const queryClient = useQueryClient();
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
@@ -108,7 +109,7 @@ const useYNABProvider = () => {
   }, [categoriesData, savedCategories, selectedBudgetId]);
 
   /** Current month data (Ready to Assign, total activity, etc.) for the selected budget */
-  const { data: monthData, refetch: refetchMonth } = useQuery({
+  const { data: monthData } = useQuery({
     queryKey: ["month", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId && !!popupState.moveMoneyState),
     queryFn: async () => {
@@ -136,8 +137,15 @@ const useYNABProvider = () => {
   });
 
   const refreshCategoriesAndAccounts = useCallback(
-    () => Promise.all([refetchCategoryGroups(), refetchAccounts(), refetchMonth()]),
-    [refetchAccounts, refetchCategoryGroups, refetchMonth]
+    () =>
+      Promise.all([
+        refetchCategoryGroups(),
+        refetchAccounts(),
+        queryClient.invalidateQueries({
+          queryKey: ["month", { budgetId: selectedBudgetId }]
+        })
+      ]),
+    [queryClient, refetchAccounts, refetchCategoryGroups, selectedBudgetId]
   );
 
   /** Check for new/unapproved transactions in selected budget (if user wants notifications) */
@@ -249,8 +257,6 @@ const useYNABProvider = () => {
         return await fetchAccountsForBudget(ynabAPI, budgetId);
       }
     });
-
-  const queryClient = useQueryClient();
 
   const addTransaction = useCallback(
     async (transaction: ynab.NewTransaction) => {
