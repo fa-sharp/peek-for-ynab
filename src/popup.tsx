@@ -1,4 +1,4 @@
-import { PopupLogin, PopupMain, TransactionAdd } from "~components";
+import { PopupLogin, PopupMain, TransactionForm } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 
@@ -30,7 +30,7 @@ export function PopupView() {
       {!loggedIn ? (
         <PopupLogin />
       ) : popupState.view === "txAdd" ? (
-        <TransactionAdd />
+        <TransactionForm />
       ) : (
         <PopupMain />
       )}

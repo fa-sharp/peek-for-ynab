@@ -1,4 +1,4 @@
-import { type FormEventHandler, useEffect, useMemo, useState } from "react";
+import { type FormEventHandler, useCallback, useEffect, useMemo, useState } from "react";
 import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "./context";
@@ -11,6 +11,9 @@ import {
   requestPermissions,
   stringValueToMillis
 } from "./utils";
+
+export type TransactionFormState = ReturnType<typeof useTransaction>["formState"];
+export type TransactionFormHandlers = ReturnType<typeof useTransaction>["handlers"];
 
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
@@ -66,15 +69,15 @@ export default function useTransaction() {
       memo?: string;
     }>
   >([{ amount: "", amountType: "Outflow", payee: null, category: null }]);
-  const onAddSubTx = () => {
+  const onAddSubTx = useCallback(() => {
     setSubTxs((prev) => [
       ...prev,
       { amount: "", amountType: "Outflow", payee: null, category: null }
     ]);
-  };
-  const onRemoveSubTx = () => {
+  }, []);
+  const onRemoveSubTx = useCallback(() => {
     setSubTxs((prev) => prev.slice(0, -1));
-  };
+  }, []);
   const totalSubTxsAmount = useMemo(
     () =>
       subTxs.reduce((sum, tx) => sum + stringValueToMillis(tx.amount, tx.amountType), 0),
@@ -111,8 +114,28 @@ export default function useTransaction() {
     if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
     const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
     if (!transferToAccount) return false;
-    return !transferToAccount.on_budget && account?.on_budget;
+    return !transferToAccount.on_budget && !!account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
+
+  const handlers = useMemo(
+    () => ({
+      setDate,
+      setAmount,
+      setAmountType,
+      setPayee,
+      setCategory,
+      setAccount,
+      setFlag,
+      setMemo,
+      setCleared,
+      setSubTxs,
+      setIsTransfer,
+      setIsSplit,
+      onAddSubTx,
+      onRemoveSubTx
+    }),
+    [onAddSubTx, onRemoveSubTx]
+  );
 
   const onSaveTransaction: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -209,37 +232,28 @@ export default function useTransaction() {
   };
 
   return {
-    date,
-    amount,
-    amountType,
-    payee,
-    category,
-    account,
-    flag,
-    memo,
-    cleared,
-    subTxs,
-    totalSubTxsAmount,
-    leftOverSubTxsAmount,
-    isTransfer,
-    isBudgetToTrackingTransfer,
-    isSplit,
     isSaving,
-    errorMessage,
-    setDate,
-    setAmount,
-    setAmountType,
-    setPayee,
-    setCategory,
-    setAccount,
-    setFlag,
-    setMemo,
-    setCleared,
-    setSubTxs,
-    setIsTransfer,
-    setIsSplit,
-    onAddSubTx,
-    onRemoveSubTx,
-    onSaveTransaction
+    onSaveTransaction,
+    handlers,
+    formState: {
+      date,
+      amount,
+      amountType,
+      payee,
+      category,
+      account,
+      flag,
+      memo,
+      cleared,
+      subTxs,
+      isSplit,
+      isTransfer,
+      errorMessage
+    },
+    derivedState: {
+      totalSubTxsAmount,
+      leftOverSubTxsAmount,
+      isBudgetToTrackingTransfer
+    }
   };
 }

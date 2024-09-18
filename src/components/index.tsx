@@ -18,7 +18,7 @@ import CategorySelect from "./extension/transaction/CategorySelect";
 import MemoField from "./extension/transaction/MemoField";
 import PayeeSelect from "./extension/transaction/PayeeSelect";
 import SubTransaction from "./extension/transaction/SubTransaction";
-import TransactionAdd from "./extension/transaction/TransactionAdd";
+import TransactionForm from "./extension/transaction/TransactionForm";
 
 export {
   AccountSelect,
@@ -43,5 +43,5 @@ export {
   SavedAccountsView,
   SavedCategoriesView,
   SubTransaction,
-  TransactionAdd
+  TransactionForm
 };
