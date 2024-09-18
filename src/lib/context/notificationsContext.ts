@@ -27,10 +27,9 @@ const useNotificationsProvider = () => {
   );
   const currentAlertsHydrated = currentAlerts !== undefined;
 
-  // TODO set the default value to LATEST_VERSION_ALERT_NUM
   const [latestVersionAlert, setLatestVersionAlert] = useStorage<number | undefined>(
     { key: "versionAlert", instance: chromeSyncStorage },
-    (val, isHydrated) => (!isHydrated ? undefined : !val ? 1 : val)
+    (val, isHydrated) => (!isHydrated ? undefined : !val ? LATEST_VERSION_ALERT_NUM : val)
   );
 
   // Update currently selected budget's alerts with latest data from API
