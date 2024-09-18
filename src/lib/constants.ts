@@ -12,7 +12,7 @@ export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_NEEDED_KEY = "tokenRefreshing";
+export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
   emojiMode: false,

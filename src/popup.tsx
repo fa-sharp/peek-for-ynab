@@ -4,7 +4,7 @@ import {
   MoveMoney,
   PopupLogin,
   PopupMain,
-  TransactionAdd
+  TransactionForm
 } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
@@ -39,7 +39,7 @@ export function PopupView() {
       ) : popupState.view === "main" ? (
         <PopupMain />
       ) : popupState.view === "txAdd" ? (
-        <TransactionAdd />
+        <TransactionForm />
       ) : popupState.view === "detail" && popupState.detailState?.type === "account" ? (
         <AccountDetailView />
       ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (

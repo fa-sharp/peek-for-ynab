@@ -10,7 +10,7 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
 
   return (
-    <main className={styles.mainContent}>
+    <div className={styles.pageContent}>
       <nav className={styles.nav}>
         <Link href="/" className={pathname === "/" ? styles.currentPage : ""}>
           Home
@@ -29,15 +29,13 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
           Privacy Policy
         </Link>
       </nav>
-      <div className={styles.pageContent}>{children}</div>
-      <div
-        className="mt-xxl mb-lg pt-sm"
-        style={{ borderTop: "solid 1px var(--border-light)" }}>
+      <main className={styles.mainContent}>{children}</main>
+      <footer className={styles.footer}>
         💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
         Peek for YNAB is a third-party extension, and is not affiliated with or supported
         by YNAB.
-      </div>
-    </main>
+      </footer>
+    </div>
   );
 };
 
