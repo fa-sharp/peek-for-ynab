@@ -9,7 +9,7 @@ import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 import {
   DEFAULT_BUDGET_SETTINGS,
   DEFAULT_SETTINGS,
-  REFRESH_NEEDED_KEY,
+  REFRESH_SIGNAL_KEY,
   TOKEN_STORAGE_KEY
 } from "~lib/constants";
 
@@ -90,7 +90,7 @@ const useStorageProvider = () => {
 
   /** Whether the token needs refreshing. Setting this to `true` will trigger a background job to refresh token. */
   const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
-    { key: REFRESH_NEEDED_KEY, instance: TOKEN_STORAGE },
+    { key: REFRESH_SIGNAL_KEY, instance: TOKEN_STORAGE },
     false
   );
 

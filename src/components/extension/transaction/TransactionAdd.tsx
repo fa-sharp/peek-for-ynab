@@ -203,22 +203,22 @@ export default function TransactionAdd() {
               accounts={accountsData}
               selectAccount={(selectedAccount) => {
                 setAccount(selectedAccount);
-                if (selectedAccount) {
-                  if (
-                    !category &&
-                    selectedAccount.on_budget &&
-                    payee &&
-                    "transferId" in payee &&
-                    accountsData?.find((a) => a.id === payee.transferId)?.on_budget ===
-                      false
-                  )
-                    setTimeout(() => categoryRef.current?.focus(), 50);
-                  else memoRef.current?.focus();
-                  if (selectedAccount.type === "cash") setCleared(true);
-                }
+                if (!selectedAccount) return;
+                if (
+                  !category &&
+                  selectedAccount.on_budget &&
+                  payee &&
+                  "transferId" in payee &&
+                  accountsData?.find((a) => a.id === payee.transferId)?.on_budget ===
+                    false
+                )
+                  setTimeout(() => categoryRef.current?.focus(), 50);
+                else memoRef.current?.focus();
+                if (selectedAccount.type === "cash") setCleared(true);
               }}
               label={
-                (!isSplit ? amountType === "Outflow" : totalSubTxsAmount <= 0)
+                (!isSplit && amountType === "Outflow") ||
+                (isSplit && totalSubTxsAmount <= 0)
                   ? "Account (From)"
                   : "Account (To)"
               }

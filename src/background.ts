@@ -8,7 +8,7 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget
 } from "~lib/api";
-import { REFRESH_NEEDED_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
+import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
 import {
   type CurrentAlerts,
@@ -27,7 +27,7 @@ const IS_REFRESHING_KEY = "isRefreshing";
 
 // Listen for token refresh signal
 TOKEN_STORAGE.watch({
-  [REFRESH_NEEDED_KEY]: async (c) => {
+  [REFRESH_SIGNAL_KEY]: async (c) => {
     if (
       c.newValue !== true ||
       (await CHROME_SESSION_STORAGE.get<boolean>(IS_REFRESHING_KEY))
@@ -92,7 +92,7 @@ async function refreshToken(): Promise<TokenData | null> {
 
   // signal that refresh is complete
   try {
-    await TOKEN_STORAGE.set(REFRESH_NEEDED_KEY, false);
+    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
     await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, false);
   } catch (err) {
     console.error("Failed to signal refresh completion:", err);
@@ -120,7 +120,7 @@ async function backgroundDataRefresh() {
     }
 
     const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-    const storage = new Storage({ area: syncEnabled ? "sync" : "local" });
+    const storage = syncEnabled ? new Storage({ area: "sync" }) : CHROME_LOCAL_STORAGE;
     const shownBudgetIds = await storage.get<string[]>("budgets");
     if (!shownBudgetIds) return;
 
@@ -134,6 +134,7 @@ async function backgroundDataRefresh() {
 
     const alerts: CurrentAlerts = {};
     const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
+    const notificationsEnabled = await checkPermissions(["notifications"]);
 
     // Fetch new data for each budget and update alerts
     for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
@@ -170,8 +171,7 @@ async function backgroundDataRefresh() {
         alerts[budget.id] = budgetAlerts;
 
         // create system notification if enabled and if budget alerts have changed
-        const notifPermission = await checkPermissions(["notifications"]);
-        if (!notifPermission) continue;
+        if (!notificationsEnabled) continue;
         if (JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id])) {
           createSystemNotification(budgetAlerts, budget);
         }

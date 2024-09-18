@@ -1,6 +1,6 @@
 # Peek for YNAB
 
-[![CI status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml)
+[![CI status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml)
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
 
