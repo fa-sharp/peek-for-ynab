@@ -15,6 +15,7 @@ interface Props {
   isSaving: boolean;
 }
 
+/** Payee, category, and account fields for a transfer transaction */
 export default function TransactionFormMainTransfer({
   formState,
   handlers,
