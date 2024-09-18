@@ -9,8 +9,6 @@ export interface TokenData {
 export interface AppSettings {
   /** Category and account names are reduced to emojis */
   emojiMode: boolean;
-  /** Balances are hidden unless you hover over them */
-  privateMode: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */

@@ -1,3 +1,5 @@
+import type { Account, CategoryGroupWithCategories } from "ynab";
+
 export const budgets = [
   {
     id: "97b0a016-a8c1-490c-a33c-cc06940d3d80",
@@ -41,7 +43,7 @@ export const budgets = [
   }
 ];
 
-export const accounts = [
+export const accounts: Account[] = [
   {
     id: "39c70b03-cf3b-4932-bcd6-5db25884f14d",
     name: "💰 Mutual Funds",
@@ -116,7 +118,7 @@ export const accounts = [
   }
 ];
 
-export const category_groups = [
+export const category_groups: CategoryGroupWithCategories[] = [
   {
     id: "c09cccbd-e8c4-48d1-a043-e92331e6827a",
     name: "Internal Master Category",
@@ -299,7 +301,7 @@ export const category_groups = [
         hidden: false,
         budgeted: 0,
         activity: 0,
-        balance: 0,
+        balance: -50_000,
         goal_type: "NEED",
         goal_day: 6,
         goal_cadence: 2,

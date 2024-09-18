@@ -24,7 +24,7 @@ jobs:
 
       - name: Package the extension into a zip artifact
         env:
-          PLASMO_PUBLIC_MAIN_URL: https://peek-for-ynab.fly.dev
+          PLASMO_PUBLIC_MAIN_URL: https://peekforynab.com
           PLASMO_PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
         run: pnpm run build:plasmo:zip
 

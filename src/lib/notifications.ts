@@ -2,12 +2,7 @@ import type { Account, Category, TransactionDetail } from "ynab";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "./constants";
 import type { BudgetNotificationSettings, CachedBudget } from "./types";
-import {
-  checkPermissions,
-  formatCurrency,
-  formatDateMonthAndDay,
-  isEmptyObject
-} from "./utils";
+import { formatCurrency, formatDateMonthAndDay, isEmptyObject } from "./utils";
 
 const notificationImage = new URL("../../assets/notification.png", import.meta.url);
 
@@ -189,9 +184,6 @@ export const createSystemNotification = async (
   budgetAlerts: BudgetAlerts,
   budgetData: CachedBudget
 ) => {
-  const notifPermission = await checkPermissions(["notifications"]);
-  if (!notifPermission) return;
-
   IS_DEV && console.log("Creating system notification for budget: ", budgetData);
 
   const { numUnapprovedTxs, accounts, cats } = budgetAlerts;
@@ -229,4 +221,6 @@ export const createSystemNotification = async (
       isClickable: true
     });
   }
+
+  return message;
 };

@@ -46,7 +46,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
             checked={settings?.notifications.checkImports ?? false}
             onChange={(e) => changeNotifSetting("checkImports", e.target.checked)}
           />
-          New/unapproved transactions
+          Unapproved transactions
         </label>
         <label
           className="flex-row gap-xs"

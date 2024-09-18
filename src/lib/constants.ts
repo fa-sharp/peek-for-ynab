@@ -15,7 +15,6 @@ export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_NEEDED_KEY = "tokenRefreshing";
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
-  privateMode: false,
   emojiMode: false,
   currentTabAccess: false,
   theme: "auto",
