@@ -17,7 +17,7 @@ import {
   updateIconAndTooltip
 } from "~lib/notifications";
 import { queryClient } from "~lib/queryClient";
-import { IS_DEV, ONE_DAY_IN_MILLIS, isEmptyObject } from "~lib/utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, checkPermissions, isEmptyObject } from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
@@ -168,9 +168,13 @@ async function backgroundDataRefresh() {
       });
       if (budgetAlerts) {
         alerts[budget.id] = budgetAlerts;
-        // create system notification if budget alerts have changed
-        if (JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id]))
+
+        // create system notification if enabled and if budget alerts have changed
+        const notifPermission = await checkPermissions(["notifications"]);
+        if (!notifPermission) continue;
+        if (JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id])) {
           createSystemNotification(budgetAlerts, budget);
+        }
       }
     }
 

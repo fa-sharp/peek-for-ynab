@@ -5,7 +5,6 @@ import type { CachedBudget } from "./context/ynabContext";
 import {
   IS_DEV,
   ONE_DAY_IN_MILLIS,
-  checkPermissions,
   formatCurrency,
   formatDateMonthAndDay,
   isEmptyObject
@@ -191,9 +190,6 @@ export const createSystemNotification = async (
   budgetAlerts: BudgetAlerts,
   budgetData: CachedBudget
 ) => {
-  const notifPermission = await checkPermissions(["notifications"]);
-  if (!notifPermission) return;
-
   IS_DEV && console.log("Creating system notification for budget: ", budgetData);
 
   const { numUnapprovedTxs, accounts, cats } = budgetAlerts;
@@ -231,4 +227,6 @@ export const createSystemNotification = async (
       isClickable: true
     });
   }
+
+  return message;
 };
