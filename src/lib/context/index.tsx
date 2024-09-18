@@ -1,38 +1,13 @@
-import {
-  QueryClient,
-  QueryClientProvider,
-  type QueryFilters
-} from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import {
-  type PersistedQuery,
-  experimental_createPersister
-} from "@tanstack/react-query-persist-client";
-import { del, get, set } from "idb-keyval";
 import type { ReactNode } from "react";
 
-import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "~lib/utils";
+import { queryClient } from "~lib/queryClient";
 
 import { AuthProvider, useAuthContext } from "./authContext";
+import { NotificationsProvider, useNotificationsContext } from "./notificationsContext";
 import { StorageProvider, useStorageContext } from "./storageContext";
 import { YNABProvider, useYNABContext } from "./ynabContext";
-
-/** Queries that should be cached */
-const cachedQueryKeys = new Set(["budgets", "payees"]);
-
-/** React Query client, default settings */
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 60 * 5, // 30 seconds in prod, 5 minutes in dev
-      retry: 1, // only retry once if there's an error,
-      persister: createIdbPersister("ynab", {
-        predicate: ({ queryKey }) =>
-          typeof queryKey[0] === "string" && cachedQueryKeys.has(queryKey[0])
-      })
-    }
-  }
-});
 
 /** Provides auth, storage, and data contexts to the containing components */
 const AppProvider = ({ children }: { children: ReactNode }) => (
@@ -40,27 +15,18 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
       <AuthProvider>
-        <YNABProvider>{children}</YNABProvider>
+        <YNABProvider>
+          <NotificationsProvider>{children}</NotificationsProvider>
+        </YNABProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StorageProvider>
 );
 
-export { AppProvider, useAuthContext, useYNABContext, useStorageContext };
-
-/** Creates an Indexed DB persister for React Query */
-function createIdbPersister(prefix: string, filters: QueryFilters) {
-  return experimental_createPersister<PersistedQuery>({
-    prefix,
-    filters,
-    maxAge: TWO_WEEKS_IN_MILLIS,
-    storage: {
-      getItem: (key) => get(key),
-      setItem: (key, val) => set(key, val),
-      removeItem: (key) => del(key)
-    },
-    serialize: (query) => query,
-    deserialize: (query) => query,
-    buster: "v1"
-  });
-}
+export {
+  AppProvider,
+  useAuthContext,
+  useYNABContext,
+  useNotificationsContext,
+  useStorageContext
+};

@@ -33,9 +33,7 @@ export default function BudgetSelect({
       className="select rounded"
       aria-label="Budget selection"
       style={{
-        flex: 1,
-        width: "100%",
-        maxWidth: emojiMode ? "5em" : "11em",
+        maxWidth: !emojiMode ? "11em" : "5em",
         fontWeight: 500,
         textOverflow: "ellipsis"
       }}

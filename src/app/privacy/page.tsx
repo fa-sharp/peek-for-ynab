@@ -1,17 +1,16 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import Link from "next/link";
 import packageJson from "package.json";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Privacy Policy | Peek for YNAB"
+};
 
 const { displayName: APP_NAME } = packageJson;
 
 function PrivacyPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>{APP_NAME} - Privacy Policy</title>
-      </Head>
+    <>
       <h1>{APP_NAME}</h1>
       <h2>Privacy Policy</h2>
       <p>
@@ -21,7 +20,9 @@ function PrivacyPage() {
         YNAB through their API to access your budget data - including your budgets, budget
         settings, categories, accounts, payees, and balances. {APP_NAME} cannot access
         your YNAB login credentials, nor any credentials to your financial institution
-        accounts.
+        accounts. The extension also communicates with a separate authentication server in
+        order to retrieve and exchange OAuth tokens from YNAB to keep the user logged in.
+        No other data is passed to the authentication server.
       </p>
       <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
@@ -33,8 +34,8 @@ function PrivacyPage() {
       </p>
       <p>
         If you enable the sync option in the extension settings, {APP_NAME} will save your
-        settings and the unique IDs of your pinned items to your browser profile, in order
-        to sync them to your other devices.
+        settings and your pinned items to your browser profile, in order to sync them to
+        your other devices.
       </p>
       <p>
         If tab access is allowed in the settings, {APP_NAME} will be able to read the
@@ -49,9 +50,9 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Mar 16, 2024</em>
+        <em>Last updated: Aug 24, 2024</em>
       </p>
-    </WebLayout>
+    </>
   );
 }
 

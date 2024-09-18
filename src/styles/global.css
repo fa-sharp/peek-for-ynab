@@ -94,6 +94,10 @@ button:focus-visible {
   justify-content: space-between;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .min-w-0 {
   min-width: 0;
 }
@@ -176,6 +180,12 @@ button:focus-visible {
   font-weight: 600;
 }
 
+.heading-small {
+  margin-block: var(--spacing-sm);
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
 .heading-bordered {
   border-bottom: solid 1px var(--border-light);
 }
@@ -223,9 +233,6 @@ li:last-child .balance-display {
   border: none;
   border-radius: 50%;
 }
-.icon-button.spin {
-  animation: spin 1s linear infinite;
-}
 .icon-button.noaction {
   cursor: initial;
 }
@@ -242,6 +249,9 @@ li:last-child .balance-display {
   font-size: inherit;
   background-color: var(--background);
   color: currentColor;
+}
+.select.small {
+  padding: 0.1em;
 }
 
 .select-dropdown-list {
@@ -358,6 +368,10 @@ li:last-child .balance-display {
   margin-bottom: var(--spacing-lg);
 }
 
+.pt-sm {
+  padding-top: var(--spacing-sm);
+}
+
 .pb-sm {
   padding-bottom: var(--spacing-sm);
 }
@@ -366,12 +380,21 @@ li:last-child .balance-display {
   padding-bottom: var(--spacing-lg);
 }
 
+.font-bold {
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
 .font-big {
   font-size: 2em;
 }
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

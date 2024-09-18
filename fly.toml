@@ -1,0 +1,32 @@
+# fly.toml app configuration file generated for peek-for-ynab on 2024-08-22T01:08:29-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'peek-for-ynab'
+primary_region = 'ewr'
+
+[http_service]
+internal_port = 3000
+force_https = true
+auto_stop_machines = 'stop'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
+
+[[statics]]
+guest_path = "/.next/static"
+url_prefix = "/_next/static"
+
+[[statics]]
+guest_path = "/public/screenshots"
+url_prefix = "/screenshots"
+
+[[statics]]
+guest_path = "/public/scripts"
+url_prefix = "/scripts"
+
+[[vm]]
+memory = '512mb'
+cpu_kind = 'shared'
+cpus = 1

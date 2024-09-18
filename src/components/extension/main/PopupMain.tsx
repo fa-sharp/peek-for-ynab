@@ -4,11 +4,13 @@ import { useEffect } from "react";
 import {
   AccountsView,
   CategoriesView,
+  NewVersionAlert,
+  NotificationsView,
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView
 } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupMain() {
   const {
@@ -21,6 +23,7 @@ export default function PopupMain() {
   } = useStorageContext();
   const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
     useYNABContext();
+  const { newVersionAlert } = useNotificationsContext();
 
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
@@ -59,9 +62,11 @@ export default function PopupMain() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      {newVersionAlert && <NewVersionAlert />}
       <PopupNav />
       {categoriesData && accountsData && (
         <>
+          <NotificationsView />
           <SavedCategoriesView />
           <SavedAccountsView />
           <CategoriesView />

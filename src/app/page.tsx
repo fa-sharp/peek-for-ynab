@@ -1,14 +1,13 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import Image from "next/image";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Peek for YNAB"
+};
 
 function IndexPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>Peek for YNAB</title>
-      </Head>
+    <>
       <h1>Peek for YNAB</h1>
       <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
@@ -48,11 +47,14 @@ function IndexPage() {
         <li>View your current category and account balances</li>
         <li>Pin your favorite categories and accounts</li>
         <li>Add transactions directly from the extension</li>
+        <li>
+          Customizable alerts for overspending, new imports, and reconciliation reminders
+        </li>
         <li>Support for split transactions</li>
         <li>Support for multiple budgets</li>
         <li>Dark mode</li>
       </ul>
-    </WebLayout>
+    </>
   );
 }
 

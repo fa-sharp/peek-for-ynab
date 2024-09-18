@@ -1,14 +1,13 @@
-import Head from "next/head";
+import type { Metadata } from "next";
 import { AlertTriangle, Check, Refresh } from "tabler-icons-react";
 
-import WebLayout from "~components/website/WebLayout";
+export const metadata: Metadata = {
+  title: "Help | Peek for YNAB"
+};
 
 function HelpPage() {
   return (
-    <WebLayout>
-      <Head>
-        <title>Peek for YNAB - Help</title>
-      </Head>
+    <>
       <h1>Peek for YNAB</h1>
       <h2>Help/FAQ</h2>
       <ul>
@@ -51,6 +50,23 @@ function HelpPage() {
         </li>
         <li>
           <h3>
+            I have enabled system notifications in the settings, but they are not showing
+            up on my device.
+          </h3>
+          <p>
+            You may need to enable notifications in your system settings: here are the
+            instructions to access those settings on{" "}
+            <a href="https://support.microsoft.com/en-us/windows/change-notification-settings-in-windows-8942c744-6198-fe56-4639-34320cf9444e">
+              Windows
+            </a>{" "}
+            and{" "}
+            <a href="https://support.apple.com/en-sa/guide/mac-help/mh40583/mac">Mac</a>.
+            Look for your browser and make sure notifications are enabled. Keep in mind
+            that this is currently an experimental feature and may not work as expected.
+          </p>
+        </li>
+        <li>
+          <h3>
             I use Direct Import (linked accounts) in YNAB. How will that work with
             transactions I enter via the extension?
           </h3>
@@ -64,9 +80,9 @@ function HelpPage() {
           <h3>I do not use Direct Import in YNAB. Should I change any settings?</h3>
           <p>
             If you will enter a lot of your transactions using the extension, you may want
-            to uncheck the <b>Approved</b> setting under <b>Transaction defaults</b>, so
-            that you will be prompted to double-check and Approve the transactions in
-            YNAB.
+            to leave them Unapproved so that you will be prompted to double-check and
+            Approve the transactions in YNAB. In the settings page, click the gear ⚙️ icon
+            next to the budget name, and then uncheck the <b>Approved</b> setting.
           </p>
         </li>
         <li>
@@ -89,10 +105,15 @@ function HelpPage() {
         </li>
         <li>
           <h3>I have an issue, bug report, or further questions.</h3>
-          <p>Please contact the developer at hello (at) fasharp (dot) io.</p>
+          <p>
+            Please keep in mind that Peek for YNAB is a third-party extension, and is not
+            officialy supported by YNAB (i.e. please <b>do not</b> reach out to their
+            support team for bug reports or feature requests). You may contact the
+            developer at peek (at) fasharp (dot) io.
+          </p>
         </li>
       </ul>
-    </WebLayout>
+    </>
   );
 }
 

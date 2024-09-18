@@ -35,7 +35,7 @@ test("Reads persisted settings on initialization", async () => {
   await chrome.storage.local.set({
     settings: JSON.stringify({
       ...DEFAULT_SETTINGS,
-      privateMode: true
+      animations: false
     })
   });
   const { result } = renderHook(useStorageContext, {
@@ -43,7 +43,7 @@ test("Reads persisted settings on initialization", async () => {
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
-  expect(result.current.settings?.privateMode).toBe(true);
+  expect(result.current.settings?.animations).toBe(false);
 });
 
 test("Can save token data", async () => {

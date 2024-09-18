@@ -1,7 +1,7 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 import { AccountView, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
@@ -9,6 +9,7 @@ import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData } = useYNABContext();
   const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
+  const { currentAlerts } = useNotificationsContext();
 
   if (
     !savedAccountsData ||
@@ -41,6 +42,7 @@ export default function SavedAccountsView() {
                   <AccountView
                     key={account.id}
                     account={account}
+                    alerts={currentAlerts?.[selectedBudgetData.id]?.accounts[account.id]}
                     currencyFormat={selectedBudgetData?.currencyFormat}
                     settings={settings}
                     actionElementsLeft={

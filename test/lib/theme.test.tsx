@@ -2,7 +2,7 @@ import { renderHook } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 import "vitest-dom/extend-expect";
 
-import { useSetColorTheme } from "~lib/utils";
+import { useSetColorTheme } from "~lib/hooks";
 
 beforeEach(() => {
   window.localStorage.clear();
