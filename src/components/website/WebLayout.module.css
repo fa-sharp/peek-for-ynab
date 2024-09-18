@@ -1,3 +1,8 @@
+.pageContent {
+  max-width: 90ch;
+  margin-inline: auto;
+}
+
 .nav {
   display: flex;
   gap: 1rem;
@@ -10,12 +15,12 @@
 }
 
 .mainContent {
-  max-width: 90ch;
-  margin-top: 1rem;
+  max-width: 85ch;
   margin-inline: auto;
 }
 
-.pageContent {
-  max-width: 85ch;
-  margin-inline: auto;
+.footer {
+  margin-top: 2.5rem;
+  padding: 6px;
+  border-top: solid 1px var(--border-light);
 }
