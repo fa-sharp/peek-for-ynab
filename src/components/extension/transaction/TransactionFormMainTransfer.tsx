@@ -11,7 +11,7 @@ interface Props {
   isBudgetToTrackingTransfer: boolean;
   accountsData?: Account[];
   categoriesData?: Category[];
-  memoRef: RefObject<HTMLInputElement>;
+  memoRef?: RefObject<HTMLInputElement>;
   isSaving: boolean;
 }
 
@@ -64,7 +64,7 @@ export default function TransactionFormMainTransfer({
               !formState.category
             )
               setTimeout(() => categoryRef.current?.focus(), 50);
-            else memoRef.current?.focus();
+            else memoRef?.current?.focus();
           }
         }}
         label={payeeDirection === "to" ? "Payee (To)" : "Payee (From)"}
@@ -77,7 +77,7 @@ export default function TransactionFormMainTransfer({
           categories={categoriesData}
           selectCategory={(selectedCategory) => {
             handlers.setCategory(selectedCategory);
-            if (selectedCategory) memoRef.current?.focus();
+            if (selectedCategory) memoRef?.current?.focus();
           }}
           disabled={isSaving}
         />
@@ -91,7 +91,7 @@ export default function TransactionFormMainTransfer({
           if (selectedAccount) {
             setTimeout(() => {
               if (categoryRef.current) categoryRef.current.focus();
-              else memoRef.current?.focus();
+              else memoRef?.current?.focus();
             }, 50);
             if (selectedAccount.type === "cash") handlers.setCleared(true);
           }

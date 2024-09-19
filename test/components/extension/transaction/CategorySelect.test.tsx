@@ -2,12 +2,20 @@ import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
+import { category_groups } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 import type { Category } from "ynab";
 
 import { CategorySelect } from "~components";
 import { useYNABContext } from "~lib/context";
+
+const electricCategory = category_groups
+  .find((cg) => cg.name === "Bills")!
+  .categories.find((c) => c.name === "Electric")!;
+const shoppingCategory = category_groups
+  .find((cg) => cg.name === "Non-Monthly")!
+  .categories.find((c) => c.name.includes("Shopping"))!;
 
 beforeEach(async () => {
   await chrome.storage.local.set({
@@ -38,14 +46,16 @@ test("Mouse behavior works as expected", async () => {
     "Category list appears on click"
   ).toBeGreaterThan(3);
 
-  const electricCategory = screen.getByRole("listbox").children[3];
-  expect(electricCategory).toHaveTextContent("Electric");
-  await user.hover(electricCategory);
-  expect(electricCategory, "Highlights category on hover").toHaveClass("highlighted");
-  await user.click(electricCategory);
-  expect(selectedCategory, "Selects the proper category on click").toMatchObject({
-    id: "a9586962-70e1-4251-947c-2bdf6f4d04f9"
-  });
+  const electricCategoryListItem = screen.getByRole("listbox").children[3];
+  expect(electricCategoryListItem).toHaveTextContent("Electric");
+  await user.hover(electricCategoryListItem);
+  expect(electricCategoryListItem, "Highlights category on hover").toHaveClass(
+    "highlighted"
+  );
+  await user.click(electricCategoryListItem);
+  expect(selectedCategory, "Selects the proper category on click").toMatchObject(
+    electricCategory
+  );
 });
 
 test("Keyboard behavior works as expected", async () => {
@@ -80,9 +90,9 @@ test("Keyboard behavior works as expected", async () => {
     "highlighted"
   );
   await user.keyboard("{ArrowDown}{ArrowDown}{Enter}");
-  expect(selectedCategory, "Enter key selects the proper category").toMatchObject({
-    id: "a9586962-70e1-4251-947c-2bdf6f4d04f9"
-  });
+  expect(selectedCategory, "Enter key selects the proper category").toMatchObject(
+    electricCategory
+  );
 });
 
 test("Filtering works as expected", async () => {
@@ -105,7 +115,7 @@ test("Filtering works as expected", async () => {
   expect(screen.getByRole("listbox").children[0]).toHaveTextContent("Non-Monthly");
   expect(screen.getByRole("listbox").children[1]).toHaveTextContent("Shopping");
   await user.keyboard("{ArrowDown}{Enter}");
-  expect(selectedCategory).toMatchObject({ id: "19138540-fde1-416a-8172-60e875914fbd" });
+  expect(selectedCategory).toMatchObject(shoppingCategory);
 });
 
 test("Ready to Assign appears as first category", async () => {
@@ -145,4 +155,28 @@ test("Credit Card Payment categories don't appear", async () => {
 
   await user.click(screen.getByLabelText("open", { exact: false }));
   expect(screen.queryByText("Credit Card Payments")).toBeNull();
+});
+
+test("Clear button works as expected", async () => {
+  const wrapper = createTestAppWrapper();
+
+  const { result } = renderHook(useYNABContext, { wrapper });
+  await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
+
+  const user = userEvent.setup();
+  let selectedCategory: Category | null = null;
+  render(
+    <CategorySelect
+      selectCategory={(c) => (selectedCategory = c)}
+      categories={result.current.categoriesData}
+    />,
+    { wrapper }
+  );
+
+  expect(selectedCategory).toBeNull();
+  await user.keyboard("{Tab}{ArrowDown}{Enter}");
+  expect(selectedCategory).toMatchObject({ name: "Inflow: Ready to Assign" });
+
+  await user.click(screen.getByLabelText("Clear category"));
+  expect(selectedCategory).toBeNull();
 });
