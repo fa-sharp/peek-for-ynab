@@ -19,8 +19,8 @@ guest_path = "/.next/static"
 url_prefix = "/_next/static"
 
 [[statics]]
-guest_path = "/public/screenshots"
-url_prefix = "/screenshots"
+guest_path = "/public/img"
+url_prefix = "/img"
 
 [[statics]]
 guest_path = "/public/scripts"

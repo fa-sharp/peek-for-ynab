@@ -39,7 +39,7 @@ function IndexPage() {
         </li>
       </ul>
       <Image
-        src="/screenshots/notification-settings.gif"
+        src="/img/screenshots/notification-settings.gif"
         alt={"Demo of notification settings"}
         className="screenshot"
         width={220}
