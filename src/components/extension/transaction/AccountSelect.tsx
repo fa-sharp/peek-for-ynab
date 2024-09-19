@@ -106,7 +106,7 @@ function AccountSelect(
               selectAccount(null);
               setTimeout(() => inputRef.current?.focus(), 50);
             }}>
-            <X />
+            <X aria-hidden />
           </button>
         ) : (
           <button
@@ -119,7 +119,7 @@ function AccountSelect(
               setHighlightedIndex(0);
               inputRef.current?.focus();
             }}>
-            <ChevronDown />
+            <ChevronDown aria-hidden />
           </button>
         )}
 
