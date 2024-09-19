@@ -11,6 +11,11 @@ function IndexPage() {
     <>
       <h1>Peek for YNAB</h1>
       <h2>Release Notes</h2>
+      <h3>0.20.1 - Sep 20, 2024</h3>
+      <ul>
+        <li>The current budget settings are expanded when opening the settings page</li>
+        <li>Small performance and accessibility improvements</li>
+      </ul>
       <h3>0.20.0 - Sep 17, 2024</h3>
       <ul>
         <li>
