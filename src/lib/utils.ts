@@ -6,23 +6,32 @@ export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
+const currencyFormatterCache = new Map<string, (millis: number) => string>();
+
 export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const formatter = new Intl.NumberFormat("default", {
+  const formatterKey = currencyFormat.iso_code + currencyFormat.decimal_digits;
+  const cachedFormatter = currencyFormatterCache.get(formatterKey);
+  if (cachedFormatter) return cachedFormatter;
+
+  const numberFormat = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
   });
-  return (millis: number) => {
+  const newFormatter = (millis: number) => {
     const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
       millis,
       currencyFormat.decimal_digits
     );
-    return formatter.format(currencyAmount);
+    return numberFormat.format(currencyAmount);
   };
+  currencyFormatterCache.set(formatterKey, newFormatter);
+
+  return newFormatter;
 };
 
 export const formatCurrency = (
