@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
@@ -40,6 +40,7 @@ const useYNABProvider = () => {
   } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
+  const queryClient = useQueryClient();
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
@@ -89,15 +90,22 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      return await fetchCategoryGroupsForBudget(ynabAPI, selectedBudgetId);
+      const queryState = queryClient.getQueryState<{
+        serverKnowledge: number;
+        categoryGroups: ynab.CategoryGroupWithCategories[];
+      }>(queryKey);
+      return await fetchCategoryGroupsForBudget(ynabAPI, selectedBudgetId, queryState);
     }
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
   const categoriesData = useMemo(
-    () => categoryGroupsData?.flatMap((categoryGroup) => categoryGroup.categories),
+    () =>
+      categoryGroupsData?.categoryGroups.flatMap(
+        (categoryGroup) => categoryGroup.categories
+      ),
     [categoryGroupsData]
   );
 
@@ -213,7 +221,7 @@ const useYNABProvider = () => {
     /** API data: List of all user's budgets */
     budgetsData,
     /** API data: List of all non-hidden category groups in current budget, with categories contained in each one */
-    categoryGroupsData,
+    categoryGroupsData: categoryGroupsData?.categoryGroups,
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,

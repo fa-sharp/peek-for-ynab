@@ -1,6 +1,11 @@
-import { GetTransactionsTypeEnum, type api } from "ynab";
+import type { QueryState } from "@tanstack/query-core";
+import {
+  type CategoryGroupWithCategories,
+  GetTransactionsTypeEnum,
+  type api
+} from "ynab";
 
-import { IS_DEV } from "./utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "./utils";
 
 /** Fetch budgets from the YNAB API */
 export async function fetchBudgets(ynabAPI: api) {
@@ -26,17 +31,73 @@ export async function fetchBudgets(ynabAPI: api) {
 /** Fetch category groups for this budget from the YNAB API */
 export async function fetchCategoryGroupsForBudget(
   ynabAPI: api,
-  selectedBudgetId: string
+  selectedBudgetId: string,
+  queryState?: QueryState<{
+    serverKnowledge: number;
+    categoryGroups: CategoryGroupWithCategories[];
+  }>
 ) {
-  const response = await ynabAPI.categories.getCategories(selectedBudgetId);
-  const categoryGroups = response.data.category_groups.filter(
-    (group) => !group.hidden // filter out hidden groups
+  const usingDeltaRequest =
+    !!queryState?.data && queryState.dataUpdatedAt > Date.now() - ONE_DAY_IN_MILLIS;
+  const response = await ynabAPI.categories.getCategories(
+    selectedBudgetId,
+    usingDeltaRequest ? queryState.data?.serverKnowledge : undefined
   );
+
+  let categoryGroups: CategoryGroupWithCategories[];
+  if (usingDeltaRequest && queryState.data) {
+    categoryGroups = mergeCategoryGroupsData(
+      queryState.data.categoryGroups,
+      response.data.category_groups
+    );
+  } else {
+    categoryGroups = response.data.category_groups;
+  }
+
+  // filter out hidden groups and categories
+  categoryGroups = categoryGroups.filter((group) => !group.hidden);
   categoryGroups.forEach(
-    // filter out hidden categories
-    (group) => (group.categories = group.categories.filter((c) => !c.hidden))
+    (cg) => (cg.categories = cg.categories.filter((c) => !c.hidden))
   );
-  IS_DEV && console.log("Fetched categories!", categoryGroups);
+  IS_DEV &&
+    console.log("Fetched categories!", {
+      categoryGroups,
+      usingDeltaRequest,
+      serverKnowledge: response.data.server_knowledge
+    });
+  return { categoryGroups, serverKnowledge: response.data.server_knowledge };
+}
+
+function mergeCategoryGroupsData(
+  existingData: CategoryGroupWithCategories[],
+  deltaResponse: CategoryGroupWithCategories[]
+) {
+  let categoryGroups = [...existingData];
+  for (const categoryGroupDelta of deltaResponse) {
+    if (categoryGroupDelta.deleted) {
+      categoryGroups = categoryGroups.filter((cg) => cg.id !== categoryGroupDelta.id);
+      continue;
+    }
+
+    const categoryGroup = categoryGroups.find((cg) => cg.id === categoryGroupDelta.id);
+    if (categoryGroup) {
+      categoryGroup.name = categoryGroupDelta.name;
+      categoryGroup.hidden = categoryGroupDelta.hidden;
+
+      const categories = categoryGroup.categories;
+      categoryGroupDelta.categories.forEach((categoryDelta) => {
+        const categoryIdx = categories.findIndex((c) => c.id === categoryDelta.id);
+        if (categoryIdx !== -1 && !categoryDelta.deleted) {
+          categories.splice(categoryIdx, 1, categoryDelta);
+        } else if (categoryIdx !== -1 && categoryDelta.deleted) {
+          categories.splice(categoryIdx, 1);
+        } else categories.push(categoryDelta);
+      });
+    } else {
+      categoryGroups.push(categoryGroupDelta);
+    }
+  }
+
   return categoryGroups;
 }
 

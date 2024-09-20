@@ -7,13 +7,13 @@ import { del, get, set } from "idb-keyval";
 
 import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "./utils";
 
-const cachedQueryKeys = new Set(["budgets", "payees"]);
+const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups", "accounts"]);
 
 /** React Query client, default settings */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 60 * 5, // 30 seconds in prod, 5 minutes in dev
+      staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 10, // TODO evaluate stale time
       retry: 1, // only retry once if there's an error,
       persister: createIdbPersister("ynab", {
         predicate: ({ queryKey }) =>
@@ -36,6 +36,6 @@ function createIdbPersister(prefix: string, filters: QueryFilters) {
     },
     serialize: (query) => query,
     deserialize: (query) => query,
-    buster: "v1"
+    buster: "v2"
   });
 }
