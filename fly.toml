@@ -27,6 +27,6 @@ guest_path = "/public/scripts"
 url_prefix = "/scripts"
 
 [[vm]]
-memory = '512mb'
+memory = '256mb'
 cpu_kind = 'shared'
 cpus = 1
