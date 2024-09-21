@@ -28,8 +28,8 @@ export async function fetchBudgets(ynabAPI: api) {
   }));
 }
 
-/** Use a delta request if cached data is fresher than this (6 hours) */
-const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 6;
+/** Use a delta request if cached data is fresher than this (2 hours) */
+const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 2;
 
 /** Fetch category groups for this budget from the YNAB API */
 export async function fetchCategoryGroupsForBudget(
