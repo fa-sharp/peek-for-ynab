@@ -4,7 +4,6 @@ export const IS_DEV = process.env.NODE_ENV === "development";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
-export const TWO_WEEKS_IN_MILLIS = ONE_DAY_IN_MILLIS * 7 * 2;
 
 const currencyFormatterCache = new Map<string, (millis: number) => string>();
 

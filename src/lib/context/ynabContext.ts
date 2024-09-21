@@ -55,7 +55,7 @@ const useYNABProvider = () => {
     isFetching: isRefreshingBudgets
   } = useQuery({
     queryKey: ["budgets"],
-    staleTime: ONE_DAY_IN_MILLIS * 2,
+    staleTime: ONE_DAY_IN_MILLIS * 7,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;

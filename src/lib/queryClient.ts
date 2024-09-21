@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-import { TWO_WEEKS_IN_MILLIS } from "./utils";
+import { ONE_DAY_IN_MILLIS } from "./utils";
 
 const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups", "accounts"]);
 
@@ -28,7 +28,7 @@ function createIdbPersister(prefix: string, filters: QueryFilters) {
   return experimental_createPersister<PersistedQuery>({
     prefix,
     filters,
-    maxAge: TWO_WEEKS_IN_MILLIS,
+    maxAge: ONE_DAY_IN_MILLIS * 7,
     storage: {
       getItem: (key) => get(key),
       setItem: (key, val) => set(key, val),
