@@ -13,7 +13,7 @@ import {
 
 import { BudgetSelect, IconButton, IconSpan } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-import { isDataFresh } from "~lib/utils";
+import { isDataFreshForDisplay } from "~lib/utils";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
@@ -74,7 +74,8 @@ export default function PopupNav() {
           ) : globalIsFetching ? (
             <Refresh aria-hidden />
           ) : !selectedBudgetId ||
-            (isDataFresh(categoriesLastUpdated) && isDataFresh(accountsLastUpdated)) ? (
+            (isDataFreshForDisplay(categoriesLastUpdated) &&
+              isDataFreshForDisplay(accountsLastUpdated)) ? (
             <Check aria-hidden color="var(--success)" />
           ) : (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates data is stale/old
