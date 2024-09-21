@@ -58,6 +58,9 @@ export const isEmptyObject = (objectName: object) => {
   return true;
 };
 
+/** Check if displayed data is fresh based on `lastUpdated` time (<4 minutes old) */
+export const isDataFresh = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
+
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
