@@ -16,7 +16,7 @@ import {
   getBudgetAlerts,
   updateIconAndTooltip
 } from "~lib/notifications";
-import { queryClient } from "~lib/queryClient";
+import { createQueryClient } from "~lib/queryClient";
 import { IS_DEV, ONE_DAY_IN_MILLIS, checkPermissions, isEmptyObject } from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
@@ -126,6 +126,9 @@ async function backgroundDataRefresh() {
 
     IS_DEV && console.log("Background refresh: updating alerts...");
     const ynabAPI = new api(tokenData.accessToken);
+    const queryClient = createQueryClient({
+      staleTime: 14 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 14 minutes
+    });
     const budgetsData = await queryClient.fetchQuery({
       queryKey: ["budgets"],
       staleTime: ONE_DAY_IN_MILLIS * 7,
