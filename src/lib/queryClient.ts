@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-import { IS_PRODUCTION, TWO_WEEKS_IN_MILLIS } from "./utils";
+import { TWO_WEEKS_IN_MILLIS } from "./utils";
 
 const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups", "accounts"]);
 
@@ -13,7 +13,7 @@ const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups", "account
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: IS_PRODUCTION ? 1000 * 30 : 1000 * 10, // TODO evaluate stale time
+      staleTime: 30 * 1000, // data is fresh for 30 seconds
       retry: 1, // only retry once if there's an error,
       persister: createIdbPersister("ynab", {
         predicate: ({ queryKey }) =>

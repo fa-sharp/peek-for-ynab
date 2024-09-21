@@ -92,20 +92,18 @@ const useYNABProvider = () => {
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      const queryState = queryClient.getQueryState<{
-        serverKnowledge: number;
-        categoryGroups: ynab.CategoryGroupWithCategories[];
-      }>(queryKey);
-      return await fetchCategoryGroupsForBudget(ynabAPI, selectedBudgetId, queryState);
-    }
+      return await fetchCategoryGroupsForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.categoryGroups
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
   const categoriesData = useMemo(
-    () =>
-      categoryGroupsData?.categoryGroups.flatMap(
-        (categoryGroup) => categoryGroup.categories
-      ),
+    () => categoryGroupsData?.flatMap((categoryGroup) => categoryGroup.categories),
     [categoryGroupsData]
   );
 
@@ -133,10 +131,15 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      return await fetchAccountsForBudget(ynabAPI, selectedBudgetId);
-    }
+      return await fetchAccountsForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.accounts
   });
 
   const refreshCategoriesAndAccounts = useCallback(
@@ -195,10 +198,15 @@ const useYNABProvider = () => {
     useQuery({
       queryKey: ["accounts", { budgetId }],
       enabled: Boolean(ynabAPI),
-      queryFn: async () => {
+      queryFn: async ({ queryKey }) => {
         if (!ynabAPI) return;
-        return await fetchAccountsForBudget(ynabAPI, budgetId);
-      }
+        return await fetchAccountsForBudget(
+          ynabAPI,
+          budgetId,
+          queryClient.getQueryState(queryKey)
+        );
+      },
+      select: (data) => data?.accounts
     });
 
   const addTransaction = useCallback(
@@ -221,7 +229,7 @@ const useYNABProvider = () => {
     /** API data: List of all user's budgets */
     budgetsData,
     /** API data: List of all non-hidden category groups in current budget, with categories contained in each one */
-    categoryGroupsData: categoryGroupsData?.categoryGroups,
+    categoryGroupsData,
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,

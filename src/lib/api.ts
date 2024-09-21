@@ -1,11 +1,11 @@
-import type { QueryState } from "@tanstack/query-core";
 import {
+  type Account,
   type CategoryGroupWithCategories,
   GetTransactionsTypeEnum,
   type api
 } from "ynab";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "./utils";
+import { IS_DEV } from "./utils";
 
 /** Fetch budgets from the YNAB API */
 export async function fetchBudgets(ynabAPI: api) {
@@ -28,26 +28,32 @@ export async function fetchBudgets(ynabAPI: api) {
   }));
 }
 
+/** Use a delta request if cached data is fresher than this (6 hours) */
+const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 6;
+
 /** Fetch category groups for this budget from the YNAB API */
 export async function fetchCategoryGroupsForBudget(
   ynabAPI: api,
   selectedBudgetId: string,
-  queryState?: QueryState<{
-    serverKnowledge: number;
-    categoryGroups: CategoryGroupWithCategories[];
-  }>
+  cache?: {
+    data?: {
+      serverKnowledge: number;
+      categoryGroups: CategoryGroupWithCategories[];
+    };
+    dataUpdatedAt: number;
+  }
 ) {
   const usingDeltaRequest =
-    !!queryState?.data && queryState.dataUpdatedAt > Date.now() - ONE_DAY_IN_MILLIS;
+    !!cache?.data && cache.dataUpdatedAt > Date.now() - DELTA_REQUEST_TIME;
   const response = await ynabAPI.categories.getCategories(
     selectedBudgetId,
-    usingDeltaRequest ? queryState.data?.serverKnowledge : undefined
+    usingDeltaRequest ? cache.data?.serverKnowledge : undefined
   );
 
   let categoryGroups: CategoryGroupWithCategories[];
-  if (usingDeltaRequest && queryState.data) {
-    categoryGroups = mergeCategoryGroupsData(
-      queryState.data.categoryGroups,
+  if (usingDeltaRequest && cache.data) {
+    categoryGroups = mergeCategoryGroupsDataFromDelta(
+      cache.data.categoryGroups,
       response.data.category_groups
     );
   } else {
@@ -68,48 +74,91 @@ export async function fetchCategoryGroupsForBudget(
   return { categoryGroups, serverKnowledge: response.data.server_knowledge };
 }
 
-function mergeCategoryGroupsData(
+function mergeCategoryGroupsDataFromDelta(
   existingData: CategoryGroupWithCategories[],
   deltaResponse: CategoryGroupWithCategories[]
 ) {
-  let categoryGroups = [...existingData];
+  let categoryGroups = structuredClone(existingData);
   for (const categoryGroupDelta of deltaResponse) {
     if (categoryGroupDelta.deleted) {
       categoryGroups = categoryGroups.filter((cg) => cg.id !== categoryGroupDelta.id);
       continue;
     }
 
-    const categoryGroup = categoryGroups.find((cg) => cg.id === categoryGroupDelta.id);
-    if (categoryGroup) {
-      categoryGroup.name = categoryGroupDelta.name;
-      categoryGroup.hidden = categoryGroupDelta.hidden;
-
-      const categories = categoryGroup.categories;
-      categoryGroupDelta.categories.forEach((categoryDelta) => {
-        const categoryIdx = categories.findIndex((c) => c.id === categoryDelta.id);
-        if (categoryIdx !== -1 && !categoryDelta.deleted) {
-          categories.splice(categoryIdx, 1, categoryDelta);
-        } else if (categoryIdx !== -1 && categoryDelta.deleted) {
-          categories.splice(categoryIdx, 1);
-        } else categories.push(categoryDelta);
-      });
+    const categoryGroupIdx = categoryGroups.findIndex(
+      (cg) => cg.id === categoryGroupDelta.id
+    );
+    if (categoryGroupIdx === -1) {
+      categoryGroups.push(categoryGroupDelta); // new category group
     } else {
-      categoryGroups.push(categoryGroupDelta);
+      // update existing category group
+      categoryGroups[categoryGroupIdx].name = categoryGroupDelta.name;
+      categoryGroups[categoryGroupIdx].hidden = categoryGroupDelta.hidden;
+
+      const categories = categoryGroups[categoryGroupIdx].categories;
+      for (const categoryDelta of categoryGroupDelta.categories) {
+        const categoryIdx = categories.findIndex((c) => c.id === categoryDelta.id);
+        if (categoryIdx === -1) {
+          categories.push(categoryDelta); // new category
+        } else if (categoryDelta.deleted) {
+          categories.splice(categoryIdx, 1); // deleted category
+        } else {
+          categories.splice(categoryIdx, 1, categoryDelta); // update existing category
+        }
+      }
     }
   }
-
   return categoryGroups;
 }
 
 /** Fetch accounts for this budget from the YNAB API */
-export async function fetchAccountsForBudget(ynabAPI: api, selectedBudgetId: string) {
-  const response = await ynabAPI.accounts.getAccounts(selectedBudgetId);
-  const accounts = response.data.accounts
-    .filter((a) => a.closed === false) // filter out closed accounts
+export async function fetchAccountsForBudget(
+  ynabAPI: api,
+  selectedBudgetId: string,
+  cache?: {
+    data?: {
+      serverKnowledge: number;
+      accounts: Account[];
+    };
+    dataUpdatedAt: number;
+  }
+) {
+  const usingDeltaRequest =
+    !!cache?.data && cache.dataUpdatedAt > Date.now() - DELTA_REQUEST_TIME;
+  const response = await ynabAPI.accounts.getAccounts(
+    selectedBudgetId,
+    usingDeltaRequest ? cache.data?.serverKnowledge : undefined
+  );
+
+  let accounts: Account[];
+  if (usingDeltaRequest && cache.data) {
+    accounts = mergeAccountsDataFromDelta(cache.data.accounts, response.data.accounts);
+  } else {
+    accounts = response.data.accounts;
+  }
+
+  // filter out closed accounts, and sort with Budget accounts first
+  accounts = accounts
+    .filter((a) => a.closed === false)
     .sort((a, b) =>
       a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
-    ); // sort with Budget accounts first
+    );
   IS_DEV && console.log("Fetched accounts!", accounts);
+  return { accounts, serverKnowledge: response.data.server_knowledge };
+}
+
+function mergeAccountsDataFromDelta(existingData: Account[], deltaResponse: Account[]) {
+  const accounts = [...existingData];
+  for (const accountDelta of deltaResponse) {
+    const accountIdx = accounts.findIndex((a) => a.id === accountDelta.id);
+    if (accountIdx === -1) {
+      accounts.push(accountDelta); // new account
+    } else if (accountDelta.deleted) {
+      accounts.splice(accountIdx, 1); // deleted account
+    } else {
+      accounts.splice(accountIdx, 1, accountDelta); // update existing account
+    }
+  }
   return accounts;
 }
 

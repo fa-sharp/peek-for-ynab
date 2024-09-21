@@ -150,16 +150,57 @@ async function backgroundDataRefresh() {
         unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
       }
 
+      // Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
+      // TODO Need to submit an issue, similar to https://github.com/TanStack/query/issues/6310
       if (
         budgetSettings.notifications.importError ||
         !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
       ) {
-        accountsData = await fetchAccountsForBudget(ynabAPI, budget.id);
+        const queryKey = ["accounts", { budgetId: budget.id }];
+        await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () =>
+            fetchAccountsForBudget(
+              ynabAPI,
+              budget.id,
+              queryClient.getQueryState(queryKey)
+            )
+        });
+        await new Promise((r) => setTimeout(r, 200));
+        const { accounts } = await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () =>
+            fetchAccountsForBudget(
+              ynabAPI,
+              budget.id,
+              queryClient.getQueryState(queryKey)
+            )
+        });
+        accountsData = accounts;
       }
 
       if (budgetSettings.notifications.overspent) {
-        const categoryGroupsData = await fetchCategoryGroupsForBudget(ynabAPI, budget.id);
-        categoriesData = categoryGroupsData.flatMap((cg) => cg.categories);
+        const queryKey = ["categoryGroups", { budgetId: budget.id }];
+        await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () =>
+            fetchCategoryGroupsForBudget(
+              ynabAPI,
+              budget.id,
+              queryClient.getQueryState(queryKey)
+            )
+        });
+        await new Promise((r) => setTimeout(r, 200));
+        const { categoryGroups } = await queryClient.fetchQuery({
+          queryKey,
+          queryFn: () =>
+            fetchCategoryGroupsForBudget(
+              ynabAPI,
+              budget.id,
+              queryClient.getQueryState(queryKey)
+            )
+        });
+        categoriesData = categoryGroups.flatMap((cg) => cg.categories);
       }
 
       const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
