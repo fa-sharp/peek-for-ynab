@@ -150,8 +150,8 @@ async function backgroundDataRefresh() {
         unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
       }
 
-      // Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
-      // TODO Need to submit an issue, similar to https://github.com/TanStack/query/issues/6310
+      // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
+      // See https://github.com/TanStack/query/issues/8075
       if (
         budgetSettings.notifications.importError ||
         !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
