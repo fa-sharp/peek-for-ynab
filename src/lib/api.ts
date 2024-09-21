@@ -74,7 +74,7 @@ export async function fetchCategoryGroupsForBudget(
   return { categoryGroups, serverKnowledge: response.data.server_knowledge };
 }
 
-function mergeCategoryGroupsDataFromDelta(
+export function mergeCategoryGroupsDataFromDelta(
   existingData: CategoryGroupWithCategories[],
   deltaResponse: CategoryGroupWithCategories[]
 ) {
@@ -147,7 +147,10 @@ export async function fetchAccountsForBudget(
   return { accounts, serverKnowledge: response.data.server_knowledge };
 }
 
-function mergeAccountsDataFromDelta(existingData: Account[], deltaResponse: Account[]) {
+export function mergeAccountsDataFromDelta(
+  existingData: Account[],
+  deltaResponse: Account[]
+) {
   const accounts = [...existingData];
   for (const accountDelta of deltaResponse) {
     const accountIdx = accounts.findIndex((a) => a.id === accountDelta.id);

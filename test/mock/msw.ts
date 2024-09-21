@@ -19,7 +19,8 @@ export const mockServer = setupServer(
     withAuth(() => {
       return HttpResponse.json({
         data: {
-          category_groups
+          category_groups,
+          server_knowledge: 1000
         }
       });
     })
@@ -29,7 +30,8 @@ export const mockServer = setupServer(
     withAuth(() => {
       return HttpResponse.json({
         data: {
-          accounts
+          accounts,
+          server_knowledge: 1000
         }
       });
     })
@@ -39,7 +41,8 @@ export const mockServer = setupServer(
     withAuth(() => {
       return HttpResponse.json({
         data: {
-          payees
+          payees,
+          server_knowledge: 1000
         }
       });
     })
