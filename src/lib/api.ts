@@ -30,8 +30,8 @@ export async function fetchBudgets(ynabAPI: api) {
   }));
 }
 
-/** Use a delta request for categories & accounts if cached data is fresher than this (4 hours) */
-const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 4;
+/** Use a delta request for categories & accounts if cached data is fresher than this (6 hours) */
+const DELTA_REQUEST_TIME = 6 * 60 * 60 * 1000;
 
 /** Fetch category groups for this budget from the YNAB API */
 export async function fetchCategoryGroupsForBudget(
@@ -174,6 +174,7 @@ export function mergeAccountsDataFromDelta(
 
 export const payeeCollator = Intl.Collator();
 
+/** Fetch payees for this budget from the YNAB API */
 export async function fetchPayeesForBudget(
   ynabAPI: api,
   selectedBudgetId: string,
