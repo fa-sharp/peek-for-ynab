@@ -2,9 +2,11 @@ import {
   type Account,
   type CategoryGroupWithCategories,
   GetTransactionsTypeEnum,
+  type Payee,
   type api
 } from "ynab";
 
+import type { CachedPayee } from "./context/ynabContext";
 import { IS_DEV } from "./utils";
 
 /** Fetch budgets from the YNAB API */
@@ -28,8 +30,8 @@ export async function fetchBudgets(ynabAPI: api) {
   }));
 }
 
-/** Use a delta request if cached data is fresher than this (2 hours) */
-const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 2;
+/** Use a delta request for categories & accounts if cached data is fresher than this (4 hours) */
+const DELTA_REQUEST_TIME = 1000 * 60 * 60 * 4;
 
 /** Fetch category groups for this budget from the YNAB API */
 export async function fetchCategoryGroupsForBudget(
@@ -143,7 +145,12 @@ export async function fetchAccountsForBudget(
     .sort((a, b) =>
       a.on_budget && !b.on_budget ? -1 : !a.on_budget && b.on_budget ? 1 : 0
     );
-  IS_DEV && console.log("Fetched accounts!", accounts);
+  IS_DEV &&
+    console.log("Fetched accounts!", {
+      accounts,
+      usingDeltaRequest,
+      serverKnowledge: response.data.server_knowledge
+    });
   return { accounts, serverKnowledge: response.data.server_knowledge };
 }
 
@@ -165,11 +172,82 @@ export function mergeAccountsDataFromDelta(
   return accounts;
 }
 
-const getNDaysAgoISO = (days: number) => {
-  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().substring(0, 10);
-};
+export const payeeCollator = Intl.Collator();
+
+export async function fetchPayeesForBudget(
+  ynabAPI: api,
+  selectedBudgetId: string,
+  cache?: {
+    data?: {
+      serverKnowledge: number;
+      payees: CachedPayee[];
+    };
+    dataUpdatedAt: number;
+  }
+) {
+  const usingDeltaRequest = !!cache?.data;
+  const response = await ynabAPI.payees.getPayees(
+    selectedBudgetId,
+    usingDeltaRequest ? cache.data?.serverKnowledge : undefined
+  );
+
+  let payees: CachedPayee[];
+  if (usingDeltaRequest && cache.data) {
+    payees = mergePayeesDataFromDelta(cache.data.payees, response.data.payees);
+  } else {
+    payees = response.data.payees
+      .map(formatPayee)
+      .sort((a, b) => payeeCollator.compare(a.name, b.name));
+  }
+
+  IS_DEV &&
+    console.log("Fetched payees!", {
+      payees,
+      usingDeltaRequest,
+      serverKnowledge: response.data.server_knowledge
+    });
+  return { payees, serverKnowledge: response.data.server_knowledge };
+}
+
+export function mergePayeesDataFromDelta(
+  existingData: CachedPayee[],
+  deltaResponse: Payee[]
+) {
+  const payees = [...existingData];
+  for (const payeeDelta of deltaResponse) {
+    const payeeIdx = payees.findIndex((p) => p.id === payeeDelta.id);
+    if (payeeIdx === -1) {
+      const sortedIdx = findSortedIndex(payees, payeeDelta, (a, b) =>
+        payeeCollator.compare(a.name, b.name)
+      );
+      payees.splice(sortedIdx, 0, formatPayee(payeeDelta)); // new payee
+    } else if (payeeDelta.deleted) {
+      payees.splice(payeeIdx, 1); // deleted payee
+    } else {
+      payees.splice(payeeIdx, 1, formatPayee(payeeDelta)); // update existing payee
+    }
+  }
+  return payees;
+}
+
+export function formatPayee(payee: Payee): CachedPayee {
+  return {
+    id: payee.id,
+    name: payee.name,
+    ...(payee.transfer_account_id && { transferId: payee.transfer_account_id })
+  };
+}
+
+function findSortedIndex<T>(array: T[], value: T, compare: (x: T, y: T) => number) {
+  let low = 0;
+  let high = array.length;
+  while (low < high) {
+    const mid = (low + high) >>> 1;
+    if (compare(array[mid], value) < 0) low = mid + 1;
+    else high = mid;
+  }
+  return low;
+}
 
 /** Check for new unapproved transactions in this budget  */
 export async function checkUnapprovedTxsForBudget(ynabAPI: api, budgetId: string) {
@@ -182,4 +260,10 @@ export async function checkUnapprovedTxsForBudget(ynabAPI: api, budgetId: string
   );
   IS_DEV && console.log("Checked for new imports!", transactions);
   return transactions;
+}
+
+function getNDaysAgoISO(days: number) {
+  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().substring(0, 10);
 }

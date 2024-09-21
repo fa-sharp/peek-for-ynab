@@ -7,7 +7,8 @@ import {
   checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget
+  fetchCategoryGroupsForBudget,
+  fetchPayeesForBudget
 } from "~lib/api";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
@@ -164,20 +165,15 @@ const useYNABProvider = () => {
     queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async (): Promise<CachedPayee[] | undefined> => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      const response = await ynabAPI.payees.getPayees(selectedBudgetId);
-      const collator = Intl.Collator();
-      const payees = response.data.payees
-        .map((payee) => ({
-          id: payee.id,
-          name: payee.name,
-          ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
-        }))
-        .sort((a, b) => collator.compare(a.name, b.name));
-      IS_DEV && console.log("Fetched payees!", payees);
-      return payees;
-    }
+      return await fetchPayeesForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.payees
   });
 
   /** Select data of only saved accounts from `accountsData` */

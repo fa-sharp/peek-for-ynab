@@ -1,4 +1,4 @@
-import type { Account, CategoryGroupWithCategories } from "ynab";
+import type { Account, CategoryGroupWithCategories, Payee } from "ynab";
 
 export const budgets = [
   {
@@ -499,43 +499,52 @@ export const category_groups: CategoryGroupWithCategories[] = [
   }
 ];
 
-export const payees = [
+export const payees: Payee[] = [
   {
     id: "3bc99e6e-1359-4997-a3fc-da5564458cbe",
-    name: "Manual Balance Adjustment"
+    name: "Manual Balance Adjustment",
+    deleted: false
   },
   {
     id: "7dc6ba69-7fb1-4eaf-826c-8dacdba9bf11",
-    name: "Reconciliation Balance Adjustment"
+    name: "Reconciliation Balance Adjustment",
+    deleted: false
   },
   {
     id: "ea0bc26e-0d77-46eb-b76f-5d8284144a07",
-    name: "Starting Balance"
+    name: "Starting Balance",
+    deleted: false
   },
   {
     id: "471ecaf5-5da8-49ce-9c99-06f45599d1a7",
     name: "Transfer : Checking",
-    transfer_account_id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e"
+    transfer_account_id: "b04cde9d-a0f7-4ed0-bf82-b44a3c4de92e",
+    deleted: false
   },
   {
     id: "99b65028-2421-4d2f-8ca7-b3cfba1678e1",
     name: "Transfer : Savings",
-    transfer_account_id: "3857871b-1a41-45b9-81e6-d60ad2d093ba"
+    transfer_account_id: "3857871b-1a41-45b9-81e6-d60ad2d093ba",
+    deleted: false
   },
   {
     id: "17920337-4897-4491-88d6-d9eb513b9e6a",
-    name: "JetBlue"
+    name: "JetBlue",
+    deleted: false
   },
   {
     id: "802f3c17-337f-46db-89e8-272048f344a1",
-    name: "JuiceLand"
+    name: "JuiceLand",
+    deleted: false
   },
   {
     id: "7545921c-5a25-42ca-ae0f-4aa2e114cb34",
-    name: "ABC Stores"
+    name: "ABC Stores",
+    deleted: false
   },
   {
     id: "7805107b-5a41-467b-bc69-a91ab7446423",
-    name: "Mr. Tire"
+    name: "Mr. Tire",
+    deleted: false
   }
 ];
