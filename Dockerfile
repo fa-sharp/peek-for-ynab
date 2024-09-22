@@ -21,7 +21,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY --link . .
 ENV NODE_ENV=production
 ARG WEBSITE_DOMAIN=""
-RUN pnpm run build:next
+RUN --mount=type=cache,id=next,target=/app/.next/cache pnpm run build:next
 
 # Final stage for app image
 FROM gcr.io/distroless/nodejs20-debian12 as runner
