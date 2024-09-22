@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import * as ynab from "ynab";
@@ -7,7 +7,8 @@ import {
   checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget
+  fetchCategoryGroupsForBudget,
+  fetchPayeesForBudget
 } from "~lib/api";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
@@ -40,6 +41,7 @@ const useYNABProvider = () => {
   } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
+  const queryClient = useQueryClient();
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
@@ -54,7 +56,7 @@ const useYNABProvider = () => {
     isFetching: isRefreshingBudgets
   } = useQuery({
     queryKey: ["budgets"],
-    staleTime: ONE_DAY_IN_MILLIS * 2,
+    staleTime: ONE_DAY_IN_MILLIS * 7,
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
@@ -89,10 +91,15 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      return await fetchCategoryGroupsForBudget(ynabAPI, selectedBudgetId);
-    }
+      return await fetchCategoryGroupsForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.categoryGroups
   });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
@@ -125,10 +132,15 @@ const useYNABProvider = () => {
   } = useQuery({
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      return await fetchAccountsForBudget(ynabAPI, selectedBudgetId);
-    }
+      return await fetchAccountsForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.accounts
   });
 
   const refreshCategoriesAndAccounts = useCallback(
@@ -153,20 +165,15 @@ const useYNABProvider = () => {
     queryKey: ["payees", { budgetId: selectedBudgetId }],
     staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
-    queryFn: async (): Promise<CachedPayee[] | undefined> => {
+    queryFn: async ({ queryKey }) => {
       if (!ynabAPI) return;
-      const response = await ynabAPI.payees.getPayees(selectedBudgetId);
-      const collator = Intl.Collator();
-      const payees = response.data.payees
-        .map((payee) => ({
-          id: payee.id,
-          name: payee.name,
-          ...(payee.transfer_account_id ? { transferId: payee.transfer_account_id } : {})
-        }))
-        .sort((a, b) => collator.compare(a.name, b.name));
-      IS_DEV && console.log("Fetched payees!", payees);
-      return payees;
-    }
+      return await fetchPayeesForBudget(
+        ynabAPI,
+        selectedBudgetId,
+        queryClient.getQueryState(queryKey)
+      );
+    },
+    select: (data) => data?.payees
   });
 
   /** Select data of only saved accounts from `accountsData` */
@@ -187,10 +194,15 @@ const useYNABProvider = () => {
     useQuery({
       queryKey: ["accounts", { budgetId }],
       enabled: Boolean(ynabAPI),
-      queryFn: async () => {
+      queryFn: async ({ queryKey }) => {
         if (!ynabAPI) return;
-        return await fetchAccountsForBudget(ynabAPI, budgetId);
-      }
+        return await fetchAccountsForBudget(
+          ynabAPI,
+          budgetId,
+          queryClient.getQueryState(queryKey)
+        );
+      },
+      select: (data) => data?.accounts
     });
 
   const addTransaction = useCallback(

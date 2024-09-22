@@ -28,7 +28,7 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default true */
+  /** Whether animations are enabled. @default false */
   animations?: boolean;
 }
 
@@ -154,26 +154,14 @@ const useStorageProvider = () => {
   /** Budget-specific settings for the current budget. Is synced if the user chooses. */
   const [budgetSettings, setBudgetSettings] = useExtensionStorage<
     BudgetSettings | undefined
-  >(
-    {
-      key: `budget-${selectedBudgetId}`,
-      instance: storageArea
-    },
-    (data, isHydrated) =>
-      !isHydrated || !selectedBudgetId
-        ? undefined
-        : !data
-          ? DEFAULT_BUDGET_SETTINGS
-          : data
+  >({ key: `budget-${selectedBudgetId}`, instance: storageArea }, (data, isHydrated) =>
+    !isHydrated || !selectedBudgetId ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
   );
 
-  /** Use budget-specific settings for a specific budget */
+  /** Get settings for a specific budget */
   const useBudgetSettings = (budgetId: string) =>
     useExtensionStorage<BudgetSettings | undefined>(
-      {
-        key: `budget-${budgetId}`,
-        instance: storageArea
-      },
+      { key: `budget-${budgetId}`, instance: storageArea },
       (data, isHydrated) =>
         !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
     );
