@@ -254,6 +254,23 @@ li:last-child .balance-display {
   padding: 0.1em;
 }
 
+.menu {
+  background-color: var(--background);
+  list-style: none;
+  overflow: auto;
+  padding: 1px;
+  margin: 0px;
+}
+.menu > [role="menuitem"] {
+  padding: var(--spacing-sm);
+  cursor: pointer;
+}
+.menu > [role="menuitem"]:hover,
+.menu > [role="menuitem"]:focus-visible {
+  background-color: var(--highlight);
+  outline-color: var(--border);
+}
+
 .select-dropdown-list {
   position: absolute;
   top: 100%;

@@ -1,5 +1,6 @@
+import { Item } from "@react-stately/collections";
 import { useIsFetching } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { type Key, useCallback } from "react";
 import {
   AlertTriangle,
   BoxMultiple,
@@ -14,6 +15,8 @@ import {
 import { BudgetSelect, IconButton, IconSpan } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 import { isDataFreshForDisplay } from "~lib/utils";
+
+import PopupNavMenu from "./PopupNavMenu";
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
@@ -48,6 +51,23 @@ export default function PopupNav() {
     );
     window.close();
   }, []);
+
+  const onMenuAction = useCallback(
+    (key: Key) => {
+      switch (key) {
+        case "editItems":
+          setPopupState({ view: "main", editMode: !popupState.editMode });
+          break;
+        case "openWindow":
+          openPopupWindow();
+          break;
+        case "openOptions":
+          chrome?.runtime?.openOptionsPage();
+          break;
+      }
+    },
+    [openPopupWindow, popupState.editMode, setPopupState]
+  );
 
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
   if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
@@ -95,23 +115,43 @@ export default function PopupNav() {
           onClick={openBudget}
           icon={<ExternalLink aria-hidden />}
         />
-        {window.name !== "peekWindow" && (
+      </div>
+      <div className="flex-row gap-xs">
+        {popupState.editMode && (
           <IconButton
-            label="Open this extension in a separate window"
-            onClick={openPopupWindow}
-            icon={<BoxMultiple aria-hidden />}
+            label={"Done editing"}
+            onClick={() =>
+              setPopupState({ view: "main", editMode: !popupState.editMode })
+            }
+            icon={<PencilOff aria-hidden />}
           />
         )}
-        <IconButton
-          label="Settings"
-          onClick={() => chrome?.runtime?.openOptionsPage()}
-          icon={<Settings aria-hidden />}
-        />
-        <IconButton
-          label={popupState.editMode ? "Done editing" : "Edit pinned items"}
-          onClick={() => setPopupState({ view: "main", editMode: !popupState.editMode })}
-          icon={popupState.editMode ? <PencilOff aria-hidden /> : <Pencil aria-hidden />}
-        />
+        <PopupNavMenu
+          label="Menu"
+          onAction={onMenuAction}
+          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}>
+          <Item
+            key="editItems"
+            textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
+            {popupState.editMode ? (
+              <>
+                <PencilOff aria-hidden size={20} /> Done editing
+              </>
+            ) : (
+              <>
+                <Pencil aria-hidden size={20} /> Edit pinned items
+              </>
+            )}
+          </Item>
+          <Item key="openWindow" textValue="Open in new window">
+            <BoxMultiple aria-hidden size={20} />
+            Open in new window
+          </Item>
+          <Item key="openOptions" textValue="Open settings">
+            <Settings aria-hidden size={20} />
+            Settings
+          </Item>
+        </PopupNavMenu>
       </div>
     </nav>
   );
