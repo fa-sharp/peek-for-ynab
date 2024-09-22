@@ -23,7 +23,7 @@ interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
 }
 
 /**
- * Menu for the popup navigation. Parts of this can be refactored into a more generic component if needed.
+ * Menu for the popup navigation. Parts of this can be refactored into more generic components if needed.
  * See https://react-spectrum.adobe.com/react-aria/useMenu.html.
  */
 export default function PopupNavMenu<T extends object>(props: MenuButtonProps<T>) {
@@ -37,6 +37,7 @@ export default function PopupNavMenu<T extends object>(props: MenuButtonProps<T>
         {...menuTriggerProps}
         buttonRef={triggerRef}
         aria-label={props.label}
+        title={props.label}
         className="icon-button">
         <Menu2 aria-hidden />
       </Button>
@@ -70,7 +71,7 @@ function MenuItem<T>({ item, state }: { item: Node<T>; state: TreeState<T> }) {
   if (isDisabled) return null;
 
   return (
-    <li {...menuItemProps} ref={ref} className="flex-row gap-sm">
+    <li {...menuItemProps} ref={ref}>
       {item.rendered}
     </li>
   );
@@ -112,14 +113,16 @@ function Button({
   buttonRef,
   children,
   className,
+  title,
   ...props
 }: AriaButtonProps<"button"> & {
   buttonRef: RefObject<HTMLButtonElement>;
   className?: string;
+  title?: string;
 }) {
   const { buttonProps } = useButton(props, buttonRef);
   return (
-    <button {...buttonProps} ref={buttonRef} className={className}>
+    <button {...buttonProps} ref={buttonRef} className={className} title={title}>
       {children}
     </button>
   );

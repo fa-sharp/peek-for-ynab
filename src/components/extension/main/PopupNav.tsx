@@ -133,23 +133,26 @@ export default function PopupNav() {
           <Item
             key="editItems"
             textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
-            {popupState.editMode ? (
-              <>
-                <PencilOff aria-hidden size={20} /> Done editing
-              </>
-            ) : (
-              <>
-                <Pencil aria-hidden size={20} /> Edit pinned items
-              </>
-            )}
+            <div className="flex-row gap-sm">
+              {popupState.editMode ? (
+                <PencilOff aria-hidden size={20} />
+              ) : (
+                <Pencil aria-hidden size={20} />
+              )}
+              {popupState.editMode ? "Done editing" : "Edit pinned items"}
+            </div>
           </Item>
           <Item key="openWindow" textValue="Open in new window">
-            <BoxMultiple aria-hidden size={20} />
-            Open in new window
+            <div className="flex-row gap-sm">
+              <BoxMultiple aria-hidden size={20} />
+              Open in new window
+            </div>
           </Item>
-          <Item key="openOptions" textValue="Open settings">
-            <Settings aria-hidden size={20} />
-            Settings
+          <Item key="openOptions" textValue="Settings">
+            <div className="flex-row gap-sm">
+              <Settings aria-hidden size={20} />
+              Settings
+            </div>
           </Item>
         </PopupNavMenu>
       </div>

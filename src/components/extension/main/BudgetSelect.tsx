@@ -34,6 +34,7 @@ export default function BudgetSelect({
       style={{
         maxWidth: !emojiMode ? "12em" : "5em",
         fontWeight: 500,
+        textAlign: "center",
         textOverflow: "ellipsis"
       }}
       value={selectedBudgetId || "initial"}

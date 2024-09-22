@@ -258,15 +258,15 @@ li:last-child .balance-display {
   background-color: var(--background);
   list-style: none;
   overflow: auto;
-  padding: 1px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
 }
-.menu > [role="menuitem"] {
+.menu > li {
   padding: var(--spacing-sm);
   cursor: pointer;
 }
-.menu > [role="menuitem"]:hover,
-.menu > [role="menuitem"]:focus-visible {
+.menu > li:hover,
+.menu > li:focus-visible {
   background-color: var(--highlight);
   outline-color: var(--border);
 }
