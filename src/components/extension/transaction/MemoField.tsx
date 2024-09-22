@@ -38,7 +38,7 @@ const MemoField = (
         />
         {settings?.currentTabAccess && (
           <IconButton
-            icon={<WorldWww strokeWidth={1} />}
+            icon={<WorldWww strokeWidth={1} aria-hidden />}
             label="Copy URL into memo field"
             onClick={onCopyURLIntoMemo}
           />

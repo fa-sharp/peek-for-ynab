@@ -10,8 +10,8 @@ import NotificationSettings from "./NotificationSettings";
 import TransactionSettings from "./TransactionSettings";
 
 export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
-  const { shownBudgetIds, toggleShowBudget } = useStorageContext();
-  const [showSettings, setShowSettings] = useState(false);
+  const { selectedBudgetId, shownBudgetIds, toggleShowBudget } = useStorageContext();
+  const [showSettings, setShowSettings] = useState(budget.id === selectedBudgetId);
 
   useEffect(() => {
     if (!shownBudgetIds?.includes(budget.id)) setShowSettings(false);
@@ -46,13 +46,16 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
 
 function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
   return (
-    <div
+    <fieldset
+      className="rounded mt-sm"
       style={{
-        marginLeft: "2rem",
+        marginLeft: "1.8em",
+        padding: "0 1em 0.5em",
         maxWidth: "15rem"
       }}>
+      <legend>Budget settings</legend>
       <TransactionSettings budget={budget} />
       <NotificationSettings budget={budget} />
-    </div>
+    </fieldset>
   );
 }

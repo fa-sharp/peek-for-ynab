@@ -11,10 +11,11 @@ interface Props {
   accountsData?: Account[];
   categoriesData?: Category[];
   payeesData?: CachedPayee[];
-  memoRef: RefObject<HTMLInputElement>;
+  memoRef?: RefObject<HTMLInputElement>;
   isSaving: boolean;
 }
 
+/** Payee, category, and account fields for a non-transfer transaction */
 export default function TransactionFormMain({
   formState,
   handlers,
@@ -36,7 +37,7 @@ export default function TransactionFormMain({
           if ("id" in selectedPayee) {
             if (!formState.category && categoryRef.current) categoryRef.current.focus();
             else if (!formState.account) accountRef.current?.focus();
-            else memoRef.current?.focus();
+            else memoRef?.current?.focus();
           }
         }}
         disabled={isSaving}
@@ -50,7 +51,7 @@ export default function TransactionFormMain({
             handlers.setCategory(selectedCategory);
             if (selectedCategory) {
               if (!formState.account) accountRef.current?.focus();
-              else memoRef.current?.focus();
+              else memoRef?.current?.focus();
             }
           }}
           disabled={isSaving}
@@ -63,7 +64,7 @@ export default function TransactionFormMain({
         selectAccount={(selectedAccount) => {
           handlers.setAccount(selectedAccount);
           if (selectedAccount) {
-            memoRef.current?.focus();
+            memoRef?.current?.focus();
             if (selectedAccount.type === "cash") handlers.setCleared(true);
           }
         }}

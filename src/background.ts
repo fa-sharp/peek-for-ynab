@@ -20,7 +20,7 @@ import {
   getBudgetAlerts,
   updateIconAndTooltip
 } from "~lib/notifications";
-import { queryClient } from "~lib/queryClient";
+import { createQueryClient } from "~lib/queryClient";
 import type { BudgetSettings, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
 
@@ -45,8 +45,13 @@ TOKEN_STORAGE.watch({
 // Setup periodic background refresh
 const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 chrome.alarms.onAlarm.addListener((alarm: chrome.alarms.Alarm) => {
-  if (alarm.name !== BACKGROUND_ALARM_NAME) return;
-  backgroundDataRefresh();
+  if (alarm.name === BACKGROUND_ALARM_NAME) {
+    try {
+      backgroundDataRefresh();
+    } catch (err) {
+      console.error("Background refresh: Error", err);
+    }
+  }
 });
 chrome.alarms.get(BACKGROUND_ALARM_NAME).then(async (alarm) => {
   if (!alarm) {
@@ -108,86 +113,118 @@ async function refreshToken(): Promise<TokenData | null> {
 
 async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
-  try {
-    // Check for existing token. If it's expired, refresh the token
-    let tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
+  // Check for existing token. If it's expired, refresh the token
+  let tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
+  if (!tokenData) {
+    IS_DEV && console.log("Background refresh: no existing token data found");
+    return;
+  }
+  if (tokenData.expires < Date.now() + 60 * 1000) {
+    IS_DEV && console.log("Background refresh: Refreshing token...");
+    tokenData = await refreshToken();
     if (!tokenData) {
-      IS_DEV && console.log("Background refresh: no existing token data found");
+      console.error("Background refresh: couldn't get new token");
       return;
     }
-    if (tokenData.expires < Date.now() + 60 * 1000) {
-      IS_DEV && console.log("Background refresh: Refreshing token...");
-      tokenData = await refreshToken();
-      if (!tokenData) {
-        console.error("Background refresh: couldn't get new token");
-        return;
-      }
-    }
-
-    const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-    const storage = syncEnabled ? new Storage({ area: "sync" }) : CHROME_LOCAL_STORAGE;
-    const shownBudgetIds = await storage.get<string[]>("budgets");
-    if (!shownBudgetIds) return;
-
-    IS_DEV && console.log("Background refresh: updating alerts...");
-    const ynabAPI = new api(tokenData.accessToken);
-    const budgetsData = await queryClient.fetchQuery({
-      queryKey: ["budgets"],
-      staleTime: ONE_DAY_IN_MILLIS * 2,
-      queryFn: () => fetchBudgets(ynabAPI)
-    });
-
-    const alerts: CurrentAlerts = {};
-    const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
-    const notificationsEnabled = await checkPermissions(["notifications"]);
-
-    // Fetch new data for each budget and update alerts
-    for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
-      const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
-      if (!budgetSettings) continue;
-
-      let unapprovedTxs: TransactionDetail[] | undefined;
-      let accountsData: Account[] | undefined;
-      let categoriesData: Category[] | undefined;
-
-      if (budgetSettings.notifications.checkImports) {
-        await ynabAPI.transactions.importTransactions(budget.id);
-        unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
-      }
-
-      if (
-        budgetSettings.notifications.importError ||
-        !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
-      ) {
-        accountsData = await fetchAccountsForBudget(ynabAPI, budget.id);
-      }
-
-      if (budgetSettings.notifications.overspent) {
-        const categoryGroupsData = await fetchCategoryGroupsForBudget(ynabAPI, budget.id);
-        categoriesData = categoryGroupsData.flatMap((cg) => cg.categories);
-      }
-
-      const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
-        accounts: accountsData,
-        categories: categoriesData,
-        unapprovedTxs
-      });
-      if (budgetAlerts) {
-        alerts[budget.id] = budgetAlerts;
-
-        // create system notification if enabled and if budget alerts have changed
-        if (!notificationsEnabled) continue;
-        if (JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id])) {
-          createSystemNotification(budgetAlerts, budget);
-        }
-      }
-    }
-
-    updateIconAndTooltip(alerts, budgetsData);
-    await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
-  } catch (err) {
-    console.error("Background refresh: Error", err);
   }
+
+  const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
+  const storage = syncEnabled ? new Storage({ area: "sync" }) : CHROME_LOCAL_STORAGE;
+  const shownBudgetIds = await storage.get<string[]>("budgets");
+  if (!shownBudgetIds) return;
+
+  IS_DEV && console.log("Background refresh: updating alerts...");
+  const ynabAPI = new api(tokenData.accessToken);
+  const queryClient = createQueryClient({
+    staleTime: 14 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 14 minutes
+  });
+  const budgetsData = await queryClient.fetchQuery({
+    queryKey: ["budgets"],
+    staleTime: ONE_DAY_IN_MILLIS * 7,
+    queryFn: () => fetchBudgets(ynabAPI)
+  });
+
+  const alerts: CurrentAlerts = {};
+  const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
+  const notificationsEnabled = await checkPermissions(["notifications"]);
+
+  // Fetch new data for each budget and update alerts
+  for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
+    const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
+    if (!budgetSettings) continue;
+
+    let unapprovedTxs: TransactionDetail[] | undefined;
+    let accountsData: Account[] | undefined;
+    let categoriesData: Category[] | undefined;
+
+    if (budgetSettings.notifications.checkImports) {
+      await ynabAPI.transactions.importTransactions(budget.id);
+      unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
+    }
+
+    // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
+    // See https://github.com/TanStack/query/issues/8075
+    if (
+      budgetSettings.notifications.importError ||
+      !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
+    ) {
+      const queryKey = ["accounts", { budgetId: budget.id }];
+      await queryClient.fetchQuery({
+        queryKey,
+        queryFn: () =>
+          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey))
+      });
+      await new Promise((r) => setTimeout(r, 200));
+      const { accounts } = await queryClient.fetchQuery({
+        queryKey,
+        queryFn: () =>
+          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey))
+      });
+      accountsData = accounts;
+    }
+
+    if (budgetSettings.notifications.overspent) {
+      const queryKey = ["categoryGroups", { budgetId: budget.id }];
+      await queryClient.fetchQuery({
+        queryKey,
+        queryFn: () =>
+          fetchCategoryGroupsForBudget(
+            ynabAPI,
+            budget.id,
+            queryClient.getQueryState(queryKey)
+          )
+      });
+      await new Promise((r) => setTimeout(r, 200));
+      const { categoryGroups } = await queryClient.fetchQuery({
+        queryKey,
+        queryFn: () =>
+          fetchCategoryGroupsForBudget(
+            ynabAPI,
+            budget.id,
+            queryClient.getQueryState(queryKey)
+          )
+      });
+      categoriesData = categoryGroups.flatMap((cg) => cg.categories);
+    }
+
+    const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
+      accounts: accountsData,
+      categories: categoriesData,
+      unapprovedTxs
+    });
+    if (budgetAlerts) {
+      alerts[budget.id] = budgetAlerts;
+      if (
+        notificationsEnabled &&
+        JSON.stringify(budgetAlerts) !== JSON.stringify(oldAlerts?.[budget.id])
+      ) {
+        createSystemNotification(budgetAlerts, budget);
+      }
+    }
+  }
+
+  updateIconAndTooltip(alerts, budgetsData);
+  await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
 }
 
 // Setup system notification click handler

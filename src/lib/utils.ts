@@ -1,22 +1,31 @@
 import * as ynab from "ynab";
 
+const currencyFormatterCache = new Map<string, (millis: number) => string>();
+
 export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
   currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
-  const formatter = new Intl.NumberFormat("default", {
+  const formatterKey = currencyFormat.iso_code + currencyFormat.decimal_digits;
+  const cachedFormatter = currencyFormatterCache.get(formatterKey);
+  if (cachedFormatter) return cachedFormatter;
+
+  const numberFormat = new Intl.NumberFormat("default", {
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
     minimumFractionDigits: currencyFormat.decimal_digits
   });
-  return (millis: number) => {
+  const newFormatter = (millis: number) => {
     const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
       millis,
       currencyFormat.decimal_digits
     );
-    return formatter.format(currencyAmount);
+    return numberFormat.format(currencyAmount);
   };
+  currencyFormatterCache.set(formatterKey, newFormatter);
+
+  return newFormatter;
 };
 
 export const formatCurrency = (
@@ -43,6 +52,10 @@ export const isEmptyObject = (objectName: object) => {
   }
   return true;
 };
+
+/** Check if data is fresh enough to display, based on `lastUpdated` time (<4 minutes old) */
+export const isDataFreshForDisplay = (lastUpdated: number) =>
+  lastUpdated + 240_000 > Date.now();
 
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(

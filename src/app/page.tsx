@@ -12,7 +12,7 @@ function IndexPage() {
       <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
         <Image
-          src="/screenshots/light-pinned.png"
+          src="/img/screenshots/light-pinned.png"
           alt={"Extension screenshot in light mode"}
           className="screenshot"
           width={380}
@@ -20,7 +20,7 @@ function IndexPage() {
           priority
         />
         <Image
-          src="/screenshots/dark-pinned.png"
+          src="/img/screenshots/dark-pinned.png"
           alt={"Extension screenshot in dark mode"}
           className="screenshot"
           width={380}
@@ -35,7 +35,7 @@ function IndexPage() {
           rel="noreferrer"
           title="Go to Chrome Web Store">
           <Image
-            src="/chromelogo.png"
+            src="/img/chromelogo.png"
             alt="Chrome Web Store logo"
             width={248}
             height={75}

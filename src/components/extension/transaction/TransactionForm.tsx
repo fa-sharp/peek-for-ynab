@@ -119,12 +119,14 @@ export default function TransactionForm() {
                 label="Cleared (click to switch)"
                 icon={<CircleC fill="var(--currency-green)" color="white" />}
                 onClick={() => handlers.setCleared(false)}
+                disabled={isSaving}
               />
             ) : (
               <IconButton
                 label="Uncleared (click to switch)"
                 icon={<CircleC color="gray" />}
                 onClick={() => handlers.setCleared(true)}
+                disabled={isSaving}
               />
             )}
           </label>
@@ -133,7 +135,8 @@ export default function TransactionForm() {
             <select
               className="select rounded"
               value={formState.flag}
-              onChange={(e) => handlers.setFlag(e.target.value)}>
+              onChange={(e) => handlers.setFlag(e.target.value)}
+              disabled={isSaving}>
               <option value="">None</option>
               {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
                 <option key={flagValue} value={flagValue}>

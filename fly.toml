@@ -19,14 +19,14 @@ guest_path = "/.next/static"
 url_prefix = "/_next/static"
 
 [[statics]]
-guest_path = "/public/screenshots"
-url_prefix = "/screenshots"
+guest_path = "/public/img"
+url_prefix = "/img"
 
 [[statics]]
 guest_path = "/public/scripts"
 url_prefix = "/scripts"
 
 [[vm]]
-memory = '512mb'
+memory = '256mb'
 cpu_kind = 'shared'
 cpus = 1
