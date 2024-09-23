@@ -6,6 +6,7 @@ import {
   BoxMultiple,
   Check,
   ExternalLink,
+  Menu2,
   Pencil,
   PencilOff,
   Plus,
@@ -117,6 +118,7 @@ export default function PopupNav() {
       <div className="flex-row gap-xs">
         <BudgetSelect
           emojiMode={settings.emojiMode}
+          animationsEnabled={settings.animations}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}
@@ -137,6 +139,7 @@ export default function PopupNav() {
         )}
         <PopupNavMenu
           label="Menu"
+          icon={<Menu2 aria-hidden />}
           onAction={onMenuAction}
           disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}
           animationsEnabled={settings.animations}>

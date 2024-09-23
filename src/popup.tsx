@@ -25,7 +25,8 @@ export function PopupView() {
       style={{
         padding: "1em",
         minWidth: settings.emojiMode ? "150px" : "260px",
-        maxWidth: "360px"
+        maxWidth: "360px",
+        minHeight: "60px"
       }}>
       {!loggedIn ? (
         <PopupLogin />

@@ -13,10 +13,15 @@ function IndexPage() {
       <h3>0.21.0 - Sep 24, 2024</h3>
       <ul>
         <li>
-          New navigation menu at the top of the extension popup, with quick links to add a
-          transaction, edit pinned items, and more. Menu is keyboard navigable thanks to
-          the awesome open-source{" "}
-          <a href="https://react-spectrum.adobe.com/react-aria/index.html">React Aria</a>{" "}
+          Redesigned navigation at the top of the popup window, with quick links to add a
+          transaction, edit pinned items, and more. The dropdown menus are accessible and
+          keyboard navigable thanks to the awesome open-source{" "}
+          <a
+            href="https://react-spectrum.adobe.com/react-aria/index.html"
+            target="_blank"
+            rel="noreferrer">
+            React Aria
+          </a>{" "}
           library 🙏.
         </li>
         <li>

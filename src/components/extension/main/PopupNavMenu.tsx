@@ -9,6 +9,7 @@ import {
   type AriaPopoverProps,
   DismissButton,
   Overlay,
+  type Placement,
   usePopover
 } from "@react-aria/overlays";
 import { type MenuTriggerProps, useMenuTriggerState } from "@react-stately/menu";
@@ -16,8 +17,7 @@ import type { OverlayTriggerState } from "@react-stately/overlays";
 import { type TreeState, useTreeState } from "@react-stately/tree";
 import type { Node } from "@react-types/shared";
 import { clsx } from "clsx";
-import { type RefObject, useRef } from "react";
-import { Menu2 } from "tabler-icons-react";
+import { type ReactElement, type RefObject, useRef } from "react";
 
 interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
   label?: string;
@@ -29,9 +29,13 @@ interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
  */
 export default function PopupNavMenu<T extends object>({
   animationsEnabled,
+  icon,
+  placement,
   ...props
 }: MenuButtonProps<T> & {
+  icon: ReactElement;
   animationsEnabled?: boolean;
+  placement?: Placement;
 }) {
   const state = useMenuTriggerState(props);
   const triggerRef = useRef(null);
@@ -45,13 +49,13 @@ export default function PopupNavMenu<T extends object>({
         aria-label={props.label}
         title={props.label}
         className="icon-button">
-        <Menu2 aria-hidden />
+        {icon}
       </Button>
       {state.isOpen && (
         <Popover
           state={state}
           triggerRef={triggerRef}
-          offset={5}
+          placement={placement}
           animationsEnabled={animationsEnabled}>
           <Menu {...props} {...menuProps} />
         </Popover>
