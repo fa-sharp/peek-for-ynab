@@ -76,12 +76,6 @@ const useYNABProvider = () => {
     [budgetsData, selectedBudgetId]
   );
 
-  /** Data from the budgets the user has selected to show */
-  const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds]
-  );
-
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
   const {
     data: categoryGroupsData,
@@ -242,8 +236,6 @@ const useYNABProvider = () => {
     unapprovedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,
-    /** API data: List of budgets the user has selected to show */
-    shownBudgetsData,
     /** API data: List of saved accounts in the currently selected budget */
     savedAccountsData,
     /** API data: List of saved categories in the currently selected budget */

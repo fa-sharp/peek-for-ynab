@@ -1,6 +1,6 @@
 import { Item } from "@react-stately/collections";
 import { useIsFetching } from "@tanstack/react-query";
-import { type Key, useCallback } from "react";
+import { type Key, useCallback, useMemo } from "react";
 import {
   AlertTriangle,
   BoxMultiple,
@@ -29,11 +29,12 @@ export default function PopupNav() {
     settings,
     tokenRefreshNeeded,
     popupState,
+    shownBudgetIds,
     setPopupState,
     setSelectedBudgetId
   } = useStorageContext();
   const {
-    shownBudgetsData,
+    budgetsData,
     accountsLastUpdated,
     accountsError,
     categoriesError,
@@ -41,6 +42,11 @@ export default function PopupNav() {
     isRefreshingBudgets
   } = useYNABContext();
   const globalIsFetching = useIsFetching();
+
+  const shownBudgetsData = useMemo(
+    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
+    [budgetsData, shownBudgetIds]
+  );
 
   const openBudget = useCallback(() => {
     window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
@@ -50,7 +56,7 @@ export default function PopupNav() {
     window.open(
       chrome.runtime.getURL("popup.html"),
       "peekWindow",
-      "width=340,height=500"
+      "width=320,height=500"
     );
     window.close();
   }, []);

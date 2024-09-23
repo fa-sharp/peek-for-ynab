@@ -45,7 +45,7 @@ export default function BudgetSelect({
         }}>
         {!selectedBudgetId || !currentBudgetName ? "Select a budget" : currentBudgetName}
       </div>
-      {(!selectedBudgetId || budgets.length > 1) && (
+      {(!selectedBudgetId || !currentBudgetName || budgets.length > 1) && (
         <PopupNavMenu
           label="Select a budget"
           placement="bottom right"
