@@ -18,12 +18,7 @@ function IndexPage() {
           transaction, edit pinned items, and more. Menu is keyboard navigable thanks to
           the awesome open-source{" "}
           <a href="https://react-spectrum.adobe.com/react-aria/index.html">React Aria</a>{" "}
-          library 🙏. See demo below.
-        </li>
-        <li>
-          New button to copy the current website title into the memo field of a
-          transaction (button only appears if you give permission to access the current
-          tab in the settings 😉)
+          library 🙏.
         </li>
         <li>
           Now using YNAB&apos;s{" "}
