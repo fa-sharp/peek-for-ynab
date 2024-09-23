@@ -93,7 +93,9 @@ export function OptionsView() {
               />
               😉 Emoji mode
             </label>
-            <label className="flex-row" title="Animate changing balances">
+            <label
+              className="flex-row"
+              title="Enable animations of changing balances and other elements">
               <input
                 type="checkbox"
                 checked={!!settings.animations}
