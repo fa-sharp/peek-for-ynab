@@ -16,7 +16,7 @@ import type { OverlayTriggerState } from "@react-stately/overlays";
 import { type TreeState, useTreeState } from "@react-stately/tree";
 import type { Node } from "@react-types/shared";
 import { clsx } from "clsx";
-import { type RefObject, useCallback, useRef, useState } from "react";
+import { type RefObject, useRef } from "react";
 import { Menu2 } from "tabler-icons-react";
 
 interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
@@ -33,17 +33,7 @@ export default function PopupNavMenu<T extends object>({
 }: MenuButtonProps<T> & {
   animationsEnabled?: boolean;
 }) {
-  const [animatingExit, setAnimatingExit] = useState(false);
-  const onOpenChange = useCallback(
-    (isOpen: boolean) => {
-      if (!animationsEnabled || isOpen) return;
-      setAnimatingExit(true);
-      setTimeout(() => setAnimatingExit(false), 200);
-    },
-    [animationsEnabled]
-  );
-
-  const state = useMenuTriggerState({ onOpenChange, ...props });
+  const state = useMenuTriggerState(props);
   const triggerRef = useRef(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger<T>({}, state, triggerRef);
 
@@ -57,11 +47,11 @@ export default function PopupNavMenu<T extends object>({
         className="icon-button">
         <Menu2 aria-hidden />
       </Button>
-      {(state.isOpen || animatingExit) && (
+      {state.isOpen && (
         <Popover
           state={state}
           triggerRef={triggerRef}
-          offset={4}
+          offset={5}
           animationsEnabled={animationsEnabled}>
           <Menu {...props} {...menuProps} />
         </Popover>
@@ -111,19 +101,18 @@ function Popover({ children, state, animationsEnabled, ...props }: PopoverProps)
   );
 
   return (
-    <Overlay isExiting={!state.isOpen}>
+    <Overlay>
       <div {...underlayProps} style={{ position: "fixed", inset: 0 }} />
       <div
         {...popoverProps}
         ref={ref}
         className={clsx("rounded", {
-          "slide-up-enter": animationsEnabled && state.isOpen,
-          "slide-up-exit": animationsEnabled && !state.isOpen
+          "slide-up": animationsEnabled && state.isOpen
         })}
         style={{
           ...popoverProps.style,
           overflow: "auto",
-          boxShadow: "var(--border-light) 0px 6px 10px 0px"
+          boxShadow: "var(--border-light) 0px 4px 9px 1px"
         }}>
         <DismissButton onDismiss={state.close} />
         {children}

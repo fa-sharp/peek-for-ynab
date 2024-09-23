@@ -55,6 +55,12 @@ export default function PopupNav() {
   const onMenuAction = useCallback(
     (key: Key) => {
       switch (key) {
+        case "addTransaction":
+          setPopupState({ view: "txAdd" });
+          break;
+        case "addTransfer":
+          setPopupState({ view: "txAdd", txAddState: { isTransfer: true } });
+          break;
         case "editItems":
           setPopupState({ view: "main", editMode: !popupState.editMode });
           break;
@@ -89,10 +95,10 @@ export default function PopupNav() {
                 ).toLocaleString()}`
         }
         icon={
-          categoriesError || accountsError ? (
-            <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : globalIsFetching ? (
+          globalIsFetching ? (
             <Refresh aria-hidden />
+          ) : categoriesError || accountsError ? (
+            <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
           ) : !selectedBudgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (
@@ -129,6 +135,13 @@ export default function PopupNav() {
           onAction={onMenuAction}
           disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}
           animationsEnabled={settings.animations}>
+          <Item key="addTransaction" textValue="Add transaction">
+            <div className="flex-row gap-sm">
+              <PencilOff aria-hidden size={20} />
+              Add transaction
+            </div>
+          </Item>
+
           <Item
             key="editItems"
             textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
