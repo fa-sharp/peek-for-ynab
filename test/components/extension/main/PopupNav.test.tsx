@@ -46,12 +46,12 @@ test("Can be navigated with keyboard", async () => {
   await user.keyboard("{Enter}");
   expect(screen.queryByRole("menu"), "can open menu").toBeTruthy();
   expect(
-    screen.getByRole("menuitem", { name: "Edit pinned items" }),
+    screen.getByRole("menuitem", { name: "Add transaction" }),
     "first item is auto-focused"
   ).toHaveFocus();
   await user.keyboard("{ArrowDown}");
   expect(
-    screen.getByRole("menuitem", { name: "Open in new window" }),
+    screen.getByRole("menuitem", { name: "Add transfer/payment" }),
     "can navigate menu"
   ).toHaveFocus();
   await user.keyboard("{Esc}");
@@ -77,7 +77,7 @@ test("Selecting a menu item closes the menu", async () => {
   expect(screen.queryByRole("menu"), "mouse closes menu").toBeNull();
 });
 
-test("Can activate edit mode", async () => {
+test("Menu buttons change the popup state as expected", async () => {
   const Wrapper = createTestAppWrapper();
   const { result } = renderHook(useStorageContext, {
     wrapper: ({ children }) => (
@@ -95,5 +95,10 @@ test("Can activate edit mode", async () => {
   expect(result.current.popupState.editMode).toBeFalsy();
   await user.click(screen.getByLabelText("Menu"));
   await user.click(screen.getByText("Edit", { exact: false }));
-  expect(result.current.popupState.editMode).toEqual(true);
+  expect(result.current.popupState.editMode, "edit mode activated").toEqual(true);
+
+  expect(result.current.popupState.view).toEqual("main");
+  await user.click(screen.getByLabelText("Menu"));
+  await user.click(screen.getByText("Add transaction"));
+  expect(result.current.popupState.view, "transaction form opened").toEqual("txAdd");
 });

@@ -27,7 +27,7 @@
 
 :root.dark {
   --background: #252525;
-  --border: #969696;
+  --border: #bababa;
   --border-light: #6e6e6e;
   --action: #ffffff;
   --accent: hsl(210, 34%, 38%);
@@ -261,6 +261,9 @@ li:last-child .balance-display {
   padding: 0;
   margin: 0;
 }
+.menu:focus-visible {
+  outline-color: var(--border);
+}
 .menu > li {
   padding: var(--spacing-sm);
   cursor: pointer;
@@ -423,31 +426,16 @@ li:last-child .balance-display {
   }
 }
 
-.slide-up-enter {
-  animation: slide-up-enter 0.2s forwards;
+.slide-up {
+  animation: slide-up 0.2s forwards;
 }
 
-.slide-up-exit {
-  animation: slide-up-exit 0.2s forwards;
-}
-
-@keyframes slide-up-enter {
+@keyframes slide-up {
   100% {
     transform: translateY(0);
     opacity: 1;
   }
   0% {
-    transform: translateY(6px);
-    opacity: 0;
-  }
-}
-
-@keyframes slide-up-exit {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
     transform: translateY(6px);
     opacity: 0;
   }

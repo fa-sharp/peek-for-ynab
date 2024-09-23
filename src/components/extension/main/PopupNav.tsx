@@ -8,8 +8,10 @@ import {
   ExternalLink,
   Pencil,
   PencilOff,
+  Plus,
   Refresh,
-  Settings
+  Settings,
+  SwitchHorizontal
 } from "tabler-icons-react";
 
 import { BudgetSelect, IconButton, IconSpan } from "~components";
@@ -59,7 +61,10 @@ export default function PopupNav() {
           setPopupState({ view: "txAdd" });
           break;
         case "addTransfer":
-          setPopupState({ view: "txAdd", txAddState: { isTransfer: true } });
+          setPopupState({
+            view: "txAdd",
+            txAddState: { isTransfer: true, accountId: "none" }
+          });
           break;
         case "editItems":
           setPopupState({ view: "main", editMode: !popupState.editMode });
@@ -137,11 +142,16 @@ export default function PopupNav() {
           animationsEnabled={settings.animations}>
           <Item key="addTransaction" textValue="Add transaction">
             <div className="flex-row gap-sm">
-              <PencilOff aria-hidden size={20} />
+              <Plus aria-hidden size={20} />
               Add transaction
             </div>
           </Item>
-
+          <Item key="addTransfer" textValue="Add transfer/payment">
+            <div className="flex-row gap-sm">
+              <SwitchHorizontal aria-hidden size={20} />
+              Add transfer/payment
+            </div>
+          </Item>
           <Item
             key="editItems"
             textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
