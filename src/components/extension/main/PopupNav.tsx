@@ -119,17 +119,16 @@ export default function PopupNav() {
       <div className="flex-row gap-xs">
         {popupState.editMode && (
           <IconButton
-            label={"Done editing"}
-            onClick={() =>
-              setPopupState({ view: "main", editMode: !popupState.editMode })
-            }
+            label="Done editing"
+            onClick={() => setPopupState({ view: "main" })}
             icon={<PencilOff aria-hidden />}
           />
         )}
         <PopupNavMenu
           label="Menu"
           onAction={onMenuAction}
-          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}>
+          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}
+          animationsEnabled={settings.animations}>
           <Item
             key="editItems"
             textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>

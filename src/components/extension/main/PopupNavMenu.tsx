@@ -15,7 +15,8 @@ import { type MenuTriggerProps, useMenuTriggerState } from "@react-stately/menu"
 import type { OverlayTriggerState } from "@react-stately/overlays";
 import { type TreeState, useTreeState } from "@react-stately/tree";
 import type { Node } from "@react-types/shared";
-import { type RefObject, useRef } from "react";
+import { clsx } from "clsx";
+import { type RefObject, useCallback, useRef, useState } from "react";
 import { Menu2 } from "tabler-icons-react";
 
 interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
@@ -23,11 +24,26 @@ interface MenuButtonProps<T> extends AriaMenuProps<T>, MenuTriggerProps {
 }
 
 /**
- * Menu for the popup navigation. Parts of this can be refactored into more generic components if needed.
+ * Dropdown menu for the popup nav. Parts of this can be refactored into more generic components if needed.
  * See https://react-spectrum.adobe.com/react-aria/useMenu.html.
  */
-export default function PopupNavMenu<T extends object>(props: MenuButtonProps<T>) {
-  const state = useMenuTriggerState(props);
+export default function PopupNavMenu<T extends object>({
+  animationsEnabled,
+  ...props
+}: MenuButtonProps<T> & {
+  animationsEnabled?: boolean;
+}) {
+  const [animatingExit, setAnimatingExit] = useState(false);
+  const onOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (!animationsEnabled || isOpen) return;
+      setAnimatingExit(true);
+      setTimeout(() => setAnimatingExit(false), 200);
+    },
+    [animationsEnabled]
+  );
+
+  const state = useMenuTriggerState({ onOpenChange, ...props });
   const triggerRef = useRef(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger<T>({}, state, triggerRef);
 
@@ -41,8 +57,12 @@ export default function PopupNavMenu<T extends object>(props: MenuButtonProps<T>
         className="icon-button">
         <Menu2 aria-hidden />
       </Button>
-      {state.isOpen && (
-        <Popover state={state} triggerRef={triggerRef} offset={4}>
+      {(state.isOpen || animatingExit) && (
+        <Popover
+          state={state}
+          triggerRef={triggerRef}
+          offset={4}
+          animationsEnabled={animationsEnabled}>
           <Menu {...props} {...menuProps} />
         </Popover>
       )}
@@ -80,9 +100,10 @@ function MenuItem<T>({ item, state }: { item: Node<T>; state: TreeState<T> }) {
 interface PopoverProps extends Omit<AriaPopoverProps, "popoverRef"> {
   children: React.ReactNode;
   state: OverlayTriggerState;
+  animationsEnabled?: boolean;
 }
 
-function Popover({ children, state, ...props }: PopoverProps) {
+function Popover({ children, state, animationsEnabled, ...props }: PopoverProps) {
   const ref = useRef(null);
   const { popoverProps, underlayProps } = usePopover(
     { ...props, popoverRef: ref },
@@ -90,16 +111,19 @@ function Popover({ children, state, ...props }: PopoverProps) {
   );
 
   return (
-    <Overlay>
+    <Overlay isExiting={!state.isOpen}>
       <div {...underlayProps} style={{ position: "fixed", inset: 0 }} />
       <div
         {...popoverProps}
         ref={ref}
-        className="rounded"
+        className={clsx("rounded", {
+          "slide-up-enter": animationsEnabled && state.isOpen,
+          "slide-up-exit": animationsEnabled && !state.isOpen
+        })}
         style={{
           ...popoverProps.style,
           overflow: "auto",
-          boxShadow: "var(--border-light) 0px 6px 12px 0px"
+          boxShadow: "var(--border-light) 0px 6px 10px 0px"
         }}>
         <DismissButton onDismiss={state.close} />
         {children}

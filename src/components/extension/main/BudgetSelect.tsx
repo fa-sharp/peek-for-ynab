@@ -18,6 +18,7 @@ export default function BudgetSelect({
       <div
         style={{
           maxWidth: emojiMode ? "5em" : "11em",
+          fontSize: "1.1em",
           fontWeight: 500,
           whiteSpace: "nowrap",
           overflow: "hidden",

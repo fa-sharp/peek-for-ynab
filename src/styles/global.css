@@ -422,3 +422,33 @@ li:last-child .balance-display {
     transform: rotate(0deg);
   }
 }
+
+.slide-up-enter {
+  animation: slide-up-enter 0.2s forwards;
+}
+
+.slide-up-exit {
+  animation: slide-up-exit 0.2s forwards;
+}
+
+@keyframes slide-up-enter {
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up-exit {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
