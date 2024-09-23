@@ -24,18 +24,20 @@ function HelpPage() {
         <li>
           <h3>How do I pin/unpin or re-arrange my categories and accounts?</h3>
           <p>
-            If you have already pinned some items, you will need to click the edit button
-            in the upper right in order to show the pin and unpin buttons next to each
-            category and account. You can also then drag and drop your pinned items to
-            re-arrange them how you like.
+            If you have already pinned some items, you will need to access the menu by
+            clicking the hamburger icon at the top right, and then selecting{" "}
+            <b>Edit pinned items</b>. This will show the pin and unpin buttons next to
+            each category and account. You can also then drag and drop your pinned items
+            to re-arrange them how you like.
           </p>
         </li>
         <li>
-          <h3>I added a new budget in YNAB, but it is not showing up.</h3>
+          <h3>I started a new budget in YNAB, but it is not showing up.</h3>
           <p>
-            After you have added a new budget, make sure to click <b>Refresh budgets</b>{" "}
-            at the bottom of the settings page, and then select the checkmark next to your
-            new budget in the list.
+            After you have added a new budget or made a Fresh Start, access the settings
+            page (click the hamburger icon at the top right and select <b>Settings</b>).
+            Select <b>Refresh budgets</b> at the bottom of the settings page, and then
+            select the checkmark next to your new budget in the list.
           </p>
         </li>
         <li>
@@ -44,8 +46,8 @@ function HelpPage() {
             Yes! The default shortcut to open the popup is <kbd>Alt/Option+Shift+Y</kbd>{" "}
             (you can change this by heading over to{" "}
             <code>chrome://extensions/shortcuts</code> in your browser). From there, you
-            can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Space</kbd>, and{" "}
-            <kbd>Enter</kbd> keys to navigate the extension.
+            can use the <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Space</kbd>,{" "}
+            <kbd>Enter</kbd>, and arrow keys to navigate the extension.
           </p>
         </li>
         <li>
