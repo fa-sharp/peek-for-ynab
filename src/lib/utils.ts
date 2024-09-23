@@ -120,6 +120,9 @@ export const findEmoji = (s: string, limit = 2) => {
   return matches ? matches.slice(0, limit).join("") : null;
 };
 
+/** Check if extension popup is open */
+export const isPopupOpen = () => chrome.extension.getViews({ type: "popup" }).length > 0;
+
 /**
  * Executes the given function in the context of the user's active browser tab.
  * @returns a Promise with the result of the given function
