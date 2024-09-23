@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 function HelpPage() {
   return (
     <>
-      <h1>Peek for YNAB</h1>
       <h2>Help/FAQ</h2>
       <ul>
         <li>

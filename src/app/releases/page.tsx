@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 function IndexPage() {
   return (
     <>
-      <h1>Peek for YNAB</h1>
       <h2>Release Notes</h2>
       <h3>0.21.0 - Sep 24, 2024</h3>
       <ul>
