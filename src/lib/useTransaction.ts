@@ -223,7 +223,7 @@ export default function useTransaction() {
             }))
           : undefined
       });
-      setPopupState(popupState.txAddState?.returnTo || { view: "main" });
+      setPopupState(txAddState?.returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);

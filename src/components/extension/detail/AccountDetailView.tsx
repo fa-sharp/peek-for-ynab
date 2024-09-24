@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { ArrowBack, ExternalLink } from "tabler-icons-react";
 import { AccountType } from "ynab";
 
-import { CurrencyView, IconButton, TransactionView } from "~components";
+import { CurrencyView, IconButton, IconSpan, TransactionView } from "~components";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
@@ -151,9 +151,7 @@ const AccountTxsView = () => {
             Last Reconciled:
             <div className="flex-row">
               {hasReconcileAlert && (
-                <IconButton
-                  noAction
-                  disabled
+                <IconSpan
                   label={`Reconciled more than ${budgetSettings?.notifications.reconcileAlerts[account.id]} days ago!`}
                   icon={<ReconcileAlertIcon />}
                 />
