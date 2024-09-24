@@ -121,7 +121,12 @@ export default function PopupNav() {
           )
         }
         onClick={() => refreshCategoriesAndAccounts()}
-        disabled={Boolean(globalIsFetching)}
+        disabled={
+          Boolean(globalIsFetching) ||
+          !selectedBudgetId ||
+          (isDataFreshForDisplay(categoriesLastUpdated) &&
+            isDataFreshForDisplay(accountsLastUpdated))
+        }
         spin={Boolean(globalIsFetching)}
       />
       <div className="flex-row gap-xs">
