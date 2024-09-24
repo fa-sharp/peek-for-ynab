@@ -32,8 +32,6 @@ test("Can be navigated with keyboard", async () => {
 
   const user = userEvent.setup();
   await user.keyboard("{Tab}");
-  expect(screen.getByLabelText("Status", { exact: false })).toHaveFocus();
-  await user.keyboard("{Tab}");
   expect(screen.getByLabelText("Select a budget")).toHaveFocus();
   await user.keyboard("{Tab}");
   expect(screen.getByLabelText("Open", { exact: false })).toHaveFocus();
@@ -62,7 +60,7 @@ test("Selecting a menu item closes the menu", async () => {
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
-  await user.keyboard("{Tab}{Tab}{Enter}");
+  await user.keyboard("{Tab}{Enter}");
   expect(screen.queryByRole("menu")).toBeTruthy();
   await user.keyboard("{Enter}");
   expect(screen.queryByRole("menu"), "keyboard closes menu").toBeNull();
