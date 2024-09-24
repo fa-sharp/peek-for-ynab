@@ -226,6 +226,14 @@ li:last-child .balance-display {
   line-height: 0;
   cursor: pointer;
 }
+.icon-button:active {
+  transform: scale(0.95);
+}
+@media (prefers-reduced-motion) {
+  .icon-button:active {
+    transform: none;
+  }
+}
 .icon-button.rounded {
   border: none;
   border-radius: 50%;
