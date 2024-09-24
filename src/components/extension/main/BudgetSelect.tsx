@@ -50,6 +50,8 @@ export default function BudgetSelect({
           label="Select a budget"
           placement="bottom right"
           icon={<ChevronDown aria-hidden />}
+          selectionMode="single"
+          selectedKeys={selectedBudgetId ? [selectedBudgetId] : []}
           onAction={onSelectBudget}
           animationsEnabled={animationsEnabled}>
           {budgets.map((budget) => (
