@@ -28,8 +28,8 @@ test("can display budgets", async () => {
   expect(screen.getByRole("button")).toHaveAccessibleName("Select a budget");
   await user.click(screen.getByRole("button"));
 
-  expect(screen.queryByRole("menuitem", { name: budgets[0].name })).toBeTruthy();
-  expect(screen.queryByRole("menuitem", { name: budgets[1].name })).toBeTruthy();
+  expect(screen.queryByRole("menuitemradio", { name: budgets[0].name })).toBeTruthy();
+  expect(screen.queryByRole("menuitemradio", { name: budgets[1].name })).toBeTruthy();
 });
 
 test("can switch between budgets", async () => {
