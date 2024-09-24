@@ -18,35 +18,36 @@ export type TransactionFormHandlers = ReturnType<typeof useTransaction>["handler
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const { settings, budgetSettings, popupState, setPopupState, setBudgetSettings } =
-    useStorageContext();
+  const {
+    settings,
+    budgetSettings,
+    popupState: { txAddState },
+    setPopupState,
+    setBudgetSettings
+  } = useStorageContext();
 
   // Transaction state
-  const [isTransfer, setIsTransfer] = useState(
-    popupState.txAddState?.isTransfer ?? false
-  );
+  const [isTransfer, setIsTransfer] = useState(txAddState?.isTransfer ?? false);
   const [date, setDate] = useState(getTodaysDateISO);
-  const [amount, setAmount] = useState(popupState.txAddState?.amount || "");
+  const [amount, setAmount] = useState(txAddState?.amount || "");
   const [cleared, setCleared] = useState(
     () =>
-      accountsData?.find((a) => a.id === popupState.txAddState?.accountId)?.type ===
-        "cash" || !!budgetSettings?.transactions.cleared
+      accountsData?.find((a) => a.id === txAddState?.accountId)?.type === "cash" ||
+      !!budgetSettings?.transactions.cleared
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    popupState.txAddState?.amountType || "Outflow"
+    txAddState?.amountType || "Outflow"
   );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    popupState.txAddState?.payee || null
+    txAddState?.payee || null
   );
   const [category, setCategory] = useState(() => {
-    if (!popupState.txAddState?.categoryId) return null;
-    return (
-      categoriesData?.find((c) => c.id === popupState.txAddState?.categoryId) || null
-    );
+    if (!txAddState?.categoryId) return null;
+    return categoriesData?.find((c) => c.id === txAddState?.categoryId) || null;
   });
   const [account, setAccount] = useState(() => {
-    if (popupState.txAddState?.accountId)
-      return accountsData?.find((a) => a.id === popupState.txAddState?.accountId) || null;
+    if (txAddState?.accountId)
+      return accountsData?.find((a) => a.id === txAddState?.accountId) || null;
     if (budgetSettings?.transactions.defaultAccountId)
       return (
         accountsData?.find(

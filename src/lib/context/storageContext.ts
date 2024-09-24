@@ -28,7 +28,7 @@ export interface AppSettings {
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default false */
+  /** Whether animations are enabled. @default true */
   animations?: boolean;
 }
 
@@ -48,14 +48,14 @@ interface BudgetToStringArrayMap {
 }
 
 export interface BudgetNotificationSettings {
-  /** Notify when a category is overspent */
+  /** Notify when a category is overspent @default false  */
   overspent: boolean;
-  /** Check for new bank imports and notify if there are unapproved transactions  */
+  /** Check for new bank imports and notify if there are unapproved transactions @default false   */
   checkImports: boolean;
-  /** Notify when a bank connection is showing an error */
+  /** Notify when a bank connection is showing an error @default false  */
   importError: boolean;
   /** Reminders for reconciliation - stored as a map
-   * of accountId to max # of days since last reconciliation */
+   * of accountId to max # of days since last reconciliation @default {} // no reminders  */
   reconcileAlerts: {
     [accountId: string]: number | undefined;
   };
@@ -65,11 +65,11 @@ export interface BudgetNotificationSettings {
 export interface BudgetSettings {
   notifications: BudgetNotificationSettings;
   transactions: {
-    /** Whether transactions are marked Cleared by default */
+    /** Whether transactions are marked Cleared by default @default false */
     cleared: boolean;
-    /** Whether transactions are automatically marked Approved */
+    /** Whether transactions are automatically marked Approved @default true */
     approved: boolean;
-    /** Whether to remember the last-used account for transaction entry. */
+    /** Whether to remember the last-used account for transaction entry. @default false */
     rememberAccount: boolean;
     /** Default account for purchases */
     defaultAccountId?: string;

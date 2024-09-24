@@ -76,12 +76,6 @@ const useYNABProvider = () => {
     [budgetsData, selectedBudgetId]
   );
 
-  /** Data from the budgets the user has selected to show */
-  const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds]
-  );
-
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
   const {
     data: categoryGroupsData,
@@ -205,6 +199,10 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
+  const [addedTransaction, setAddedTransaction] = useState<ynab.NewTransaction | null>(
+    null
+  );
+
   const addTransaction = useCallback(
     async (transaction: ynab.NewTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
@@ -217,7 +215,11 @@ const useYNABProvider = () => {
         refreshCategoriesAndAccounts();
         if (!transaction.payee_id) refetchPayees();
       }, 350);
+
+      setAddedTransaction(transaction);
+      setTimeout(() => setAddedTransaction(null), 6 * 1000);
     },
+
     [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
   );
 
@@ -242,8 +244,6 @@ const useYNABProvider = () => {
     unapprovedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,
-    /** API data: List of budgets the user has selected to show */
-    shownBudgetsData,
     /** API data: List of saved accounts in the currently selected budget */
     savedAccountsData,
     /** API data: List of saved categories in the currently selected budget */
@@ -255,7 +255,9 @@ const useYNABProvider = () => {
     /** Get accounts for the specified budget */
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */
-    addTransaction
+    addTransaction,
+    /** The recently added transaction. Can be used to trigger animations/effects. */
+    addedTransaction
   };
 };
 

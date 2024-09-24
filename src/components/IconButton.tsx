@@ -9,8 +9,7 @@ export default function IconButton({
   accent,
   rounded,
   spin,
-  disabled,
-  noAction
+  disabled
 }: {
   label: string;
   onClick?: MouseEventHandler;
@@ -19,7 +18,6 @@ export default function IconButton({
   rounded?: boolean;
   spin?: boolean;
   disabled?: boolean;
-  noAction?: boolean;
 }) {
   return (
     <button
@@ -29,8 +27,7 @@ export default function IconButton({
       className={clsx("icon-button", {
         rounded,
         spin,
-        accent,
-        noaction: noAction
+        accent
       })}
       onClick={onClick}
       disabled={disabled}>

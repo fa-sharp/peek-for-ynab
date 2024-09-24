@@ -29,7 +29,10 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
           Privacy Policy
         </Link>
       </nav>
-      <main className={styles.mainContent}>{children}</main>
+      <main className={styles.mainContent}>
+        <h1>Peek for YNAB</h1>
+        {children}
+      </main>
       <footer className={styles.footer}>
         💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
         Peek for YNAB is a third-party extension, and is not affiliated with or supported

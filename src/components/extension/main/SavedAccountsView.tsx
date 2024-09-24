@@ -7,7 +7,7 @@ import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
-  const { selectedBudgetData, savedAccountsData } = useYNABContext();
+  const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
   const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
@@ -45,6 +45,7 @@ export default function SavedAccountsView() {
                     alerts={currentAlerts?.[selectedBudgetData.id]?.accounts[account.id]}
                     currencyFormat={selectedBudgetData?.currencyFormat}
                     settings={settings}
+                    addedTransaction={!!addedTransaction}
                     actionElementsLeft={
                       !popupState.editMode ? null : (
                         <IconButton
