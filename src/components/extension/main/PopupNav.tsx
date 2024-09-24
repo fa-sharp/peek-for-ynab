@@ -105,7 +105,7 @@ export default function PopupNav() {
                   categoriesLastUpdated < accountsLastUpdated
                     ? categoriesLastUpdated
                     : accountsLastUpdated
-                ).toLocaleString()}. Click to refresh`
+                ).toLocaleString()}`
         }
         icon={
           globalIsFetching ? (
@@ -124,6 +124,8 @@ export default function PopupNav() {
         disabled={
           Boolean(globalIsFetching) ||
           !selectedBudgetId ||
+          !!categoriesError ||
+          !!accountsError ||
           (isDataFreshForDisplay(categoriesLastUpdated) &&
             isDataFreshForDisplay(accountsLastUpdated))
         }
