@@ -116,7 +116,7 @@ function Popover({ children, state, animationsEnabled, ...props }: PopoverProps)
         style={{
           ...popoverProps.style,
           overflow: "auto",
-          boxShadow: "var(--border-light) 0px 4px 9px 1px"
+          boxShadow: "var(--border-light) 0px 2px 7px 1px"
         }}>
         <DismissButton onDismiss={state.close} />
         {children}
