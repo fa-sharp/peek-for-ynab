@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 function IndexPage() {
   return (
     <>
-      <h1>Peek for YNAB</h1>
       <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
         <Image

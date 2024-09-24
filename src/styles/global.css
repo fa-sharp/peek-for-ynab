@@ -27,7 +27,7 @@
 
 :root.dark {
   --background: #252525;
-  --border: #969696;
+  --border: #bababa;
   --border-light: #6e6e6e;
   --action: #ffffff;
   --accent: hsl(210, 34%, 38%);
@@ -235,15 +235,20 @@ li:last-child .balance-display {
   line-height: 0;
   cursor: pointer;
 }
-.icon-button:active:not(.noaction) {
+.icon-button:active {
   transform: scale(0.95);
+}
+@media (prefers-reduced-motion) {
+  .icon-button:active {
+    transform: none;
+  }
 }
 .icon-button.rounded {
   border: none;
   border-radius: 50%;
 }
-.icon-button.noaction {
-  cursor: initial;
+.icon-button[disabled] {
+  cursor: unset;
 }
 
 .list {
@@ -261,6 +266,26 @@ li:last-child .balance-display {
 }
 .select.small {
   padding: 0.1em;
+}
+
+.menu {
+  background-color: var(--background);
+  list-style: none;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+}
+.menu:focus-visible {
+  outline-color: var(--border);
+}
+.menu > li {
+  padding: var(--spacing-sm);
+  cursor: pointer;
+}
+.menu > li:hover,
+.menu > li:focus-visible {
+  background-color: var(--highlight);
+  outline-color: var(--border);
 }
 
 .select-dropdown-list {
@@ -424,5 +449,20 @@ li:last-child .balance-display {
   }
   100% {
     transform: rotate(0deg);
+  }
+}
+
+.slide-up {
+  animation: slide-up 0.2s forwards;
+}
+
+@keyframes slide-up {
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
   }
 }

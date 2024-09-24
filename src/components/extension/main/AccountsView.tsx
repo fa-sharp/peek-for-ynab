@@ -139,12 +139,7 @@ function AccountTypeView({
                 alerts={accountAlerts?.[account.id]}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
-                    <IconButton
-                      icon={<PinnedItemIcon />}
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
+                    <IconSpan icon={<PinnedItemIcon />} label="Pinned" />
                   ) : (
                     <IconButton
                       icon={<PinItemIcon />}
@@ -195,7 +190,8 @@ export const AccountView = ({
   actionElementsLeft,
   actionElementsRight,
   alerts,
-  settings
+  settings,
+  addedTransaction
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
@@ -203,6 +199,7 @@ export const AccountView = ({
   actionElementsRight?: ReactElement | null;
   alerts?: AccountAlerts[string];
   settings: AppSettings;
+  addedTransaction?: boolean;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
@@ -240,7 +237,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations}
+          animationEnabled={settings.animations && addedTransaction}
         />
         {actionElementsRight}
       </div>

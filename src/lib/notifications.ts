@@ -178,6 +178,8 @@ export const updateIconAndTooltip = (
 
   chrome.action?.setTitle({ title: tooltip.trimEnd() });
   chrome.action?.setBadgeText({ text: String(numNotifications || "") });
+  chrome.action?.setBadgeTextColor({ color: "#000" });
+  chrome.action?.setBadgeBackgroundColor({ color: "#9dc9e7" });
 };
 
 export const createSystemNotification = async (

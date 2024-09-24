@@ -23,9 +23,9 @@ test("Can focus on button with keyboard", async () => {
 
 test("Changes class names correctly", async () => {
   const { rerender } = render(
-    <IconButton icon={<PinItemIcon />} label="Pin item" accent spin noAction />
+    <IconButton icon={<PinItemIcon />} label="Pin item" accent spin />
   );
-  expect(screen.getByRole("button")).toHaveClass("accent spin noaction");
+  expect(screen.getByRole("button")).toHaveClass("accent spin");
 
   rerender(<IconButton icon={<PinItemIcon />} label="Pin item" rounded accent />);
   expect(screen.getByRole("button")).toHaveClass("accent rounded");

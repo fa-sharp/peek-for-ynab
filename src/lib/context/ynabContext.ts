@@ -11,7 +11,7 @@ import {
   fetchPayeesForBudget
 } from "~lib/api";
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
-import type { CachedBudget, CachedPayee } from "~lib/types";
+import type { CachedBudget } from "~lib/types";
 import { getNDaysAgoISO } from "~lib/utils";
 
 import { useAuthContext } from "./authContext";
@@ -65,12 +65,6 @@ const useYNABProvider = () => {
   const selectedBudgetData = useMemo(
     () => budgetsData?.find((b) => b.id === selectedBudgetId) || null,
     [budgetsData, selectedBudgetId]
-  );
-
-  /** Data from the budgets the user has selected to show */
-  const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds]
   );
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
@@ -269,6 +263,10 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
+  const [addedTransaction, setAddedTransaction] = useState<ynab.NewTransaction | null>(
+    null
+  );
+
   const addTransaction = useCallback(
     async (transaction: ynab.NewTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
@@ -277,6 +275,9 @@ const useYNABProvider = () => {
       });
       IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
+      setAddedTransaction(transaction);
+      setTimeout(() => setAddedTransaction(null), 6 * 1000);
+
       setTimeout(() => {
         refreshCategoriesAndAccounts();
         if (!transaction.payee_id) refetchPayees();
@@ -375,8 +376,6 @@ const useYNABProvider = () => {
     unapprovedTxs,
     /** API data: Currently selected budget */
     selectedBudgetData,
-    /** API data: List of budgets the user has selected to show */
-    shownBudgetsData,
     /** API data: List of saved accounts in the currently selected budget */
     savedAccountsData,
     /** API data: List of saved categories in the currently selected budget */
@@ -389,6 +388,8 @@ const useYNABProvider = () => {
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */
     addTransaction,
+    /** The recently added transaction. Can be used to trigger animations/effects. */
+    addedTransaction,
     useGetAccountTxs,
     useGetCategoryTxs,
     /** Move money in the current budget */

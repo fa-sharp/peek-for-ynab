@@ -144,12 +144,7 @@ export function CategoryGroupView({
                     !editMode ? null : savedCategories?.some(
                         (id) => id === category.id
                       ) ? (
-                      <IconButton
-                        icon={<PinnedItemIcon />}
-                        label="Pinned"
-                        disabled
-                        noAction
-                      />
+                      <IconSpan icon={<PinnedItemIcon />} label="Pinned" />
                     ) : (
                       <IconButton
                         icon={<PinItemIcon />}
@@ -227,7 +222,8 @@ export const CategoryView = ({
   settings,
   alerts,
   actionElementsRight,
-  actionElementsLeft
+  actionElementsLeft,
+  addedTransaction
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
@@ -235,6 +231,7 @@ export const CategoryView = ({
   actionElementsLeft?: ReactElement | null;
   alerts?: CategoryAlerts[string];
   settings: AppSettings;
+  addedTransaction?: boolean;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
@@ -260,7 +257,7 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations}
+          animationEnabled={settings.animations && addedTransaction}
         />
         {actionElementsRight}
       </div>

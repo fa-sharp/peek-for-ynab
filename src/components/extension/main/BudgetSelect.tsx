@@ -1,50 +1,66 @@
+import { Item } from "@react-stately/collections";
+import { type Key, useCallback, useMemo } from "react";
+import { ChevronDown } from "tabler-icons-react";
+
 import type { CachedBudget } from "~lib/types";
 import { findEmoji } from "~lib/utils";
+
+import PopupNavMenu from "./PopupNavMenu";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({
   emojiMode,
+  animationsEnabled,
   shownBudgets: budgets,
   selectedBudgetId,
   setSelectedBudgetId
 }: {
   emojiMode?: boolean;
+  animationsEnabled?: boolean;
   shownBudgets: CachedBudget[];
   selectedBudgetId: string;
   setSelectedBudgetId: (budgetId: string) => void;
 }) {
-  if (budgets.length === 1 && budgets[0].id === selectedBudgetId)
-    return (
+  const currentBudgetName = useMemo(() => {
+    const name = budgets.find((b) => b.id === selectedBudgetId)?.name;
+    if (!name) return "";
+    return emojiMode ? findEmoji(name) || name : name;
+  }, [budgets, emojiMode, selectedBudgetId]);
+
+  const onSelectBudget = useCallback(
+    (id: Key) => typeof id === "string" && setSelectedBudgetId(id),
+    [setSelectedBudgetId]
+  );
+
+  return (
+    <>
       <div
         style={{
           maxWidth: emojiMode ? "5em" : "11em",
-          marginInline: 4,
+          fontSize: "1.1em",
           fontWeight: 500,
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis"
         }}>
-        {emojiMode ? findEmoji(budgets[0].name) || budgets[0].name : budgets[0].name}
+        {!selectedBudgetId || !currentBudgetName ? "Select a budget" : currentBudgetName}
       </div>
-    );
-
-  return (
-    <select
-      className="select rounded"
-      aria-label="Budget selection"
-      style={{
-        maxWidth: !emojiMode ? "11em" : "5em",
-        fontWeight: 500,
-        textOverflow: "ellipsis"
-      }}
-      value={selectedBudgetId || "initial"}
-      onChange={(e) => setSelectedBudgetId(e.target.value)}>
-      {!selectedBudgetId && <option value="initial">--Select a budget--</option>}
-      {budgets.map((budget) => (
-        <option key={budget.id} value={budget.id}>
-          {emojiMode ? findEmoji(budget.name) || budget.name : budget.name}
-        </option>
-      ))}
-    </select>
+      {(!selectedBudgetId || !currentBudgetName || budgets.length > 1) && (
+        <PopupNavMenu
+          label="Select a budget"
+          placement="bottom right"
+          icon={<ChevronDown aria-hidden />}
+          selectionMode="single"
+          selectedKeys={selectedBudgetId ? [selectedBudgetId] : []}
+          onAction={onSelectBudget}
+          animationsEnabled={animationsEnabled}>
+          {budgets.map((budget) => (
+            <Item key={budget.id}>
+              {emojiMode ? findEmoji(budget.name) || budget.name : budget.name}
+            </Item>
+          ))}
+        </PopupNavMenu>
+      )}
+    </>
   );
 }

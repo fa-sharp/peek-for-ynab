@@ -14,7 +14,8 @@ import {
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
   const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
-  const { accountsData, selectedBudgetData, savedCategoriesData } = useYNABContext();
+  const { accountsData, selectedBudgetData, savedCategoriesData, addedTransaction } =
+    useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   if (
@@ -58,6 +59,7 @@ export default function SavedCategoriesView() {
                       currencyFormat={currencyFormat}
                       alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
                       settings={settings}
+                      addedTransaction={!!addedTransaction}
                       actionElementsLeft={
                         !popupState.editMode ? null : (
                           <IconButton

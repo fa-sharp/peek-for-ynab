@@ -22,7 +22,7 @@ export default function TransactionForm() {
   const memoRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section style={{ minWidth: "280px" }}>
+    <section style={{ minWidth: "270px" }}>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>

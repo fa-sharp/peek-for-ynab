@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
   emojiMode: false,
   currentTabAccess: false,
   theme: "auto",
-  animations: false
+  animations: true
 });
 
 export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({

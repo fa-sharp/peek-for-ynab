@@ -10,8 +10,7 @@ export default function IconButton({
   gray,
   rounded,
   spin,
-  disabled,
-  noAction
+  disabled
 }: {
   label: string;
   onClick?: MouseEventHandler;
@@ -21,7 +20,6 @@ export default function IconButton({
   rounded?: boolean;
   spin?: boolean;
   disabled?: boolean;
-  noAction?: boolean;
 }) {
   return (
     <button
@@ -32,8 +30,7 @@ export default function IconButton({
         rounded,
         spin,
         accent,
-        gray,
-        noaction: noAction
+        gray
       })}
       onClick={onClick}
       disabled={disabled}>

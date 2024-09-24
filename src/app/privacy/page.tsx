@@ -11,7 +11,6 @@ const { displayName: APP_NAME } = packageJson;
 function PrivacyPage() {
   return (
     <>
-      <h1>{APP_NAME}</h1>
       <h2>Privacy Policy</h2>
       <p>
         {APP_NAME} follows the{" "}
