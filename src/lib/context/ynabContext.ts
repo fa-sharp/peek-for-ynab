@@ -199,6 +199,10 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
+  const [addedTransaction, setAddedTransaction] = useState<ynab.NewTransaction | null>(
+    null
+  );
+
   const addTransaction = useCallback(
     async (transaction: ynab.NewTransaction) => {
       if (!ynabAPI || !selectedBudgetId) return;
@@ -211,7 +215,11 @@ const useYNABProvider = () => {
         refreshCategoriesAndAccounts();
         if (!transaction.payee_id) refetchPayees();
       }, 350);
+
+      setAddedTransaction(transaction);
+      setTimeout(() => setAddedTransaction(null), 6 * 1000);
     },
+
     [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
   );
 
@@ -247,7 +255,9 @@ const useYNABProvider = () => {
     /** Get accounts for the specified budget */
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */
-    addTransaction
+    addTransaction,
+    /** The recently added transaction. Can be used to trigger animations/effects. */
+    addedTransaction
   };
 };
 

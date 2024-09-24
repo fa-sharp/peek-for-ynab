@@ -1,5 +1,5 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 
 import {
   AccountsView,
@@ -11,7 +11,6 @@ import {
   SavedCategoriesView
 } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { isDataFreshForDisplay, isPopupOpen } from "~lib/utils";
 
 export default function PopupMain() {
   const {
@@ -22,14 +21,8 @@ export default function PopupMain() {
     setPopupState,
     selectedBudgetId
   } = useStorageContext();
-  const {
-    categoriesData,
-    accountsData,
-    savedCategoriesData,
-    savedAccountsData,
-    categoriesLastUpdated,
-    accountsLastUpdated
-  } = useYNABContext();
+  const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
+    useYNABContext();
   const { newVersionAlert } = useNotificationsContext();
 
   // activate edit mode if there are no pinned categories or accounts yet
@@ -43,20 +36,6 @@ export default function PopupMain() {
     )
       setPopupState({ view: "main", editMode: true });
   }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
-
-  /**
-   * Whether to show the main data (notifications, categories, and accounts). To prevent flashes and
-   * excess animations, we only show if all data has been fetched, and if it is relatively fresh data.
-   */
-  const showData = useMemo(
-    () =>
-      categoriesData &&
-      accountsData &&
-      (!isPopupOpen() ||
-        (isDataFreshForDisplay(categoriesLastUpdated) &&
-          isDataFreshForDisplay(accountsLastUpdated))),
-    [accountsData, accountsLastUpdated, categoriesData, categoriesLastUpdated]
-  );
 
   /** Callback when dragging and dropping pinned categories and accounts */
   const onDragEnd: OnDragEndResponder = useCallback(
@@ -95,7 +74,7 @@ export default function PopupMain() {
     <DragDropContext onDragEnd={onDragEnd}>
       {newVersionAlert && <NewVersionAlert />}
       <PopupNav />
-      {showData && (
+      {categoriesData && accountsData && (
         <>
           <NotificationsView />
           <SavedCategoriesView />

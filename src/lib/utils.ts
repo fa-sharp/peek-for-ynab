@@ -58,10 +58,6 @@ export const isEmptyObject = (objectName: object) => {
   return true;
 };
 
-/** Check if data is fresh enough to display, based on `lastUpdated` time (<5 minutes old) */
-export const isDataFreshForDisplay = (lastUpdated: number) =>
-  lastUpdated + 300_000 > Date.now();
-
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
@@ -119,9 +115,6 @@ export const findEmoji = (s: string, limit = 2) => {
   const matches = s.match(emojiRegex);
   return matches ? matches.slice(0, limit).join("") : null;
 };
-
-/** Check if extension popup is open */
-export const isPopupOpen = () => chrome.extension.getViews({ type: "popup" }).length > 0;
 
 /**
  * Executes the given function in the context of the user's active browser tab.

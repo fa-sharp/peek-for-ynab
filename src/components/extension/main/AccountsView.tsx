@@ -165,7 +165,8 @@ export const AccountView = ({
   actionElementsLeft,
   actionElementsRight,
   alerts,
-  settings
+  settings,
+  addedTransaction
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
@@ -173,6 +174,7 @@ export const AccountView = ({
   actionElementsRight?: ReactElement | null;
   alerts?: AccountAlerts[string];
   settings: AppSettings;
+  addedTransaction?: boolean;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
@@ -213,7 +215,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations}
+          animationEnabled={settings.animations && addedTransaction}
         />
         {actionElementsRight}
       </div>

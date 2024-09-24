@@ -17,9 +17,11 @@ import {
 
 import { BudgetSelect, IconButton } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-import { isDataFreshForDisplay } from "~lib/utils";
 
 import PopupNavMenu from "./PopupNavMenu";
+
+/** Whether data is considered fresh for display, based on `lastUpdated` time (<4 minutes old) */
+const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
@@ -124,9 +126,9 @@ export default function PopupNav() {
         disabled={
           Boolean(globalIsFetching) ||
           !selectedBudgetId ||
-          !!categoriesError ||
-          !!accountsError ||
-          (isDataFreshForDisplay(categoriesLastUpdated) &&
+          (!categoriesError &&
+            !accountsError &&
+            isDataFreshForDisplay(categoriesLastUpdated) &&
             isDataFreshForDisplay(accountsLastUpdated))
         }
         spin={Boolean(globalIsFetching)}
