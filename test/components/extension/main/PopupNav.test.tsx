@@ -22,21 +22,19 @@ afterEach(() => window.localStorage.removeItem("selectedBudget"));
 test("Correct budget is selected", async () => {
   const wrapper = createTestAppWrapper();
   render(<PopupNav />, { wrapper });
-  await waitFor(() =>
-    expect(screen.getByRole("combobox")).toHaveDisplayValue(budgets[0].name)
-  );
+  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 });
 
 test("Can be navigated with keyboard", async () => {
   const wrapper = createTestAppWrapper();
   render(<PopupNav />, { wrapper });
-  await waitFor(() =>
-    expect(screen.getByRole("combobox")).toHaveDisplayValue(budgets[0].name)
-  );
+  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
   await user.keyboard("{Tab}");
-  expect(screen.getByRole("combobox")).toHaveFocus();
+  expect(screen.getByLabelText("Status", { exact: false })).toHaveFocus();
+  await user.keyboard("{Tab}");
+  expect(screen.getByLabelText("Select a budget")).toHaveFocus();
   await user.keyboard("{Tab}");
   expect(screen.getByLabelText("Open", { exact: false })).toHaveFocus();
   await user.keyboard("{Tab}");
@@ -61,12 +59,10 @@ test("Can be navigated with keyboard", async () => {
 test("Selecting a menu item closes the menu", async () => {
   const wrapper = createTestAppWrapper();
   render(<PopupNav />, { wrapper });
-  await waitFor(() =>
-    expect(screen.getByRole("combobox")).toHaveDisplayValue(budgets[0].name)
-  );
+  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
-  await user.keyboard("{Tab}{Tab}{Tab}{Enter}");
+  await user.keyboard("{Tab}{Tab}{Enter}");
   expect(screen.queryByRole("menu")).toBeTruthy();
   await user.keyboard("{Enter}");
   expect(screen.queryByRole("menu"), "keyboard closes menu").toBeNull();
@@ -87,9 +83,7 @@ test("Menu buttons change the popup state as expected", async () => {
       </Wrapper>
     )
   });
-  await waitFor(() =>
-    expect(screen.getByRole("combobox")).toHaveDisplayValue(budgets[0].name)
-  );
+  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
   expect(result.current.popupState.editMode).toBeFalsy();

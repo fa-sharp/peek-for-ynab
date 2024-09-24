@@ -16,6 +16,7 @@ test("can display budgets", async () => {
   const budgets = createBudgets();
   let selectedBudgetId = budgets[0].id;
 
+  const user = userEvent.setup();
   render(
     <BudgetSelect
       selectedBudgetId={selectedBudgetId}
@@ -23,15 +24,12 @@ test("can display budgets", async () => {
       shownBudgets={budgets}
     />
   );
-  expect(screen.getByRole("combobox")).toHaveTextContent("Budget 1");
-  expect(screen.getByRole("combobox")).toHaveValue(budgets[0].id);
+  expect(screen.queryByText(budgets[0].name)).toBeTruthy();
+  expect(screen.getByRole("button")).toHaveAccessibleName("Select a budget");
+  await user.click(screen.getByRole("button"));
 
-  const options = screen.getAllByRole("option");
-  expect(options).toHaveLength(2);
-
-  const option2 = options.find((option) => option.textContent === budgets[1].name);
-  expect(option2).toBeTruthy();
-  expect(option2).toHaveValue(budgets[1].id);
+  expect(screen.queryByRole("menuitem", { name: budgets[0].name })).toBeTruthy();
+  expect(screen.queryByRole("menuitem", { name: budgets[1].name })).toBeTruthy();
 });
 
 test("can switch between budgets", async () => {
@@ -48,11 +46,8 @@ test("can switch between budgets", async () => {
       shownBudgets={budgets}
     />
   );
-  const input: HTMLSelectElement = screen.getByRole("combobox");
-  const option2 = screen.getByRole("option", {
-    name: "Budget 2"
-  });
-  await user.selectOptions(input, option2);
+  await user.click(screen.getByRole("button", { name: "Select a budget" }));
+  await user.click(screen.getByText(budgets[1].name));
 
   expect(selectedBudgetId).toBe(budgets[1].id);
 });
