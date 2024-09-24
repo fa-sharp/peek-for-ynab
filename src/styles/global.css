@@ -226,15 +226,12 @@ li:last-child .balance-display {
   line-height: 0;
   cursor: pointer;
 }
-.icon-button:active:not(.noaction) {
-  transform: scale(0.95);
-}
 .icon-button.rounded {
   border: none;
   border-radius: 50%;
 }
-.icon-button.noaction {
-  cursor: initial;
+.icon-button[disabled] {
+  cursor: unset;
 }
 
 .list {

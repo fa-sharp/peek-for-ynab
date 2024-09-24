@@ -136,12 +136,7 @@ export function CategoryGroupView({
                     !editMode ? null : savedCategories?.some(
                         (id) => id === category.id
                       ) ? (
-                      <IconButton
-                        icon={<PinnedItemIcon />}
-                        label="Pinned"
-                        disabled
-                        noAction
-                      />
+                      <IconSpan icon={<PinnedItemIcon />} label="Pinned" />
                     ) : (
                       <IconButton
                         icon={<PinItemIcon />}

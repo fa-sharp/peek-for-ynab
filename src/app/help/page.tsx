@@ -96,7 +96,7 @@ function HelpPage() {
             <li>
               <AlertTriangle color="var(--stale)" />
               &nbsp;There was an error fetching data from YNAB, and/or the data is out of
-              date. Close and re-open the extension to retry.
+              date. You can click on the icon to refresh the data.
             </li>
             <li>
               <Refresh />

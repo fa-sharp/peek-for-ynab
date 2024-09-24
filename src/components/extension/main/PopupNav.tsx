@@ -15,7 +15,7 @@ import {
   SwitchHorizontal
 } from "tabler-icons-react";
 
-import { BudgetSelect, IconButton, IconSpan } from "~components";
+import { BudgetSelect, IconButton } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 import { isDataFreshForDisplay } from "~lib/utils";
 
@@ -39,6 +39,7 @@ export default function PopupNav() {
     accountsError,
     categoriesError,
     categoriesLastUpdated,
+    refreshCategoriesAndAccounts,
     isRefreshingBudgets
   } = useYNABContext();
   const globalIsFetching = useIsFetching();
@@ -94,17 +95,17 @@ export default function PopupNav() {
 
   return (
     <nav className="flex-row justify-between mb-lg">
-      <IconSpan
+      <IconButton
         label={
           categoriesError || accountsError
-            ? "Error getting data from YNAB!"
+            ? "Error getting data from YNAB! Click to retry"
             : globalIsFetching
               ? "Status: Refreshing data..."
               : `Status: Last updated ${new Date(
                   categoriesLastUpdated < accountsLastUpdated
                     ? categoriesLastUpdated
                     : accountsLastUpdated
-                ).toLocaleString()}`
+                ).toLocaleString()}. Click to refresh`
         }
         icon={
           globalIsFetching ? (
@@ -119,6 +120,8 @@ export default function PopupNav() {
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates data is stale/old
           )
         }
+        onClick={() => refreshCategoriesAndAccounts()}
+        disabled={Boolean(globalIsFetching)}
         spin={Boolean(globalIsFetching)}
       />
       <div className="flex-row gap-xs">

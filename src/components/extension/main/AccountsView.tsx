@@ -130,12 +130,7 @@ function AccountTypeView({
                 alerts={accountAlerts?.[account.id]}
                 actionElementsLeft={
                   !editMode ? null : savedAccounts?.some((id) => id === account.id) ? (
-                    <IconButton
-                      icon={<PinnedItemIcon />}
-                      label="Pinned"
-                      disabled
-                      noAction
-                    />
+                    <IconSpan icon={<PinnedItemIcon />} label="Pinned" />
                   ) : (
                     <IconButton
                       icon={<PinItemIcon />}
