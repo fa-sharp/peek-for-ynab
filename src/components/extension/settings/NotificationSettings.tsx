@@ -27,8 +27,8 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
 
   return (
     <>
-      <h4 className="heading-small">Notifications</h4>
-      <div className="flex-col gap-sm">
+      <h4 className="heading-medium">Notifications</h4>
+      <div className="flex-col gap-sm mb-lg">
         <label
           className="flex-row gap-xs"
           title="Notify for overspent categories this month">
@@ -59,20 +59,20 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           />
           Import errors
         </label>
-        <div
-          className="heading-small flex-row gap-xs cursor-pointer"
-          onClick={() => setReconcileExpanded(!reconcileExpanded)}>
-          <span title="Setup alerts for the last time you reconciled an account">
-            Reconciliation alerts
-          </span>
-          <IconButton
-            label={reconcileExpanded ? "Collapse" : "Expand"}
-            icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
-            onClick={() => setReconcileExpanded(!reconcileExpanded)}
-          />
-        </div>
-        {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
       </div>
+      <h4
+        className="heading-medium flex-row gap-xs cursor-pointer"
+        onClick={() => setReconcileExpanded(!reconcileExpanded)}>
+        <span title="Setup alerts for the last time you reconciled an account">
+          Reconciliation alerts
+        </span>
+        <IconButton
+          label={reconcileExpanded ? "Collapse" : "Expand"}
+          icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
+          onClick={() => setReconcileExpanded(!reconcileExpanded)}
+        />
+      </h4>
+      {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
     </>
   );
 }

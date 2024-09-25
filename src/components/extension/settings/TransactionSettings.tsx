@@ -26,7 +26,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
 
   return (
     <>
-      <h4 className="heading-small">Transaction defaults</h4>
+      <h4 className="heading-medium">Transaction defaults</h4>
       <div className="flex-col gap-sm mb-lg">
         <label
           className="flex-row gap-xs"

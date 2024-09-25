@@ -20,7 +20,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   const { useGetCategoryGroupsForBudget } = useYNABContext();
   const { data: categoryGroupsData } = useGetCategoryGroupsForBudget(budget.id);
 
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [addingCategory, setAddingCategory] = useState(false);
   const [addingEmoji, setAddingEmoji] = useState(false);
   const [settings, setSettings] = useBudgetSettings(budget.id);
@@ -86,7 +86,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   return (
     <>
       <h4
-        className="heading-small flex-row gap-xs cursor-pointer"
+        className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span title="Setup confetti after adding a transaction">Confetti</span>
         <IconButton
