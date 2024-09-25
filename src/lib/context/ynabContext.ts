@@ -10,8 +10,9 @@ import {
   fetchCategoryGroupsForBudget,
   fetchPayeesForBudget
 } from "~lib/api";
+import { useConfetti } from "~lib/hooks";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, findAllEmoji } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -95,6 +96,21 @@ const useYNABProvider = () => {
     },
     select: (data) => data?.categoryGroups
   });
+
+  const useGetCategoryGroupsForBudget = (budgetId: string) =>
+    useQuery({
+      queryKey: ["categoryGroups", { budgetId }],
+      enabled: Boolean(ynabAPI),
+      queryFn: async ({ queryKey }) => {
+        if (!ynabAPI) return;
+        return await fetchCategoryGroupsForBudget(
+          ynabAPI,
+          budgetId,
+          queryClient.getQueryState(queryKey)
+        );
+      },
+      select: (data) => data?.categoryGroups
+    });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
   const categoriesData = useMemo(
@@ -199,6 +215,8 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
+  const { launchConfetti } = useConfetti();
+
   const [addedTransaction, setAddedTransaction] = useState<ynab.TransactionDetail | null>(
     null
   );
@@ -217,12 +235,30 @@ const useYNABProvider = () => {
       }, 350);
 
       if (response.data.transaction) {
-        setAddedTransaction(response.data.transaction);
-        setTimeout(() => setAddedTransaction(null), 3 * 1000);
+        const { transaction } = response.data;
+        setAddedTransaction(transaction);
+        setTimeout(() => setAddedTransaction(null), 4 * 1000);
+        if (
+          budgetSettings?.confetti?.allCategories ||
+          (transaction.category_id &&
+            budgetSettings?.confetti?.categories.includes(transaction.category_id))
+        ) {
+          const emojis = [
+            ...budgetSettings.confetti.emojis,
+            ...findAllEmoji(transaction.category_name || "")
+          ];
+          launchConfetti(emojis);
+        }
       }
     },
-
-    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
+    [
+      ynabAPI,
+      selectedBudgetId,
+      budgetSettings?.confetti,
+      refreshCategoriesAndAccounts,
+      refetchPayees,
+      launchConfetti
+    ]
   );
 
   return {
@@ -254,6 +290,8 @@ const useYNABProvider = () => {
     refreshBudgets,
     isRefreshingBudgets,
     refreshCategoriesAndAccounts,
+    /** Get category data for the specific budget */
+    useGetCategoryGroupsForBudget,
     /** Get accounts for the specified budget */
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */

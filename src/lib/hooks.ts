@@ -1,4 +1,5 @@
-import { useLayoutEffect } from "react";
+import JSConfetti from "js-confetti";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import useLocalStorageState from "use-local-storage-state";
 
 /**
@@ -31,4 +32,23 @@ export const useSetColorTheme = () => {
 
     return () => prefersDarkModeQuery?.removeEventListener("change", listener);
   }, [themeSetting]);
+};
+
+export const useConfetti = () => {
+  const confetti = useRef<JSConfetti>();
+  useEffect(() => {
+    confetti.current = new JSConfetti();
+    return () => confetti.current?.destroyCanvas();
+  }, []);
+
+  const launchConfetti = useCallback((emojis: string[]) => {
+    confetti.current?.addConfetti({
+      emojis,
+      emojiSize: 40
+    });
+  }, []);
+
+  return {
+    launchConfetti
+  };
 };

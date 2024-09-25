@@ -26,5 +26,10 @@ export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({
     approved: true,
     cleared: false,
     rememberAccount: false
+  },
+  confetti: {
+    allCategories: false,
+    categories: [],
+    emojis: []
   }
 });
