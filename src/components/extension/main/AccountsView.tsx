@@ -1,7 +1,8 @@
+import { clsx } from "clsx";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { AlertTriangle, Circle, LockOpen } from "tabler-icons-react";
-import type { Account, CurrencyFormat } from "ynab";
+import type { Account, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useYNABContext } from "~lib/context";
@@ -160,7 +161,7 @@ function AccountTypeView({
 }
 
 export const AccountView = ({
-  account: { name, balance, last_reconciled_at },
+  account: { id, name, balance, last_reconciled_at },
   currencyFormat,
   actionElementsLeft,
   actionElementsRight,
@@ -174,13 +175,18 @@ export const AccountView = ({
   actionElementsRight?: ReactElement | null;
   alerts?: AccountAlerts[string];
   settings: AppSettings;
-  addedTransaction?: boolean;
+  addedTransaction?: TransactionDetail | null;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
   return (
     <div
-      className="balance-display"
+      className={clsx("balance-display", {
+        highlighted:
+          settings.animations &&
+          (addedTransaction?.account_id === id ||
+            addedTransaction?.transfer_account_id === id)
+      })}
       title={
         foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
@@ -215,7 +221,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations && addedTransaction}
+          animationEnabled={settings.animations && !!addedTransaction}
         />
         {actionElementsRight}
       </div>

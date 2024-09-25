@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { AlertTriangle } from "tabler-icons-react";
@@ -5,7 +6,8 @@ import type {
   Account,
   Category,
   CategoryGroupWithCategories,
-  CurrencyFormat
+  CurrencyFormat,
+  TransactionDetail
 } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
@@ -191,7 +193,7 @@ export function CategoryGroupView({
 }
 
 export const CategoryView = ({
-  categoryData: { name, balance },
+  categoryData: { id, name, balance },
   currencyFormat,
   settings,
   alerts,
@@ -205,13 +207,15 @@ export const CategoryView = ({
   actionElementsLeft?: ReactElement | null;
   alerts?: CategoryAlerts[string];
   settings: AppSettings;
-  addedTransaction?: boolean;
+  addedTransaction?: TransactionDetail | null;
 }) => {
   const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
 
   return (
     <div
-      className="balance-display"
+      className={clsx("balance-display", {
+        highlighted: settings.animations && addedTransaction?.category_id === id
+      })}
       title={
         foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
       }>
@@ -234,7 +238,7 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations && addedTransaction}
+          animationEnabled={settings.animations && !!addedTransaction}
         />
         {actionElementsRight}
       </div>

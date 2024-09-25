@@ -58,7 +58,7 @@ export default function SavedCategoriesView() {
                       currencyFormat={currencyFormat}
                       alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
                       settings={settings}
-                      addedTransaction={!!addedTransaction}
+                      addedTransaction={addedTransaction}
                       actionElementsLeft={
                         !popupState.editMode ? null : (
                           <IconButton

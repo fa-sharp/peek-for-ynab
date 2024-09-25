@@ -45,7 +45,7 @@ export default function SavedAccountsView() {
                     alerts={currentAlerts?.[selectedBudgetData.id]?.accounts[account.id]}
                     currencyFormat={selectedBudgetData?.currencyFormat}
                     settings={settings}
-                    addedTransaction={!!addedTransaction}
+                    addedTransaction={addedTransaction}
                     actionElementsLeft={
                       !popupState.editMode ? null : (
                         <IconButton

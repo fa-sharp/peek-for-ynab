@@ -198,6 +198,16 @@ button:focus-visible {
 
   padding: 3px 0px;
   border-bottom: solid 1px var(--border-light);
+
+  outline: transparent solid 2px;
+  outline-offset: 1px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
+}
+.balance-display.highlighted {
+  outline-color: var(--border);
+  border-radius: var(--border-radius);
 }
 .balance-display:not(:hover) span.hidden {
   color: transparent;

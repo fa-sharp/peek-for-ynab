@@ -199,7 +199,7 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
-  const [addedTransaction, setAddedTransaction] = useState<ynab.NewTransaction | null>(
+  const [addedTransaction, setAddedTransaction] = useState<ynab.TransactionDetail | null>(
     null
   );
 
@@ -216,8 +216,10 @@ const useYNABProvider = () => {
         if (!transaction.payee_id) refetchPayees();
       }, 350);
 
-      setAddedTransaction(transaction);
-      setTimeout(() => setAddedTransaction(null), 6 * 1000);
+      if (response.data.transaction) {
+        setAddedTransaction(response.data.transaction);
+        setTimeout(() => setAddedTransaction(null), 3 * 1000);
+      }
     },
 
     [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
