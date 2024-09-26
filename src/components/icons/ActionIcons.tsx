@@ -1,7 +1,9 @@
 import {
+  Check,
   ChevronDown,
   ChevronUp,
   CreditCard,
+  type IconProps,
   Pinned,
   Plus,
   SwitchHorizontal
@@ -42,3 +44,5 @@ export const ExpandListIconBold = () => (
 export const CollapseListIconBold = () => (
   <ChevronUp aria-hidden size={24} color="var(--action)" strokeWidth={2} />
 );
+
+export const CheckIcon = (props?: IconProps) => <Check aria-hidden {...props} />;

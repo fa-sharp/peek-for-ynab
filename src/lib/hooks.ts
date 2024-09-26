@@ -37,6 +37,8 @@ export const useSetColorTheme = () => {
 export const useConfetti = () => {
   const confetti = useRef<JSConfetti>();
   useEffect(() => {
+    if (process.env.VITEST) return; // skip this in tests
+
     confetti.current = new JSConfetti();
     return () => confetti.current?.destroyCanvas();
   }, []);
