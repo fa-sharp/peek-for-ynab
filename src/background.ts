@@ -15,7 +15,11 @@ import {
   fetchCategoryGroupsForBudget
 } from "~lib/api";
 import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
-import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
+import type {
+  BudgetSettings,
+  TokenData,
+  TxAddInitialState
+} from "~lib/context/storageContext";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import {
   type CurrentAlerts,
@@ -250,8 +254,13 @@ chrome.omnibox.setDefaultSuggestion({
   description:
     "<dim>amount</dim> (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
 });
-chrome.omnibox.onInputEntered.addListener((text) => {
-  console.log("Received transaction:", JSON.parse(text));
+chrome.omnibox.onInputEntered.addListener(async (text) => {
+  const tx = JSON.parse(text);
+  console.log("Received transaction:", tx);
+  await CHROME_LOCAL_STORAGE.set("popupState", {
+    view: "txAdd",
+    txAddState: tx
+  });
   chrome.action.openPopup();
 });
 
@@ -365,9 +374,9 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     suggestions.map(({ payee, category, account }) => ({
       content: JSON.stringify({
         amount,
-        payee: payee?.id,
-        account: account?.id,
-        category: category?.id,
+        payee,
+        accountId: account?.id,
+        categoryId: category?.id,
         memo: memo.trim() || undefined
       }),
       description:

@@ -99,15 +99,15 @@ const useStorageProvider = () => {
     defaultValue: ""
   });
 
-  /** Current popup state - not persisted */
-  const [popupState, setPopupState] = useState<{
+  /** Current popup state */
+  const [popupState, setPopupState] = useExtensionStorage<{
     view: "main" | "txAdd";
     editMode?: boolean;
     txAddState?: TxAddInitialState;
-  }>({
-    view: "main",
-    editMode: false
-  });
+  }>(
+    { key: "popupState", instance: CHROME_LOCAL_STORAGE },
+    { view: "main", editMode: false }
+  );
 
   /** Whether syncing is enabled */
   const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
