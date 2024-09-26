@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Help, InfoCircle } from "tabler-icons-react";
 
-import { IconButton } from "~components";
+import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useStorageContext } from "~lib/context";
 import type { BudgetSettings } from "~lib/context/storageContext";
@@ -9,15 +10,15 @@ import type { CachedBudget } from "~lib/context/ynabContext";
 import ReconcileAlertSettings from "./ReconcileAlertSettings";
 
 export default function NotificationSettings({ budget }: { budget: CachedBudget }) {
-  const { useBudgetSettings } = useStorageContext();
-  const [settings, setSettings] = useBudgetSettings(budget.id);
+  const { useBudgetSettings, settings } = useStorageContext();
+  const [budgetSettings, setBudgetSettings] = useBudgetSettings(budget.id);
   const [reconcileExpanded, setReconcileExpanded] = useState(false);
 
   const changeNotifSetting = <K extends keyof BudgetSettings["notifications"]>(
     key: K,
     value: BudgetSettings["notifications"][K]
   ) =>
-    setSettings((prev) => {
+    setBudgetSettings((prev) => {
       if (!prev) return undefined;
       return {
         ...prev,
@@ -27,14 +28,19 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
 
   return (
     <>
-      <h4 className="heading-medium">Notifications</h4>
+      <h4 aria-labelledby="notification-heading" className="heading-medium">
+        <span id="notification-heading">Notifications</span>
+        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+          <Dialog>Enable notifications for the following events in your budget.</Dialog>
+        </Tooltip>
+      </h4>
       <div className="flex-col gap-sm mb-lg">
         <label
           className="flex-row gap-xs"
           title="Notify for overspent categories this month">
           <input
             type="checkbox"
-            checked={settings?.notifications.overspent ?? false}
+            checked={budgetSettings?.notifications.overspent ?? false}
             onChange={(e) => changeNotifSetting("overspent", e.target.checked)}
           />
           Overspending
@@ -44,7 +50,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           title="Check and notify for newly imported and/or unapproved transactions from your accounts">
           <input
             type="checkbox"
-            checked={settings?.notifications.checkImports ?? false}
+            checked={budgetSettings?.notifications.checkImports ?? false}
             onChange={(e) => changeNotifSetting("checkImports", e.target.checked)}
           />
           Unapproved transactions
@@ -54,18 +60,23 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           title="Notify if one of your linked accounts has a connection error/issue">
           <input
             type="checkbox"
-            checked={settings?.notifications.importError ?? false}
+            checked={budgetSettings?.notifications.importError ?? false}
             onChange={(e) => changeNotifSetting("importError", e.target.checked)}
           />
           Import errors
         </label>
       </div>
       <h4
+        aria-labelledby="reconcile-heading"
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setReconcileExpanded(!reconcileExpanded)}>
-        <span title="Setup alerts for the last time you reconciled an account">
-          Reconciliation alerts
-        </span>
+        <span id="reconcile-heading">Reconciliation alerts</span>
+        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+          <Dialog>
+            Setup alerts to notify you if an account has not been reconciled in a set
+            amount of time.
+          </Dialog>
+        </Tooltip>
         <IconButton
           label={reconcileExpanded ? "Collapse" : "Expand"}
           icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}

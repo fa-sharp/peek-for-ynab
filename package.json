@@ -25,6 +25,7 @@
   "dependencies": {
     "@plasmohq/storage": "^1.12.0",
     "@react-aria/button": "^3.9.8",
+    "@react-aria/dialog": "^3.5.17",
     "@react-aria/menu": "^3.15.3",
     "@react-aria/overlays": "^3.23.2",
     "@react-stately/collections": "^3.10.9",

@@ -1,6 +1,7 @@
 import { type FormEventHandler, useMemo, useRef, useState } from "react";
-import { X } from "tabler-icons-react";
+import { Help, X } from "tabler-icons-react";
 
+import { Dialog, Tooltip } from "~components";
 import IconButton from "~components/IconButton";
 import {
   AddTransactionIcon,
@@ -89,6 +90,9 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span title="Setup confetti after adding a transaction">Confetti</span>
+        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+          <Dialog>Setup confetti celebrations after adding a transaction.</Dialog>
+        </Tooltip>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}

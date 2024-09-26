@@ -289,6 +289,15 @@ li:last-child .balance-display {
   outline-color: var(--border);
 }
 
+.dialog {
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  max-width: 200px;
+}
+.dialog:focus-visible {
+  outline-color: var(--border);
+}
+
 .select-dropdown-list {
   position: absolute;
   top: 100%;
@@ -443,6 +452,11 @@ li:last-child .balance-display {
 
 .slide-up {
   animation: slide-up 0.2s forwards;
+}
+@media (prefers-reduced-motion) {
+  .slide-up {
+    animation: none;
+  }
 }
 
 @keyframes slide-up {
