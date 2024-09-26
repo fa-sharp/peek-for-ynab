@@ -97,6 +97,9 @@
       "activeTab",
       "notifications"
     ],
+    "omnibox": {
+      "keyword": "peek"
+    },
     "options_ui": {
       "open_in_tab": true
     },

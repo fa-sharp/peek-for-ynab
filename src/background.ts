@@ -1,4 +1,10 @@
-import { type Account, type Category, type TransactionDetail, api } from "ynab";
+import {
+  type Account,
+  type Category,
+  type CategoryGroupWithCategories,
+  type TransactionDetail,
+  api
+} from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
@@ -10,6 +16,7 @@ import {
 } from "~lib/api";
 import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
+import type { CachedPayee } from "~lib/context/ynabContext";
 import {
   type CurrentAlerts,
   createSystemNotification,
@@ -17,7 +24,15 @@ import {
   updateIconAndTooltip
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
-import { IS_DEV, ONE_DAY_IN_MILLIS, checkPermissions, isEmptyObject } from "~lib/utils";
+import {
+  IS_DEV,
+  ONE_DAY_IN_MILLIS,
+  checkPermissions,
+  formatCurrency,
+  isEmptyObject,
+  searchWithinString,
+  stringValueToMillis
+} from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
@@ -229,3 +244,153 @@ const onSystemNotificationClick = (id: string) => {
 };
 chrome.notifications?.onClicked.removeListener(onSystemNotificationClick);
 chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
+
+// Setup omnibox
+chrome.omnibox.setDefaultSuggestion({
+  description:
+    "<dim>amount</dim> (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
+});
+chrome.omnibox.onInputEntered.addListener((text) => {
+  console.log("Received transaction:", JSON.parse(text));
+  chrome.action.openPopup();
+});
+
+const omniCache: {
+  payees?: CachedPayee[];
+  categories?: Category[];
+  accounts?: Account[];
+} = {};
+const primeOmniCache = async (key: "payees" | "categories" | "accounts") => {
+  console.log("priming cache..");
+  const queryClient = createQueryClient({
+    staleTime: ONE_DAY_IN_MILLIS * 7
+  });
+  const budgetId = "a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c";
+  switch (key) {
+    case "payees": {
+      const { payees } = await queryClient.fetchQuery<{ payees: CachedPayee[] }>({
+        queryKey: ["payees", { budgetId }],
+        queryFn: () => ({ payees: [] })
+      });
+      omniCache.payees = payees;
+      return { payees };
+    }
+    case "categories": {
+      const { categoryGroups } = await queryClient.fetchQuery<{
+        categoryGroups: CategoryGroupWithCategories[];
+      }>({
+        queryKey: ["categoryGroups", { budgetId }],
+        queryFn: () => ({ categoryGroups: [] })
+      });
+      categoryGroups.splice(1, 1); // CCP
+      const categories = categoryGroups.flatMap((cg) => cg.categories);
+      categories.splice(1, 2); // Internal master, deferred
+      omniCache.categories = categories;
+      return { categories };
+    }
+    case "accounts": {
+      const { accounts } = await queryClient.fetchQuery<{
+        accounts: Account[];
+      }>({
+        queryKey: ["accounts", { budgetId }],
+        queryFn: () => ({ accounts: [] })
+      });
+      omniCache.accounts = accounts;
+      return { accounts };
+    }
+    default:
+      return {};
+  }
+};
+chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
+  const [amount, ...dataToParse] = text.split(" ");
+  if (!amount || dataToParse.length === 0) return suggest([]);
+  /** payee, category, account, memo */
+  const parsedData: [string, string, string, string] = ["", "", "", ""];
+  let parsedIdx = -1;
+  for (const word of dataToParse) {
+    if (word === "at" && parsedIdx < 0) parsedIdx = 0;
+    else if (word === "for" && parsedIdx < 1) parsedIdx = 1;
+    else if (word === "on" && parsedIdx < 2) parsedIdx = 2;
+    else if (word === "memo" && parsedIdx < 3) parsedIdx = 3;
+    else if (parsedIdx >= 0) parsedData[parsedIdx] += word + " ";
+  }
+  const [payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
+  let payeeResults: CachedPayee[] = [];
+  let categoryResults: Category[] = [];
+  let accountResults: Account[] = [];
+
+  if (payeeQuery) {
+    const payees = omniCache.payees || (await primeOmniCache("payees")).payees;
+    payeeResults =
+      payees?.filter((p) => searchWithinString(p.name, payeeQuery.trim())).slice(0, 5) ||
+      [];
+  }
+  if (categoryQuery) {
+    const categories =
+      omniCache.categories || (await primeOmniCache("categories")).categories;
+    categoryResults =
+      categories
+        ?.filter((c) => searchWithinString(c.name, categoryQuery.trim()))
+        .slice(0, 5) || [];
+  }
+  if (accountQuery) {
+    const accounts = omniCache.accounts || (await primeOmniCache("accounts")).accounts;
+    accountResults =
+      accounts
+        ?.filter((a) => searchWithinString(a.name, accountQuery.trim()))
+        .slice(0, 5) || [];
+  }
+
+  let suggestions: { payee?: CachedPayee; account?: Account; category?: Category }[] = [];
+  for (const payee of payeeResults) {
+    suggestions.push({ payee });
+  }
+  if (suggestions.length === 0)
+    categoryResults.forEach((category) => suggestions.push({ category }));
+  else if (categoryResults.length > 0) {
+    suggestions = categoryResults.flatMap((category) =>
+      suggestions.map((suggestion) => ({ ...suggestion, category }))
+    );
+  }
+  if (suggestions.length === 0)
+    accountResults.forEach((account) => suggestions.push({ account }));
+  else if (accountResults.length > 0) {
+    suggestions = accountResults.flatMap((account) =>
+      suggestions.map((suggestion) => ({ ...suggestion, account }))
+    );
+  }
+
+  suggest(
+    suggestions.map(({ payee, category, account }) => ({
+      content: JSON.stringify({
+        amount,
+        payee: payee?.id,
+        account: account?.id,
+        category: category?.id,
+        memo: memo.trim() || undefined
+      }),
+      description:
+        "add " +
+        formatCurrency(stringValueToMillis(amount, "Outflow")) +
+        (payee ? ` at <match>${escapeXML(payee!.name)}</match>` : "") +
+        (category ? ` for <match>${escapeXML(category!.name)}</match>` : "") +
+        (account ? ` on <match>${escapeXML(account!.name)}</match>` : "") +
+        (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
+    }))
+  );
+});
+const xmlEscapedChars: Record<string, string> = {
+  '"': "&quot;",
+  "'": "&apos;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "&": "&amp;"
+};
+function escapeXML(xmlString: string) {
+  let escaped = "";
+  for (const c of xmlString) {
+    escaped += xmlEscapedChars[c] || c;
+  }
+  return escaped;
+}
