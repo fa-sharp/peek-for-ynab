@@ -28,6 +28,13 @@ export interface CachedPayee {
   transferId?: string | null;
 }
 
+export interface BudgetMainData {
+  accountsData: ynab.Account[];
+  categoriesData: ynab.Category[];
+  categoryGroupsData: ynab.CategoryGroupWithCategories[];
+  payeesData?: CachedPayee[];
+}
+
 const useYNABProvider = () => {
   const { tokenExpired } = useAuthContext();
   const {
@@ -200,6 +207,17 @@ const useYNABProvider = () => {
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
+  /** Group commonly used data into one object */
+  const budgetMainData: BudgetMainData | null = useMemo(() => {
+    if (!accountsData || !categoriesData || !categoryGroupsData) return null;
+    return {
+      accountsData,
+      categoriesData,
+      categoryGroupsData,
+      payeesData
+    };
+  }, [accountsData, categoriesData, categoryGroupsData, payeesData]);
+
   const useGetAccountsForBudget = (budgetId: string) =>
     useQuery({
       queryKey: ["accounts", { budgetId }],
@@ -278,6 +296,8 @@ const useYNABProvider = () => {
     accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
+    /** API data: Accounts, category gorups, categories, and payees in current budget */
+    budgetMainData,
     /** API data: Unapproved transactions in current budget */
     unapprovedTxs,
     /** API data: Currently selected budget */

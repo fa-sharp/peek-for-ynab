@@ -13,13 +13,14 @@ import TransactionFormSplit from "./TransactionFormSplit";
 
 /** Form that lets user add a transaction. */
 export default function TransactionForm() {
-  const { selectedBudgetData, accountsData, categoriesData, payeesData } =
-    useYNABContext();
+  const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { settings, setPopupState } = useStorageContext();
 
   const { formState, derivedState, handlers, onSaveTransaction, isSaving } =
     useTransaction();
   const memoRef = useRef<HTMLInputElement>(null);
+
+  if (!budgetMainData) return <div>Loading...</div>;
 
   return (
     <section style={{ minWidth: "270px" }}>
@@ -73,9 +74,7 @@ export default function TransactionForm() {
             {...{
               formState,
               handlers,
-              accountsData,
-              categoriesData,
-              payeesData,
+              budgetMainData,
               memoRef,
               isSaving
             }}
@@ -85,8 +84,7 @@ export default function TransactionForm() {
             {...{
               formState,
               handlers,
-              accountsData,
-              categoriesData,
+              budgetMainData,
               memoRef,
               isBudgetToTrackingTransfer: derivedState.isBudgetToTrackingTransfer,
               totalSubTxsAmount: derivedState.totalSubTxsAmount,
@@ -109,6 +107,7 @@ export default function TransactionForm() {
             totalSubTxsAmount={derivedState.totalSubTxsAmount}
             currencyFormat={selectedBudgetData?.currencyFormat}
             isSaving={isSaving}
+            budgetMainData={budgetMainData}
           />
         )}
         <div className="flex-row justify-between mt-sm">

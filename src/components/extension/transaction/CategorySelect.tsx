@@ -10,25 +10,33 @@ import {
   useState
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Category, CurrencyFormat } from "ynab";
+import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
-import { useYNABContext } from "~lib/context";
+import type { CachedBudget } from "~lib/context/ynabContext";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   initialCategory?: Category | null;
-  categories?: Category[];
+  categories: Category[];
+  categoryGroupsData: CategoryGroupWithCategories[];
+  budgetData?: CachedBudget | null;
   selectCategory: (category: Category | null) => void;
   disabled?: boolean;
   placeholder?: string;
 }
 
 function CategorySelect(
-  { initialCategory, categories, selectCategory, disabled, placeholder }: Props,
+  {
+    initialCategory,
+    selectCategory,
+    categories,
+    categoryGroupsData,
+    budgetData,
+    disabled,
+    placeholder
+  }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const { categoryGroupsData, selectedBudgetData } = useYNABContext();
-
   /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
@@ -74,7 +82,7 @@ function CategorySelect(
       if (category.name === "Inflow: Ready to Assign") return category.name;
       return `${category.name} (${formatCurrency(
         category.balance,
-        selectedBudgetData?.currencyFormat
+        budgetData?.currencyFormat
       )})`;
     },
     onInputValueChange({ inputValue }) {
@@ -166,7 +174,7 @@ function CategorySelect(
                           })}>
                           {formatCategoryWithBalance(
                             category,
-                            selectedBudgetData?.currencyFormat
+                            budgetData?.currencyFormat
                           )}
                         </li>
                       );

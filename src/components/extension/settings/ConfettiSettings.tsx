@@ -3,11 +3,7 @@ import { Help, Plus, X } from "tabler-icons-react";
 
 import { Dialog, Tooltip } from "~components";
 import IconButton from "~components/IconButton";
-import {
-  AddTransactionIcon,
-  CollapseListIcon,
-  ExpandListIcon
-} from "~components/icons/ActionIcons";
+import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { DEFAULT_BUDGET_SETTINGS } from "~lib/constants";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { BudgetSettings } from "~lib/context/storageContext";
@@ -19,12 +15,13 @@ import CategorySelect from "../transaction/CategorySelect";
 export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();
   const { useGetCategoryGroupsForBudget } = useYNABContext();
+
   const { data: categoryGroupsData } = useGetCategoryGroupsForBudget(budget.id);
+  const [settings, setSettings] = useBudgetSettings(budget.id);
 
   const [expanded, setExpanded] = useState(false);
   const [addingCategory, setAddingCategory] = useState(false);
   const [addingEmoji, setAddingEmoji] = useState(false);
-  const [settings, setSettings] = useBudgetSettings(budget.id);
 
   const categoriesData = useMemo(
     () => categoryGroupsData?.flatMap((cg) => cg.categories),
@@ -137,11 +134,14 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
                     }}>
                     <Plus aria-label="Add" size={18} /> Category
                   </button>
+                ) : !categoriesToAdd || !categoryGroupsData ? (
+                  <div>Loading categories...</div>
                 ) : (
                   <CategorySelect
                     ref={categoryRef}
                     initialCategory={null}
                     categories={categoriesToAdd}
+                    categoryGroupsData={categoryGroupsData}
                     placeholder="Add category"
                     selectCategory={(category) => {
                       if (category) {
