@@ -229,11 +229,11 @@ li:last-child .balance-display {
 }
 
 .icon-button {
+  display: inline-flex;
   padding: 1px;
 
   background: none;
   border: none;
-  line-height: 0;
   cursor: pointer;
 }
 .icon-button:active {

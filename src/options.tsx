@@ -63,7 +63,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "0" }}>
             Settings
           </h3>
-          <div className="flex-col">
+          <div className="flex-col mb-lg">
             <label
               className="flex-row"
               title="Sync settings and pinned categories/accounts to your browser profile">
@@ -118,10 +118,8 @@ export function OptionsView() {
             </label>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Permissions
-          </h3>
-          <div className="flex-col gap-sm">
+          <h3 className="heading-big">Permissions</h3>
+          <div className="flex-col mb-lg">
             <div className="flex-row">
               <input
                 id="tab-permission"
@@ -147,7 +145,7 @@ export function OptionsView() {
                 <Dialog>
                   <ol
                     className="list"
-                    style={{ listStyle: "numeric", paddingLeft: "2rem" }}>
+                    style={{ listStyle: "numeric", paddingLeft: "2em" }}>
                     <li>
                       Automatically copy the selected amount into the transaction form.
                     </li>
@@ -185,9 +183,7 @@ export function OptionsView() {
             </div>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Budgets
-          </h3>
+          <h3 className="heading-big">Budgets</h3>
           <ul className="list flex-col mb-lg">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />

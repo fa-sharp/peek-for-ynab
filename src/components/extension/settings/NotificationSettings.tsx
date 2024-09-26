@@ -28,7 +28,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
 
   return (
     <>
-      <h4 aria-labelledby="notification-heading" className="heading-medium">
+      <h4 aria-labelledby="notification-heading" className="heading-medium mb-sm">
         <span id="notification-heading">Notifications</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>Enable notifications for the following events in your budget.</Dialog>
@@ -73,7 +73,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         <span id="reconcile-heading">Reconciliation alerts</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>
-            Setup alerts to notify you if an account has not been reconciled in a set
+            Setup alerts to notify you if an account has not been reconciled in the given
             amount of time.
           </Dialog>
         </Tooltip>

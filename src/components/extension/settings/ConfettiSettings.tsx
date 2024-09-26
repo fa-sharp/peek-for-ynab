@@ -98,7 +98,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
         />
       </h4>
       {expanded && (
-        <div className="flex-col gap-lg">
+        <div className="flex-col">
           <label className="flex-row gap-xs">
             <input
               type="checkbox"
@@ -111,19 +111,22 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
           {!settings?.confetti?.allCategories && (
             <div className="flex-col gap-sm">
               <b>Enable for specific categories: </b>
-              {settings.confetti?.categories
-                .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
-                .filter((c) => !!c)
-                .map((category) => (
-                  <div key={category.id} className="flex-row gap-xs">
-                    {category.name}
-                    <IconButton
-                      label="Disable"
-                      icon={<X size={16} aria-hidden />}
-                      onClick={() => setConfettiCategory(category.id, false)}
-                    />
-                  </div>
-                ))}
+              <ul className="list flex-col gap-sm">
+                {settings.confetti?.categories
+                  .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
+                  .filter((c) => !!c)
+                  .map((category) => (
+                    <li key={category.id} className="flex-row gap-xs">
+                      {category.name}
+                      <IconButton
+                        label="Disable"
+                        icon={<X size={16} aria-hidden />}
+                        onClick={() => setConfettiCategory(category.id, false)}
+                      />
+                    </li>
+                  ))}
+              </ul>
+
               <div>
                 {!addingCategory ? (
                   <button
@@ -157,22 +160,27 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
 
           <div className="flex-row">
             <b>Emojis: </b>
-            {!settings.confetti || settings.confetti.emojis.length === 0
-              ? "(None selected)"
-              : settings.confetti.emojis.map((emoji, idx) => (
-                  <button
-                    key={idx}
-                    className="icon-button font-big"
-                    title="Click to remove"
-                    onClick={() => {
-                      if (!settings.confetti) return;
-                      const newEmojis = [...settings.confetti.emojis];
-                      newEmojis.splice(idx, 1);
-                      changeConfettiSetting("emojis", newEmojis);
-                    }}>
-                    {emoji}
-                  </button>
+            {!settings.confetti || settings.confetti.emojis.length === 0 ? (
+              "(None selected)"
+            ) : (
+              <ul className="list flex-row">
+                {settings.confetti.emojis.map((emoji, idx) => (
+                  <li key={idx}>
+                    <button
+                      className="icon-button font-big"
+                      title="Click to remove"
+                      onClick={() => {
+                        if (!settings.confetti) return;
+                        const newEmojis = [...settings.confetti.emojis];
+                        newEmojis.splice(idx, 1);
+                        changeConfettiSetting("emojis", newEmojis);
+                      }}>
+                      {emoji}
+                    </button>
+                  </li>
                 ))}
+              </ul>
+            )}
           </div>
           <div>
             {addingEmoji ? (
