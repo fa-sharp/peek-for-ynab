@@ -87,9 +87,10 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   return (
     <>
       <h4
+        aria-labelledby="confetti-heading"
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
-        <span title="Setup confetti after adding a transaction">Confetti</span>
+        <span id="confetti-heading">Confetti</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>Setup confetti celebrations after adding a transaction.</Dialog>
         </Tooltip>

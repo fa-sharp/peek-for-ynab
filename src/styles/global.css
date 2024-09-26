@@ -292,7 +292,7 @@ li:last-child .balance-display {
 .dialog {
   background-color: var(--background);
   padding: var(--spacing-md);
-  max-width: 200px;
+  max-width: 250px;
 }
 .dialog:focus-visible {
   outline-color: var(--border);
