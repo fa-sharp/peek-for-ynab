@@ -2,21 +2,18 @@ import { Item } from "@react-stately/collections";
 import { type Key, useCallback, useMemo } from "react";
 import { ChevronDown } from "tabler-icons-react";
 
+import { Menu } from "~components";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import { findEmoji } from "~lib/utils";
-
-import PopupNavMenu from "./PopupNavMenu";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({
   emojiMode,
-  animationsEnabled,
   shownBudgets: budgets,
   selectedBudgetId,
   setSelectedBudgetId
 }: {
   emojiMode?: boolean;
-  animationsEnabled?: boolean;
   shownBudgets: CachedBudget[];
   selectedBudgetId: string;
   setSelectedBudgetId: (budgetId: string) => void;
@@ -46,20 +43,19 @@ export default function BudgetSelect({
         {!selectedBudgetId || !currentBudgetName ? "Select a budget" : currentBudgetName}
       </div>
       {(!selectedBudgetId || !currentBudgetName || budgets.length > 1) && (
-        <PopupNavMenu
+        <Menu
           label="Select a budget"
           placement="bottom right"
           icon={<ChevronDown aria-hidden />}
           selectionMode="single"
           selectedKeys={selectedBudgetId ? [selectedBudgetId] : []}
-          onAction={onSelectBudget}
-          animationsEnabled={animationsEnabled}>
+          onAction={onSelectBudget}>
           {budgets.map((budget) => (
             <Item key={budget.id}>
               {emojiMode ? findEmoji(budget.name) || budget.name : budget.name}
             </Item>
           ))}
-        </PopupNavMenu>
+        </Menu>
       )}
     </>
   );

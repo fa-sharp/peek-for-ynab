@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { Refresh } from "tabler-icons-react";
+import { Help, Refresh } from "tabler-icons-react";
 
-import { BudgetSettings } from "~components";
+import { BudgetSettings, Dialog, Tooltip } from "~components";
 import {
   AppProvider,
   useAuthContext,
@@ -63,7 +63,7 @@ export function OptionsView() {
           <h3 className="heading-big" style={{ marginTop: "0" }}>
             Settings
           </h3>
-          <div className="flex-col">
+          <div className="flex-col mb-lg">
             <label
               className="flex-row"
               title="Sync settings and pinned categories/accounts to your browser profile">
@@ -118,69 +118,72 @@ export function OptionsView() {
             </label>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Permissions
-          </h3>
-          <div className="flex-col">
-            <div>
-              <label className="flex-row mb-sm">
-                <input
-                  type="checkbox"
-                  checked={settings.currentTabAccess}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      const granted = await requestPermissions([
-                        "activeTab",
-                        "scripting"
-                      ]);
-                      if (granted) changeSetting("currentTabAccess", true);
-                    } else {
-                      await removePermissions(["activeTab", "scripting"]);
-                      changeSetting("currentTabAccess", false);
-                    }
-                  }}
-                />
-                Allow access to the currently open tab, to enable these features:
+          <h3 className="heading-big">Permissions</h3>
+          <div className="flex-col mb-lg">
+            <div className="flex-row">
+              <input
+                id="tab-permission"
+                type="checkbox"
+                checked={settings.currentTabAccess}
+                onChange={async (e) => {
+                  if (e.target.checked) {
+                    const granted = await requestPermissions(["activeTab", "scripting"]);
+                    if (granted) changeSetting("currentTabAccess", true);
+                  } else {
+                    await removePermissions(["activeTab", "scripting"]);
+                    changeSetting("currentTabAccess", false);
+                  }
+                }}
+              />
+              <label htmlFor="tab-permission">
+                Allow access to the current tab, to enable more transaction entry features
               </label>
-              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
-                <li>Automatically copy the selected amount into the transaction form</li>
-                <li>Copy the current URL into the memo field of the transaction</li>
-              </ul>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  <ol
+                    className="list"
+                    style={{ listStyle: "numeric", paddingLeft: "2em" }}>
+                    <li>
+                      Automatically copy the selected amount into the transaction form.
+                    </li>
+                    <li>Copy the current URL into the memo field of the transaction.</li>
+                  </ol>
+                </Dialog>
+              </Tooltip>
             </div>
-            <div>
-              <label className="flex-row mb-sm">
-                <input
-                  type="checkbox"
-                  checked={notificationEnabled}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      requestNotificationPermission();
-                    } else {
-                      removeNotificationPermission();
-                    }
-                  }}
-                />
+            <div className="flex-row mb-sm">
+              <input
+                id="notification-permission"
+                type="checkbox"
+                checked={notificationEnabled}
+                onChange={async (e) => {
+                  if (e.target.checked) {
+                    requestNotificationPermission();
+                  } else {
+                    removeNotificationPermission();
+                  }
+                }}
+              />
+              <label htmlFor="notification-permission">
                 Enable system notifications (⚠️ Experimental ⚠️)
               </label>
-              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
-                <li>
-                  Native notifications on your device (based on the notifications you
-                  setup for each budget below)
-                </li>
-                <li>
-                  You may also need to enable notifications for your browser in your
-                  system settings
-                </li>
-                <li>
-                  This setting is not synced and must be manually enabled on each device
-                </li>
-              </ul>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable system notifications based on the notifications you setup for
+                  each budget below. Keep in mind you may also need to enable
+                  notifications for your browser in your system settings.
+                </Dialog>
+              </Tooltip>
             </div>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Budgets
-          </h3>
+          <h3 className="heading-big">Budgets</h3>
           <ul className="list flex-col mb-lg">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />

@@ -81,7 +81,7 @@ function PayeeSelect(
       <div className="flex-col">
         <input required={required} {...getInputProps({ ref })} disabled={disabled} />
         <ul
-          className={clsx("select-dropdown-list", { rounded: isOpen })}
+          className={clsx("select-dropdown-list", { "rounded shadow": isOpen })}
           {...getMenuProps({ ref: listRef })}>
           {!isOpen ? null : payeeList.length === 0 ? (
             <li className="select-dropdown-item">

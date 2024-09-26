@@ -65,6 +65,10 @@ button:focus-visible {
   outline-color: var(--border);
 }
 
+input[type="checkbox"] {
+  accent-color: var(--accent-hover);
+}
+
 .flex-row {
   display: flex;
   align-items: center;
@@ -198,6 +202,16 @@ button:focus-visible {
 
   padding: 3px 0px;
   border-bottom: solid 1px var(--border-light);
+
+  outline: transparent solid 2px;
+  outline-offset: 1px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
+}
+.balance-display.highlighted {
+  outline-color: var(--border);
+  border-radius: var(--border-radius);
 }
 .balance-display:not(:hover) span.hidden {
   color: transparent;
@@ -219,11 +233,11 @@ li:last-child .balance-display {
 }
 
 .icon-button {
+  display: inline-flex;
   padding: 1px;
 
   background: none;
   border: none;
-  line-height: 0;
   cursor: pointer;
 }
 .icon-button:active {
@@ -279,6 +293,15 @@ li:last-child .balance-display {
   outline-color: var(--border);
 }
 
+.dialog {
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  max-width: 250px;
+}
+.dialog:focus-visible {
+  outline-color: var(--border);
+}
+
 .select-dropdown-list {
   position: absolute;
   top: 100%;
@@ -329,6 +352,10 @@ li:last-child .balance-display {
 .rounded {
   border: 1px solid var(--border);
   border-radius: var(--border-radius);
+}
+
+.shadow {
+  box-shadow: var(--border-light) 0px 2px 6px 1px;
 }
 
 .accent:not(:disabled) {
@@ -433,6 +460,11 @@ li:last-child .balance-display {
 
 .slide-up {
   animation: slide-up 0.2s forwards;
+}
+@media (prefers-reduced-motion) {
+  .slide-up {
+    animation: none;
+  }
 }
 
 @keyframes slide-up {

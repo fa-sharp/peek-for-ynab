@@ -61,6 +61,12 @@ export interface BudgetNotificationSettings {
   };
 }
 
+export interface BudgetConfettiSettings {
+  allCategories: boolean;
+  categories: string[];
+  emojis: string[];
+}
+
 /** Budget-specific settings */
 export interface BudgetSettings {
   notifications: BudgetNotificationSettings;
@@ -74,6 +80,7 @@ export interface BudgetSettings {
     /** Default account for purchases */
     defaultAccountId?: string;
   };
+  confetti?: BudgetConfettiSettings;
 }
 
 const TOKEN_STORAGE = new Storage({ area: "local" });

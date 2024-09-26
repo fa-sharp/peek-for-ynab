@@ -116,6 +116,10 @@ export const findEmoji = (s: string, limit = 2) => {
   return matches ? matches.slice(0, limit).join("") : null;
 };
 
+export const findAllEmoji = (s: string): string[] => {
+  return s.match(emojiRegex) || [];
+};
+
 /**
  * Executes the given function in the context of the user's active browser tab.
  * @returns a Promise with the result of the given function

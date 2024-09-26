@@ -1,16 +1,13 @@
 import { type RefObject, useRef } from "react";
-import type { Account, Category } from "ynab";
 
 import { AccountSelect, CategorySelect, PayeeSelect } from "~components";
-import type { CachedPayee } from "~lib/context/ynabContext";
+import type { BudgetMainData } from "~lib/context/ynabContext";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {
   formState: TransactionFormState;
   handlers: TransactionFormHandlers;
-  accountsData?: Account[];
-  categoriesData?: Category[];
-  payeesData?: CachedPayee[];
+  budgetMainData: BudgetMainData;
   memoRef?: RefObject<HTMLInputElement>;
   isSaving: boolean;
 }
@@ -19,9 +16,7 @@ interface Props {
 export default function TransactionFormMain({
   formState,
   handlers,
-  accountsData,
-  categoriesData,
-  payeesData,
+  budgetMainData,
   memoRef,
   isSaving
 }: Props) {
@@ -31,7 +26,7 @@ export default function TransactionFormMain({
   return (
     <>
       <PayeeSelect
-        payees={payeesData}
+        payees={budgetMainData.payeesData}
         selectPayee={(selectedPayee) => {
           handlers.setPayee(selectedPayee);
           if ("id" in selectedPayee) {
@@ -46,7 +41,8 @@ export default function TransactionFormMain({
         <CategorySelect
           ref={categoryRef}
           initialCategory={formState.category}
-          categories={categoriesData}
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={(selectedCategory) => {
             handlers.setCategory(selectedCategory);
             if (selectedCategory) {
@@ -60,7 +56,7 @@ export default function TransactionFormMain({
       <AccountSelect
         ref={accountRef}
         currentAccount={formState.account}
-        accounts={accountsData}
+        accounts={budgetMainData.accountsData}
         selectAccount={(selectedAccount) => {
           handlers.setAccount(selectedAccount);
           if (selectedAccount) {

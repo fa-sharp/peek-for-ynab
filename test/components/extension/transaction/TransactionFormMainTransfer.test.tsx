@@ -27,11 +27,7 @@ test("Transfer form has expected keyboard tab order", async () => {
     () => ({ ynab: useYNABContext(), transaction: useTransaction() }),
     { wrapper }
   );
-  await waitFor(() =>
-    expect(
-      result.current.ynab.accountsData && result.current.ynab.categoriesData
-    ).toBeTruthy()
-  );
+  await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
 
   const memoRef: RefObject<HTMLInputElement> = { current: null };
   const user = userEvent.setup();
@@ -41,8 +37,7 @@ test("Transfer form has expected keyboard tab order", async () => {
         formState={result.current.transaction.formState}
         handlers={result.current.transaction.handlers}
         memoRef={memoRef}
-        accountsData={result.current.ynab.accountsData}
-        categoriesData={result.current.ynab.categoriesData}
+        budgetMainData={result.current.ynab.budgetMainData!}
         isBudgetToTrackingTransfer={
           result.current.transaction.derivedState.isBudgetToTrackingTransfer
         }
@@ -69,19 +64,14 @@ test("Proper transfer payee and account state when filling out the form", async 
     () => ({ ynab: useYNABContext(), transaction: useTransaction() }),
     { wrapper }
   );
-  await waitFor(() =>
-    expect(
-      result.current.ynab.accountsData && result.current.ynab.categoriesData
-    ).toBeTruthy()
-  );
+  await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
 
   const user = userEvent.setup();
   render(
     <TransactionFormMainTransfer
       formState={result.current.transaction.formState}
       handlers={result.current.transaction.handlers}
-      accountsData={result.current.ynab.accountsData}
-      categoriesData={result.current.ynab.categoriesData}
+      budgetMainData={result.current.ynab.budgetMainData!}
       isBudgetToTrackingTransfer={
         result.current.transaction.derivedState.isBudgetToTrackingTransfer
       }

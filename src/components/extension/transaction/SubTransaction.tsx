@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
-import { useYNABContext } from "~lib/context";
-import type { CachedPayee } from "~lib/context/ynabContext";
+import type { BudgetMainData, CachedPayee } from "~lib/context/ynabContext";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
@@ -19,6 +18,7 @@ interface Props {
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
   setCategory: (category: Category | null) => void;
   setMemo: (memo: string) => void;
+  budgetMainData: BudgetMainData;
 }
 
 export default function SubTransaction({
@@ -32,10 +32,9 @@ export default function SubTransaction({
   setAmountType,
   setPayee,
   setCategory,
-  setMemo
+  setMemo,
+  budgetMainData
 }: Props) {
-  const { accountsData, categoriesData, payeesData } = useYNABContext();
-
   const [showPayee, setShowPayee] = useState(false);
   const [showCategory, setShowCategory] = useState(true);
   const [showMemo, setShowMemo] = useState(false);
@@ -59,7 +58,7 @@ export default function SubTransaction({
         (!isTransfer ? (
           <PayeeSelect
             ref={payeeRef}
-            payees={payeesData}
+            payees={budgetMainData.payeesData}
             selectPayee={setPayee}
             required={false}
           />
@@ -67,7 +66,7 @@ export default function SubTransaction({
           <AccountSelect
             ref={payeeRef}
             label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
-            accounts={accountsData}
+            accounts={budgetMainData.accountsData}
             selectAccount={(account) => {
               if (!account || !account.transfer_payee_id) {
                 setPayee(null);
@@ -91,7 +90,8 @@ export default function SubTransaction({
       {showCategory && (
         <CategorySelect
           ref={categoryRef}
-          categories={categoriesData}
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={setCategory}
           placeholder=""
         />
