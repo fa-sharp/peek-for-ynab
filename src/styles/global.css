@@ -65,6 +65,10 @@ button:focus-visible {
   outline-color: var(--border);
 }
 
+input[type="checkbox"] {
+  accent-color: var(--accent-hover);
+}
+
 .flex-row {
   display: flex;
   align-items: center;
