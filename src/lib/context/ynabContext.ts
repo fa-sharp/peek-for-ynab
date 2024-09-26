@@ -32,7 +32,7 @@ export interface BudgetMainData {
   accountsData: ynab.Account[];
   categoriesData: ynab.Category[];
   categoryGroupsData: ynab.CategoryGroupWithCategories[];
-  payeesData?: CachedPayee[];
+  payeesData: CachedPayee[];
 }
 
 const useYNABProvider = () => {
@@ -209,7 +209,8 @@ const useYNABProvider = () => {
 
   /** Group commonly used data into one object */
   const budgetMainData: BudgetMainData | null = useMemo(() => {
-    if (!accountsData || !categoriesData || !categoryGroupsData) return null;
+    if (!accountsData || !categoriesData || !categoryGroupsData || !payeesData)
+      return null;
     return {
       accountsData,
       categoriesData,

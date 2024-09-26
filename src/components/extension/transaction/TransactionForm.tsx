@@ -5,6 +5,8 @@ import { TransactionFlagColor } from "ynab";
 import { AmountField, IconButton, MemoField } from "~components";
 import { CheckIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import type { AppSettings } from "~lib/context/storageContext";
+import type { BudgetMainData, CachedBudget } from "~lib/context/ynabContext";
 import useTransaction from "~lib/useTransaction";
 import { flagColorToEmoji, getTodaysDateISO } from "~lib/utils";
 
@@ -12,11 +14,35 @@ import TransactionFormMain from "./TransactionFormMain";
 import TransactionFormMainTransfer from "./TransactionFormMainTransfer";
 import TransactionFormSplit from "./TransactionFormSplit";
 
-/** Form that lets user add a transaction. */
-export default function TransactionForm() {
+export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { settings, setPopupState } = useStorageContext();
 
+  if (!budgetMainData) return <div>Loading...</div>;
+  return (
+    <TransactionFormInner
+      budgetMainData={budgetMainData}
+      selectedBudgetData={selectedBudgetData}
+      settings={settings}
+      resetPopupState={() => setPopupState({ view: "main" })}
+    />
+  );
+}
+
+interface Props {
+  selectedBudgetData?: CachedBudget | null;
+  budgetMainData: BudgetMainData;
+  settings?: AppSettings;
+  resetPopupState: () => void;
+}
+
+/** Form that lets user add a transaction. */
+export function TransactionFormInner({
+  budgetMainData,
+  selectedBudgetData,
+  resetPopupState,
+  settings
+}: Props) {
   const { formState, derivedState, handlers, onSaveTransaction, isSaving } =
     useTransaction();
   const memoRef = useRef<HTMLInputElement>(null);
@@ -158,7 +184,7 @@ export default function TransactionForm() {
           <button
             type="button"
             className="button gray rounded flex-1"
-            onClick={() => setPopupState({ view: "main" })}
+            onClick={resetPopupState}
             disabled={isSaving}>
             Cancel
           </button>

@@ -27,6 +27,7 @@ export default function TransactionFormMain({
     <>
       <PayeeSelect
         payees={budgetMainData.payeesData}
+        initialPayee={formState.payee}
         selectPayee={(selectedPayee) => {
           handlers.setPayee(selectedPayee);
           if ("id" in selectedPayee) {

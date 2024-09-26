@@ -10,6 +10,7 @@ interface Props {
   payees?: CachedPayee[];
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
+  initialPayee?: CachedPayee | { name: string } | null;
   disabled?: boolean;
   required?: boolean;
 }
@@ -25,7 +26,7 @@ function estimateSize() {
 }
 
 function PayeeSelect(
-  { payees, selectPayee, disabled, required = true }: Props,
+  { payees, initialPayee, selectPayee, disabled, required = true }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const [payeeList, setPayeeList] = useState(() => {
@@ -56,6 +57,7 @@ function PayeeSelect(
     itemToString(payee) {
       return payee ? payee.name : "";
     },
+    initialSelectedItem: initialPayee,
     onInputValueChange({ inputValue, selectedItem }) {
       setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
