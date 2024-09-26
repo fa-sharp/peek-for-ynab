@@ -29,13 +29,12 @@ export default function Popover({ children, state, ...props }: PopoverProps) {
       <div
         {...popoverProps}
         ref={ref}
-        className={clsx("rounded", {
+        className={clsx("rounded shadow", {
           "slide-up": state.isOpen
         })}
         style={{
           ...popoverProps.style,
-          overflow: "auto",
-          boxShadow: "var(--border-light) 0px 2px 7px 1px"
+          overflow: "auto"
         }}>
         <DismissButton onDismiss={state.close} />
         {children}

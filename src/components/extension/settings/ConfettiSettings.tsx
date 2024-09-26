@@ -1,5 +1,5 @@
 import { type FormEventHandler, useMemo, useRef, useState } from "react";
-import { Help, X } from "tabler-icons-react";
+import { Help, Plus, X } from "tabler-icons-react";
 
 import { Dialog, Tooltip } from "~components";
 import IconButton from "~components/IconButton";
@@ -90,7 +90,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span title="Setup confetti after adding a transaction">Confetti</span>
-        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>Setup confetti celebrations after adding a transaction.</Dialog>
         </Tooltip>
         <IconButton
@@ -129,12 +129,12 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
               <div>
                 {!addingCategory ? (
                   <button
-                    className="button flex-row gap-sm accent rounded"
+                    className="button flex-row gap-xs accent rounded"
                     onClick={() => {
                       setAddingCategory(true);
                       setTimeout(() => categoryRef.current?.focus(), 50);
                     }}>
-                    <AddTransactionIcon /> Add category
+                    <Plus aria-label="Add" size={18} /> Category
                   </button>
                 ) : (
                   <CategorySelect
@@ -162,6 +162,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
                   <button
                     key={idx}
                     className="icon-button font-big"
+                    title="Click to remove"
                     onClick={() => {
                       if (!settings.confetti) return;
                       const newEmojis = [...settings.confetti.emojis];
@@ -185,12 +186,12 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
               </form>
             ) : (
               <button
-                className="button flex-row gap-sm accent rounded"
+                className="button flex-row gap-xs accent rounded"
                 onClick={() => {
                   setAddingEmoji(true);
                   setTimeout(() => emojiRef.current?.focus(), 50);
                 }}>
-                <AddTransactionIcon /> Add emoji
+                <Plus aria-label="Add" size={18} /> Emoji
               </button>
             )}
           </div>

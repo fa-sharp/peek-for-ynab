@@ -131,7 +131,7 @@ function CategorySelect(
         )}
 
         <ul
-          className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
+          className={`select-dropdown-list ${isOpen ? "rounded shadow" : ""}`}
           {...getMenuProps()}>
           {!isOpen ? null : categoryList.length === 0 ? (
             <li className="select-dropdown-item">--Category not found!--</li>

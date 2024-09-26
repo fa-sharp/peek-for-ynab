@@ -124,7 +124,7 @@ function AccountSelect(
         )}
 
         <ul
-          className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
+          className={`select-dropdown-list ${isOpen ? "rounded shadow" : ""}`}
           {...getMenuProps()}>
           {!isOpen ? null : accountList.length === 0 ? (
             <li className="select-dropdown-item">--Account not found!--</li>

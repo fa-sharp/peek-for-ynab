@@ -28,7 +28,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
     <>
       <h4 aria-labelledby="tx-heading" className="heading-medium">
         <span id="tx-heading">Transaction defaults</span>
-        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>Set default settings when entering a transaction.</Dialog>
         </Tooltip>
       </h4>

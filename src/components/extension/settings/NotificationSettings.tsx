@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Help, InfoCircle } from "tabler-icons-react";
+import { Help } from "tabler-icons-react";
 
 import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
@@ -10,7 +10,7 @@ import type { CachedBudget } from "~lib/context/ynabContext";
 import ReconcileAlertSettings from "./ReconcileAlertSettings";
 
 export default function NotificationSettings({ budget }: { budget: CachedBudget }) {
-  const { useBudgetSettings, settings } = useStorageContext();
+  const { useBudgetSettings } = useStorageContext();
   const [budgetSettings, setBudgetSettings] = useBudgetSettings(budget.id);
   const [reconcileExpanded, setReconcileExpanded] = useState(false);
 
@@ -30,7 +30,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
     <>
       <h4 aria-labelledby="notification-heading" className="heading-medium">
         <span id="notification-heading">Notifications</span>
-        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>Enable notifications for the following events in your budget.</Dialog>
         </Tooltip>
       </h4>
@@ -71,7 +71,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setReconcileExpanded(!reconcileExpanded)}>
         <span id="reconcile-heading">Reconciliation alerts</span>
-        <Tooltip label="More info" icon={<Help size={20} aria-hidden />} placement="top">
+        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>
             Setup alerts to notify you if an account has not been reconciled in a set
             amount of time.
