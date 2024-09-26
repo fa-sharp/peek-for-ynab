@@ -56,7 +56,7 @@ export default function useTransaction() {
       );
     return null;
   });
-  const [memo, setMemo] = useState("");
+  const [memo, setMemo] = useState(txAddState?.memo || "");
   const [flag, setFlag] = useState("");
 
   // Split transaction state

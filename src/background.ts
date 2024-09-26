@@ -15,11 +15,7 @@ import {
   fetchCategoryGroupsForBudget
 } from "~lib/api";
 import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
-import type {
-  BudgetSettings,
-  TokenData,
-  TxAddInitialState
-} from "~lib/context/storageContext";
+import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
 import type { CachedPayee } from "~lib/context/ynabContext";
 import {
   type CurrentAlerts,
@@ -256,7 +252,7 @@ chrome.omnibox.setDefaultSuggestion({
 });
 chrome.omnibox.onInputEntered.addListener(async (text) => {
   const tx = JSON.parse(text);
-  console.log("Received transaction:", tx);
+  IS_DEV && console.log("Received transaction:", tx);
   await CHROME_LOCAL_STORAGE.set("popupState", {
     view: "txAdd",
     txAddState: tx
@@ -380,11 +376,11 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
         memo: memo.trim() || undefined
       }),
       description:
-        "add " +
+        "transaction: " +
         formatCurrency(stringValueToMillis(amount, "Outflow")) +
-        (payee ? ` at <match>${escapeXML(payee!.name)}</match>` : "") +
-        (category ? ` for <match>${escapeXML(category!.name)}</match>` : "") +
-        (account ? ` on <match>${escapeXML(account!.name)}</match>` : "") +
+        (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
+        (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
+        (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
         (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
     }))
   );
