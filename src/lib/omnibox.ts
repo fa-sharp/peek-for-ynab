@@ -31,11 +31,11 @@ export function parseTxInput(text: string):
   const dataToParse = text.split(/\s+/);
   if (dataToParse.length === 0) return null;
 
-  if (dataToParse[0] !== "transfer") {
+  if (dataToParse[0] === "add") {
     /** [amount, payee, category, account, memo] */
     const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
     let parsedIdx = 0;
-    for (const word of dataToParse) {
+    for (const word of dataToParse.slice(1)) {
       if (word === "at" && parsedIdx < 1) parsedIdx = 1;
       else if (word === "for" && parsedIdx < 2) parsedIdx = 2;
       else if (word === "on" && parsedIdx < 3) parsedIdx = 3;
@@ -47,7 +47,7 @@ export function parseTxInput(text: string):
     }
     const [amount, payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
     return { type: "tx", amount, payeeQuery, categoryQuery, accountQuery, memo };
-  } else {
+  } else if (dataToParse[0] === "transfer") {
     /** [amount, account 1, account 2, category, memo] */
     const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
     let account1Direction: "from" | "to" = "from";
@@ -74,6 +74,7 @@ export function parseTxInput(text: string):
       memo
     };
   }
+  return null;
 }
 
 export function getPossibleTxFieldsFromParsedInput(

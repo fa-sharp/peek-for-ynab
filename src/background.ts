@@ -238,11 +238,19 @@ chrome.notifications?.onClicked.removeListener(onSystemNotificationClick);
 chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 
 // Setup omnibox
-chrome.omnibox.setDefaultSuggestion({
-  description:
-    "(<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>) OR transfer (<dim>amount</dim>) (from|to <dim>account</dim>)"
-});
+chrome.omnibox.onInputStarted.addListener(() =>
+  chrome.omnibox.setDefaultSuggestion({
+    description: "add <dim>or</dim> transfer"
+  })
+);
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
+  chrome.omnibox.setDefaultSuggestion({
+    description: text.startsWith("add")
+      ? "add (<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
+      : text.startsWith("transfer")
+        ? "transfer (<dim>amount</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
+        : "add <dim>or</dim> transfer"
+  });
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
   const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
