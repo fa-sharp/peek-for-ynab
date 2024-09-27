@@ -23,6 +23,7 @@ import {
   getBudgetAlerts,
   updateIconAndTooltip
 } from "~lib/notifications";
+import { getPossibleTxFieldsFromParsedInput, parseTxInput } from "~lib/parsing";
 import { createQueryClient } from "~lib/queryClient";
 import {
   IS_DEV,
@@ -30,7 +31,6 @@ import {
   checkPermissions,
   formatCurrency,
   isEmptyObject,
-  searchWithinString,
   stringValueToMillis
 } from "~lib/utils";
 
@@ -248,7 +248,7 @@ chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 // Setup omnibox
 chrome.omnibox.setDefaultSuggestion({
   description:
-    "<dim>amount</dim> (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
+    "(<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
 });
 chrome.omnibox.onInputEntered.addListener(async (text) => {
   const tx = JSON.parse(text);
@@ -259,125 +259,25 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
   });
   chrome.action.openPopup();
 });
-
-const omniCache: {
-  payees?: CachedPayee[];
-  categories?: Category[];
-  accounts?: Account[];
-} = {};
-const primeOmniCache = async (key: "payees" | "categories" | "accounts") => {
-  console.log("priming cache..");
-  const queryClient = createQueryClient({
-    staleTime: ONE_DAY_IN_MILLIS * 7
-  });
-  const budgetId = "a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c";
-  switch (key) {
-    case "payees": {
-      const { payees } = await queryClient.fetchQuery<{ payees: CachedPayee[] }>({
-        queryKey: ["payees", { budgetId }],
-        queryFn: () => ({ payees: [] })
-      });
-      omniCache.payees = payees;
-      return { payees };
-    }
-    case "categories": {
-      const { categoryGroups } = await queryClient.fetchQuery<{
-        categoryGroups: CategoryGroupWithCategories[];
-      }>({
-        queryKey: ["categoryGroups", { budgetId }],
-        queryFn: () => ({ categoryGroups: [] })
-      });
-      categoryGroups.splice(1, 1); // CCP
-      const categories = categoryGroups.flatMap((cg) => cg.categories);
-      categories.splice(1, 2); // Internal master, deferred
-      omniCache.categories = categories;
-      return { categories };
-    }
-    case "accounts": {
-      const { accounts } = await queryClient.fetchQuery<{
-        accounts: Account[];
-      }>({
-        queryKey: ["accounts", { budgetId }],
-        queryFn: () => ({ accounts: [] })
-      });
-      omniCache.accounts = accounts;
-      return { accounts };
-    }
-    default:
-      return {};
-  }
-};
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
-  const [amount, ...dataToParse] = text.split(" ");
-  if (!amount || dataToParse.length === 0) return suggest([]);
-  /** payee, category, account, memo */
-  const parsedData: [string, string, string, string] = ["", "", "", ""];
-  let parsedIdx = -1;
-  for (const word of dataToParse) {
-    if (word === "at" && parsedIdx < 0) parsedIdx = 0;
-    else if (word === "for" && parsedIdx < 1) parsedIdx = 1;
-    else if (word === "on" && parsedIdx < 2) parsedIdx = 2;
-    else if (word === "memo" && parsedIdx < 3) parsedIdx = 3;
-    else if (parsedIdx >= 0) parsedData[parsedIdx] += word + " ";
-  }
-  const [payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
-  let payeeResults: CachedPayee[] = [];
-  let categoryResults: Category[] = [];
-  let accountResults: Account[] = [];
-
-  if (payeeQuery) {
-    const payees = omniCache.payees || (await primeOmniCache("payees")).payees;
-    payeeResults =
-      payees?.filter((p) => searchWithinString(p.name, payeeQuery.trim())).slice(0, 5) ||
-      [];
-  }
-  if (categoryQuery) {
-    const categories =
-      omniCache.categories || (await primeOmniCache("categories")).categories;
-    categoryResults =
-      categories
-        ?.filter((c) => searchWithinString(c.name, categoryQuery.trim()))
-        .slice(0, 5) || [];
-  }
-  if (accountQuery) {
-    const accounts = omniCache.accounts || (await primeOmniCache("accounts")).accounts;
-    accountResults =
-      accounts
-        ?.filter((a) => searchWithinString(a.name, accountQuery.trim()))
-        .slice(0, 5) || [];
-  }
-
-  let suggestions: { payee?: CachedPayee; account?: Account; category?: Category }[] = [];
-  for (const payee of payeeResults) {
-    suggestions.push({ payee });
-  }
-  if (suggestions.length === 0)
-    categoryResults.forEach((category) => suggestions.push({ category }));
-  else if (categoryResults.length > 0) {
-    suggestions = categoryResults.flatMap((category) =>
-      suggestions.map((suggestion) => ({ ...suggestion, category }))
-    );
-  }
-  if (suggestions.length === 0)
-    accountResults.forEach((account) => suggestions.push({ account }));
-  else if (accountResults.length > 0) {
-    suggestions = accountResults.flatMap((account) =>
-      suggestions.map((suggestion) => ({ ...suggestion, account }))
-    );
-  }
-
+  const { amount, payeeQuery, categoryQuery, accountQuery, memo } = parseTxInput(text);
+  const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+  const possibleTxFields = getPossibleTxFieldsFromParsedInput(
+    { payeeQuery, categoryQuery, accountQuery },
+    data
+  );
   suggest(
-    suggestions.map(({ payee, category, account }) => ({
+    possibleTxFields.map(({ payee, category, account }) => ({
       content: JSON.stringify({
         amount,
         payee,
         accountId: account?.id,
         categoryId: category?.id,
-        memo: memo.trim() || undefined
+        memo: memo?.trim()
       }),
       description:
         "transaction: " +
-        formatCurrency(stringValueToMillis(amount, "Outflow")) +
+        (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
         (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
         (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
         (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
@@ -385,6 +285,48 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     }))
   );
 });
+
+const omniboxCache: {
+  [budgetId: string]: {
+    payees?: CachedPayee[];
+    categories?: Category[];
+    accounts?: Account[];
+  };
+} = {};
+async function getOmniboxCache(budgetId: string) {
+  if (omniboxCache[budgetId]) return omniboxCache[budgetId];
+
+  const budgetCache: (typeof omniboxCache)[string] = {};
+  const queryClient = createQueryClient({
+    staleTime: ONE_DAY_IN_MILLIS * 7
+  });
+  const { payees } = await queryClient.fetchQuery<{ payees: CachedPayee[] }>({
+    queryKey: ["payees", { budgetId }],
+    queryFn: () => ({ payees: [] })
+  });
+  budgetCache.payees = payees;
+  const { categoryGroups } = await queryClient.fetchQuery<{
+    categoryGroups: CategoryGroupWithCategories[];
+  }>({
+    queryKey: ["categoryGroups", { budgetId }],
+    queryFn: () => ({ categoryGroups: [] })
+  });
+  categoryGroups.splice(1, 1); // CCP
+  const categories = categoryGroups.flatMap((cg) => cg.categories);
+  categories.splice(1, 2); // Internal master, deferred
+  budgetCache.categories = categories;
+  const { accounts } = await queryClient.fetchQuery<{
+    accounts: Account[];
+  }>({
+    queryKey: ["accounts", { budgetId }],
+    queryFn: () => ({ accounts: [] })
+  });
+  budgetCache.accounts = accounts;
+
+  omniboxCache[budgetId] = budgetCache;
+  return budgetCache;
+}
+
 const xmlEscapedChars: Record<string, string> = {
   '"': "&quot;",
   "'": "&apos;",
@@ -392,9 +334,9 @@ const xmlEscapedChars: Record<string, string> = {
   ">": "&gt;",
   "&": "&amp;"
 };
-function escapeXML(xmlString: string) {
+function escapeXML(s: string) {
   let escaped = "";
-  for (const c of xmlString) {
+  for (const c of s) {
     escaped += xmlEscapedChars[c] || c;
   }
   return escaped;
