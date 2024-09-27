@@ -112,7 +112,7 @@ export default function TransactionForm() {
               icon={
                 <CircleC
                   aria-hidden
-                  fill={formState.cleared ? "var(--currency-green)" : undefined}
+                  fill={formState.cleared ? "var(--currency-green)" : "var(--background)"}
                   color={formState.cleared ? "var(--background)" : "gray"}
                 />
               }
