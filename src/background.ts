@@ -16,23 +16,20 @@ import {
 } from "~lib/api";
 import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
 import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
-import type { CachedPayee } from "~lib/context/ynabContext";
 import {
   type CurrentAlerts,
   createSystemNotification,
   getBudgetAlerts,
   updateIconAndTooltip
 } from "~lib/notifications";
-import { getPossibleTxFieldsFromParsedInput, parseTxInput } from "~lib/parsing";
-import { createQueryClient } from "~lib/queryClient";
 import {
-  IS_DEV,
-  ONE_DAY_IN_MILLIS,
-  checkPermissions,
-  formatCurrency,
-  isEmptyObject,
-  stringValueToMillis
-} from "~lib/utils";
+  createOmniboxSuggestions,
+  getOmniboxCache,
+  getPossibleTxFieldsFromParsedInput,
+  parseTxInput
+} from "~lib/omnibox";
+import { createQueryClient } from "~lib/queryClient";
+import { IS_DEV, ONE_DAY_IN_MILLIS, checkPermissions, isEmptyObject } from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
@@ -250,15 +247,6 @@ chrome.omnibox.setDefaultSuggestion({
   description:
     "(<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
 });
-chrome.omnibox.onInputEntered.addListener(async (text) => {
-  const tx = JSON.parse(text);
-  IS_DEV && console.log("Received transaction:", tx);
-  await CHROME_LOCAL_STORAGE.set("popupState", {
-    view: "txAdd",
-    txAddState: tx
-  });
-  chrome.action.openPopup();
-});
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   const { amount, payeeQuery, categoryQuery, accountQuery, memo } = parseTxInput(text);
   const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
@@ -266,78 +254,11 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     { payeeQuery, categoryQuery, accountQuery },
     data
   );
-  suggest(
-    possibleTxFields.map(({ payee, category, account }) => ({
-      content: JSON.stringify({
-        amount,
-        payee,
-        accountId: account?.id,
-        categoryId: category?.id,
-        memo: memo?.trim()
-      }),
-      description:
-        "transaction: " +
-        (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
-        (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
-        (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
-        (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
-        (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
-    }))
-  );
+  suggest(createOmniboxSuggestions(possibleTxFields, amount, memo));
 });
-
-const omniboxCache: {
-  [budgetId: string]: {
-    payees?: CachedPayee[];
-    categories?: Category[];
-    accounts?: Account[];
-  };
-} = {};
-async function getOmniboxCache(budgetId: string) {
-  if (omniboxCache[budgetId]) return omniboxCache[budgetId];
-
-  const budgetCache: (typeof omniboxCache)[string] = {};
-  const queryClient = createQueryClient({
-    staleTime: ONE_DAY_IN_MILLIS * 7
-  });
-  const { payees } = await queryClient.fetchQuery<{ payees: CachedPayee[] }>({
-    queryKey: ["payees", { budgetId }],
-    queryFn: () => ({ payees: [] })
-  });
-  budgetCache.payees = payees;
-  const { categoryGroups } = await queryClient.fetchQuery<{
-    categoryGroups: CategoryGroupWithCategories[];
-  }>({
-    queryKey: ["categoryGroups", { budgetId }],
-    queryFn: () => ({ categoryGroups: [] })
-  });
-  categoryGroups.splice(1, 1); // CCP
-  const categories = categoryGroups.flatMap((cg) => cg.categories);
-  categories.splice(1, 2); // Internal master, deferred
-  budgetCache.categories = categories;
-  const { accounts } = await queryClient.fetchQuery<{
-    accounts: Account[];
-  }>({
-    queryKey: ["accounts", { budgetId }],
-    queryFn: () => ({ accounts: [] })
-  });
-  budgetCache.accounts = accounts;
-
-  omniboxCache[budgetId] = budgetCache;
-  return budgetCache;
-}
-
-const xmlEscapedChars: Record<string, string> = {
-  '"': "&quot;",
-  "'": "&apos;",
-  "<": "&lt;",
-  ">": "&gt;",
-  "&": "&amp;"
-};
-function escapeXML(s: string) {
-  let escaped = "";
-  for (const c of s) {
-    escaped += xmlEscapedChars[c] || c;
-  }
-  return escaped;
-}
+chrome.omnibox.onInputEntered.addListener(async (text) => {
+  const tx = JSON.parse(text);
+  IS_DEV && console.log("Received tx fields from omnibox:", tx);
+  await CHROME_LOCAL_STORAGE.set("popupState", { view: "txAdd", txAddState: tx });
+  chrome.action.openPopup();
+});
