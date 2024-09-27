@@ -10,31 +10,70 @@ import {
   stringValueToMillis
 } from "./utils";
 
-export function parseTxInput(text: string): {
-  amount?: string;
-  payeeQuery?: string;
-  categoryQuery?: string;
-  accountQuery?: string;
-  memo?: string;
-} {
+export function parseTxInput(text: string):
+  | {
+      type: "tx";
+      amount?: string;
+      payeeQuery?: string;
+      categoryQuery?: string;
+      accountQuery?: string;
+      memo?: string;
+    }
+  | {
+      type: "transfer";
+      fromAccountQuery?: string;
+      toAccountQuery?: string;
+      categoryQuery?: string;
+      amount?: string;
+      memo?: string;
+    }
+  | null {
   const dataToParse = text.split(/\s+/);
-  if (dataToParse.length === 0) return {};
+  if (dataToParse.length === 0) return null;
 
-  /** [amount, payee, category, account, memo] */
-  const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
-  let parsedIdx = 0;
-  for (const word of dataToParse) {
-    if (word === "at" && parsedIdx < 1) parsedIdx = 1;
-    else if (word === "for" && parsedIdx < 2) parsedIdx = 2;
-    else if (word === "on" && parsedIdx < 3) parsedIdx = 3;
-    else if (word === "memo" && parsedIdx < 4) parsedIdx = 4;
-    else if (parsedIdx === 0) {
-      const parsedAmount = parseLocaleNumber(word);
-      if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
-    } else parsedData[parsedIdx] += word + " ";
+  if (dataToParse[0] !== "transfer") {
+    /** [amount, payee, category, account, memo] */
+    const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
+    let parsedIdx = 0;
+    for (const word of dataToParse) {
+      if (word === "at" && parsedIdx < 1) parsedIdx = 1;
+      else if (word === "for" && parsedIdx < 2) parsedIdx = 2;
+      else if (word === "on" && parsedIdx < 3) parsedIdx = 3;
+      else if (word === "memo" && parsedIdx < 4) parsedIdx = 4;
+      else if (parsedIdx === 0) {
+        const parsedAmount = parseLocaleNumber(word);
+        if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
+      } else parsedData[parsedIdx] += word + " ";
+    }
+    const [amount, payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
+    return { type: "tx", amount, payeeQuery, categoryQuery, accountQuery, memo };
+  } else {
+    /** [amount, account 1, account 2, category, memo] */
+    const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
+    let account1Direction: "from" | "to" = "from";
+    let parsedIdx = 0;
+    for (const word of dataToParse.slice(1)) {
+      if ((word === "from" || word === "to") && parsedIdx < 1) {
+        if (word === "to") account1Direction = "to";
+        parsedIdx = 1;
+      } else if ((word === "from" || word === "to") && parsedIdx < 2) parsedIdx = 2;
+      else if (word === "for" && parsedIdx < 3) parsedIdx = 3;
+      else if (word === "memo" && parsedIdx < 4) parsedIdx = 4;
+      else if (parsedIdx === 0) {
+        const parsedAmount = parseLocaleNumber(word);
+        if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
+      } else parsedData[parsedIdx] += word + " ";
+    }
+    const [amount, account1, account2, category, memo] = parsedData;
+    return {
+      type: "transfer",
+      amount,
+      fromAccountQuery: account1Direction === "from" ? account1 : account2,
+      toAccountQuery: account1Direction === "from" ? account2 : account1,
+      categoryQuery: category,
+      memo
+    };
   }
-  const [amount, payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
-  return { amount, payeeQuery, categoryQuery, accountQuery, memo };
 }
 
 export function getPossibleTxFieldsFromParsedInput(
@@ -49,27 +88,21 @@ export function getPossibleTxFieldsFromParsedInput(
     accounts?: Account[];
   }
 ) {
-  let payeeResults: CachedPayee[] = [];
-  let categoryResults: Category[] = [];
-  let accountResults: Account[] = [];
-  if (parsed.payeeQuery) {
-    payeeResults =
-      data.payees
+  const payeeResults: CachedPayee[] = parsed.payeeQuery
+    ? data.payees
         ?.filter((p) => searchWithinString(p.name, parsed.payeeQuery!.trim()))
-        .slice(0, 5) || [];
-  }
-  if (parsed.categoryQuery) {
-    categoryResults =
-      data.categories
+        .slice(0, 5) || []
+    : [];
+  const categoryResults: Category[] = parsed.categoryQuery
+    ? data.categories
         ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
-        .slice(0, 5) || [];
-  }
-  if (parsed.accountQuery) {
-    accountResults =
-      data.accounts
+        .slice(0, 5) || []
+    : [];
+  const accountResults: Account[] = parsed.accountQuery
+    ? data.accounts
         ?.filter((a) => searchWithinString(a.name, parsed.accountQuery!.trim()))
-        .slice(0, 5) || [];
-  }
+        .slice(0, 5) || []
+    : [];
 
   let possibleTxFields: {
     payee?: CachedPayee;
@@ -98,7 +131,69 @@ export function getPossibleTxFieldsFromParsedInput(
   return possibleTxFields;
 }
 
+export function getPossibleTransferFieldsFromParsedInput(
+  parsed: {
+    fromAccountQuery?: string;
+    toAccountQuery?: string;
+    categoryQuery?: string;
+  },
+  data: {
+    categories?: Category[];
+    accounts?: Account[];
+  }
+) {
+  const fromAccountResults: Account[] = parsed.fromAccountQuery
+    ? data.accounts
+        ?.filter((a) => searchWithinString(a.name, parsed.fromAccountQuery!.trim()))
+        .slice(0, 5) || []
+    : [];
+  const toAccountResults: Account[] = parsed.toAccountQuery
+    ? data.accounts
+        ?.filter((a) => searchWithinString(a.name, parsed.toAccountQuery!.trim()))
+        .slice(0, 5) || []
+    : [];
+  const categoryResults: Category[] = parsed.categoryQuery
+    ? data.categories
+        ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
+        .slice(0, 5) || []
+    : [];
+
+  let possibleTxFields: {
+    payee?: CachedPayee;
+    account?: Account;
+    category?: Category;
+  }[] = [];
+
+  for (const account of toAccountResults) {
+    account.transfer_payee_id &&
+      possibleTxFields.push({
+        payee: {
+          id: account.transfer_payee_id,
+          name: account.name,
+          transferId: account.id
+        }
+      });
+  }
+  if (possibleTxFields.length === 0)
+    fromAccountResults.forEach((account) => possibleTxFields.push({ account }));
+  else if (fromAccountResults.length > 0) {
+    possibleTxFields = fromAccountResults.flatMap((account) =>
+      possibleTxFields.map((fields) => ({ ...fields, account }))
+    );
+  }
+  if (possibleTxFields.length === 0)
+    categoryResults.forEach((category) => possibleTxFields.push({ category }));
+  else if (categoryResults.length > 0) {
+    possibleTxFields = categoryResults.flatMap((category) =>
+      possibleTxFields.map((fields) => ({ ...fields, category }))
+    );
+  }
+
+  return possibleTxFields;
+}
+
 export function createOmniboxSuggestions(
+  type: "tx" | "transfer",
   possibleTxFields: {
     payee?: CachedPayee;
     account?: Account;
@@ -113,15 +208,23 @@ export function createOmniboxSuggestions(
       payee,
       accountId: account?.id,
       categoryId: category?.id,
-      memo: memo?.trim()
+      memo: memo?.trim(),
+      isTransfer: type === "transfer"
     }),
     description:
-      "transaction: " +
-      (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
-      (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
-      (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
-      (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
-      (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
+      type === "tx"
+        ? "transaction: " +
+          (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
+          (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
+          (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
+          (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
+          (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
+        : "transfer: " +
+          (amount ? formatCurrency(stringValueToMillis(amount, "Inflow")) : "") +
+          (account ? ` from <match>${escapeXML(account.name)}</match>` : "") +
+          (payee ? ` to <match>${escapeXML(payee.name)}</match>` : "") +
+          (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
+          (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
   }));
 }
 
@@ -156,28 +259,32 @@ export async function getOmniboxCache(budgetId: string) {
   const queryClient = createQueryClient({
     staleTime: ONE_DAY_IN_MILLIS * 7
   });
-  const { payees } = await queryClient.fetchQuery<{ payees: CachedPayee[] }>({
-    queryKey: ["payees", { budgetId }],
-    queryFn: () => ({ payees: [] })
-  });
+  const [{ payees }, { categoryGroups }, { accounts }] = await Promise.all([
+    queryClient.fetchQuery<{ payees: CachedPayee[] }>({
+      queryKey: ["payees", { budgetId }],
+      queryFn: () => ({ payees: [] })
+    }),
+    queryClient.fetchQuery<{
+      categoryGroups: CategoryGroupWithCategories[];
+    }>({
+      queryKey: ["categoryGroups", { budgetId }],
+      queryFn: () => ({ categoryGroups: [] })
+    }),
+    queryClient.fetchQuery<{
+      accounts: Account[];
+    }>({
+      queryKey: ["accounts", { budgetId }],
+      queryFn: () => ({ accounts: [] })
+    })
+  ]);
+
   budgetCache.payees = payees;
-  const { categoryGroups } = await queryClient.fetchQuery<{
-    categoryGroups: CategoryGroupWithCategories[];
-  }>({
-    queryKey: ["categoryGroups", { budgetId }],
-    queryFn: () => ({ categoryGroups: [] })
-  });
-  categoryGroups.splice(1, 1); // CCP
-  const categories = categoryGroups.flatMap((cg) => cg.categories);
-  categories.splice(1, 2); // Internal master, deferred
-  budgetCache.categories = categories;
-  const { accounts } = await queryClient.fetchQuery<{
-    accounts: Account[];
-  }>({
-    queryKey: ["accounts", { budgetId }],
-    queryFn: () => ({ accounts: [] })
-  });
   budgetCache.accounts = accounts;
+
+  categoryGroups.splice(1, 1); // CCP categories
+  const categories = categoryGroups.flatMap((cg) => cg.categories);
+  categories.splice(1, 2); // Internal master, deferred income categories
+  budgetCache.categories = categories;
 
   omniboxCache[budgetId] = budgetCache;
   return budgetCache;

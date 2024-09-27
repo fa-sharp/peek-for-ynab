@@ -1,10 +1,4 @@
-import {
-  type Account,
-  type Category,
-  type CategoryGroupWithCategories,
-  type TransactionDetail,
-  api
-} from "ynab";
+import { type Account, type Category, type TransactionDetail, api } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
@@ -25,6 +19,7 @@ import {
 import {
   createOmniboxSuggestions,
   getOmniboxCache,
+  getPossibleTransferFieldsFromParsedInput,
   getPossibleTxFieldsFromParsedInput,
   parseTxInput
 } from "~lib/omnibox";
@@ -245,16 +240,24 @@ chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 // Setup omnibox
 chrome.omnibox.setDefaultSuggestion({
   description:
-    "(<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
+    "(<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>) OR transfer (<dim>amount</dim>) (from|to <dim>account</dim>)"
 });
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
-  const { amount, payeeQuery, categoryQuery, accountQuery, memo } = parseTxInput(text);
+  const parsedQuery = parseTxInput(text);
+  if (!parsedQuery) return;
   const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
-  const possibleTxFields = getPossibleTxFieldsFromParsedInput(
-    { payeeQuery, categoryQuery, accountQuery },
-    data
+  const possibleTxFields =
+    parsedQuery.type === "tx"
+      ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
+      : getPossibleTransferFieldsFromParsedInput(parsedQuery, data);
+  suggest(
+    createOmniboxSuggestions(
+      parsedQuery.type,
+      possibleTxFields,
+      parsedQuery.amount,
+      parsedQuery.memo
+    )
   );
-  suggest(createOmniboxSuggestions(possibleTxFields, amount, memo));
 });
 chrome.omnibox.onInputEntered.addListener(async (text) => {
   const tx = JSON.parse(text);
