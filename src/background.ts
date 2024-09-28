@@ -67,6 +67,7 @@ async function refreshToken(): Promise<TokenData | null> {
   const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
   if (!tokenData) {
     console.error("Not refreshing - no existing token data found");
+    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
     await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, false);
     return null;
   }
