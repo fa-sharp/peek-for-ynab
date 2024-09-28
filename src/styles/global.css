@@ -242,6 +242,11 @@ li:last-child .balance-display {
   cursor: unset;
 }
 
+.icon-span {
+  display: inline-flex;
+  padding: 1px;
+}
+
 .list {
   margin: 0;
   padding: 0;

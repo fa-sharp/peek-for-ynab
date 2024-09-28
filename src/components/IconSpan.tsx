@@ -12,7 +12,7 @@ export default function IconSpan({
   spin?: boolean;
 }) {
   return (
-    <span aria-label={label} title={label} className={clsx("flex-row", { spin })}>
+    <span aria-label={label} title={label} className={clsx("icon-span", { spin })}>
       {icon}
     </span>
   );
