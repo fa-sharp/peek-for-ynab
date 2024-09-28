@@ -67,6 +67,7 @@ async function refreshToken(): Promise<TokenData | null> {
   const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
   if (!tokenData) {
     console.error("Not refreshing - no existing token data found");
+    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
     await CHROME_SESSION_STORAGE.set(IS_REFRESHING_KEY, false);
     return null;
   }
@@ -131,7 +132,7 @@ async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);
   const queryClient = createQueryClient({
-    staleTime: 14 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 14 minutes
+    staleTime: 10 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 10 minutes
   });
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
