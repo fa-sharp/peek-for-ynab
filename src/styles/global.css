@@ -200,11 +200,10 @@ input[type="checkbox"] {
   align-items: center;
   gap: var(--spacing-lg);
 
-  padding: 3px 0px;
+  padding: 3px 1px;
   border-bottom: solid 1px var(--border-light);
 
   outline: transparent solid 2px;
-  outline-offset: 1px;
   transition:
     outline-color 0.3s,
     border-radius 0.3s;
@@ -254,6 +253,11 @@ li:last-child .balance-display {
 }
 .icon-button[disabled] {
   cursor: unset;
+}
+
+.icon-span {
+  display: inline-flex;
+  padding: 1px;
 }
 
 .list {
