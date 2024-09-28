@@ -132,7 +132,7 @@ async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);
   const queryClient = createQueryClient({
-    staleTime: 14 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 14 minutes
+    staleTime: 10 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 10 minutes
   });
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
