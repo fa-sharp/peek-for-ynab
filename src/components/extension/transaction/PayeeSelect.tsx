@@ -52,7 +52,7 @@ function PayeeSelect(
     inputValue,
     highlightedIndex,
     selectedItem
-  } = useCombobox<CachedPayee | null>({
+  } = useCombobox<CachedPayee | { name: string } | null>({
     items: payeeList,
     itemToString(payee) {
       return payee ? payee.name : "";
@@ -98,7 +98,10 @@ function PayeeSelect(
                   data-index={virtualItem.index}
                   className={clsx("select-dropdown-item virtual", {
                     highlighted: highlightedIndex === virtualItem.index,
-                    selected: selectedItem?.id === virtualItem.key
+                    selected:
+                      !!selectedItem &&
+                      "id" in selectedItem &&
+                      selectedItem?.id === virtualItem.key
                   })}
                   {...getItemProps({
                     ref: listVirtualizer.measureElement,
