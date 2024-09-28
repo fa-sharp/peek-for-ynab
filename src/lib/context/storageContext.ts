@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -30,6 +30,8 @@ export interface AppSettings {
   theme?: "auto" | "dark" | "light";
   /** Whether animations are enabled. @default true */
   animations?: boolean;
+  /** Whether omnibox is enabled. @default false */
+  omnibox?: boolean;
 }
 
 /** Initial state of the add transaction screen */

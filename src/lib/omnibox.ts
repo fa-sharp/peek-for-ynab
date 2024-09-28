@@ -1,5 +1,8 @@
 import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
+import { Storage } from "@plasmohq/storage";
+
+import type { AppSettings } from "./context/storageContext";
 import type { CachedPayee } from "./context/ynabContext";
 import { createQueryClient } from "./queryClient";
 import {
@@ -193,6 +196,16 @@ export function getPossibleTransferFieldsFromParsedInput(
   return possibleTxFields;
 }
 
+const chromeLocalStorage = new Storage({ area: "local" });
+const chromeSyncStorage = new Storage({ area: "sync" });
+export async function checkOmniboxPermission() {
+  const sync = await chromeLocalStorage.get<boolean>("sync");
+  const settings = await (sync ? chromeSyncStorage : chromeLocalStorage).get<AppSettings>(
+    "settings"
+  );
+  return !!settings?.omnibox;
+}
+
 export function createOmniboxSuggestions(
   type: "tx" | "transfer",
   possibleTxFields: {
@@ -204,17 +217,23 @@ export function createOmniboxSuggestions(
   memo?: string
 ): chrome.omnibox.SuggestResult[] {
   return possibleTxFields.map(({ payee, category, account }) => ({
-    content: JSON.stringify({
-      amount,
-      payee,
-      accountId: account?.id,
-      categoryId: category?.id,
-      memo: memo?.trim(),
-      isTransfer: type === "transfer"
-    }),
+    content:
+      type === "tx"
+        ? "add " +
+          (amount ? amount : "") +
+          (payee ? ` at ${payee.name}` : "") +
+          (category ? ` for ${category.name}` : "") +
+          (account ? ` on ${account.name}` : "") +
+          (memo ? ` memo ${memo}` : "")
+        : "transfer " +
+          (amount ? amount : "") +
+          (account ? ` from ${account.name}` : "") +
+          (payee ? ` to ${payee.name}` : "") +
+          (category ? ` for ${category.name}` : "") +
+          (memo ? ` memo ${memo}` : ""),
     description:
       type === "tx"
-        ? "transaction: " +
+        ? "add: " +
           (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
           (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
           (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +

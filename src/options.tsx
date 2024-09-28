@@ -154,6 +154,39 @@ export function OptionsView() {
                 </Dialog>
               </Tooltip>
             </div>
+            <div className="flex-row">
+              <input
+                id="omnibox-permission"
+                type="checkbox"
+                checked={!!settings.omnibox}
+                onChange={async (e) => changeSetting("omnibox", e.target.checked)}
+              />
+              <label htmlFor="omnibox-permission">Enable URL/address bar features</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable entering transactions via the URL/address bar, with automatic
+                  suggestions from your payees, categories, and accounts. You can type in
+                  &quot;peek <kbd>space</kbd>&quot; to see the various options.{" "}
+                  <i>
+                    Note: This is not AI! The extension processes your input locally to
+                    come up with suggestions. Communication happens directly between the
+                    URL bar and the extension - no data is sent anywhere else. Still,
+                    privacy concerns are understandable, which is why this is disabled by
+                    default. See{" "}
+                    <a
+                      href="https://developer.chrome.com/docs/extensions/reference/api/omnibox"
+                      target="_blank"
+                      rel="noreferrer">
+                      these docs
+                    </a>{" "}
+                    for the API being used under the hood.
+                  </i>
+                </Dialog>
+              </Tooltip>
+            </div>
             <div className="flex-row mb-sm">
               <input
                 id="notification-permission"

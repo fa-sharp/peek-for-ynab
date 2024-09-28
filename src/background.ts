@@ -17,6 +17,7 @@ import {
   updateIconAndTooltip
 } from "~lib/notifications";
 import {
+  checkOmniboxPermission,
   createOmniboxSuggestions,
   getOmniboxCache,
   getPossibleTransferFieldsFromParsedInput,
@@ -239,12 +240,21 @@ chrome.notifications?.onClicked.removeListener(onSystemNotificationClick);
 chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 
 // Setup omnibox
-chrome.omnibox.onInputStarted.addListener(() =>
+chrome.omnibox.onInputStarted.addListener(async () => {
+  if (!(await checkOmniboxPermission())) {
+    chrome.omnibox.setDefaultSuggestion({
+      description: "URL/address bar not enabled in settings!"
+    });
+    return;
+  }
   chrome.omnibox.setDefaultSuggestion({
     description: "add <dim>or</dim> transfer"
-  })
-);
+  });
+  getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+});
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
+  if (!(await checkOmniboxPermission())) return;
+
   chrome.omnibox.setDefaultSuggestion({
     description: text.startsWith("add")
       ? "add (<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
@@ -269,8 +279,26 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   );
 });
 chrome.omnibox.onInputEntered.addListener(async (text) => {
-  const tx = JSON.parse(text);
+  if (!(await checkOmniboxPermission())) return;
+
+  const parsedQuery = parseTxInput(text);
+  if (!parsedQuery) return;
+  const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+  const [tx] =
+    parsedQuery.type === "tx"
+      ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
+      : getPossibleTransferFieldsFromParsedInput(parsedQuery, data);
   IS_DEV && console.log("Received tx fields from omnibox:", tx);
-  await CHROME_LOCAL_STORAGE.set("popupState", { view: "txAdd", txAddState: tx });
+  await CHROME_LOCAL_STORAGE.set("popupState", {
+    view: "txAdd",
+    txAddState: {
+      amount: parsedQuery.amount,
+      payee: tx?.payee,
+      accountId: tx?.account?.id,
+      categoryId: tx?.category?.id,
+      memo: parsedQuery.memo?.trim(),
+      isTransfer: parsedQuery.type === "transfer"
+    }
+  });
   chrome.action.openPopup();
 });
