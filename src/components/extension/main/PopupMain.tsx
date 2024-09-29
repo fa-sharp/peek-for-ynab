@@ -40,7 +40,7 @@ export default function PopupMain() {
   /** Callback when dragging and dropping pinned categories and accounts */
   const onDragEnd: OnDragEndResponder = useCallback(
     (result) => {
-      if (!result.destination) return;
+      if (!result.destination || !selectedBudgetId) return;
       if (
         result.source.droppableId === "savedCategories" &&
         result.destination.droppableId === "savedCategories"

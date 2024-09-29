@@ -94,7 +94,7 @@ const useYNABProvider = () => {
     queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !selectedBudgetId) return;
       return await fetchCategoryGroupsForBudget(
         ynabAPI,
         selectedBudgetId,
@@ -127,7 +127,7 @@ const useYNABProvider = () => {
 
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData) return null;
+    if (!categoriesData || !selectedBudgetId) return null;
     return savedCategories?.[selectedBudgetId]?.reduce<ynab.Category[]>(
       (newArray, savedCategoryId) => {
         const categoryData = categoriesData.find(
@@ -150,7 +150,7 @@ const useYNABProvider = () => {
     queryKey: ["accounts", { budgetId: selectedBudgetId }],
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !selectedBudgetId) return;
       return await fetchAccountsForBudget(
         ynabAPI,
         selectedBudgetId,
@@ -172,7 +172,7 @@ const useYNABProvider = () => {
       ynabAPI && selectedBudgetId && budgetSettings?.notifications.checkImports
     ),
     queryFn: async () => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !selectedBudgetId) return;
       return await checkUnapprovedTxsForBudget(ynabAPI, selectedBudgetId);
     }
   });
@@ -183,7 +183,7 @@ const useYNABProvider = () => {
     staleTime: ONE_DAY_IN_MILLIS,
     enabled: Boolean(ynabAPI && selectedBudgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !selectedBudgetId) return;
       return await fetchPayeesForBudget(
         ynabAPI,
         selectedBudgetId,
@@ -195,7 +195,7 @@ const useYNABProvider = () => {
 
   /** Select data of only saved accounts from `accountsData` */
   const savedAccountsData = useMemo(() => {
-    if (!accountsData) return null;
+    if (!accountsData || !selectedBudgetId) return null;
     // For each saved account in the current budget, grab the account data and add to array
     return savedAccounts?.[selectedBudgetId]?.reduce<ynab.Account[]>(
       (newArray, savedAccountId) => {

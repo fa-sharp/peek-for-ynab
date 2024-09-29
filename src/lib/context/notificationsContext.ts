@@ -34,7 +34,13 @@ const useNotificationsProvider = () => {
 
   // Update currently selected budget's alerts with latest data from API
   useEffect(() => {
-    if (!currentAlertsHydrated || !budgetSettings || !accountsData || !categoriesData)
+    if (
+      !currentAlertsHydrated ||
+      !budgetSettings ||
+      !accountsData ||
+      !categoriesData ||
+      !selectedBudgetId
+    )
       return;
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
       accounts: accountsData,

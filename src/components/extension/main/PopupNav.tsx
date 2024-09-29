@@ -91,7 +91,7 @@ export default function PopupNav() {
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
   if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
-  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
+  if (!shownBudgetsData || !settings || selectedBudgetId === undefined) return null; // storage not hydrated yet
 
   return (
     <nav className="flex-row justify-between mb-lg">

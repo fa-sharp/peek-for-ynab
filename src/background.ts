@@ -240,17 +240,29 @@ chrome.notifications?.onClicked.removeListener(onSystemNotificationClick);
 chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 
 // Setup omnibox
+const OMNIBOX_START_TEXT = "add <dim>or</dim> transfer";
 chrome.omnibox.onInputStarted.addListener(async () => {
   if (!(await checkOmniboxPermission())) {
     chrome.omnibox.setDefaultSuggestion({
       description: "URL/address bar not enabled in settings!"
     });
-    return;
+  } else {
+    chrome.omnibox.setDefaultSuggestion({
+      description: OMNIBOX_START_TEXT
+    });
+    getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
   }
-  chrome.omnibox.setDefaultSuggestion({
-    description: "add <dim>or</dim> transfer"
-  });
-  getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+});
+chrome.omnibox.onInputCancelled.addListener(async () => {
+  if (!(await checkOmniboxPermission())) {
+    chrome.omnibox.setDefaultSuggestion({
+      description: "URL/address bar not enabled in settings!"
+    });
+  } else {
+    chrome.omnibox.setDefaultSuggestion({
+      description: OMNIBOX_START_TEXT
+    });
+  }
 });
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   if (!(await checkOmniboxPermission())) return;
@@ -260,7 +272,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
       ? "add (<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
       : text.startsWith("transfer")
         ? "transfer (<dim>amount</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
-        : "add <dim>or</dim> transfer"
+        : OMNIBOX_START_TEXT
   });
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;

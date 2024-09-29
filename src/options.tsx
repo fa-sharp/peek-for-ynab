@@ -20,7 +20,7 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, syncEnabled, changeSetting } = useStorageContext();
+  const { selectedBudgetId, settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
   const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
@@ -34,7 +34,7 @@ export function OptionsView() {
     remove: removeNotificationPermission
   } = useNotificationPermission();
 
-  if (!settings) return null;
+  if (!settings || !selectedBudgetId === undefined) return null;
 
   return (
     <section

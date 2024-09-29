@@ -27,14 +27,8 @@ import {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
-  const {
-    savedAccounts,
-    selectedBudgetId,
-    saveAccount,
-    setPopupState,
-    popupState,
-    settings
-  } = useStorageContext();
+  const { savedAccounts, saveAccount, setPopupState, popupState, settings } =
+    useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
@@ -59,8 +53,8 @@ function AccountsView() {
           <AccountTypeView
             accountType="Budget"
             accountsData={accountsData.filter((a) => a.on_budget)}
-            accountAlerts={currentAlerts?.[selectedBudgetId]?.accounts}
-            savedAccounts={savedAccounts[selectedBudgetId]}
+            accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
+            savedAccounts={savedAccounts[selectedBudgetData.id]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
             budgetData={selectedBudgetData}
@@ -70,8 +64,8 @@ function AccountsView() {
           <AccountTypeView
             accountType="Tracking"
             accountsData={accountsData.filter((a) => !a.on_budget)}
-            accountAlerts={currentAlerts?.[selectedBudgetId]?.accounts}
-            savedAccounts={savedAccounts[selectedBudgetId]}
+            accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
+            savedAccounts={savedAccounts[selectedBudgetData.id]}
             saveAccount={saveAccount}
             editMode={popupState.editMode}
             budgetData={selectedBudgetData}

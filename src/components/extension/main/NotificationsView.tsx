@@ -18,40 +18,47 @@ const NotificationsView = () => {
 
   const numNotifications = useMemo(
     () =>
-      currentAlerts?.[selectedBudgetId]
+      selectedBudgetId && currentAlerts?.[selectedBudgetId]
         ? getNumAlertsForBudget(currentAlerts[selectedBudgetId])
         : 0,
     [currentAlerts, selectedBudgetId]
   );
 
   const numUnapprovedTxs = useMemo(
-    () => currentAlerts?.[selectedBudgetId]?.numUnapprovedTxs ?? 0,
+    () =>
+      selectedBudgetId ? (currentAlerts?.[selectedBudgetId]?.numUnapprovedTxs ?? 0) : 0,
     [currentAlerts, selectedBudgetId]
   );
 
   const overspentCategories = useMemo(
     () =>
-      Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {})
-        .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
-        .filter((c) => !!c),
+      selectedBudgetId
+        ? Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {})
+            .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
+            .filter((c) => !!c)
+        : [],
     [categoriesData, currentAlerts, selectedBudgetId]
   );
 
   const accountsToReconcile = useMemo(
     () =>
-      Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
-        .filter(([, accountAlerts]) => !!accountAlerts?.reconcile)
-        .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
-        .filter((a) => !!a),
+      selectedBudgetId
+        ? Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
+            .filter(([, accountAlerts]) => !!accountAlerts?.reconcile)
+            .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
+            .filter((a) => !!a)
+        : [],
     [accountsData, currentAlerts, selectedBudgetId]
   );
 
   const accountsWithImportError = useMemo(
     () =>
-      Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
-        .filter(([, accountAlerts]) => !!accountAlerts?.importError)
-        .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
-        .filter((a) => !!a),
+      selectedBudgetId
+        ? Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
+            .filter(([, accountAlerts]) => !!accountAlerts?.importError)
+            .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
+            .filter((a) => !!a)
+        : [],
     [accountsData, currentAlerts, selectedBudgetId]
   );
 

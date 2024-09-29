@@ -35,14 +35,8 @@ import {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const {
-    savedCategories,
-    saveCategory,
-    setPopupState,
-    popupState,
-    settings,
-    selectedBudgetId
-  } = useStorageContext();
+  const { savedCategories, saveCategory, setPopupState, popupState, settings } =
+    useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
@@ -66,10 +60,10 @@ function CategoriesView() {
           <CategoryGroupView
             key={categoryGroup.id}
             categoryGroup={categoryGroup}
-            categoryAlerts={currentAlerts?.[selectedBudgetId]?.cats}
+            categoryAlerts={currentAlerts?.[selectedBudgetData.id]?.cats}
             budgetData={selectedBudgetData}
             accountsData={accountsData}
-            savedCategories={savedCategories[selectedBudgetId]}
+            savedCategories={savedCategories[selectedBudgetData.id]}
             editMode={popupState.editMode}
             settings={settings}
             onSaveCategory={(categoryId) => saveCategory(categoryId)}

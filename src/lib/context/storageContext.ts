@@ -105,9 +105,15 @@ const useStorageProvider = () => {
   );
 
   /** The budget currently in view */
-  const [selectedBudgetId, setSelectedBudgetId] = useLocalStorage("selectedBudget", {
-    defaultValue: ""
-  });
+  const [selectedBudgetId, setSelectedBudgetId] = useExtensionStorage<string | undefined>(
+    { key: "selectedBudget", instance: CHROME_LOCAL_STORAGE },
+    (data, isHydrated) =>
+      !isHydrated
+        ? undefined
+        : data == null // if no value in storage, try reading initial value from `localStorage` (old way of storing the selected budget)
+          ? JSON.parse(localStorage?.selectedBudget || '""')
+          : data
+  );
 
   /** Current popup state */
   const [popupState, setPopupState] = useExtensionStorage<{
@@ -206,6 +212,7 @@ const useStorageProvider = () => {
 
   /** Save/pin a category for the currently selected budget */
   const saveCategory = (categoryIdToSave: string) => {
+    if (!selectedBudgetId) return;
     const foundDuplicate = savedCategories?.[selectedBudgetId]?.find(
       (categoryId) => categoryId === categoryIdToSave
     );
@@ -230,6 +237,7 @@ const useStorageProvider = () => {
 
   /** Remove/unpin a category for the currently selected budget */
   const removeCategory = (categoryIdToRemove: string) => {
+    if (!selectedBudgetId) return;
     setSavedCategories({
       ...savedCategories,
       [selectedBudgetId]: savedCategories?.[selectedBudgetId]?.filter(
@@ -240,6 +248,7 @@ const useStorageProvider = () => {
 
   /** Save/pin an account for the currently selected budget */
   const saveAccount = (accountIdToSave: string) => {
+    if (!selectedBudgetId) return;
     const foundDuplicate = savedAccounts?.[selectedBudgetId]?.find(
       (accountId) => accountId === accountIdToSave
     );
@@ -261,6 +270,7 @@ const useStorageProvider = () => {
 
   /** Remove/unpin an account for the currently selected budget */
   const removeAccount = (accountIdToRemove: string) => {
+    if (!selectedBudgetId) return;
     setSavedAccounts({
       ...savedAccounts,
       [selectedBudgetId]: savedAccounts?.[selectedBudgetId]?.filter(
