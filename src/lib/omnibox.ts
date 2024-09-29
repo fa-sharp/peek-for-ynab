@@ -3,7 +3,7 @@ import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 import { Storage } from "@plasmohq/storage";
 
 import type { AppSettings } from "./context/storageContext";
-import type { CachedPayee } from "./context/ynabContext";
+import type { CachedBudget, CachedPayee } from "./context/ynabContext";
 import { createQueryClient } from "./queryClient";
 import {
   ONE_DAY_IN_MILLIS,
@@ -17,6 +17,7 @@ export function parseTxInput(text: string):
   | {
       type: "tx";
       amount?: string;
+      budgetQuery?: string;
       payeeQuery?: string;
       categoryQuery?: string;
       accountQuery?: string;
@@ -24,6 +25,7 @@ export function parseTxInput(text: string):
     }
   | {
       type: "transfer";
+      budgetQuery?: string;
       fromAccountQuery?: string;
       toAccountQuery?: string;
       categoryQuery?: string;
@@ -35,42 +37,54 @@ export function parseTxInput(text: string):
   if (dataToParse.length === 0) return null;
 
   if (dataToParse[0] === "add") {
-    /** [amount, payee, category, account, memo] */
-    const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
+    /** [amount, budget, payee, category, account, memo] */
+    const parsedData: string[] = ["", "", "", "", "", ""];
     let parsedIdx = 0;
     for (const word of dataToParse.slice(1)) {
-      if (word === "at" && parsedIdx < 1) parsedIdx = 1;
-      else if (word === "for" && parsedIdx < 2) parsedIdx = 2;
-      else if (word === "on" && parsedIdx < 3) parsedIdx = 3;
-      else if (word === "memo" && parsedIdx < 4) parsedIdx = 4;
+      if (word === "in" && parsedIdx < 1) parsedIdx = 1;
+      else if (word === "at" && parsedIdx < 2) parsedIdx = 2;
+      else if (word === "for" && parsedIdx < 3) parsedIdx = 3;
+      else if (word === "on" && parsedIdx < 4) parsedIdx = 4;
+      else if (word === "memo" && parsedIdx < 5) parsedIdx = 5;
       else if (parsedIdx === 0) {
         const parsedAmount = parseLocaleNumber(word);
         if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
       } else parsedData[parsedIdx] += word + " ";
     }
-    const [amount, payeeQuery, categoryQuery, accountQuery, memo] = parsedData;
-    return { type: "tx", amount, payeeQuery, categoryQuery, accountQuery, memo };
+    const [amount, budgetQuery, payeeQuery, categoryQuery, accountQuery, memo] =
+      parsedData;
+    return {
+      type: "tx",
+      budgetQuery,
+      amount,
+      payeeQuery,
+      categoryQuery,
+      accountQuery,
+      memo
+    };
   } else if (dataToParse[0] === "transfer") {
-    /** [amount, account 1, account 2, category, memo] */
-    const parsedData: [string, string, string, string, string] = ["", "", "", "", ""];
+    /** [amount, budget, account 1, account 2, category, memo] */
+    const parsedData: string[] = ["", "", "", "", "", ""];
     let account1Direction: "from" | "to" = "from";
     let parsedIdx = 0;
     for (const word of dataToParse.slice(1)) {
-      if ((word === "from" || word === "to") && parsedIdx < 1) {
+      if (word === "in" && parsedIdx < 1) parsedIdx = 1;
+      else if ((word === "from" || word === "to") && parsedIdx < 2) {
         if (word === "to") account1Direction = "to";
-        parsedIdx = 1;
-      } else if ((word === "from" || word === "to") && parsedIdx < 2) parsedIdx = 2;
-      else if (word === "for" && parsedIdx < 3) parsedIdx = 3;
-      else if (word === "memo" && parsedIdx < 4) parsedIdx = 4;
+        parsedIdx = 2;
+      } else if ((word === "from" || word === "to") && parsedIdx < 3) parsedIdx = 3;
+      else if (word === "for" && parsedIdx < 4) parsedIdx = 4;
+      else if (word === "memo" && parsedIdx < 5) parsedIdx = 5;
       else if (parsedIdx === 0) {
         const parsedAmount = parseLocaleNumber(word);
         if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
       } else parsedData[parsedIdx] += word + " ";
     }
-    const [amount, account1, account2, category, memo] = parsedData;
+    const [amount, budget, account1, account2, category, memo] = parsedData;
     return {
       type: "transfer",
       amount,
+      budgetQuery: budget,
       fromAccountQuery: account1Direction === "from" ? account1 : account2,
       toAccountQuery: account1Direction === "from" ? account2 : account1,
       categoryQuery: category,
@@ -82,6 +96,7 @@ export function parseTxInput(text: string):
 
 export function getPossibleTxFieldsFromParsedInput(
   parsed: {
+    budgetQuery?: string;
     payeeQuery?: string;
     categoryQuery?: string;
     accountQuery?: string;
@@ -213,6 +228,7 @@ export function createOmniboxSuggestions(
     account?: Account;
     category?: Category;
   }[],
+  budget?: CachedBudget,
   amount?: string,
   memo?: string
 ): chrome.omnibox.SuggestResult[] {
@@ -221,12 +237,14 @@ export function createOmniboxSuggestions(
       type === "tx"
         ? "add " +
           (amount ? amount : "") +
+          (budget ? ` in ${budget.name}` : "") +
           (payee ? ` at ${payee.name}` : "") +
           (category ? ` for ${category.name}` : "") +
           (account ? ` on ${account.name}` : "") +
           (memo ? ` memo ${memo}` : "")
         : "transfer " +
           (amount ? amount : "") +
+          (budget ? ` in ${budget.name}` : "") +
           (account ? ` from ${account.name}` : "") +
           (payee ? ` to ${payee.name}` : "") +
           (category ? ` for ${category.name}` : "") +
@@ -235,12 +253,14 @@ export function createOmniboxSuggestions(
       type === "tx"
         ? "add: " +
           (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
+          (budget ? ` in ${escapeXML(budget.name)}` : "") +
           (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
           (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
           (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
           (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
         : "transfer: " +
           (amount ? formatCurrency(stringValueToMillis(amount, "Inflow")) : "") +
+          (budget ? ` in ${escapeXML(budget.name)}` : "") +
           (account ? ` from <match>${escapeXML(account.name)}</match>` : "") +
           (payee ? ` to <match>${escapeXML(payee.name)}</match>` : "") +
           (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
@@ -265,17 +285,40 @@ function escapeXML(s: string) {
 }
 
 const omniboxCache: {
-  [budgetId: string]: {
-    payees?: CachedPayee[];
-    categories?: Category[];
-    accounts?: Account[];
+  budgets?: CachedBudget[];
+  data: {
+    [budgetId: string]: {
+      payees?: CachedPayee[];
+      categories?: Category[];
+      accounts?: Account[];
+    };
   };
-} = {};
+} = { data: {} };
 
-export async function getOmniboxCache(budgetId: string) {
-  if (omniboxCache[budgetId]) return omniboxCache[budgetId];
+export async function getOmniboxBudgets() {
+  if (omniboxCache.budgets) return omniboxCache.budgets;
 
-  const budgetCache: (typeof omniboxCache)[string] = {};
+  const queryClient = createQueryClient({
+    staleTime: ONE_DAY_IN_MILLIS * 7
+  });
+  const storage = (await chromeLocalStorage.get<boolean>("sync"))
+    ? chromeSyncStorage
+    : chromeLocalStorage;
+  const budgetIdsToShow = await storage.get<string[]>("budgets");
+  const budgets = (
+    await queryClient.fetchQuery<CachedBudget[]>({
+      queryKey: ["budgets"],
+      queryFn: () => []
+    })
+  ).filter((b) => budgetIdsToShow?.includes(b.id));
+  omniboxCache.budgets = budgets;
+  return budgets;
+}
+
+export async function getOmniboxCacheForBudget(budgetId: string) {
+  if (omniboxCache.data[budgetId]) return omniboxCache.data[budgetId];
+
+  const budgetCache: (typeof omniboxCache)["data"][string] = {};
   const queryClient = createQueryClient({
     staleTime: ONE_DAY_IN_MILLIS * 7
   });
@@ -306,6 +349,6 @@ export async function getOmniboxCache(budgetId: string) {
   categories.splice(1, 2); // Internal master, deferred income categories
   budgetCache.categories = categories;
 
-  omniboxCache[budgetId] = budgetCache;
+  omniboxCache.data[budgetId] = budgetCache;
   return budgetCache;
 }

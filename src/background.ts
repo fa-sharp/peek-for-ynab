@@ -19,13 +19,20 @@ import {
 import {
   checkOmniboxPermission,
   createOmniboxSuggestions,
-  getOmniboxCache,
+  getOmniboxBudgets,
+  getOmniboxCacheForBudget,
   getPossibleTransferFieldsFromParsedInput,
   getPossibleTxFieldsFromParsedInput,
   parseTxInput
 } from "~lib/omnibox";
 import { createQueryClient } from "~lib/queryClient";
-import { IS_DEV, ONE_DAY_IN_MILLIS, checkPermissions, isEmptyObject } from "~lib/utils";
+import {
+  IS_DEV,
+  ONE_DAY_IN_MILLIS,
+  checkPermissions,
+  isEmptyObject,
+  searchWithinString
+} from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
@@ -250,7 +257,8 @@ chrome.omnibox.onInputStarted.addListener(async () => {
     chrome.omnibox.setDefaultSuggestion({
       description: OMNIBOX_START_TEXT
     });
-    getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+    const budgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
+    if (budgetId) getOmniboxCacheForBudget(budgetId);
   }
 });
 chrome.omnibox.onInputCancelled.addListener(async () => {
@@ -269,14 +277,22 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
 
   chrome.omnibox.setDefaultSuggestion({
     description: text.startsWith("add")
-      ? "add (<dim>amount</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
+      ? "add (<dim>amount</dim>) (in <dim>budget</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
       : text.startsWith("transfer")
-        ? "transfer (<dim>amount</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
+        ? "transfer (<dim>amount</dim>) (in <dim>budget</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
         : OMNIBOX_START_TEXT
   });
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
-  const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+  const budgets = await getOmniboxBudgets();
+  const budgetId = parsedQuery.budgetQuery
+    ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
+    : await CHROME_LOCAL_STORAGE.get("selectedBudget");
+  if (!budgetId) {
+    chrome.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
+    return;
+  }
+  const data = await getOmniboxCacheForBudget(budgetId);
   const possibleTxFields =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
@@ -285,6 +301,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     createOmniboxSuggestions(
       parsedQuery.type,
       possibleTxFields,
+      parsedQuery.budgetQuery ? budgets.find((b) => b.id === budgetId) : undefined,
       parsedQuery.amount,
       parsedQuery.memo
     )
@@ -295,12 +312,20 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
 
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
-  const data = await getOmniboxCache("a1ce2dcc-0ed5-4d3d-946f-f4ee35af775c");
+  const budgets = await getOmniboxBudgets();
+  const selectedBudgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
+  const budgetId = parsedQuery.budgetQuery
+    ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
+    : selectedBudgetId;
+  if (!budgetId) return;
+  const data = await getOmniboxCacheForBudget(budgetId);
   const [tx] =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
       : getPossibleTransferFieldsFromParsedInput(parsedQuery, data);
   IS_DEV && console.log("Received tx fields from omnibox:", tx);
+  if (budgetId !== selectedBudgetId)
+    await CHROME_LOCAL_STORAGE.set("selectedBudget", budgetId);
   await CHROME_LOCAL_STORAGE.set("popupState", {
     view: "txAdd",
     txAddState: {
