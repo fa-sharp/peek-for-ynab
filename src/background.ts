@@ -17,10 +17,10 @@ import {
   updateIconAndTooltip
 } from "~lib/notifications";
 import {
-  checkOmniboxPermission,
-  createOmniboxSuggestions,
-  getOmniboxBudgets,
-  getOmniboxCacheForBudget,
+  checkBrowserBarPermission,
+  createBrowserBarSuggestions,
+  getBrowserBarBudgets,
+  getBrowserBarCacheForBudget,
   getPossibleTransferFieldCombinations,
   getPossibleTxFieldCombinations,
   parseTxInput
@@ -249,7 +249,7 @@ chrome.notifications?.onClicked.addListener(onSystemNotificationClick);
 // Setup omnibox
 const OMNIBOX_START_TEXT = "add <dim>or</dim> transfer";
 chrome.omnibox.onInputStarted.addListener(async () => {
-  if (!(await checkOmniboxPermission())) {
+  if (!(await checkBrowserBarPermission())) {
     chrome.omnibox.setDefaultSuggestion({
       description: "URL/address bar not enabled in settings!"
     });
@@ -258,11 +258,11 @@ chrome.omnibox.onInputStarted.addListener(async () => {
       description: OMNIBOX_START_TEXT
     });
     const budgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
-    if (budgetId) getOmniboxCacheForBudget(budgetId);
+    if (budgetId) getBrowserBarCacheForBudget(budgetId);
   }
 });
 chrome.omnibox.onInputCancelled.addListener(async () => {
-  if (!(await checkOmniboxPermission())) {
+  if (!(await checkBrowserBarPermission())) {
     chrome.omnibox.setDefaultSuggestion({
       description: "URL/address bar not enabled in settings!"
     });
@@ -273,7 +273,7 @@ chrome.omnibox.onInputCancelled.addListener(async () => {
   }
 });
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
-  if (!(await checkOmniboxPermission())) return;
+  if (!(await checkBrowserBarPermission())) return;
 
   chrome.omnibox.setDefaultSuggestion({
     description: text.startsWith("add")
@@ -284,7 +284,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   });
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
-  const budgets = await getOmniboxBudgets();
+  const budgets = await getBrowserBarBudgets();
   const budgetId = parsedQuery.budgetQuery
     ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
     : await CHROME_LOCAL_STORAGE.get("selectedBudget");
@@ -292,13 +292,13 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     chrome.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
     return;
   }
-  const data = await getOmniboxCacheForBudget(budgetId);
+  const data = await getBrowserBarCacheForBudget(budgetId);
   const possibleTxFields =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldCombinations(parsedQuery, data)
       : getPossibleTransferFieldCombinations(parsedQuery, data);
   suggest(
-    createOmniboxSuggestions(
+    createBrowserBarSuggestions(
       parsedQuery.type,
       possibleTxFields,
       parsedQuery.budgetQuery ? budgets.find((b) => b.id === budgetId) : undefined,
@@ -308,17 +308,17 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   );
 });
 chrome.omnibox.onInputEntered.addListener(async (text) => {
-  if (!(await checkOmniboxPermission())) return;
+  if (!(await checkBrowserBarPermission())) return;
 
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
-  const budgets = await getOmniboxBudgets();
+  const budgets = await getBrowserBarBudgets();
   const selectedBudgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
   const budgetId = parsedQuery.budgetQuery
     ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
     : selectedBudgetId;
   if (!budgetId) return;
-  const data = await getOmniboxCacheForBudget(budgetId);
+  const data = await getBrowserBarCacheForBudget(budgetId);
   const [tx] =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldCombinations(parsedQuery, data)

@@ -1,15 +1,18 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useMemo } from "react";
 import { Help, Pencil, Wand } from "tabler-icons-react";
 
-import { CurrencyView, RadioButton, RadioButtonGroup } from "~components";
+import { CurrencyView } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import {
-  getPossibleTransferFieldsFromParsedInput,
-  getPossibleTxFieldsFromParsedInput,
+  getPossibleTransferFields,
+  getPossibleTxFields,
   parseTxInput
 } from "~lib/omnibox";
 import useTransaction from "~lib/useTransaction";
 import { stringValueToMillis } from "~lib/utils";
+
+import OmniboxTransaction from "./OmniboxTransaction";
+import OmniboxTransfer from "./OmniboxTransfer";
 
 const txFields = [
   { idx: 0, prefix: "", label: "amount" },
@@ -54,7 +57,7 @@ export default function Omnibox() {
     handlers.setMemo(parsedQuery.memo);
     if (parsedQuery.type === "tx") {
       handlers.setIsTransfer(false);
-      const results = getPossibleTxFieldsFromParsedInput(parsedQuery, budgetMainData);
+      const results = getPossibleTxFields(parsedQuery, budgetMainData);
       handlers.setPayee(results.payeeResults[0] || null);
       handlers.setCategory(results.categoryResults[0] || null);
       handlers.setAccount(
@@ -65,10 +68,7 @@ export default function Omnibox() {
       return results;
     } else {
       handlers.setIsTransfer(true);
-      const results = getPossibleTransferFieldsFromParsedInput(
-        parsedQuery,
-        budgetMainData
-      );
+      const results = getPossibleTransferFields(parsedQuery, budgetMainData);
       if (results.toAccountResults[0] && results.toAccountResults[0].transfer_payee_id)
         handlers.setPayee({
           id: results.toAccountResults[0].transfer_payee_id,
@@ -95,9 +95,8 @@ export default function Omnibox() {
       {parsedQuery && (
         <>
           <div style={{ fontSize: ".95em", padding: "2px" }}>
-            <Help size={16} style={{ verticalAlign: "bottom" }} />
-            {` `}
-            {parsedQuery.type === "tx" ? "add " : "transfer "}
+            <Help aria-label="Help:" size={16} style={{ verticalAlign: "bottom" }} />
+            {parsedQuery.type === "tx" ? " add " : " transfer "}
             {(parsedQuery.type === "tx" ? txFields : transferFields).map((field) => (
               <Fragment key={field.idx}>
                 {parsedQuery.lastParsedIdx === field.idx ? (
@@ -124,133 +123,14 @@ export default function Omnibox() {
               </div>
             )}
             {parsedQuery?.type === "tx" && results && "payeeResults" in results && (
-              <>
-                {parsedQuery.payeeQuery && (
-                  <RadioButtonGroup
-                    label="Payee:"
-                    className="flex-row gap-sm flex-wrap"
-                    value={
-                      formState.payee && "id" in formState.payee
-                        ? formState.payee?.id || null
-                        : null
-                    }
-                    onChange={(id) =>
-                      handlers.setPayee(
-                        results.payeeResults.find((p) => p.id === id) || null
-                      )
-                    }>
-                    {results.payeeResults.map((payee) => (
-                      <RadioButton key={payee.id} value={payee.id}>
-                        {payee.name}
-                      </RadioButton>
-                    ))}
-                  </RadioButtonGroup>
-                )}
-                {parsedQuery.categoryQuery && (
-                  <RadioButtonGroup
-                    label="Category:"
-                    className="flex-row gap-sm flex-wrap"
-                    value={formState.category?.id || null}
-                    onChange={(id) =>
-                      handlers.setCategory(
-                        results.categoryResults.find((c) => c.id === id) || null
-                      )
-                    }>
-                    {results.categoryResults.map((category) => (
-                      <RadioButton key={category.id} value={category.id}>
-                        {category.name}
-                      </RadioButton>
-                    ))}
-                  </RadioButtonGroup>
-                )}
-                <RadioButtonGroup
-                  label="Account:"
-                  className="flex-row gap-sm flex-wrap"
-                  value={formState.account?.id || null}
-                  onChange={(id) =>
-                    handlers.setAccount(
-                      results.accountResults.find((a) => a.id === id) || null
-                    )
-                  }>
-                  {!parsedQuery.accountQuery && defaultAccount && (
-                    <RadioButton key={defaultAccount.id} value={defaultAccount.id}>
-                      {defaultAccount.name}
-                    </RadioButton>
-                  )}
-                  {results.accountResults.map((account) => (
-                    <RadioButton key={account.id} value={account.id}>
-                      {account.name}
-                    </RadioButton>
-                  ))}
-                </RadioButtonGroup>
-              </>
+              <OmniboxTransaction
+                {...{ formState, handlers, parsedQuery, results, defaultAccount }}
+              />
             )}
             {parsedQuery?.type === "transfer" &&
               results &&
               "fromAccountResults" in results && (
-                <>
-                  {parsedQuery.fromAccountQuery && (
-                    <RadioButtonGroup
-                      label="From:"
-                      className="flex-row gap-sm flex-wrap"
-                      value={formState.account?.id || null}
-                      onChange={(id) =>
-                        handlers.setAccount(
-                          results.fromAccountResults.find((a) => a.id === id) || null
-                        )
-                      }>
-                      {results.fromAccountResults.map((account) => (
-                        <RadioButton key={account.id} value={account.id}>
-                          {account.name}
-                        </RadioButton>
-                      ))}
-                    </RadioButtonGroup>
-                  )}
-                  {parsedQuery.toAccountQuery && (
-                    <RadioButtonGroup
-                      label="To:"
-                      className="flex-row gap-sm flex-wrap"
-                      value={
-                        formState.payee && "transferId" in formState.payee
-                          ? formState.payee?.transferId || null
-                          : null
-                      }
-                      onChange={(id) => {
-                        const account = results.toAccountResults.find((a) => a.id === id);
-                        if (!account || !account.transfer_payee_id)
-                          handlers.setPayee(null);
-                        else
-                          handlers.setPayee({
-                            id: account.transfer_payee_id,
-                            name: account.name,
-                            transferId: account.id
-                          });
-                      }}>
-                      {results.toAccountResults.map((account) => (
-                        <RadioButton key={account.id} value={account.id}>
-                          {account.name}
-                        </RadioButton>
-                      ))}
-                    </RadioButtonGroup>
-                  )}
-                  {parsedQuery.categoryQuery && (
-                    <RadioButtonGroup
-                      label="Category:"
-                      className="flex-row gap-sm flex-wrap"
-                      value={formState.category?.id || null}
-                      onChange={(id) =>
-                        handlers.setCategory(
-                          results.categoryResults.find((c) => c.id === id) || null
-                        )
-                      }>
-                      {results.categoryResults.map((category) => (
-                        <RadioButton key={category.id} value={category.id}>
-                          {category.name}
-                        </RadioButton>
-                      ))}
-                    </RadioButtonGroup>
-                  )}
-                </>
+                <OmniboxTransfer {...{ formState, handlers, parsedQuery, results }} />
               )}
             {formState.memo && (
               <div className="flex-row gap-sm">Memo: {formState.memo}</div>

@@ -13,7 +13,46 @@ import {
   stringValueToMillis
 } from "./utils";
 
-export function parseTxInput(text: string) {
+interface CachedBudgetData {
+  payeesData?: CachedPayee[];
+  categoriesData?: Category[];
+  accountsData?: Account[];
+}
+
+interface ParsedQuery {
+  amount: string;
+  memo: string;
+  lastParsedIdx: number;
+  budgetQuery?: string;
+}
+
+export interface ParsedTxQuery extends ParsedQuery {
+  type: "tx";
+  payeeQuery?: string;
+  categoryQuery?: string;
+  accountQuery?: string;
+}
+
+export interface ParsedTxResults {
+  payeeResults: CachedPayee[];
+  categoryResults: Category[];
+  accountResults: Account[];
+}
+
+export interface ParsedTransferQuery extends ParsedQuery {
+  type: "transfer";
+  fromAccountQuery?: string;
+  toAccountQuery?: string;
+  categoryQuery?: string;
+}
+
+export interface ParsedTransferResults {
+  fromAccountResults: Account[];
+  toAccountResults: Account[];
+  categoryResults: Category[];
+}
+
+export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery | null {
   const dataToParse = text.split(/\s+/);
   if (dataToParse.length === 0) return null;
 
@@ -43,7 +82,7 @@ export function parseTxInput(text: string) {
       accountQuery,
       memo,
       lastParsedIdx: parsedIdx
-    } as const;
+    };
   } else if (dataToParse[0] === "transfer") {
     /** [amount, budget, account 1, account 2, category, memo] */
     const parsedData: string[] = ["", "", "", "", "", ""];
@@ -72,152 +111,131 @@ export function parseTxInput(text: string) {
       categoryQuery: category,
       memo,
       lastParsedIdx: parsedIdx
-    } as const;
+    };
   }
   return null;
 }
 
-interface ParsedTxQuery {
-  payeeQuery?: string;
-  categoryQuery?: string;
-  accountQuery?: string;
-}
-
-interface CachedBudgetData {
-  payeesData?: CachedPayee[];
-  categoriesData?: Category[];
-  accountsData?: Account[];
-}
-
-export function getPossibleTxFieldsFromParsedInput(
+export const getPossibleTxFields = (
   parsed: ParsedTxQuery,
   data: CachedBudgetData
-) {
-  const payeeResults: CachedPayee[] = parsed.payeeQuery
-    ? data.payeesData
-        ?.filter((p) => searchWithinString(p.name, parsed.payeeQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-  const categoryResults: Category[] = parsed.categoryQuery
-    ? data.categoriesData
-        ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-  const accountResults: Account[] = parsed.accountQuery
-    ? data.accountsData
-        ?.filter((a) => searchWithinString(a.name, parsed.accountQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-  return { payeeResults, categoryResults, accountResults };
-}
+): ParsedTxResults => ({
+  payeeResults:
+    parsed.payeeQuery && data.payeesData
+      ? data.payeesData
+          .filter((p) => searchWithinString(p.name, parsed.payeeQuery!.trim()))
+          .slice(0, 5)
+      : [],
+  categoryResults:
+    parsed.categoryQuery && data.categoriesData
+      ? data.categoriesData
+          .filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
+          .slice(0, 5)
+      : [],
+  accountResults:
+    parsed.accountQuery && data.accountsData
+      ? data.accountsData
+          .filter((a) => searchWithinString(a.name, parsed.accountQuery!.trim()))
+          .slice(0, 5)
+      : []
+});
 
 export function getPossibleTxFieldCombinations(
   parsed: ParsedTxQuery,
   data: CachedBudgetData
 ) {
-  const { payeeResults, categoryResults, accountResults } =
-    getPossibleTxFieldsFromParsedInput(parsed, data);
+  const { payeeResults, categoryResults, accountResults } = getPossibleTxFields(
+    parsed,
+    data
+  );
 
-  let possibleTxFields: {
+  let txCombinations: Array<{
     payee?: CachedPayee;
     account?: Account;
     category?: Category;
-  }[] = [];
+  }> = payeeResults.map((payee) => ({ payee }));
 
-  for (const payee of payeeResults) {
-    possibleTxFields.push({ payee });
-  }
-  if (possibleTxFields.length === 0)
-    categoryResults.forEach((category) => possibleTxFields.push({ category }));
-  else if (categoryResults.length > 0) {
-    possibleTxFields = categoryResults.flatMap((category) =>
-      possibleTxFields.map((fields) => ({ ...fields, category }))
+  if (txCombinations.length === 0)
+    categoryResults.forEach((category) => txCombinations.push({ category }));
+  else if (categoryResults.length > 0)
+    txCombinations = categoryResults.flatMap((category) =>
+      txCombinations.map((fields) => ({ ...fields, category }))
     );
-  }
-  if (possibleTxFields.length === 0)
-    accountResults.forEach((account) => possibleTxFields.push({ account }));
-  else if (accountResults.length > 0) {
-    possibleTxFields = accountResults.flatMap((account) =>
-      possibleTxFields.map((fields) => ({ ...fields, account }))
+  if (txCombinations.length === 0)
+    accountResults.forEach((account) => txCombinations.push({ account }));
+  else if (accountResults.length > 0)
+    txCombinations = accountResults.flatMap((account) =>
+      txCombinations.map((fields) => ({ ...fields, account }))
     );
-  }
 
-  return possibleTxFields;
+  return txCombinations;
 }
 
-interface ParsedTransferQuery {
-  fromAccountQuery?: string;
-  toAccountQuery?: string;
-  categoryQuery?: string;
-}
-
-export function getPossibleTransferFieldsFromParsedInput(
+export const getPossibleTransferFields = (
   parsed: ParsedTransferQuery,
   data: CachedBudgetData
-) {
-  const fromAccountResults: Account[] = parsed.fromAccountQuery
-    ? data.accountsData
-        ?.filter((a) => searchWithinString(a.name, parsed.fromAccountQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-  const toAccountResults: Account[] = parsed.toAccountQuery
-    ? data.accountsData
-        ?.filter((a) => searchWithinString(a.name, parsed.toAccountQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-  const categoryResults: Category[] = parsed.categoryQuery
-    ? data.categoriesData
-        ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
-        .slice(0, 5) || []
-    : [];
-
-  return { fromAccountResults, toAccountResults, categoryResults };
-}
+): ParsedTransferResults => ({
+  fromAccountResults:
+    parsed.fromAccountQuery && data.accountsData
+      ? data.accountsData
+          .filter((a) => searchWithinString(a.name, parsed.fromAccountQuery!.trim()))
+          .slice(0, 5)
+      : [],
+  toAccountResults:
+    parsed.toAccountQuery && data.accountsData
+      ? data.accountsData
+          .filter((a) => searchWithinString(a.name, parsed.toAccountQuery!.trim()))
+          .slice(0, 5)
+      : [],
+  categoryResults:
+    parsed.categoryQuery && data.categoriesData
+      ? data.categoriesData
+          .filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
+          .slice(0, 5)
+      : []
+});
 
 export function getPossibleTransferFieldCombinations(
   parsed: ParsedTransferQuery,
   data: CachedBudgetData
 ) {
   const { fromAccountResults, toAccountResults, categoryResults } =
-    getPossibleTransferFieldsFromParsedInput(parsed, data);
+    getPossibleTransferFields(parsed, data);
 
-  let possibleTxFields: {
+  let txCombinations: {
     payee?: CachedPayee;
     account?: Account;
     category?: Category;
-  }[] = [];
-
-  for (const account of toAccountResults) {
-    account.transfer_payee_id &&
-      possibleTxFields.push({
-        payee: {
-          id: account.transfer_payee_id,
-          name: account.name,
-          transferId: account.id
-        }
-      });
-  }
-  if (possibleTxFields.length === 0)
-    fromAccountResults.forEach((account) => possibleTxFields.push({ account }));
-  else if (fromAccountResults.length > 0) {
-    possibleTxFields = fromAccountResults.flatMap((account) =>
-      possibleTxFields.map((fields) => ({ ...fields, account }))
+  }[] = toAccountResults
+    .filter((a) => !!a.transfer_payee_id)
+    .map((account) => ({
+      payee: {
+        id: account.transfer_payee_id!,
+        name: account.name,
+        transferId: account.id
+      }
+    }));
+  if (txCombinations.length === 0)
+    fromAccountResults.forEach((account) => txCombinations.push({ account }));
+  else if (fromAccountResults.length > 0)
+    txCombinations = fromAccountResults.flatMap((account) =>
+      txCombinations.map((fields) => ({ ...fields, account }))
     );
-  }
-  if (possibleTxFields.length === 0)
-    categoryResults.forEach((category) => possibleTxFields.push({ category }));
-  else if (categoryResults.length > 0) {
-    possibleTxFields = categoryResults.flatMap((category) =>
-      possibleTxFields.map((fields) => ({ ...fields, category }))
+  if (txCombinations.length === 0)
+    categoryResults.forEach((category) => txCombinations.push({ category }));
+  else if (categoryResults.length > 0)
+    txCombinations = categoryResults.flatMap((category) =>
+      txCombinations.map((fields) => ({ ...fields, category }))
     );
-  }
 
-  return possibleTxFields;
+  return txCombinations;
 }
 
 const chromeLocalStorage = new Storage({ area: "local" });
 const chromeSyncStorage = new Storage({ area: "sync" });
-export async function checkOmniboxPermission() {
+
+/** Check if user has enabled permission to use the URL/address bar */
+export async function checkBrowserBarPermission() {
   const sync = await chromeLocalStorage.get<boolean>("sync");
   const settings = await (sync ? chromeSyncStorage : chromeLocalStorage).get<AppSettings>(
     "settings"
@@ -225,7 +243,7 @@ export async function checkOmniboxPermission() {
   return !!settings?.omnibox;
 }
 
-export function createOmniboxSuggestions(
+export function createBrowserBarSuggestions(
   type: "tx" | "transfer",
   possibleTxFields: {
     payee?: CachedPayee;
@@ -256,14 +274,24 @@ export function createOmniboxSuggestions(
     description:
       type === "tx"
         ? "add: " +
-          (amount ? formatCurrency(stringValueToMillis(amount, "Outflow")) : "") +
+          (amount
+            ? formatCurrency(
+                stringValueToMillis(amount, "Outflow"),
+                budget?.currencyFormat
+              )
+            : "") +
           (budget ? ` in ${escapeXML(budget.name)}` : "") +
           (payee ? ` at <match>${escapeXML(payee.name)}</match>` : "") +
           (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
           (account ? ` on <match>${escapeXML(account.name)}</match>` : "") +
           (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
         : "transfer: " +
-          (amount ? formatCurrency(stringValueToMillis(amount, "Inflow")) : "") +
+          (amount
+            ? formatCurrency(
+                stringValueToMillis(amount, "Inflow"),
+                budget?.currencyFormat
+              )
+            : "") +
           (budget ? ` in ${escapeXML(budget.name)}` : "") +
           (account ? ` from <match>${escapeXML(account.name)}</match>` : "") +
           (payee ? ` to <match>${escapeXML(payee.name)}</match>` : "") +
@@ -288,7 +316,7 @@ function escapeXML(s: string) {
   return escaped;
 }
 
-const omniboxCache: {
+const browserBarCache: {
   budgets?: CachedBudget[];
   data: {
     [budgetId: string]: {
@@ -299,8 +327,8 @@ const omniboxCache: {
   };
 } = { data: {} };
 
-export async function getOmniboxBudgets() {
-  if (omniboxCache.budgets) return omniboxCache.budgets;
+export async function getBrowserBarBudgets() {
+  if (browserBarCache.budgets) return browserBarCache.budgets;
 
   const queryClient = createQueryClient({
     staleTime: ONE_DAY_IN_MILLIS * 7
@@ -315,14 +343,14 @@ export async function getOmniboxBudgets() {
       queryFn: () => []
     })
   ).filter((b) => budgetIdsToShow?.includes(b.id));
-  omniboxCache.budgets = budgets;
+  browserBarCache.budgets = budgets;
   return budgets;
 }
 
-export async function getOmniboxCacheForBudget(budgetId: string) {
-  if (omniboxCache.data[budgetId]) return omniboxCache.data[budgetId];
+export async function getBrowserBarCacheForBudget(budgetId: string) {
+  if (browserBarCache.data[budgetId]) return browserBarCache.data[budgetId];
 
-  const budgetCache: (typeof omniboxCache)["data"][string] = {};
+  const budgetCache: (typeof browserBarCache)["data"][string] = {};
   const queryClient = createQueryClient({
     staleTime: ONE_DAY_IN_MILLIS * 7
   });
@@ -353,6 +381,6 @@ export async function getOmniboxCacheForBudget(budgetId: string) {
   categories.splice(1, 2); // Internal master, deferred income categories
   budgetCache.categoriesData = categories;
 
-  omniboxCache.data[budgetId] = budgetCache;
+  browserBarCache.data[budgetId] = budgetCache;
   return budgetCache;
 }
