@@ -90,6 +90,10 @@ input[type="checkbox"] {
   flex-grow: 1;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -229,6 +233,13 @@ li:last-child .balance-display {
   cursor: pointer;
   padding: var(--spacing-sm) 0.7em;
   text-align: center;
+}
+.button.small {
+  padding: var(--spacing-xs) 0.4em;
+  border: none;
+}
+.button.focus {
+  outline: 2px solid var(--border);
 }
 
 .icon-button {
@@ -398,6 +409,10 @@ li:last-child .balance-display {
 }
 .currency.negative {
   color: var(--currency-red);
+}
+
+.max-w-32 {
+  max-width: 8rem;
 }
 
 .mt-sm {

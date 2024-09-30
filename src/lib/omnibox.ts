@@ -13,26 +13,7 @@ import {
   stringValueToMillis
 } from "./utils";
 
-export function parseTxInput(text: string):
-  | {
-      type: "tx";
-      amount?: string;
-      budgetQuery?: string;
-      payeeQuery?: string;
-      categoryQuery?: string;
-      accountQuery?: string;
-      memo?: string;
-    }
-  | {
-      type: "transfer";
-      budgetQuery?: string;
-      fromAccountQuery?: string;
-      toAccountQuery?: string;
-      categoryQuery?: string;
-      amount?: string;
-      memo?: string;
-    }
-  | null {
+export function parseTxInput(text: string) {
   const dataToParse = text.split(/\s+/);
   if (dataToParse.length === 0) return null;
 
@@ -60,8 +41,9 @@ export function parseTxInput(text: string):
       payeeQuery,
       categoryQuery,
       accountQuery,
-      memo
-    };
+      memo,
+      lastParsedIdx: parsedIdx
+    } as const;
   } else if (dataToParse[0] === "transfer") {
     /** [amount, budget, account 1, account 2, category, memo] */
     const parsedData: string[] = ["", "", "", "", "", ""];
@@ -88,40 +70,53 @@ export function parseTxInput(text: string):
       fromAccountQuery: account1Direction === "from" ? account1 : account2,
       toAccountQuery: account1Direction === "from" ? account2 : account1,
       categoryQuery: category,
-      memo
-    };
+      memo,
+      lastParsedIdx: parsedIdx
+    } as const;
   }
   return null;
 }
 
+interface ParsedTxQuery {
+  payeeQuery?: string;
+  categoryQuery?: string;
+  accountQuery?: string;
+}
+
+interface CachedBudgetData {
+  payeesData?: CachedPayee[];
+  categoriesData?: Category[];
+  accountsData?: Account[];
+}
+
 export function getPossibleTxFieldsFromParsedInput(
-  parsed: {
-    budgetQuery?: string;
-    payeeQuery?: string;
-    categoryQuery?: string;
-    accountQuery?: string;
-  },
-  data: {
-    payees?: CachedPayee[];
-    categories?: Category[];
-    accounts?: Account[];
-  }
+  parsed: ParsedTxQuery,
+  data: CachedBudgetData
 ) {
   const payeeResults: CachedPayee[] = parsed.payeeQuery
-    ? data.payees
+    ? data.payeesData
         ?.filter((p) => searchWithinString(p.name, parsed.payeeQuery!.trim()))
         .slice(0, 5) || []
     : [];
   const categoryResults: Category[] = parsed.categoryQuery
-    ? data.categories
+    ? data.categoriesData
         ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
         .slice(0, 5) || []
     : [];
   const accountResults: Account[] = parsed.accountQuery
-    ? data.accounts
+    ? data.accountsData
         ?.filter((a) => searchWithinString(a.name, parsed.accountQuery!.trim()))
         .slice(0, 5) || []
     : [];
+  return { payeeResults, categoryResults, accountResults };
+}
+
+export function getPossibleTxFieldCombinations(
+  parsed: ParsedTxQuery,
+  data: CachedBudgetData
+) {
+  const { payeeResults, categoryResults, accountResults } =
+    getPossibleTxFieldsFromParsedInput(parsed, data);
 
   let possibleTxFields: {
     payee?: CachedPayee;
@@ -150,32 +145,41 @@ export function getPossibleTxFieldsFromParsedInput(
   return possibleTxFields;
 }
 
+interface ParsedTransferQuery {
+  fromAccountQuery?: string;
+  toAccountQuery?: string;
+  categoryQuery?: string;
+}
+
 export function getPossibleTransferFieldsFromParsedInput(
-  parsed: {
-    fromAccountQuery?: string;
-    toAccountQuery?: string;
-    categoryQuery?: string;
-  },
-  data: {
-    categories?: Category[];
-    accounts?: Account[];
-  }
+  parsed: ParsedTransferQuery,
+  data: CachedBudgetData
 ) {
   const fromAccountResults: Account[] = parsed.fromAccountQuery
-    ? data.accounts
+    ? data.accountsData
         ?.filter((a) => searchWithinString(a.name, parsed.fromAccountQuery!.trim()))
         .slice(0, 5) || []
     : [];
   const toAccountResults: Account[] = parsed.toAccountQuery
-    ? data.accounts
+    ? data.accountsData
         ?.filter((a) => searchWithinString(a.name, parsed.toAccountQuery!.trim()))
         .slice(0, 5) || []
     : [];
   const categoryResults: Category[] = parsed.categoryQuery
-    ? data.categories
+    ? data.categoriesData
         ?.filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
         .slice(0, 5) || []
     : [];
+
+  return { fromAccountResults, toAccountResults, categoryResults };
+}
+
+export function getPossibleTransferFieldCombinations(
+  parsed: ParsedTransferQuery,
+  data: CachedBudgetData
+) {
+  const { fromAccountResults, toAccountResults, categoryResults } =
+    getPossibleTransferFieldsFromParsedInput(parsed, data);
 
   let possibleTxFields: {
     payee?: CachedPayee;
@@ -288,9 +292,9 @@ const omniboxCache: {
   budgets?: CachedBudget[];
   data: {
     [budgetId: string]: {
-      payees?: CachedPayee[];
-      categories?: Category[];
-      accounts?: Account[];
+      payeesData?: CachedPayee[];
+      categoriesData?: Category[];
+      accountsData?: Account[];
     };
   };
 } = { data: {} };
@@ -341,13 +345,13 @@ export async function getOmniboxCacheForBudget(budgetId: string) {
     })
   ]);
 
-  budgetCache.payees = payees;
-  budgetCache.accounts = accounts;
+  budgetCache.payeesData = payees;
+  budgetCache.accountsData = accounts;
 
   categoryGroups.splice(1, 1); // CCP categories
   const categories = categoryGroups.flatMap((cg) => cg.categories);
   categories.splice(1, 2); // Internal master, deferred income categories
-  budgetCache.categories = categories;
+  budgetCache.categoriesData = categories;
 
   omniboxCache.data[budgetId] = budgetCache;
   return budgetCache;

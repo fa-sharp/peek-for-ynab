@@ -6,6 +6,7 @@ import BudgetSelect from "./extension/main/BudgetSelect";
 import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
 import NewVersionAlert from "./extension/main/NewVersionAlert";
 import NotificationsView from "./extension/main/NotificationsView";
+import Omnibox from "./extension/main/Omnibox";
 import PopupLogin from "./extension/main/PopupLogin";
 import PopupMain from "./extension/main/PopupMain";
 import PopupNav from "./extension/main/PopupNav";
@@ -21,6 +22,7 @@ import SubTransaction from "./extension/transaction/SubTransaction";
 import TransactionForm from "./extension/transaction/TransactionForm";
 import Dialog from "./react-aria/Dialog";
 import Menu from "./react-aria/Menu";
+import { RadioButton, RadioButtonGroup } from "./react-aria/RadioButton";
 import Tooltip from "./react-aria/Tooltip";
 
 export {
@@ -41,10 +43,13 @@ export {
   Menu,
   NewVersionAlert,
   NotificationsView,
+  Omnibox,
   PayeeSelect,
   PopupLogin,
   PopupMain,
   PopupNav,
+  RadioButton,
+  RadioButtonGroup,
   SavedAccountsView,
   SavedCategoriesView,
   SubTransaction,

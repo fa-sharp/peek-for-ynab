@@ -21,8 +21,8 @@ import {
   createOmniboxSuggestions,
   getOmniboxBudgets,
   getOmniboxCacheForBudget,
-  getPossibleTransferFieldsFromParsedInput,
-  getPossibleTxFieldsFromParsedInput,
+  getPossibleTransferFieldCombinations,
+  getPossibleTxFieldCombinations,
   parseTxInput
 } from "~lib/omnibox";
 import { createQueryClient } from "~lib/queryClient";
@@ -295,8 +295,8 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   const data = await getOmniboxCacheForBudget(budgetId);
   const possibleTxFields =
     parsedQuery.type === "tx"
-      ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
-      : getPossibleTransferFieldsFromParsedInput(parsedQuery, data);
+      ? getPossibleTxFieldCombinations(parsedQuery, data)
+      : getPossibleTransferFieldCombinations(parsedQuery, data);
   suggest(
     createOmniboxSuggestions(
       parsedQuery.type,
@@ -321,9 +321,10 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
   const data = await getOmniboxCacheForBudget(budgetId);
   const [tx] =
     parsedQuery.type === "tx"
-      ? getPossibleTxFieldsFromParsedInput(parsedQuery, data)
-      : getPossibleTransferFieldsFromParsedInput(parsedQuery, data);
+      ? getPossibleTxFieldCombinations(parsedQuery, data)
+      : getPossibleTransferFieldCombinations(parsedQuery, data);
   IS_DEV && console.log("Received tx fields from omnibox:", tx);
+
   if (budgetId !== selectedBudgetId)
     await CHROME_LOCAL_STORAGE.set("selectedBudget", budgetId);
   await CHROME_LOCAL_STORAGE.set("popupState", {

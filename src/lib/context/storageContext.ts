@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useContext, useEffect, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -116,14 +116,21 @@ const useStorageProvider = () => {
   );
 
   /** Current popup state */
-  const [popupState, setPopupState] = useExtensionStorage<{
+  interface PopupState {
     view: "main" | "txAdd";
     editMode?: boolean;
     txAddState?: TxAddInitialState;
-  }>(
-    { key: "popupState", instance: CHROME_LOCAL_STORAGE },
-    { view: "main", editMode: false }
-  );
+    omnibox?: string;
+  }
+  const [popupState, _setPopupState, { setRenderValue }] =
+    useExtensionStorage<PopupState>(
+      { key: "popupState", instance: CHROME_LOCAL_STORAGE },
+      { view: "main", editMode: false }
+    );
+  const setPopupState = (state: PopupState) => {
+    setRenderValue(state);
+    _setPopupState(state);
+  };
 
   /** Whether syncing is enabled */
   const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {

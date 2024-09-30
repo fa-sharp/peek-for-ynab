@@ -6,6 +6,7 @@ import {
   CategoriesView,
   NewVersionAlert,
   NotificationsView,
+  Omnibox,
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView
@@ -14,6 +15,7 @@ import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib
 
 export default function PopupMain() {
   const {
+    popupState,
     savedCategories,
     savedAccounts,
     saveCategoriesForBudget,
@@ -77,10 +79,15 @@ export default function PopupMain() {
       {categoriesData && accountsData && (
         <>
           <NotificationsView />
-          <SavedCategoriesView />
-          <SavedAccountsView />
-          <CategoriesView />
-          <AccountsView />
+          <Omnibox />
+          {!popupState.omnibox && (
+            <>
+              <SavedCategoriesView />
+              <SavedAccountsView />
+              <CategoriesView />
+              <AccountsView />
+            </>
+          )}
         </>
       )}
     </DragDropContext>
