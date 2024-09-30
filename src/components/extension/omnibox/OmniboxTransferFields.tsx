@@ -9,7 +9,7 @@ interface Props {
   handlers: TransactionFormHandlers;
 }
 
-export default function OmniboxTransfer({
+export default function OmniboxTransferFields({
   parsedQuery,
   results,
   formState,
