@@ -18,9 +18,8 @@ test("Can expand and collapse all category groups", async () => {
   const user = userEvent.setup();
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
   render(<CategoriesView />, { wrapper });
-  await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
+  await waitFor(() => screen.getByText("Categories"));
 
   expect(screen.queryByText("Bills")).toBeNull();
   await user.click(screen.getByLabelText("Expand"));
@@ -34,9 +33,9 @@ test("Can expand and collapse a category group", async () => {
   const user = userEvent.setup();
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
   render(<CategoriesView />, { wrapper });
-  await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
+  await waitFor(() => screen.getByText("Categories"));
+
   await user.click(screen.getByLabelText("Expand"));
 
   expect(screen.queryByRole("list")).toBeNull();
