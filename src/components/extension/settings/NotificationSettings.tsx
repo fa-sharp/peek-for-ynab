@@ -28,13 +28,16 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
 
   return (
     <>
-      <h4 aria-labelledby="notification-heading" className="heading-medium mb-sm">
-        <span id="notification-heading">Notifications</span>
-        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
-          <Dialog>Enable notifications for the following events in your budget.</Dialog>
-        </Tooltip>
-      </h4>
-      <div className="flex-col gap-sm mb-lg">
+      <div className="flex-col gap-sm">
+        <h3 aria-labelledby="notification-heading" className="heading-medium">
+          <span id="notification-heading">Notifications</span>
+          <Tooltip
+            label="More info"
+            icon={<Help size={18} aria-hidden />}
+            placement="top">
+            <Dialog>Enable notifications for the following events in your budget.</Dialog>
+          </Tooltip>
+        </h3>
         <label
           className="flex-row gap-xs"
           title="Notify for overspent categories this month">
@@ -66,7 +69,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           Import errors
         </label>
       </div>
-      <h4
+      <h3
         aria-labelledby="reconcile-heading"
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setReconcileExpanded(!reconcileExpanded)}>
@@ -82,7 +85,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
           onClick={() => setReconcileExpanded(!reconcileExpanded)}
         />
-      </h4>
+      </h3>
       {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
     </>
   );

@@ -49,7 +49,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
 function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
   return (
     <fieldset
-      className="rounded mt-sm"
+      className="flex-col rounded mt-sm"
       style={{
         marginLeft: "1.8em",
         padding: "0 1em 0.5em",
