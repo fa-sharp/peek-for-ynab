@@ -80,23 +80,27 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   if (!settings) return null;
 
   return (
-    <>
-      <h4
+    <div className="flex-col gap-sm">
+      <h3
         aria-labelledby="confetti-heading"
         className="heading-medium flex-row gap-xs cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span id="confetti-heading">Confetti</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
-          <Dialog>Setup confetti celebrations after adding a transaction.</Dialog>
+          <Dialog>
+            Enable confetti celebrations after adding a transaction. You can enable them
+            for specific categories that you choose, or for all categories. You can also
+            add your favorite emojis to the confetti.
+          </Dialog>
         </Tooltip>
         <IconButton
           label={expanded ? "Collapse" : "Expand"}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
           onClick={() => setExpanded(!expanded)}
         />
-      </h4>
+      </h3>
       {expanded && (
-        <div className="flex-col">
+        <>
           <label className="flex-row gap-xs">
             <input
               type="checkbox"
@@ -105,10 +109,9 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
             />
             Enable for all categories
           </label>
-
           {!settings?.confetti?.allCategories && (
             <div className="flex-col gap-sm">
-              <b>Enable for specific categories: </b>
+              <h4 className="heading-small">Categories:</h4>
               <ul className="list flex-col gap-sm">
                 {settings.confetti?.categories
                   .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
@@ -155,7 +158,6 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
               </div>
             </div>
           )}
-
           <div className="flex-row">
             <b>Emojis: </b>
             {!settings.confetti || settings.confetti.emojis.length === 0 ? (
@@ -202,8 +204,8 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
               </button>
             )}
           </div>
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 }

@@ -131,9 +131,8 @@ export default function PopupNav() {
         }
         spin={Boolean(globalIsFetching)}
       />
-      <div className="flex-row gap-xs">
+      <div className="flex-row gap-sm">
         <BudgetSelect
-          emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
           setSelectedBudgetId={(id) => setPopupState({ budgetId: id })}
@@ -143,8 +142,6 @@ export default function PopupNav() {
           onClick={openBudget}
           icon={<ExternalLink aria-hidden />}
         />
-      </div>
-      <div className="flex-row gap-xs">
         {editingItems && (
           <IconButton
             label="Done editing"

@@ -14,12 +14,7 @@ import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
 import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
-import {
-  findCCAccount,
-  findEmoji,
-  formatCurrency,
-  millisToStringValue
-} from "~lib/utils";
+import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
   AddCCPaymentIcon,
@@ -214,23 +209,14 @@ export const CategoryView = ({
   settings: AppSettings;
   addedTransaction?: TransactionDetail | null;
 }) => {
-  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
-
   return (
     <div
       className={clsx("balance-display", {
         highlighted: settings.animations && addedTransaction?.category_id === id
-      })}
-      title={
-        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
-      }>
+      })}>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? (
-          <span className="font-big">{foundEmoji}</span>
-        ) : (
-          <div className="hide-overflow">{name}</div>
-        )}
+        <div className="hide-overflow">{name}</div>
         {alerts?.overspent && (
           <IconSpan
             label="Overspent"

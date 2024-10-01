@@ -59,12 +59,12 @@ export function OptionsView() {
           </button>
         </>
       ) : (
-        <>
+        <div className="flex-col">
           <h1>Peek for YNAB</h1>
-          <h3 className="heading-big" style={{ marginTop: "0" }}>
-            Settings
-          </h3>
-          <div className="flex-col mb-lg">
+          <div className="flex-col gap-sm">
+            <h2 className="heading-big" style={{ marginTop: "0" }}>
+              Settings
+            </h2>
             <label
               className="flex-row"
               title="Sync settings and pinned categories/accounts to your browser profile">
@@ -79,16 +79,6 @@ export function OptionsView() {
                 }}
               />
               🔄 Sync settings
-            </label>
-            <label
-              className="flex-row"
-              title="Display category/account names as emojis only">
-              <input
-                type="checkbox"
-                checked={settings.emojiMode}
-                onChange={(e) => changeSetting("emojiMode", e.target.checked)}
-              />
-              😉 Emoji mode
             </label>
             <label
               className="flex-row"
@@ -115,8 +105,8 @@ export function OptionsView() {
             </label>
           </div>
 
-          <h3 className="heading-big">Permissions</h3>
-          <div className="flex-col mb-lg">
+          <div className="flex-col gap-sm">
+            <h2 className="heading-big">Permissions</h2>
             <div className="flex-row">
               <input
                 id="tab-permission"
@@ -140,6 +130,7 @@ export function OptionsView() {
                 icon={<Help size={18} aria-hidden />}
                 placement="top">
                 <Dialog>
+                  <div>Features include:</div>
                   <ol
                     className="list"
                     style={{ listStyle: "numeric", paddingLeft: "2em" }}>
@@ -213,40 +204,42 @@ export function OptionsView() {
             </div>
           </div>
 
-          <h3 className="heading-big">Budgets</h3>
-          <ul className="list flex-col mb-lg">
+          <h2 className="heading-big">Budgets</h2>
+          <ul className="list flex-col">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />
             ))}
           </ul>
-          <button
-            title="Refresh the list of budgets from YNAB"
-            className="button rounded accent flex-row mb-lg"
-            onClick={() => refreshBudgets()}
-            disabled={isRefreshingBudgets}>
-            <Refresh size={14} aria-hidden />
-            {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
-          </button>
-          <button
-            className="button rounded gray flex-row mb-lg"
-            onClick={() =>
-              window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
-            }>
-            Help/FAQ
-          </button>
-          <button
-            className="button rounded warn"
-            onClick={async () => {
-              const confirmed = confirm(
-                "Are you sure? Logging out will clear all settings and data stored in your browser."
-              );
-              if (confirmed) {
-                await logout();
-              }
-            }}>
-            Logout
-          </button>
-        </>
+          <div>
+            <button
+              title="Refresh the list of budgets from YNAB"
+              className="button rounded accent flex-row mb-lg"
+              onClick={() => refreshBudgets()}
+              disabled={isRefreshingBudgets}>
+              <Refresh size={14} aria-hidden />
+              {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
+            </button>
+            <button
+              className="button rounded gray flex-row mb-lg"
+              onClick={() =>
+                window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
+              }>
+              Help/FAQ
+            </button>
+            <button
+              className="button rounded warn"
+              onClick={async () => {
+                const confirmed = confirm(
+                  "Are you sure? Logging out will clear all settings and data stored in your browser."
+                );
+                if (confirmed) {
+                  await logout();
+                }
+              }}>
+              Logout
+            </button>
+          </div>
+        </div>
       )}
     </section>
   );

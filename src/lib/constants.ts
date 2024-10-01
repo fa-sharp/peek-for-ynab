@@ -30,7 +30,6 @@ export const DEFAULT_POPUP_STATE: PopupState = {
 };
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
-  emojiMode: false,
   currentTabAccess: false,
   theme: "auto",
   animations: true
