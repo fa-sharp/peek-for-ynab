@@ -9,7 +9,6 @@ export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
-  emojiMode: false,
   currentTabAccess: false,
   theme: "auto",
   animations: true

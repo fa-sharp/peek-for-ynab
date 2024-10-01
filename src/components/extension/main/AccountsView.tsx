@@ -13,7 +13,7 @@ import {
 } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AccountAlerts } from "~lib/notifications";
-import { findEmoji, formatCurrency, formatDateMonthAndDay } from "~lib/utils";
+import { formatDateMonthAndDay } from "~lib/utils";
 
 import {
   AddTransactionIcon,
@@ -177,8 +177,6 @@ export const AccountView = ({
   settings: AppSettings;
   addedTransaction?: TransactionDetail | null;
 }) => {
-  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
-
   return (
     <div
       className={clsx("balance-display", {
@@ -186,17 +184,10 @@ export const AccountView = ({
           settings.animations &&
           (addedTransaction?.account_id === id ||
             addedTransaction?.transfer_account_id === id)
-      })}
-      title={
-        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
-      }>
+      })}>
       <div className="flex-row gap-sm min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? (
-          <span className="font-big">{foundEmoji}</span>
-        ) : (
-          <div className="hide-overflow">{name}</div>
-        )}
+        <div className="hide-overflow">{name}</div>
         {!!alerts?.numUnapprovedTxs && (
           <IconSpan
             label={`${alerts.numUnapprovedTxs} unapproved transaction${alerts.numUnapprovedTxs > 1 ? "s" : ""}`}

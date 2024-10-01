@@ -90,9 +90,9 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
         <span id="confetti-heading">Confetti</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
           <Dialog>
-            Enable confetti celebrations after adding a transaction. You can enable it for
-            specific categories that you choose, or for all categories. You can also add
-            your favorite emojis to the confetti.
+            Enable confetti celebrations after adding a transaction. You can enable them
+            for specific categories that you choose, or for all categories. You can also
+            add your favorite emojis to the confetti.
           </Dialog>
         </Tooltip>
         <IconButton

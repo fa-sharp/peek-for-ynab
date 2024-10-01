@@ -133,7 +133,6 @@ export default function PopupNav() {
       />
       <div className="flex-row gap-xs">
         <BudgetSelect
-          emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}
