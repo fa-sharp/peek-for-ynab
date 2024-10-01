@@ -1,7 +1,5 @@
 import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
-import { Storage } from "@plasmohq/storage";
-
 import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
@@ -11,6 +9,7 @@ import { createQueryClient } from "./queryClient";
 import type { AppSettings, CachedBudget, CachedPayee } from "./types";
 import {
   formatCurrency,
+  getIgnoredCategoryIdsForTx,
   parseLocaleNumber,
   searchWithinString,
   stringValueToMillis
@@ -121,7 +120,8 @@ export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery 
 
 export const getPossibleTxFields = (
   parsed: ParsedTxQuery,
-  data: CachedBudgetData
+  data: CachedBudgetData,
+  ignoredCategoryIds?: Set<string>
 ): ParsedTxResults => ({
   payeeResults:
     parsed.payeeQuery && data.payeesData
@@ -132,6 +132,7 @@ export const getPossibleTxFields = (
   categoryResults:
     parsed.categoryQuery && data.categoriesData
       ? data.categoriesData
+          .filter((c) => !ignoredCategoryIds?.has(c.id))
           .filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
           .slice(0, 5)
       : [],
@@ -176,7 +177,8 @@ export function getPossibleTxFieldCombinations(
 
 export const getPossibleTransferFields = (
   parsed: ParsedTransferQuery,
-  data: CachedBudgetData
+  data: CachedBudgetData,
+  ignoredCategoryIds?: Set<string>
 ): ParsedTransferResults => ({
   fromAccountResults:
     parsed.fromAccountQuery && data.accountsData
@@ -193,6 +195,7 @@ export const getPossibleTransferFields = (
   categoryResults:
     parsed.categoryQuery && data.categoriesData
       ? data.categoriesData
+          .filter((c) => !ignoredCategoryIds?.has(c.id))
           .filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
           .slice(0, 5)
       : []
@@ -376,9 +379,10 @@ export async function getBrowserBarDataForBudget(budgetId: string) {
   budgetCache.payeesData = payees;
   budgetCache.accountsData = accounts;
 
-  categoryGroups.splice(1, 1); // CCP categories
-  const categories = categoryGroups.flatMap((cg) => cg.categories);
-  categories.splice(1, 2); // Internal master, deferred income categories
+  const ignoredCategoryIds = getIgnoredCategoryIdsForTx(categoryGroups);
+  const categories = categoryGroups
+    .flatMap((cg) => cg.categories)
+    .filter((c) => !ignoredCategoryIds.has(c.id));
   budgetCache.categoriesData = categories;
 
   browserBarCache.data[budgetId] = budgetCache;

@@ -23,7 +23,7 @@ export default function TransactionFormWrapper() {
       budgetMainData={budgetMainData}
       selectedBudgetData={selectedBudgetData}
       settings={settings}
-      resetPopupState={() => setPopupState({ view: "main" })}
+      resetPopupState={() => setPopupState({ view: "main", txAddState: {} })}
     />
   );
 }

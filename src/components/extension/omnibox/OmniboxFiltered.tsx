@@ -31,82 +31,88 @@ export default function OmniboxFiltered({
   return (
     <>
       {filtered.categories.length > 0 && (
-        <ul aria-label="filtered categories" className="list">
-          {filtered.categories.map((category) => {
-            const ccAccount =
-              category.category_group_name === "Credit Card Payments"
-                ? findCCAccount(budgetMainData.accountsData, category.name)
-                : undefined;
-            return (
-              <li key={category.id}>
-                <CategoryView
-                  categoryData={category}
-                  settings={settings}
-                  currencyFormat={budget.currencyFormat}
-                  alerts={currentAlerts?.[budget.id]?.cats[category.id]}
-                  actionElementsRight={
-                    !ccAccount ? (
+        <>
+          <h3 className="heading-medium">Categories</h3>
+          <ul className="list">
+            {filtered.categories.map((category) => {
+              const ccAccount =
+                category.category_group_name === "Credit Card Payments"
+                  ? findCCAccount(budgetMainData.accountsData, category.name)
+                  : undefined;
+              return (
+                <li key={category.id}>
+                  <CategoryView
+                    categoryData={category}
+                    settings={settings}
+                    currencyFormat={budget.currencyFormat}
+                    alerts={currentAlerts?.[budget.id]?.cats[category.id]}
+                    actionElementsRight={
+                      !ccAccount ? (
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddTransactionIcon />}
+                          label="Add transaction"
+                          onClick={() => openTxForm({ categoryId: category.id })}
+                        />
+                      ) : (
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddCCPaymentIcon />}
+                          label="Add credit card payment"
+                          onClick={() =>
+                            ccAccount.transfer_payee_id &&
+                            openTxForm({
+                              isTransfer: true,
+                              amount:
+                                category.balance >= 0
+                                  ? millisToStringValue(
+                                      category.balance,
+                                      budget?.currencyFormat
+                                    )
+                                  : undefined,
+                              amountType: "Inflow",
+                              accountId: ccAccount.id
+                            })
+                          }
+                        />
+                      )
+                    }
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+      {filtered.accounts.length > 0 && (
+        <>
+          <h3 className="heading-medium">Accounts</h3>
+          <ul className="list">
+            {filtered.accounts.map((account) => {
+              return (
+                <li key={account.id}>
+                  <AccountView
+                    account={account}
+                    currencyFormat={budget.currencyFormat}
+                    settings={settings}
+                    alerts={currentAlerts?.[budget.id]?.accounts[account.id]}
+                    actionElementsRight={
                       <IconButton
                         rounded
                         accent
                         icon={<AddTransactionIcon />}
                         label="Add transaction"
-                        onClick={() => openTxForm({ categoryId: category.id })}
+                        onClick={() => openTxForm({ accountId: account.id })}
                       />
-                    ) : (
-                      <IconButton
-                        rounded
-                        accent
-                        icon={<AddCCPaymentIcon />}
-                        label="Add credit card payment"
-                        onClick={() =>
-                          ccAccount.transfer_payee_id &&
-                          openTxForm({
-                            isTransfer: true,
-                            amount:
-                              category.balance >= 0
-                                ? millisToStringValue(
-                                    category.balance,
-                                    budget?.currencyFormat
-                                  )
-                                : undefined,
-                            amountType: "Inflow",
-                            accountId: ccAccount.id
-                          })
-                        }
-                      />
-                    )
-                  }
-                />
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {filtered.accounts.length > 0 && (
-        <ul aria-label="filtered accounts" className="list">
-          {filtered.accounts.map((account) => {
-            return (
-              <li key={account.id}>
-                <AccountView
-                  account={account}
-                  currencyFormat={budget.currencyFormat}
-                  settings={settings}
-                  alerts={currentAlerts?.[budget.id]?.accounts[account.id]}
-                  actionElementsRight={
-                    <IconButton
-                      rounded
-                      accent
-                      icon={<AddTransactionIcon />}
-                      label="Add transaction"
-                      onClick={() => openTxForm({ accountId: account.id })}
-                    />
-                  }
-                />
-              </li>
-            );
-          })}
-        </ul>
+                    }
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
     </>
   );

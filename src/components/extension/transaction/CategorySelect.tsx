@@ -13,7 +13,11 @@ import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import type { CachedBudget } from "~lib/types";
-import { formatCurrency, searchWithinString } from "~lib/utils";
+import {
+  formatCurrency,
+  getIgnoredCategoryIdsForTx,
+  searchWithinString
+} from "~lib/utils";
 
 interface Props {
   initialCategory?: Category | null;
@@ -37,14 +41,9 @@ function CategorySelect(
   }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
-    const ignoredIds = new Set(
-      categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
-    );
-    ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
-    return ignoredIds;
+    return getIgnoredCategoryIdsForTx(categoryGroupsData);
   }, [categoryGroupsData]);
 
   const getFilter = useCallback(

@@ -29,9 +29,9 @@ export default function Omnibox() {
       accounts: budgetMainData.accountsData.filter((a) =>
         searchWithinString(a.name, omniboxInput)
       ),
-      categories: budgetMainData.categoriesData.filter((c) =>
-        searchWithinString(c.name, omniboxInput)
-      )
+      categories: budgetMainData.categoriesData
+        .filter((c) => c.category_group_name !== "Internal Master Category")
+        .filter((c) => searchWithinString(c.name, omniboxInput))
     };
   }, [budgetMainData, parsedQuery, omniboxInput]);
 
@@ -57,7 +57,10 @@ export default function Omnibox() {
             filtered,
             settings,
             currentAlerts,
-            openTxForm: (txAddState) => setPopupState({ view: "txAdd", txAddState })
+            openTxForm: (txAddState) => {
+              setPopupState({ view: "txAdd", txAddState });
+              setOmniboxInput("");
+            }
           }}
         />
       ) : parsedQuery ? (
@@ -70,7 +73,10 @@ export default function Omnibox() {
             isSaving,
             parsedQuery,
             defaultAccountId: budgetSettings?.transactions.defaultAccountId,
-            openTxForm: (txAddState) => setPopupState({ view: "txAdd", txAddState })
+            openTxForm: (txAddState) => {
+              setPopupState({ view: "txAdd", txAddState });
+              setOmniboxInput("");
+            }
           }}
         />
       ) : null}

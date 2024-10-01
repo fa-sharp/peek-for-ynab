@@ -10,7 +10,7 @@ import {
 } from "~lib/omnibox";
 import type { BudgetMainData, CachedBudget, TxAddInitialState } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
-import { stringValueToMillis } from "~lib/utils";
+import { getIgnoredCategoryIdsForTx, stringValueToMillis } from "~lib/utils";
 
 import OmniboxTransactionFields from "./OmniboxTransactionFields";
 import OmniboxTransferFields from "./OmniboxTransferFields";
@@ -56,12 +56,17 @@ export default function OmniboxTransaction({
     return budgetMainData.accountsData.find((a) => a.id === defaultAccountId);
   }, [budgetMainData, defaultAccountId]);
 
+  const ignoredCategoryIds = useMemo(() => {
+    if (!budgetMainData) return undefined;
+    return getIgnoredCategoryIdsForTx(budgetMainData.categoryGroupsData);
+  }, [budgetMainData]);
+
   const results = useMemo(() => {
     if (!parsedQuery || !budgetMainData) return null;
     return parsedQuery.type === "tx"
-      ? getPossibleTxFields(parsedQuery, budgetMainData)
-      : getPossibleTransferFields(parsedQuery, budgetMainData);
-  }, [budgetMainData, parsedQuery]);
+      ? getPossibleTxFields(parsedQuery, budgetMainData, ignoredCategoryIds)
+      : getPossibleTransferFields(parsedQuery, budgetMainData, ignoredCategoryIds);
+  }, [budgetMainData, ignoredCategoryIds, parsedQuery]);
 
   useEffect(() => {
     if (!parsedQuery || !results) return;

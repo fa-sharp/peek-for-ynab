@@ -58,6 +58,15 @@ export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
   );
 
+/** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
+export const getIgnoredCategoryIdsForTx = (data: ynab.CategoryGroupWithCategories[]) => {
+  const ignoredIds = new Set(
+    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
+  );
+  ignoredIds.delete(data[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
+  return ignoredIds;
+};
+
 /** Check if a search query is contained in a string, in the context of searching (i.e. ignore case) */
 export const searchWithinString = (str: string, query: string) =>
   str.toLocaleLowerCase().includes(query.toLocaleLowerCase());
