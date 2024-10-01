@@ -2,8 +2,8 @@ import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import { useCallback, useEffect } from "react";
 
 import {
-  AccountsView,
-  CategoriesView,
+  AllAccountsView,
+  AllCategoriesView,
   NewVersionAlert,
   NotificationsView,
   Omnibox,
@@ -85,8 +85,8 @@ export default function PopupMain() {
             <>
               <SavedCategoriesView />
               <SavedAccountsView />
-              <CategoriesView />
-              <AccountsView />
+              <AllCategoriesView />
+              <AllAccountsView />
             </>
           )}
         </>

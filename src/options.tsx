@@ -159,11 +159,8 @@ export function OptionsView() {
                   suggestions from your payees, categories, and accounts. You can type in
                   &quot;peek <kbd>space</kbd>&quot; to see the various options.{" "}
                   <i>
-                    Note: This is not AI! The extension processes your input locally to
-                    come up with suggestions. Communication happens directly between the
-                    URL bar and the extension - no data is sent anywhere else. Still,
-                    privacy concerns are understandable, which is why this is disabled by
-                    default. See{" "}
+                    Note: Communication happens directly between the URL bar and the
+                    extension - no data is sent anywhere else. See{" "}
                     <a
                       href="https://developer.chrome.com/docs/extensions/reference/api/omnibox"
                       target="_blank"

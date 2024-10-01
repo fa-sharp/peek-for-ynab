@@ -1,9 +1,11 @@
 import CurrencyView from "./CurrencyView";
 import IconButton from "./IconButton";
 import IconSpan from "./IconSpan";
-import AccountsView, { AccountView } from "./extension/main/AccountsView";
+import AccountView from "./extension/main/AccountView";
+import AllAccountsView from "./extension/main/AllAccountsView";
+import AllCategoriesView from "./extension/main/AllCategoriesView";
 import BudgetSelect from "./extension/main/BudgetSelect";
-import CategoriesView, { CategoryView } from "./extension/main/CategoriesView";
+import CategoryView from "./extension/main/CategoryView";
 import NewVersionAlert from "./extension/main/NewVersionAlert";
 import NotificationsView from "./extension/main/NotificationsView";
 import PopupLogin from "./extension/main/PopupLogin";
@@ -28,11 +30,11 @@ import Tooltip from "./react-aria/Tooltip";
 export {
   AccountSelect,
   AccountView,
-  AccountsView,
+  AllAccountsView,
   AmountField,
   BudgetSelect,
   BudgetSettings,
-  CategoriesView,
+  AllCategoriesView,
   CategorySelect,
   CategoryView,
   CurrencyView,

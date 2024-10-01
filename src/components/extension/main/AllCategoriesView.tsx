@@ -1,16 +1,7 @@
-import { clsx } from "clsx";
-import type { ReactElement } from "react";
 import { useState } from "react";
-import { AlertTriangle } from "tabler-icons-react";
-import type {
-  Account,
-  Category,
-  CategoryGroupWithCategories,
-  CurrencyFormat,
-  TransactionDetail
-} from "ynab";
+import type { Account, CategoryGroupWithCategories } from "ynab";
 
-import { CurrencyView, IconButton, IconSpan } from "~components";
+import { CategoryView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
 import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
@@ -191,50 +182,5 @@ export function CategoryGroupView({
     </>
   );
 }
-
-export const CategoryView = ({
-  categoryData: { id, name, balance },
-  currencyFormat,
-  settings,
-  alerts,
-  actionElementsRight,
-  actionElementsLeft,
-  addedTransaction
-}: {
-  categoryData: Category;
-  currencyFormat?: CurrencyFormat;
-  actionElementsRight?: ReactElement | null;
-  actionElementsLeft?: ReactElement | null;
-  alerts?: CategoryAlerts[string];
-  settings: AppSettings;
-  addedTransaction?: TransactionDetail | null;
-}) => {
-  return (
-    <div
-      className={clsx("balance-display", {
-        highlighted: settings.animations && addedTransaction?.category_id === id
-      })}>
-      <div className="flex-row min-w-0">
-        {actionElementsLeft}
-        <div className="hide-overflow">{name}</div>
-        {alerts?.overspent && (
-          <IconSpan
-            label="Overspent"
-            icon={<AlertTriangle color="var(--stale)" size={18} aria-hidden />}
-          />
-        )}
-      </div>
-      <div className="flex-row">
-        <CurrencyView
-          milliUnits={balance}
-          currencyFormat={currencyFormat}
-          colorsEnabled={true}
-          animationEnabled={settings.animations && !!addedTransaction}
-        />
-        {actionElementsRight}
-      </div>
-    </div>
-  );
-};
 
 export default CategoriesView;
