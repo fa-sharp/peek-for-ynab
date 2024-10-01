@@ -49,7 +49,7 @@ export function TransactionFormInner({
   if (!budgetMainData) return <div>Loading...</div>;
 
   return (
-    <section style={{ minWidth: "270px" }}>
+    <section>
       <div className="heading-big">
         <div role="heading">Add Transaction</div>
       </div>

@@ -25,7 +25,7 @@ export function PopupView() {
     <div
       style={{
         padding: "1em",
-        minWidth: "260px",
+        minWidth: "270px",
         maxWidth: "360px",
         minHeight: "50px"
       }}>
