@@ -32,7 +32,7 @@ import {
   parseTxInput
 } from "~lib/omnibox";
 import { createQueryClient } from "~lib/queryClient";
-import type { BudgetSettings, TokenData } from "~lib/types";
+import type { BudgetSettings, PopupState, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject, searchWithinString } from "~lib/utils";
 
 const IS_REFRESHING_KEY = "isRefreshing";
@@ -254,7 +254,7 @@ chrome.omnibox.onInputStarted.addListener(async () => {
     chrome.omnibox.setDefaultSuggestion({
       description: OMNIBOX_START_TEXT
     });
-    const budgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
+    const budgetId = (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
     if (budgetId) getBrowserBarDataForBudget(budgetId);
   }
 });
@@ -284,7 +284,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   const budgets = await getBrowserBarBudgets();
   const budgetId = parsedQuery.budgetQuery
     ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
-    : await CHROME_LOCAL_STORAGE.get("selectedBudget");
+    : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
   if (!budgetId) {
     chrome.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
     return;
@@ -309,12 +309,13 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
 
   const parsedQuery = parseTxInput(text);
   if (!parsedQuery) return;
+
   const budgets = await getBrowserBarBudgets();
-  const selectedBudgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
   const budgetId = parsedQuery.budgetQuery
     ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
-    : selectedBudgetId;
+    : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
   if (!budgetId) return;
+
   const data = await getBrowserBarDataForBudget(budgetId);
   const [tx] =
     parsedQuery.type === "tx"
@@ -322,10 +323,9 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
       : getPossibleTransferFieldCombinations(parsedQuery, data);
   IS_DEV && console.log("Received tx fields from omnibox:", tx);
 
-  if (budgetId !== selectedBudgetId)
-    await CHROME_LOCAL_STORAGE.set("selectedBudget", budgetId);
   await CHROME_LOCAL_STORAGE.set("popupState", {
     view: "txAdd",
+    budgetId: budgetId,
     txAddState: {
       amount: parsedQuery.amount,
       payee: tx?.payee,
@@ -334,6 +334,6 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
       memo: parsedQuery.memo?.trim(),
       isTransfer: parsedQuery.type === "transfer"
     }
-  });
+  } satisfies PopupState);
   chrome.action.openPopup();
 });
