@@ -27,7 +27,10 @@ export default function CategoryView({
   return (
     <div
       className={clsx("balance-display", {
-        highlighted: settings.animations && addedTransaction?.category_id === id
+        highlighted:
+          settings.animations &&
+          (addedTransaction?.category_id === id ||
+            addedTransaction?.subtransactions.some((sub) => sub.category_id === id))
       })}>
       <div className="flex-row min-w-0">
         {actionElementsLeft}

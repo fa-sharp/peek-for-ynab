@@ -31,7 +31,10 @@ export default function AccountView({
         highlighted:
           settings.animations &&
           (addedTransaction?.account_id === id ||
-            addedTransaction?.transfer_account_id === id)
+            addedTransaction?.transfer_account_id === id ||
+            addedTransaction?.subtransactions.some(
+              (sub) => sub.transfer_account_id === id
+            ))
       })}>
       <div className="flex-row gap-sm min-w-0">
         {actionElementsLeft}
