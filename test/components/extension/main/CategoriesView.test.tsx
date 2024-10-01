@@ -1,4 +1,4 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
@@ -6,7 +6,6 @@ import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { CategoriesView } from "~components";
-import { useYNABContext } from "~lib/context";
 
 beforeEach(async () => {
   await chrome.storage.local.set({
