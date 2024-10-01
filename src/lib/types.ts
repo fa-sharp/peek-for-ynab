@@ -22,8 +22,6 @@ export interface PopupState {
 }
 
 export interface AppSettings {
-  /** Category and account names are reduced to emojis */
-  emojiMode: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
