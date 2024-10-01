@@ -25,13 +25,13 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 export default function PopupNav() {
   const { tokenExpired } = useAuthContext();
   const {
-    selectedBudgetId,
     settings,
     tokenRefreshNeeded,
-    popupState,
     shownBudgetIds,
-    setPopupState,
-    setSelectedBudgetId
+    editingItems,
+    setEditingItems,
+    popupState,
+    setPopupState
   } = useStorageContext();
   const {
     budgetsData,
@@ -50,8 +50,8 @@ export default function PopupNav() {
   );
 
   const openBudget = useCallback(() => {
-    window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
-  }, [selectedBudgetId]);
+    window.open(`https://app.ynab.com/${popupState?.budgetId}/budget`, "_blank");
+  }, [popupState?.budgetId]);
 
   const openPopupWindow = useCallback(() => {
     window.open(
@@ -75,7 +75,7 @@ export default function PopupNav() {
           });
           break;
         case "editItems":
-          setPopupState({ view: "main", editMode: !popupState.editMode });
+          setEditingItems(!editingItems);
           break;
         case "openWindow":
           openPopupWindow();
@@ -85,13 +85,13 @@ export default function PopupNav() {
           break;
       }
     },
-    [openPopupWindow, popupState.editMode, setPopupState]
+    [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
   if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
-  if (!shownBudgetsData || !settings || selectedBudgetId === undefined) return null; // storage not hydrated yet
+  if (!shownBudgetsData || !settings || !popupState) return null; // storage not hydrated yet
 
   return (
     <nav className="flex-row justify-between mb-lg">
@@ -112,7 +112,7 @@ export default function PopupNav() {
             <Refresh aria-hidden />
           ) : categoriesError || accountsError ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : !selectedBudgetId ||
+          ) : !popupState?.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (
             <Check aria-hidden color="var(--success)" />
@@ -123,7 +123,7 @@ export default function PopupNav() {
         onClick={() => refreshCategoriesAndAccounts()}
         disabled={
           Boolean(globalIsFetching) ||
-          !selectedBudgetId ||
+          !popupState?.budgetId ||
           (!categoriesError &&
             !accountsError &&
             isDataFreshForDisplay(categoriesLastUpdated) &&
@@ -135,8 +135,8 @@ export default function PopupNav() {
         <BudgetSelect
           emojiMode={settings.emojiMode}
           shownBudgets={shownBudgetsData}
-          selectedBudgetId={selectedBudgetId}
-          setSelectedBudgetId={setSelectedBudgetId}
+          selectedBudgetId={popupState.budgetId}
+          setSelectedBudgetId={(id) => setPopupState({ budgetId: id })}
         />
         <IconButton
           label="Open this budget in YNAB"
@@ -145,10 +145,10 @@ export default function PopupNav() {
         />
       </div>
       <div className="flex-row gap-xs">
-        {popupState.editMode && (
+        {editingItems && (
           <IconButton
             label="Done editing"
-            onClick={() => setPopupState({ view: "main" })}
+            onClick={() => setEditingItems(false)}
             icon={<PencilOff aria-hidden />}
           />
         )}
@@ -171,14 +171,14 @@ export default function PopupNav() {
           </Item>
           <Item
             key="editItems"
-            textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
+            textValue={editingItems ? "Done editing" : "Edit pinned items"}>
             <div className="flex-row gap-sm">
-              {popupState.editMode ? (
+              {editingItems ? (
                 <PencilOff aria-hidden size={20} />
               ) : (
                 <Pencil aria-hidden size={20} />
               )}
-              {popupState.editMode ? "Done editing" : "Edit pinned items"}
+              {editingItems ? "Done editing" : "Edit pinned items"}
             </div>
           </Item>
           <Item key="openWindow" textValue="Open in new window">

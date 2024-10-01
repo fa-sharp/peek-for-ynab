@@ -20,7 +20,7 @@ import {
   checkBrowserBarPermission,
   createBrowserBarSuggestions,
   getBrowserBarBudgets,
-  getBrowserBarCacheForBudget,
+  getBrowserBarDataForBudget,
   getPossibleTransferFieldCombinations,
   getPossibleTxFieldCombinations,
   parseTxInput
@@ -258,7 +258,7 @@ chrome.omnibox.onInputStarted.addListener(async () => {
       description: OMNIBOX_START_TEXT
     });
     const budgetId = await CHROME_LOCAL_STORAGE.get("selectedBudget");
-    if (budgetId) getBrowserBarCacheForBudget(budgetId);
+    if (budgetId) getBrowserBarDataForBudget(budgetId);
   }
 });
 chrome.omnibox.onInputCancelled.addListener(async () => {
@@ -292,7 +292,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     chrome.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
     return;
   }
-  const data = await getBrowserBarCacheForBudget(budgetId);
+  const data = await getBrowserBarDataForBudget(budgetId);
   const possibleTxFields =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldCombinations(parsedQuery, data)
@@ -318,7 +318,7 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
     ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))?.id
     : selectedBudgetId;
   if (!budgetId) return;
-  const data = await getBrowserBarCacheForBudget(budgetId);
+  const data = await getBrowserBarDataForBudget(budgetId);
   const [tx] =
     parsedQuery.type === "tx"
       ? getPossibleTxFieldCombinations(parsedQuery, data)

@@ -9,33 +9,31 @@ import OmniboxFiltered from "./OmniboxFiltered";
 import OmniboxTransaction from "./OmniboxTransaction";
 
 export default function Omnibox() {
-  const { budgetSettings, settings, popupState, setPopupState } = useStorageContext();
+  const { budgetSettings, settings, setPopupState, omniboxInput, setOmniboxInput } =
+    useStorageContext();
   const { currentAlerts } = useNotificationsContext();
   const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { formState, handlers, onSaveTransaction, isSaving } = useTransaction();
 
   /** Parsed search terms for each transaction field */
   const parsedQuery = useMemo(() => {
-    if (
-      popupState.omnibox &&
-      (popupState.omnibox.startsWith("add") || popupState.omnibox.startsWith("transfer"))
-    )
-      return parseTxInput(popupState.omnibox);
+    if (omniboxInput.startsWith("add") || omniboxInput.startsWith("transfer"))
+      return parseTxInput(omniboxInput);
     return null;
-  }, [popupState.omnibox]);
+  }, [omniboxInput]);
 
   /** Filtered categories and accounts (if not entering a transaction) */
   const filtered = useMemo(() => {
-    if (parsedQuery || !budgetMainData || !popupState.omnibox) return null;
+    if (parsedQuery || !budgetMainData || !omniboxInput) return null;
     return {
       accounts: budgetMainData.accountsData.filter((a) =>
-        searchWithinString(a.name, popupState.omnibox!)
+        searchWithinString(a.name, omniboxInput)
       ),
       categories: budgetMainData.categoriesData.filter((c) =>
-        searchWithinString(c.name, popupState.omnibox!)
+        searchWithinString(c.name, omniboxInput)
       )
     };
-  }, [budgetMainData, parsedQuery, popupState.omnibox]);
+  }, [budgetMainData, parsedQuery, omniboxInput]);
 
   if (!selectedBudgetData || !budgetMainData || !settings) return null;
 
@@ -46,8 +44,8 @@ export default function Omnibox() {
       <label className="form-input">
         <input
           placeholder="🪄 filter or type 'add', 'transfer'..."
-          value={popupState.omnibox || ""}
-          onChange={(e) => setPopupState({ view: "main", omnibox: e.target.value })}
+          value={omniboxInput}
+          onChange={(e) => setOmniboxInput(e.target.value)}
           disabled={isSaving}
         />
       </label>

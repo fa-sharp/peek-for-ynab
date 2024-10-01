@@ -12,8 +12,8 @@ import NotificationSettings from "./NotificationSettings";
 import TransactionSettings from "./TransactionSettings";
 
 export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
-  const { selectedBudgetId, shownBudgetIds, toggleShowBudget } = useStorageContext();
-  const [showSettings, setShowSettings] = useState(budget.id === selectedBudgetId);
+  const { popupState, shownBudgetIds, toggleShowBudget } = useStorageContext();
+  const [showSettings, setShowSettings] = useState(budget.id === popupState?.budgetId);
 
   useEffect(() => {
     if (!shownBudgetIds?.includes(budget.id)) setShowSettings(false);

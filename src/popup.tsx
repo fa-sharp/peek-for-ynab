@@ -13,12 +13,13 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { selectedBudgetId, settings, popupState } = useStorageContext();
+  const { settings, popupState } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
 
   useSetColorTheme();
 
-  if (authLoading || !settings || selectedBudgetId === undefined) return null;
+  // check if auth and storage are hydrated to avoid flashes
+  if (authLoading || !settings || !popupState) return null;
 
   return (
     <div

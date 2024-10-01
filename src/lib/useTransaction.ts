@@ -18,13 +18,10 @@ export type TransactionFormHandlers = ReturnType<typeof useTransaction>["handler
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const {
-    settings,
-    budgetSettings,
-    popupState: { txAddState },
-    setPopupState,
-    setBudgetSettings
-  } = useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState, setBudgetSettings } =
+    useStorageContext();
+
+  const { txAddState } = popupState || {};
 
   // Transaction state
   const [isTransfer, setIsTransfer] = useState(txAddState?.isTransfer ?? false);

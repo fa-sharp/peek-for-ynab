@@ -18,7 +18,7 @@ const chromeLocalStorage = new Storage({ area: "local" });
 const chromeSyncStorage = new Storage({ area: "sync" });
 
 const useNotificationsProvider = () => {
-  const { budgetSettings, selectedBudgetId } = useStorageContext();
+  const { budgetSettings, popupState } = useStorageContext();
   const { accountsData, budgetsData, categoriesData, unapprovedTxs } = useYNABContext();
 
   const [currentAlerts, setCurrentAlerts] = useStorage<CurrentAlerts | undefined>(
@@ -39,7 +39,7 @@ const useNotificationsProvider = () => {
       !budgetSettings ||
       !accountsData ||
       !categoriesData ||
-      !selectedBudgetId
+      !popupState?.budgetId
     )
       return;
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
@@ -49,7 +49,7 @@ const useNotificationsProvider = () => {
     });
     setCurrentAlerts((prev) => ({
       ...prev,
-      [selectedBudgetId]: budgetAlerts || undefined
+      [popupState.budgetId]: budgetAlerts || undefined
     }));
   }, [
     accountsData,
@@ -57,7 +57,7 @@ const useNotificationsProvider = () => {
     categoriesData,
     currentAlertsHydrated,
     unapprovedTxs,
-    selectedBudgetId,
+    popupState?.budgetId,
     setCurrentAlerts
   ]);
 

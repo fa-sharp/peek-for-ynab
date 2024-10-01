@@ -10,7 +10,7 @@ import { getNumAlertsForBudget } from "~lib/notifications";
 import { formatDateMonthAndDay } from "~lib/utils";
 
 const NotificationsView = () => {
-  const { selectedBudgetId } = useStorageContext();
+  const { popupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
   const { selectedBudgetData, categoriesData, accountsData } = useYNABContext();
 
@@ -18,51 +18,53 @@ const NotificationsView = () => {
 
   const numNotifications = useMemo(
     () =>
-      selectedBudgetId && currentAlerts?.[selectedBudgetId]
-        ? getNumAlertsForBudget(currentAlerts[selectedBudgetId])
+      popupState?.budgetId && currentAlerts?.[popupState.budgetId]
+        ? getNumAlertsForBudget(currentAlerts[popupState.budgetId]!)
         : 0,
-    [currentAlerts, selectedBudgetId]
+    [currentAlerts, popupState?.budgetId]
   );
 
   const numUnapprovedTxs = useMemo(
     () =>
-      selectedBudgetId ? (currentAlerts?.[selectedBudgetId]?.numUnapprovedTxs ?? 0) : 0,
-    [currentAlerts, selectedBudgetId]
+      popupState?.budgetId
+        ? (currentAlerts?.[popupState.budgetId]?.numUnapprovedTxs ?? 0)
+        : 0,
+    [currentAlerts, popupState?.budgetId]
   );
 
   const overspentCategories = useMemo(
     () =>
-      selectedBudgetId
-        ? Object.keys(currentAlerts?.[selectedBudgetId]?.cats || {})
+      popupState?.budgetId
+        ? Object.keys(currentAlerts?.[popupState.budgetId]?.cats || {})
             .map((categoryId) => categoriesData?.find((c) => c.id === categoryId))
             .filter((c) => !!c)
         : [],
-    [categoriesData, currentAlerts, selectedBudgetId]
+    [categoriesData, currentAlerts, popupState?.budgetId]
   );
 
   const accountsToReconcile = useMemo(
     () =>
-      selectedBudgetId
-        ? Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
+      popupState?.budgetId
+        ? Object.entries(currentAlerts?.[popupState.budgetId]?.accounts || {})
             .filter(([, accountAlerts]) => !!accountAlerts?.reconcile)
             .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
             .filter((a) => !!a)
         : [],
-    [accountsData, currentAlerts, selectedBudgetId]
+    [accountsData, currentAlerts, popupState?.budgetId]
   );
 
   const accountsWithImportError = useMemo(
     () =>
-      selectedBudgetId
-        ? Object.entries(currentAlerts?.[selectedBudgetId]?.accounts || {})
+      popupState?.budgetId
+        ? Object.entries(currentAlerts?.[popupState.budgetId]?.accounts || {})
             .filter(([, accountAlerts]) => !!accountAlerts?.importError)
             .map(([accountId]) => accountsData?.find((a) => a.id === accountId))
             .filter((a) => !!a)
         : [],
-    [accountsData, currentAlerts, selectedBudgetId]
+    [accountsData, currentAlerts, popupState?.budgetId]
   );
 
-  if (!currentAlerts || numNotifications === 0) return null;
+  if (!currentAlerts || !popupState || numNotifications === 0) return null;
 
   return (
     <div className={clsx("flex-col gap-0 rounded mb-lg", { "pb-sm": expanded })}>

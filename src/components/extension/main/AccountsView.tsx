@@ -27,14 +27,21 @@ import {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 function AccountsView() {
-  const { savedAccounts, saveAccount, setPopupState, popupState, settings } =
-    useStorageContext();
+  const {
+    savedAccounts,
+    saveAccount,
+    setPopupState,
+    popupState,
+    editingItems,
+    settings
+  } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
 
-  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
+  if (!popupState || !selectedBudgetData || !accountsData || !savedAccounts || !settings)
+    return null;
 
   return (
     <>
@@ -56,7 +63,7 @@ function AccountsView() {
             accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
             savedAccounts={savedAccounts[selectedBudgetData.id]}
             saveAccount={saveAccount}
-            editMode={popupState.editMode}
+            editMode={editingItems}
             budgetData={selectedBudgetData}
             settings={settings}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
@@ -67,7 +74,7 @@ function AccountsView() {
             accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
             savedAccounts={savedAccounts[selectedBudgetData.id]}
             saveAccount={saveAccount}
-            editMode={popupState.editMode}
+            editMode={editingItems}
             budgetData={selectedBudgetData}
             settings={settings}
             onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}

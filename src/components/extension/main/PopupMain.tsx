@@ -16,12 +16,13 @@ import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib
 export default function PopupMain() {
   const {
     popupState,
+    setEditingItems,
+    omniboxInput,
     savedCategories,
     savedAccounts,
     saveCategoriesForBudget,
     saveAccountsForBudget,
-    setPopupState,
-    selectedBudgetId
+    setPopupState
   } = useStorageContext();
   const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
     useYNABContext();
@@ -30,19 +31,19 @@ export default function PopupMain() {
   // activate edit mode if there are no pinned categories or accounts yet
   useEffect(() => {
     if (
-      selectedBudgetId &&
+      popupState &&
       savedCategories &&
       savedAccounts &&
-      !savedCategories[selectedBudgetId]?.length &&
-      !savedAccounts[selectedBudgetId]?.length
+      !savedCategories[popupState.budgetId]?.length &&
+      !savedAccounts[popupState.budgetId]?.length
     )
-      setPopupState({ view: "main", editMode: true });
-  }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
+      setEditingItems(true);
+  }, [popupState, savedAccounts, savedCategories, setEditingItems, setPopupState]);
 
   /** Callback when dragging and dropping pinned categories and accounts */
   const onDragEnd: OnDragEndResponder = useCallback(
     (result) => {
-      if (!result.destination || !selectedBudgetId) return;
+      if (!result.destination || !popupState?.budgetId) return;
       if (
         result.source.droppableId === "savedCategories" &&
         result.destination.droppableId === "savedCategories"
@@ -51,7 +52,7 @@ export default function PopupMain() {
         const savedCategoryIds = savedCategoriesData.map((c) => c.id);
         const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
         savedCategoryIds.splice(result.destination.index, 0, categoryId);
-        saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
+        saveCategoriesForBudget(popupState.budgetId, savedCategoryIds);
       } else if (
         result.source.droppableId === "savedAccounts" &&
         result.destination.droppableId === "savedAccounts"
@@ -60,7 +61,7 @@ export default function PopupMain() {
         const savedAccountIds = savedAccountsData.map((a) => a.id);
         const [accountId] = savedAccountIds.splice(result.source.index, 1);
         savedAccountIds.splice(result.destination.index, 0, accountId);
-        saveAccountsForBudget(selectedBudgetId, savedAccountIds);
+        saveAccountsForBudget(popupState.budgetId, savedAccountIds);
       }
     },
     [
@@ -68,7 +69,7 @@ export default function PopupMain() {
       saveCategoriesForBudget,
       savedAccountsData,
       savedCategoriesData,
-      selectedBudgetId
+      popupState?.budgetId
     ]
   );
 
@@ -80,7 +81,7 @@ export default function PopupMain() {
         <>
           <NotificationsView />
           <Omnibox />
-          {!popupState.omnibox && (
+          {!omniboxInput && (
             <>
               <SavedCategoriesView />
               <SavedAccountsView />

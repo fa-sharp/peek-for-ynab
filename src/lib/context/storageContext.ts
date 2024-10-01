@@ -1,5 +1,5 @@
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
@@ -8,6 +8,7 @@ import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 import {
   DEFAULT_BUDGET_SETTINGS,
+  DEFAULT_POPUP_STATE,
   DEFAULT_SETTINGS,
   REFRESH_SIGNAL_KEY,
   TOKEN_STORAGE_KEY
@@ -19,6 +20,16 @@ export interface TokenData {
   accessToken: string;
   refreshToken: string;
   expires: number;
+}
+
+/** Current popup state */
+export interface PopupState {
+  /** Current page/view */
+  view: "main" | "txAdd";
+  /** Currently selected budget ID. Could be an empty string if no budget is selected. */
+  budgetId: string;
+  /** Initial state of the transaction form */
+  txAddState?: TxAddInitialState;
 }
 
 export interface AppSettings {
@@ -104,49 +115,48 @@ const useStorageProvider = () => {
     false
   );
 
-  /** The budget currently in view */
-  const [selectedBudgetId, setSelectedBudgetId] = useExtensionStorage<string | undefined>(
-    { key: "selectedBudget", instance: CHROME_LOCAL_STORAGE },
-    (data, isHydrated) =>
-      !isHydrated
-        ? undefined
-        : data == null // if no value in storage, try reading initial value from `localStorage` (old way of storing the selected budget)
-          ? JSON.parse(localStorage?.selectedBudget || '""')
-          : data
+  /** Current state of popup (persisted locally) */
+  const [popupState, _setPopupState] = useExtensionStorage<PopupState | undefined>(
+    { key: "popupState", instance: CHROME_LOCAL_STORAGE },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_POPUP_STATE : data)
   );
 
-  /** Current popup state */
-  interface PopupState {
-    view: "main" | "txAdd";
-    editMode?: boolean;
-    txAddState?: TxAddInitialState;
-    omnibox?: string;
-  }
-  const [popupState, _setPopupState, { setRenderValue }] =
-    useExtensionStorage<PopupState>(
-      { key: "popupState", instance: CHROME_LOCAL_STORAGE },
-      { view: "main", editMode: false }
-    );
-  const setPopupState = (state: PopupState) => {
-    setRenderValue(state);
-    _setPopupState(state);
-  };
+  /** Partial update of popup state */
+  const setPopupState = useCallback(
+    (state: Partial<PopupState>) => {
+      if (!popupState) return;
+      _setPopupState({ ...popupState, ...state });
+    },
+    [_setPopupState, popupState]
+  );
 
-  /** Whether syncing is enabled */
-  const [syncEnabled, setSyncEnabled] = useLocalStorage<boolean>("sync", {
+  /** Whether user can edita and re-arrange the pinned categories and accounts */
+  const [editingItems, setEditingItems] = useState(false);
+
+  /** Omnibox input state */
+  const [omniboxInput, setOmniboxInput] = useState("");
+
+  /** Whether syncing of settings is enabled (persisted in extension storage) */
+  const [syncEnabledInStorage, setSyncEnabledInStorage] = useExtensionStorage<
+    boolean | undefined
+  >({ key: "sync", instance: CHROME_LOCAL_STORAGE }, (val, isHydrated) =>
+    !isHydrated ? undefined : !val ? false : val
+  );
+
+  /** Keep `syncEnabled` setting synced to localStorage, in order to make it synchronous for the subsequent hooks */
+  const [syncEnabledLocal, setSyncEnabledLocal] = useLocalStorage<boolean>("sync", {
     defaultValue: false
   });
-
-  /** Save the `syncEnabled` setting to Chrome local storage for background thread */
   useEffect(() => {
-    CHROME_LOCAL_STORAGE.get<boolean>("sync").then((val) => {
-      if (val !== syncEnabled) CHROME_LOCAL_STORAGE.set("sync", syncEnabled);
-    });
-  }, [syncEnabled]);
+    if (syncEnabledInStorage !== undefined && syncEnabledInStorage !== syncEnabledLocal) {
+      setSyncEnabledLocal(syncEnabledInStorage);
+      location.reload(); // need to refresh the page, since the Storage hooks won't automatically update
+    }
+  }, [setSyncEnabledLocal, syncEnabledInStorage, syncEnabledLocal]);
 
   const storageArea = useMemo(
-    () => (syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
-    [syncEnabled]
+    () => (syncEnabledLocal ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
+    [syncEnabledLocal]
   );
 
   /** Extension settings. Is synced if the user chooses. */
@@ -169,7 +179,7 @@ const useStorageProvider = () => {
     { key: "budgets", instance: storageArea },
     (data, isHydrated) => {
       if (!isHydrated) return undefined;
-      else if (!data) return selectedBudgetId ? [selectedBudgetId] : [];
+      else if (!data) return popupState?.budgetId ? [popupState.budgetId] : [];
       return data;
     }
   );
@@ -177,8 +187,14 @@ const useStorageProvider = () => {
   /** Budget-specific settings for the current budget. Is synced if the user chooses. */
   const [budgetSettings, setBudgetSettings] = useExtensionStorage<
     BudgetSettings | undefined
-  >({ key: `budget-${selectedBudgetId}`, instance: storageArea }, (data, isHydrated) =>
-    !isHydrated || !selectedBudgetId ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
+  >(
+    { key: `budget-${popupState?.budgetId}`, instance: storageArea },
+    (data, isHydrated) =>
+      !isHydrated || !popupState?.budgetId
+        ? undefined
+        : !data
+          ? DEFAULT_BUDGET_SETTINGS
+          : data
   );
 
   /** Get settings for a specific budget */
@@ -210,7 +226,8 @@ const useStorageProvider = () => {
     key: K,
     newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
   ) => {
-    if (key === "sync" && typeof newValue === "boolean") setSyncEnabled(newValue);
+    if (key === "sync" && typeof newValue === "boolean")
+      setSyncEnabledInStorage(newValue);
     else
       setSettings((prevSettings) =>
         prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
@@ -219,15 +236,15 @@ const useStorageProvider = () => {
 
   /** Save/pin a category for the currently selected budget */
   const saveCategory = (categoryIdToSave: string) => {
-    if (!selectedBudgetId) return;
-    const foundDuplicate = savedCategories?.[selectedBudgetId]?.find(
+    if (!popupState) return;
+    const foundDuplicate = savedCategories?.[popupState.budgetId]?.find(
       (categoryId) => categoryId === categoryIdToSave
     );
     if (foundDuplicate) return;
     setSavedCategories({
       ...savedCategories,
-      [selectedBudgetId]: [
-        ...(savedCategories?.[selectedBudgetId] || []),
+      [popupState.budgetId]: [
+        ...(savedCategories?.[popupState.budgetId] || []),
         categoryIdToSave
       ]
     });
@@ -244,10 +261,10 @@ const useStorageProvider = () => {
 
   /** Remove/unpin a category for the currently selected budget */
   const removeCategory = (categoryIdToRemove: string) => {
-    if (!selectedBudgetId) return;
+    if (!popupState) return;
     setSavedCategories({
       ...savedCategories,
-      [selectedBudgetId]: savedCategories?.[selectedBudgetId]?.filter(
+      [popupState.budgetId]: savedCategories?.[popupState.budgetId]?.filter(
         (categoryId) => categoryId !== categoryIdToRemove
       )
     });
@@ -255,14 +272,17 @@ const useStorageProvider = () => {
 
   /** Save/pin an account for the currently selected budget */
   const saveAccount = (accountIdToSave: string) => {
-    if (!selectedBudgetId) return;
-    const foundDuplicate = savedAccounts?.[selectedBudgetId]?.find(
+    if (!popupState) return;
+    const foundDuplicate = savedAccounts?.[popupState.budgetId]?.find(
       (accountId) => accountId === accountIdToSave
     );
     if (foundDuplicate) return;
     setSavedAccounts({
       ...savedAccounts,
-      [selectedBudgetId]: [...(savedAccounts?.[selectedBudgetId] || []), accountIdToSave]
+      [popupState.budgetId]: [
+        ...(savedAccounts?.[popupState.budgetId] || []),
+        accountIdToSave
+      ]
     });
   };
 
@@ -277,10 +297,10 @@ const useStorageProvider = () => {
 
   /** Remove/unpin an account for the currently selected budget */
   const removeAccount = (accountIdToRemove: string) => {
-    if (!selectedBudgetId) return;
+    if (!popupState) return;
     setSavedAccounts({
       ...savedAccounts,
-      [selectedBudgetId]: savedAccounts?.[selectedBudgetId]?.filter(
+      [popupState.budgetId]: savedAccounts?.[popupState.budgetId]?.filter(
         (accountId) => accountId !== accountIdToRemove
       )
     });
@@ -292,7 +312,7 @@ const useStorageProvider = () => {
     // hide budget
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
-      if (selectedBudgetId === budgetId) setSelectedBudgetId("");
+      if (popupState?.budgetId === budgetId) setPopupState({ budgetId: "" });
       // Clean up saved categories and accounts for this budget
       setSavedCategories({
         ...savedCategories,
@@ -326,11 +346,13 @@ const useStorageProvider = () => {
     setTokenRefreshNeeded,
     popupState,
     setPopupState,
+    editingItems,
+    setEditingItems,
+    omniboxInput,
+    setOmniboxInput,
     settings,
-    syncEnabled,
+    syncEnabled: syncEnabledInStorage,
     changeSetting,
-    selectedBudgetId,
-    setSelectedBudgetId,
     shownBudgetIds,
     setShownBudgetIds,
     toggleShowBudget,

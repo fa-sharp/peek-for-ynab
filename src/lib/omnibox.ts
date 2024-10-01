@@ -347,7 +347,7 @@ export async function getBrowserBarBudgets() {
   return budgets;
 }
 
-export async function getBrowserBarCacheForBudget(budgetId: string) {
+export async function getBrowserBarDataForBudget(budgetId: string) {
   if (browserBarCache.data[budgetId]) return browserBarCache.data[budgetId];
 
   const budgetCache: (typeof browserBarCache)["data"][string] = {};

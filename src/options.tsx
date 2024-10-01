@@ -20,9 +20,9 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { selectedBudgetId, settings, syncEnabled, changeSetting } = useStorageContext();
+  const { popupState, settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
-  const { loginWithOAuth, loggedIn, logout } = useAuthContext();
+  const { authLoading, loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   useSetColorTheme();
 
@@ -34,7 +34,8 @@ export function OptionsView() {
     remove: removeNotificationPermission
   } = useNotificationPermission();
 
-  if (!settings || !selectedBudgetId === undefined) return null;
+  // check if auth and storage are hydrated to avoid flashes
+  if (authLoading || !settings || !popupState) return null;
 
   return (
     <section
@@ -74,11 +75,7 @@ export function OptionsView() {
                   const confirmMessage = syncEnabled
                     ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
                     : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
-                  const confirmed = confirm(confirmMessage);
-                  if (confirmed) {
-                    changeSetting("sync", e.target.checked);
-                    location.reload();
-                  }
+                  if (confirm(confirmMessage)) changeSetting("sync", e.target.checked);
                 }}
               />
               🔄 Sync settings
