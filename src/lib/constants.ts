@@ -1,4 +1,6 @@
-import { type AppSettings, type BudgetSettings, type PopupState } from "./types";
+import { Storage } from "@plasmohq/storage";
+
+import type { AppSettings, BudgetSettings, PopupState } from "./types";
 
 /** Update these 2 variables to alert the user for a major new update/version */
 export const LATEST_VERSION_ALERT_NUM = 2;
@@ -12,6 +14,11 @@ export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
+
+export const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
+export const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
+export const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
+export const TOKEN_STORAGE = new Storage({ area: "local" });
 
 export const DEFAULT_POPUP_STATE: PopupState = {
   view: "main",

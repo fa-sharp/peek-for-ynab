@@ -1,7 +1,5 @@
 import { type Account, type Category, type TransactionDetail, api } from "ynab";
 
-import { Storage } from "@plasmohq/storage";
-
 import {
   checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
@@ -9,9 +7,13 @@ import {
   fetchCategoryGroupsForBudget
 } from "~lib/api";
 import {
+  CHROME_LOCAL_STORAGE,
+  CHROME_SESSION_STORAGE,
+  CHROME_SYNC_STORAGE,
   IS_DEV,
   ONE_DAY_IN_MILLIS,
   REFRESH_SIGNAL_KEY,
+  TOKEN_STORAGE,
   TOKEN_STORAGE_KEY
 } from "~lib/constants";
 import {
@@ -32,10 +34,6 @@ import {
 import { createQueryClient } from "~lib/queryClient";
 import type { BudgetSettings, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject, searchWithinString } from "~lib/utils";
-
-const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
-const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
-const TOKEN_STORAGE = new Storage({ area: "local" });
 
 const IS_REFRESHING_KEY = "isRefreshing";
 
@@ -139,7 +137,7 @@ async function backgroundDataRefresh() {
   }
 
   const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-  const storage = syncEnabled ? new Storage({ area: "sync" }) : CHROME_LOCAL_STORAGE;
+  const storage = syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE;
   const shownBudgetIds = await storage.get<string[]>("budgets");
   if (!shownBudgetIds) return;
 

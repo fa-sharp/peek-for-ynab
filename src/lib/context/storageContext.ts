@@ -3,14 +3,16 @@ import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
-import { Storage } from "@plasmohq/storage";
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 
 import {
+  CHROME_LOCAL_STORAGE,
+  CHROME_SYNC_STORAGE,
   DEFAULT_BUDGET_SETTINGS,
   DEFAULT_POPUP_STATE,
   DEFAULT_SETTINGS,
   REFRESH_SIGNAL_KEY,
+  TOKEN_STORAGE,
   TOKEN_STORAGE_KEY
 } from "~lib/constants";
 import type { AppSettings, BudgetSettings, PopupState, TokenData } from "~lib/types";
@@ -19,10 +21,6 @@ import type { AppSettings, BudgetSettings, PopupState, TokenData } from "~lib/ty
 interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
-
-const TOKEN_STORAGE = new Storage({ area: "local" });
-const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
-const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user. Stored locally. */
@@ -47,10 +45,9 @@ const useStorageProvider = () => {
   /** Partial update of popup state */
   const setPopupState = useCallback(
     (state: Partial<PopupState>) => {
-      if (!popupState) return;
-      _setPopupState({ ...popupState, ...state });
+      _setPopupState((prev) => (!prev ? undefined : { ...prev, ...state }));
     },
-    [_setPopupState, popupState]
+    [_setPopupState]
   );
 
   /** Whether user can edita and re-arrange the pinned categories and accounts */

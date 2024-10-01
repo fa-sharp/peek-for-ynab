@@ -2,7 +2,11 @@ import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
-import { ONE_DAY_IN_MILLIS } from "./constants";
+import {
+  CHROME_LOCAL_STORAGE,
+  CHROME_SYNC_STORAGE,
+  ONE_DAY_IN_MILLIS
+} from "./constants";
 import { createQueryClient } from "./queryClient";
 import type { AppSettings, CachedBudget, CachedPayee } from "./types";
 import {
@@ -230,15 +234,12 @@ export function getPossibleTransferFieldCombinations(
   return txCombinations;
 }
 
-const chromeLocalStorage = new Storage({ area: "local" });
-const chromeSyncStorage = new Storage({ area: "sync" });
-
 /** Check if user has enabled permission to use the URL/address bar */
 export async function checkBrowserBarPermission() {
-  const sync = await chromeLocalStorage.get<boolean>("sync");
-  const settings = await (sync ? chromeSyncStorage : chromeLocalStorage).get<AppSettings>(
-    "settings"
-  );
+  const sync = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
+  const settings = await (
+    sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE
+  ).get<AppSettings>("settings");
   return !!settings?.omnibox;
 }
 
@@ -332,9 +333,9 @@ export async function getBrowserBarBudgets() {
   const queryClient = createQueryClient({
     staleTime: ONE_DAY_IN_MILLIS * 7
   });
-  const storage = (await chromeLocalStorage.get<boolean>("sync"))
-    ? chromeSyncStorage
-    : chromeLocalStorage;
+  const storage = (await CHROME_LOCAL_STORAGE.get<boolean>("sync"))
+    ? CHROME_SYNC_STORAGE
+    : CHROME_LOCAL_STORAGE;
   const budgetIdsToShow = await storage.get<string[]>("budgets");
   const budgets = (
     await queryClient.fetchQuery<CachedBudget[]>({
