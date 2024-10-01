@@ -37,17 +37,21 @@ const useStorageProvider = () => {
   );
 
   /** Current state of popup (persisted locally) */
-  const [popupState, _setPopupState] = useExtensionStorage<PopupState | undefined>(
-    { key: "popupState", instance: CHROME_LOCAL_STORAGE },
-    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_POPUP_STATE : data)
-  );
+  const [popupState, _setPopupState, { setRenderValue: _setPopupRender }] =
+    useExtensionStorage<PopupState | undefined>(
+      { key: "popupState", instance: CHROME_LOCAL_STORAGE },
+      (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_POPUP_STATE : data)
+    );
 
   /** Partial update of popup state */
   const setPopupState = useCallback(
-    (state: Partial<PopupState>) => {
-      _setPopupState((prev) => (!prev ? undefined : { ...prev, ...state }));
+    (newState: Partial<PopupState>) => {
+      if (!popupState) return;
+      const newPopupState = { ...popupState, ...newState };
+      _setPopupRender(newPopupState); // ensure popup state change is rendered ASAP
+      _setPopupState(newPopupState);
     },
-    [_setPopupState]
+    [_setPopupRender, _setPopupState, popupState]
   );
 
   /** Whether user can edita and re-arrange the pinned categories and accounts */

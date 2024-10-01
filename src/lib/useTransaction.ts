@@ -18,8 +18,14 @@ export type TransactionFormHandlers = ReturnType<typeof useTransaction>["handler
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const { settings, budgetSettings, popupState, setPopupState, setBudgetSettings } =
-    useStorageContext();
+  const {
+    settings,
+    budgetSettings,
+    popupState,
+    setPopupState,
+    setOmniboxInput,
+    setBudgetSettings
+  } = useStorageContext();
 
   const { txAddState } = popupState || {};
 
@@ -220,6 +226,7 @@ export default function useTransaction() {
             }))
           : undefined
       });
+      setOmniboxInput("");
       setPopupState({ view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
