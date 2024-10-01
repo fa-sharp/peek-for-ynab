@@ -12,7 +12,7 @@ import {
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {

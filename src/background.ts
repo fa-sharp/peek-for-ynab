@@ -8,8 +8,12 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget
 } from "~lib/api";
-import { REFRESH_SIGNAL_KEY, TOKEN_STORAGE_KEY } from "~lib/constants";
-import type { BudgetSettings, TokenData } from "~lib/context/storageContext";
+import {
+  IS_DEV,
+  ONE_DAY_IN_MILLIS,
+  REFRESH_SIGNAL_KEY,
+  TOKEN_STORAGE_KEY
+} from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
@@ -26,13 +30,8 @@ import {
   parseTxInput
 } from "~lib/omnibox";
 import { createQueryClient } from "~lib/queryClient";
-import {
-  IS_DEV,
-  ONE_DAY_IN_MILLIS,
-  checkPermissions,
-  isEmptyObject,
-  searchWithinString
-} from "~lib/utils";
+import type { BudgetSettings, TokenData } from "~lib/types";
+import { checkPermissions, isEmptyObject, searchWithinString } from "~lib/utils";
 
 const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 const CHROME_SESSION_STORAGE = new Storage({ area: "session" });

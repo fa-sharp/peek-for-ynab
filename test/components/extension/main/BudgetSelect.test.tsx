@@ -5,7 +5,7 @@ import { expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { BudgetSelect } from "~components";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 
 const createBudgets = (): CachedBudget[] => [
   { id: randomUUID(), name: "Budget 1" },

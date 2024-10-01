@@ -1,5 +1,5 @@
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 
 export default function ReconcileAlertSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();

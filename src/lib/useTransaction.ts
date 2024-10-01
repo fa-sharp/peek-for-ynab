@@ -1,10 +1,10 @@
 import { type FormEventHandler, useCallback, useEffect, useMemo, useState } from "react";
 import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
+import { IS_PRODUCTION } from "./constants";
 import { useStorageContext, useYNABContext } from "./context";
-import type { CachedPayee } from "./context/ynabContext";
+import type { CachedPayee } from "./types";
 import {
-  IS_PRODUCTION,
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,

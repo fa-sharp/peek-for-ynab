@@ -11,29 +11,12 @@ import {
   fetchPayeesForBudget
 } from "~lib/api";
 import { useConfetti } from "~lib/hooks";
+import type { BudgetMainData, CachedBudget } from "~lib/types";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS, findAllEmoji } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
+import { findAllEmoji } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
-
-export interface CachedBudget {
-  id: string;
-  name: string;
-  currencyFormat?: ynab.CurrencyFormat;
-}
-
-export interface CachedPayee {
-  id: string;
-  name: string;
-  transferId?: string | null;
-}
-
-export interface BudgetMainData {
-  accountsData: ynab.Account[];
-  categoriesData: ynab.Category[];
-  categoryGroupsData: ynab.CategoryGroupWithCategories[];
-  payeesData: CachedPayee[];
-}
 
 const useYNABProvider = () => {
   const { tokenExpired } = useAuthContext();

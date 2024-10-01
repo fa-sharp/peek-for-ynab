@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { URL } from "url";
 
 import { OAUTH_BASE_URL } from "~lib/constants";
-import type { TokenData } from "~lib/context/storageContext";
 import { logger } from "~lib/logger";
+import type { TokenData } from "~lib/types";
 
 const { PLASMO_PUBLIC_YNAB_CLIENT_ID: YNAB_CLIENT_ID, YNAB_SECRET } = process.env;
 

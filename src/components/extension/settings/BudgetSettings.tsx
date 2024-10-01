@@ -4,8 +4,7 @@ import { Settings } from "tabler-icons-react";
 
 import { IconButton } from "~components";
 import { useStorageContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 
 import ConfettiSettings from "./ConfettiSettings";
 import NotificationSettings from "./NotificationSettings";

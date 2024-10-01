@@ -4,8 +4,7 @@ import { Help } from "tabler-icons-react";
 import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useStorageContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { BudgetSettings, CachedBudget } from "~lib/types";
 
 import ReconcileAlertSettings from "./ReconcileAlertSettings";
 

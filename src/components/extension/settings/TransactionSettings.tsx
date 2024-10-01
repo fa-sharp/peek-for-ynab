@@ -2,8 +2,7 @@ import { CircleC, Help, InfoCircle } from "tabler-icons-react";
 
 import { AccountSelect, Dialog, Tooltip } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { BudgetSettings, CachedBudget } from "~lib/types";
 
 export default function TransactionSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();

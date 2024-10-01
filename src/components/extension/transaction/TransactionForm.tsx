@@ -5,8 +5,7 @@ import { TransactionFlagColor } from "ynab";
 import { AmountField, IconButton, MemoField } from "~components";
 import { CheckIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AppSettings } from "~lib/context/storageContext";
-import type { BudgetMainData, CachedBudget } from "~lib/context/ynabContext";
+import type { AppSettings, BudgetMainData, CachedBudget } from "~lib/types";
 import useTransaction from "~lib/useTransaction";
 import { flagColorToEmoji, getTodaysDateISO } from "~lib/utils";
 

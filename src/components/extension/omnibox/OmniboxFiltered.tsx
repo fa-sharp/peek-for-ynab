@@ -2,9 +2,13 @@ import type { Account, Category } from "ynab";
 
 import { AccountView, CategoryView, IconButton } from "~components";
 import { AddCCPaymentIcon, AddTransactionIcon } from "~components/icons/ActionIcons";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
-import type { BudgetMainData, CachedBudget } from "~lib/context/ynabContext";
 import type { CurrentAlerts } from "~lib/notifications";
+import type {
+  AppSettings,
+  BudgetMainData,
+  CachedBudget,
+  TxAddInitialState
+} from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 interface Props {

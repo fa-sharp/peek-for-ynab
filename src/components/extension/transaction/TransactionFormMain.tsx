@@ -1,7 +1,7 @@
 import { type RefObject, useRef } from "react";
 
 import { AccountSelect, CategorySelect, PayeeSelect } from "~components";
-import type { BudgetMainData } from "~lib/context/ynabContext";
+import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {

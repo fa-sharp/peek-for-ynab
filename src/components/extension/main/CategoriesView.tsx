@@ -12,9 +12,8 @@ import type {
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
 import type { CategoryAlerts } from "~lib/notifications";
+import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
 import {
   findCCAccount,
   findEmoji,

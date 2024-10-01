@@ -1,15 +1,14 @@
 import { Fragment, useEffect, useMemo } from "react";
 import { Help, Pencil, Wand } from "tabler-icons-react";
 
-import CurrencyView from "~components/CurrencyView";
-import type { TxAddInitialState } from "~lib/context/storageContext";
-import type { BudgetMainData, CachedBudget } from "~lib/context/ynabContext";
+import { CurrencyView } from "~components";
 import {
   type ParsedTransferQuery,
   type ParsedTxQuery,
   getPossibleTransferFields,
   getPossibleTxFields
 } from "~lib/omnibox";
+import type { BudgetMainData, CachedBudget, TxAddInitialState } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 import { stringValueToMillis } from "~lib/utils";
 

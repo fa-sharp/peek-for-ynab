@@ -2,11 +2,10 @@ import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
 import { Storage } from "@plasmohq/storage";
 
-import type { AppSettings } from "./context/storageContext";
-import type { CachedBudget, CachedPayee } from "./context/ynabContext";
+import { ONE_DAY_IN_MILLIS } from "./constants";
 import { createQueryClient } from "./queryClient";
+import type { AppSettings, CachedBudget, CachedPayee } from "./types";
 import {
-  ONE_DAY_IN_MILLIS,
   formatCurrency,
   parseLocaleNumber,
   searchWithinString,

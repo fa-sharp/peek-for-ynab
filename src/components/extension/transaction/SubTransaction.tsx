@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
-import type { BudgetMainData, CachedPayee } from "~lib/context/ynabContext";
+import type { BudgetMainData, CachedPayee } from "~lib/types";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 

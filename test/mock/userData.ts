@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-import type { TokenData } from "~lib/context/storageContext";
+import type { TokenData } from "~lib/types";
 
 export const validToken: TokenData = {
   accessToken: randomUUID(),
