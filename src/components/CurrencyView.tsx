@@ -56,7 +56,7 @@ function CurrencyView({
       className={className}
       start={prevValueRef.current}
       end={milliUnits}
-      duration={1.5}
+      duration={1.3}
       formattingFn={formatValue}
       onStart={() => setIsAnimating(true)}
       onEnd={() => setIsAnimating(false)}
