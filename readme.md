@@ -11,7 +11,7 @@ An open-source browser extension for YNAB that lets users see their category and
 - `src/`
   - `popup.tsx` Extension - popup component
   - `options.tsx` Extension - options component
-  - `background.ts` Extension - background worker (refreshes the token)
+  - `background.ts` Extension - background worker (refreshes data and the OAuth token)
   - `app/` Website and server (Next.js)
     - `api/` API routes to fetch OAuth tokens from YNAB API
   - `lib/` Library and utility functions
