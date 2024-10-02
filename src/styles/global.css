@@ -216,11 +216,8 @@ input[type="checkbox"] {
   outline-color: var(--border);
   border-radius: var(--border-radius);
 }
-.balance-display:not(:hover) span.hidden {
-  color: transparent;
-}
 
-li:last-child .balance-display {
+li:last-child > .balance-display {
   border-bottom-color: transparent;
 }
 
