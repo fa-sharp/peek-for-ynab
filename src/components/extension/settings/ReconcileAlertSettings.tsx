@@ -1,7 +1,13 @@
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { CachedBudget } from "~lib/types";
 
-export default function ReconcileAlertSettings({ budget }: { budget: CachedBudget }) {
+export default function ReconcileAlertSettings({
+  id,
+  budget
+}: {
+  id: string;
+  budget: CachedBudget;
+}) {
   const { useBudgetSettings } = useStorageContext();
   const { useGetAccountsForBudget } = useYNABContext();
   const { data: accountsData } = useGetAccountsForBudget(budget.id);
@@ -32,7 +38,7 @@ export default function ReconcileAlertSettings({ budget }: { budget: CachedBudge
   if (!settings) return null;
 
   return (
-    <ul className="list flex-col gap-sm">
+    <ul id={id} className="list flex-col gap-sm">
       {!accountsData ? (
         <li>Loading accounts...</li>
       ) : (

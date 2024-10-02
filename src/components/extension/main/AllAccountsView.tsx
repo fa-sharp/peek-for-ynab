@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { Account } from "ynab";
 
 import { AccountView, IconButton, IconSpan } from "~components";
@@ -30,6 +30,7 @@ export default function AllAccountsView() {
   const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
   if (!popupState || !selectedBudgetData || !accountsData || !savedAccounts || !settings)
     return null;
@@ -40,6 +41,8 @@ export default function AllAccountsView() {
         className={"heading-big cursor-pointer"}
         onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-controls={controlsId}
+          aria-expanded={expanded}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
@@ -47,30 +50,34 @@ export default function AllAccountsView() {
         <div role="heading">Accounts</div>
       </div>
       {expanded && (
-        <>
-          <AccountTypeView
-            accountType="Budget"
-            accountsData={accountsData.filter((a) => a.on_budget)}
-            accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-            savedAccounts={savedAccounts[selectedBudgetData.id]}
-            saveAccount={saveAccount}
-            editMode={editingItems}
-            budgetData={selectedBudgetData}
-            settings={settings}
-            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
-          />
-          <AccountTypeView
-            accountType="Tracking"
-            accountsData={accountsData.filter((a) => !a.on_budget)}
-            accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-            savedAccounts={savedAccounts[selectedBudgetData.id]}
-            saveAccount={saveAccount}
-            editMode={editingItems}
-            budgetData={selectedBudgetData}
-            settings={settings}
-            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
-          />
-        </>
+        <ul id={controlsId} className="list">
+          <li>
+            <AccountTypeView
+              accountType="Budget"
+              accountsData={accountsData.filter((a) => a.on_budget)}
+              accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
+              savedAccounts={savedAccounts[selectedBudgetData.id]}
+              saveAccount={saveAccount}
+              editMode={editingItems}
+              budgetData={selectedBudgetData}
+              settings={settings}
+              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            />
+          </li>
+          <li>
+            <AccountTypeView
+              accountType="Tracking"
+              accountsData={accountsData.filter((a) => !a.on_budget)}
+              accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
+              savedAccounts={savedAccounts[selectedBudgetData.id]}
+              saveAccount={saveAccount}
+              editMode={editingItems}
+              budgetData={selectedBudgetData}
+              settings={settings}
+              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            />
+          </li>
+        </ul>
       )}
     </>
   );
@@ -99,6 +106,7 @@ function AccountTypeView({
   onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
   return (
     <>
@@ -106,6 +114,8 @@ function AccountTypeView({
         className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-controls={controlsId}
+          aria-expanded={expanded}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
@@ -113,7 +123,7 @@ function AccountTypeView({
         <div role="heading">{accountType}</div>
       </div>
       {expanded && (
-        <ul className="list">
+        <ul id={controlsId} className="list">
           {accountsData.map((account) => (
             <li key={account.id}>
               <AccountView

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Help } from "tabler-icons-react";
 
 import { Dialog, IconButton, Tooltip } from "~components";
@@ -12,6 +12,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
   const { useBudgetSettings } = useStorageContext();
   const [budgetSettings, setBudgetSettings] = useBudgetSettings(budget.id);
   const [reconcileExpanded, setReconcileExpanded] = useState(false);
+  const reconcileControlsId = useId();
 
   const changeNotifSetting = <K extends keyof BudgetSettings["notifications"]>(
     key: K,
@@ -80,12 +81,16 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           </Dialog>
         </Tooltip>
         <IconButton
+          aria-controls={reconcileControlsId}
+          aria-expanded={reconcileExpanded}
           label={reconcileExpanded ? "Collapse" : "Expand"}
           icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
           onClick={() => setReconcileExpanded(!reconcileExpanded)}
         />
       </h3>
-      {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
+      {reconcileExpanded && (
+        <ReconcileAlertSettings id={reconcileControlsId} budget={budget} />
+      )}
     </>
   );
 }

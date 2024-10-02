@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { Account, CategoryGroupWithCategories } from "ynab";
 
 import { CategoryView, IconButton, IconSpan } from "~components";
@@ -32,6 +32,7 @@ function CategoriesView() {
   const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
   if (
     !popupState ||
@@ -46,27 +47,32 @@ function CategoriesView() {
     <>
       <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-expanded={expanded}
+          aria-controls={controlsId}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
         />
         <div role="heading">Categories</div>
       </div>
-      {expanded &&
-        categoryGroupsData.map((categoryGroup) => (
-          <CategoryGroupView
-            key={categoryGroup.id}
-            categoryGroup={categoryGroup}
-            categoryAlerts={currentAlerts?.[selectedBudgetData.id]?.cats}
-            budgetData={selectedBudgetData}
-            accountsData={accountsData}
-            savedCategories={savedCategories[selectedBudgetData.id]}
-            editMode={editingItems}
-            settings={settings}
-            onSaveCategory={(categoryId) => saveCategory(categoryId)}
-            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
-          />
-        ))}
+      {expanded && (
+        <ul id={controlsId} className="list">
+          {categoryGroupsData.map((categoryGroup) => (
+            <CategoryGroupView
+              key={categoryGroup.id}
+              categoryGroup={categoryGroup}
+              categoryAlerts={currentAlerts?.[selectedBudgetData.id]?.cats}
+              budgetData={selectedBudgetData}
+              accountsData={accountsData}
+              savedCategories={savedCategories[selectedBudgetData.id]}
+              editMode={editingItems}
+              settings={settings}
+              onSaveCategory={(categoryId) => saveCategory(categoryId)}
+              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+            />
+          ))}
+        </ul>
+      )}
     </>
   );
 }
@@ -94,16 +100,19 @@ export function CategoryGroupView({
   onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
   // Skip Ready to Assign category group
   if (categoryGroup.name === "Internal Master Category") return null;
 
   return (
-    <>
+    <li>
       <div
         className="heading-medium heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-controls={controlsId}
+          aria-expanded={expanded}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
@@ -111,7 +120,7 @@ export function CategoryGroupView({
         <div role="heading">{categoryGroup.name}</div>
       </div>
       {expanded && (
-        <ul className="list">
+        <ul id={controlsId} className="list">
           {categoryGroup.categories.map((category) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
@@ -179,7 +188,7 @@ export function CategoryGroupView({
           })}
         </ul>
       )}
-    </>
+    </li>
   );
 }
 
