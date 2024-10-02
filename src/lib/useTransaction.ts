@@ -5,10 +5,10 @@ import { IS_PRODUCTION } from "./constants";
 import { useStorageContext, useYNABContext } from "./context";
 import type { CachedPayee } from "./types";
 import {
+  checkPermissions,
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,
-  requestPermissions,
   stringValueToMillis
 } from "./utils";
 
@@ -99,7 +99,7 @@ export default function useTransaction() {
   // Try parsing user's selection as the amount upon opening the form
   useEffect(() => {
     if (!settings?.currentTabAccess) return;
-    requestPermissions(["activeTab", "scripting"]).then((granted) => {
+    checkPermissions(["activeTab", "scripting"]).then((granted) => {
       if (!granted) return;
       executeScriptInCurrentTab(() => getSelection()?.toString())
         .then((selection) => {

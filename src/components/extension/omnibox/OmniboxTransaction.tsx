@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { Help, Pencil, Wand } from "tabler-icons-react";
 
 import { CurrencyView } from "~components";
@@ -68,9 +68,13 @@ export default function OmniboxTransaction({
       : getPossibleTransferFields(parsedQuery, budgetMainData, ignoredCategoryIds);
   }, [budgetMainData, ignoredCategoryIds, parsedQuery]);
 
+  const initialAmount = useRef(formState.amount);
+  const canSubmitImmediately =
+    !!formState.amount && !!formState.payee && !!formState.account;
+
   useEffect(() => {
     if (!parsedQuery || !results) return;
-    handlers.setAmount(parsedQuery.amount);
+    handlers.setAmount(parsedQuery.amount || initialAmount.current);
     handlers.setAmountType("Outflow");
     handlers.setMemo(parsedQuery.memo);
     if (parsedQuery.type === "tx" && "payeeResults" in results) {
@@ -141,15 +145,13 @@ export default function OmniboxTransaction({
         <div className="error-message">{formState.errorMessage}</div>
         <div className="flex-row mt-lg">
           <button
-            type="submit"
+            type={canSubmitImmediately ? "submit" : "button"}
             className="flex-1 flex-row justify-center button accent rounded"
-            disabled={
-              isSaving || !formState.amount || !formState.payee || !formState.account
-            }>
+            disabled={isSaving || !canSubmitImmediately}>
             <Wand aria-hidden size={18} /> Save now
           </button>
           <button
-            type="button"
+            type={canSubmitImmediately ? "button" : "submit"}
             className="flex-1 flex-row justify-center button accent rounded"
             onClick={() =>
               openTxForm({
