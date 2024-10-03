@@ -37,3 +37,14 @@ test("'parseTxInput' can parse all transfer fields", () => {
   expect(categoryQuery).toBeFalsy();
   expect(memo?.trim()).toBe("save that monayyy");
 });
+
+test("'parseTxInput' detects the amount type correctly", () => {
+  const { amountType } = parseTxInput("add -50.42") as ParsedTxQuery;
+  expect(amountType).toBe("Outflow");
+
+  const { amountType: amountType2 } = parseTxInput("add +100.23") as ParsedTxQuery;
+  expect(amountType2).toBe("Inflow");
+
+  const { amountType: amountType3 } = parseTxInput("add on account") as ParsedTxQuery;
+  expect(amountType3).toBe("Outflow");
+});
