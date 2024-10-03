@@ -113,6 +113,8 @@ export async function backgroundDataRefresh() {
   const notificationsEnabled = await checkPermissions(["notifications"]);
 
   // Fetch new data for each budget and update alerts
+  // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
+  // See https://github.com/TanStack/query/issues/8075
   for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
     const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
     if (!budgetSettings) continue;
@@ -122,12 +124,23 @@ export async function backgroundDataRefresh() {
     let categoriesData: Category[] | undefined;
 
     if (budgetSettings.notifications.checkImports) {
-      await ynabAPI.transactions.importTransactions(budget.id);
+      // call import API, then check for unapproved transactions
+      const queryKey = ["import", { budgetId: budget.id }];
+      await queryClient.fetchQuery({
+        queryKey,
+        queryFn: async () =>
+          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids
+      });
+      await new Promise((r) => setTimeout(r, 100));
+      await queryClient.fetchQuery({
+        queryKey,
+        staleTime: 50 * 60 * 1000, // 50 minutes
+        queryFn: async () =>
+          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids
+      });
       unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
     }
 
-    // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
-    // See https://github.com/TanStack/query/issues/8075
     if (
       budgetSettings.notifications.importError ||
       !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
@@ -138,7 +151,7 @@ export async function backgroundDataRefresh() {
         queryFn: () =>
           fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey))
       });
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 100));
       const { accounts } = await queryClient.fetchQuery({
         queryKey,
         queryFn: () =>
@@ -158,7 +171,7 @@ export async function backgroundDataRefresh() {
             queryClient.getQueryState(queryKey)
           )
       });
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 100));
       const { categoryGroups } = await queryClient.fetchQuery({
         queryKey,
         queryFn: () =>
