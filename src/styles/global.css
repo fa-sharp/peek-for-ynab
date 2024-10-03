@@ -242,6 +242,7 @@ li:last-child > .balance-display {
 .icon-button {
   display: inline-flex;
   padding: 1px;
+  vertical-align: text-bottom;
 
   background: none;
   border: none;
@@ -265,6 +266,7 @@ li:last-child > .balance-display {
 
 .icon-span {
   display: inline-flex;
+  vertical-align: text-bottom;
   padding: 1px;
 }
 

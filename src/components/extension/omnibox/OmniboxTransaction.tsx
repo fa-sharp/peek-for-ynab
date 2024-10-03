@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef } from "react";
 import { Help, Pencil, Wand } from "tabler-icons-react";
 
-import { CurrencyView } from "~components";
+import { CurrencyView, Dialog, Tooltip } from "~components";
 import {
   type ParsedTransferQuery,
   type ParsedTxQuery,
@@ -104,7 +104,15 @@ export default function OmniboxTransaction({
   return (
     <>
       <div style={{ fontSize: ".95em", padding: "2px" }}>
-        <Help aria-label="Help:" size={16} style={{ verticalAlign: "bottom" }} />
+        <Tooltip label="More info" icon={<Help aria-hidden size={16} />}>
+          <Dialog>
+            Type all the info first, then change the selections below if needed. You can
+            skip fields, but you must use the keywords in the order listed (e.g.
+            &quot;24.85 on amex&quot;, not &quot;on amex 24.85&quot;. If you have entered
+            an amount, payee, and account, you can submit the transaction immediately with
+            the <kbd>Enter</kbd> key.
+          </Dialog>
+        </Tooltip>
         {parsedQuery.type === "tx" ? " add " : " transfer "}
         {(parsedQuery.type === "tx" ? txFields : transferFields).map((field) => (
           <Fragment key={field.idx}>
