@@ -131,6 +131,7 @@ export const getPossibleTxFields = (
   payeeResults:
     parsed.payeeQuery && data.payeesData
       ? data.payeesData
+          .filter((p) => !p.transferId) // filter out transfer payees
           .filter((p) => searchWithinString(p.name, parsed.payeeQuery!.trim()))
           .slice(0, 5)
       : [],
