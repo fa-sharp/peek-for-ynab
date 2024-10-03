@@ -38,9 +38,7 @@ export default function Omnibox() {
   if (!selectedBudgetData || !budgetMainData || !settings) return null;
 
   return (
-    <form
-      className="mb-lg flex-col"
-      onSubmit={parsedQuery ? onSaveTransaction : (e) => e.preventDefault()}>
+    <form className="mb-lg flex-col" onSubmit={onSaveTransaction}>
       <label className="form-input">
         <input
           placeholder="🪄 filter or type 'add', 'transfer'..."

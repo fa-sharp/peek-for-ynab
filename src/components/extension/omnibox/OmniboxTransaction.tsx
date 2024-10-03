@@ -153,7 +153,8 @@ export default function OmniboxTransaction({
           <button
             type={canSubmitImmediately ? "button" : "submit"}
             className="flex-1 flex-row justify-center button accent rounded"
-            onClick={() =>
+            onClick={(e) => {
+              e.preventDefault();
               openTxForm({
                 amount: formState.amount,
                 amountType: formState.amountType,
@@ -165,8 +166,8 @@ export default function OmniboxTransaction({
                     : undefined,
                 isTransfer: formState.isTransfer,
                 memo: formState.memo
-              })
-            }
+              });
+            }}
             disabled={isSaving}>
             <Pencil aria-hidden size={19} /> Edit and save
           </button>
