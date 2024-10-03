@@ -75,10 +75,10 @@ export default function OmniboxTransaction({
   useEffect(() => {
     if (!parsedQuery || !results) return;
     handlers.setAmount(parsedQuery.amount || initialAmount.current);
-    handlers.setAmountType("Outflow");
     handlers.setMemo(parsedQuery.memo);
     if (parsedQuery.type === "tx" && "payeeResults" in results) {
       handlers.setIsTransfer(false);
+      handlers.setAmountType(parsedQuery.amountType);
       handlers.setPayee(results.payeeResults[0] || null);
       handlers.setCategory(results.categoryResults[0] || null);
       handlers.setAccount(
@@ -88,6 +88,7 @@ export default function OmniboxTransaction({
       );
     } else if (results && "fromAccountResults" in results) {
       handlers.setIsTransfer(true);
+      handlers.setAmountType("Outflow");
       if (results.toAccountResults[0] && results.toAccountResults[0].transfer_payee_id)
         handlers.setPayee({
           id: results.toAccountResults[0].transfer_payee_id,
@@ -123,10 +124,7 @@ export default function OmniboxTransaction({
           <div className="flex-row gap-sm">
             Amount:
             <CurrencyView
-              milliUnits={stringValueToMillis(
-                formState.amount,
-                parsedQuery.type === "tx" ? "Outflow" : "Inflow"
-              )}
+              milliUnits={stringValueToMillis(formState.amount, formState.amountType)}
               currencyFormat={budget.currencyFormat}
             />
           </div>

@@ -30,6 +30,7 @@ interface ParsedQuery {
 
 export interface ParsedTxQuery extends ParsedQuery {
   type: "tx";
+  amountType: "Inflow" | "Outflow";
   payeeQuery?: string;
   categoryQuery?: string;
   accountQuery?: string;
@@ -62,13 +63,16 @@ export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery 
     /** [amount, budget, payee, category, account, memo] */
     const parsedData: string[] = ["", "", "", "", "", ""];
     let parsedIdx = 0;
+    let amountType: "Inflow" | "Outflow" = "Outflow";
     for (const word of dataToParse.slice(1)) {
+      if (word.trim() === "") continue;
       if (word === "in" && parsedIdx < 1) parsedIdx = 1;
       else if (word === "at" && parsedIdx < 2) parsedIdx = 2;
       else if (word === "for" && parsedIdx < 3) parsedIdx = 3;
       else if (word === "on" && parsedIdx < 4) parsedIdx = 4;
       else if (word === "memo" && parsedIdx < 5) parsedIdx = 5;
       else if (parsedIdx === 0) {
+        amountType = word.startsWith("+") ? "Inflow" : "Outflow";
         const parsedAmount = parseLocaleNumber(word);
         if (!isNaN(parsedAmount)) parsedData[0] = parsedAmount.toString();
       } else parsedData[parsedIdx] += word + " ";
@@ -79,6 +83,7 @@ export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery 
       type: "tx",
       budgetQuery,
       amount,
+      amountType,
       payeeQuery,
       categoryQuery,
       accountQuery,
@@ -255,13 +260,14 @@ export function createBrowserBarSuggestions(
   }[],
   budget?: CachedBudget,
   amount?: string,
-  memo?: string
+  memo?: string,
+  amountType?: "Outflow" | "Inflow"
 ): chrome.omnibox.SuggestResult[] {
   return possibleTxFields.map(({ payee, category, account }) => ({
     content:
       type === "tx"
         ? "add " +
-          (amount ? amount : "") +
+          (amount ? (amountType === "Inflow" ? "+" : "") + amount : "") +
           (budget ? ` in ${budget.name}` : "") +
           (payee ? ` at ${payee.name}` : "") +
           (category ? ` for ${category.name}` : "") +
@@ -279,7 +285,7 @@ export function createBrowserBarSuggestions(
         ? "add: " +
           (amount
             ? formatCurrency(
-                stringValueToMillis(amount, "Outflow"),
+                stringValueToMillis(amount, amountType || "Outflow"),
                 budget?.currencyFormat
               )
             : "") +

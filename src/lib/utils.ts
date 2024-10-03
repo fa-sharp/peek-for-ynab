@@ -106,7 +106,7 @@ export const parseLocaleNumber = (
   locales = typeof navigator !== "undefined" ? navigator.languages : undefined
 ) => {
   const example = Intl.NumberFormat(locales).format(1.1);
-  const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
+  const cleanPattern = new RegExp(`[^0-9${example.charAt(1)}]`, "g");
   const cleaned = value.replace(cleanPattern, "");
   const normalized = cleaned.replace(example.charAt(1), ".");
 

@@ -124,7 +124,8 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
       possibleTxFields,
       parsedQuery.budgetQuery ? budgets.find((b) => b.id === budgetId) : undefined,
       parsedQuery.amount,
-      parsedQuery.memo
+      parsedQuery.memo,
+      parsedQuery.type === "tx" ? parsedQuery.amountType : undefined
     )
   );
 });
