@@ -15,20 +15,20 @@ import { getIgnoredCategoryIdsForTx, stringValueToMillis } from "~lib/utils";
 import OmniboxTransactionFields from "./OmniboxTransactionFields";
 import OmniboxTransferFields from "./OmniboxTransferFields";
 
-const txFields = [
+const TX_FIELDS = Object.freeze([
   { idx: 0, prefix: "", label: "amount" },
   { idx: 2, prefix: "at", label: "payee" },
   { idx: 3, prefix: "for", label: "category" },
   { idx: 4, prefix: "on", label: "account" },
   { idx: 5, prefix: "memo", label: "memo" }
-];
-const transferFields = [
+]);
+const TRANSFER_FIELDS = Object.freeze([
   { idx: 0, prefix: "", label: "amount" },
   { idx: 2, prefix: "to/from", label: "account" },
   { idx: 3, prefix: "to/from", label: "account" },
   { idx: 4, prefix: "for", label: "category" },
   { idx: 5, prefix: "memo", label: "memo" }
-];
+]);
 
 interface Props {
   parsedQuery: ParsedTxQuery | ParsedTransferQuery;
@@ -114,7 +114,7 @@ export default function OmniboxTransaction({
           </Dialog>
         </Tooltip>
         {parsedQuery.type === "tx" ? " add " : " transfer "}
-        {(parsedQuery.type === "tx" ? txFields : transferFields).map((field) => (
+        {(parsedQuery.type === "tx" ? TX_FIELDS : TRANSFER_FIELDS).map((field) => (
           <Fragment key={field.idx}>
             {parsedQuery.lastParsedIdx === field.idx ? (
               <b>{`${field.prefix ? field.prefix + " " : ""}{${field.label}} `}</b>

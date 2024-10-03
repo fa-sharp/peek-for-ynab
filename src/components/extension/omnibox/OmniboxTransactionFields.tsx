@@ -25,11 +25,7 @@ export default function OmniboxTransactionFields({
         <RadioButtonGroup
           label="Payee:"
           className="flex-row gap-sm flex-wrap"
-          value={
-            formState.payee && "id" in formState.payee
-              ? formState.payee?.id || null
-              : null
-          }
+          value={formState.payee && "id" in formState.payee ? formState.payee.id : null}
           onChange={(id) =>
             handlers.setPayee(results.payeeResults.find((p) => p.id === id) || null)
           }>

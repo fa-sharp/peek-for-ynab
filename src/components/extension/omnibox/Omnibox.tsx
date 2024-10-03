@@ -42,7 +42,7 @@ export default function Omnibox() {
       <label className="form-input">
         <input
           autoFocus
-          placeholder="🪄 filter or type 'add', 'transfer'..."
+          placeholder="filter or type 'add', 'transfer'..."
           value={omniboxInput}
           onChange={(e) => setOmniboxInput(e.target.value)}
           disabled={isSaving}
