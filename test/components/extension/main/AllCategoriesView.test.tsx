@@ -37,12 +37,12 @@ test("Can expand and collapse a category group", async () => {
 
   await user.click(screen.getByLabelText("Expand"));
 
-  expect(screen.queryByRole("list")).toBeNull();
+  expect(screen.queryByRole("list")).toBeTruthy();
   expect(screen.queryByText("Rent/Mortgage")).toBeNull();
 
   const expandBillsButton = screen.queryByText("Bills")?.previousElementSibling;
   expect(expandBillsButton).toBeTruthy();
   await user.click(expandBillsButton!);
-  expect(screen.queryByRole("list")).toBeTruthy();
+  expect(screen.queryAllByRole("list")).toHaveLength(2);
   expect(screen.getByText("Rent/Mortgage")).toBeTruthy();
 });
