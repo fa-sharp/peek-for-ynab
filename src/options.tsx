@@ -157,18 +157,7 @@ export function OptionsView() {
                 <Dialog>
                   Enable entering transactions via the URL/address bar, with automatic
                   suggestions from your payees, categories, and accounts. You can type in
-                  &quot;peek <kbd>space</kbd>&quot; to see the various options.{" "}
-                  <i>
-                    Note: Communication happens directly between the URL bar and the
-                    extension - no data is sent anywhere else. See{" "}
-                    <a
-                      href="https://developer.chrome.com/docs/extensions/reference/api/omnibox"
-                      target="_blank"
-                      rel="noreferrer">
-                      these docs
-                    </a>{" "}
-                    for the API being used under the hood.
-                  </i>
+                  &quot;peek <kbd>space</kbd>&quot; to see the various options.
                 </Dialog>
               </Tooltip>
             </div>

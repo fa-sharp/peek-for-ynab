@@ -4,20 +4,29 @@
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
 
-An open-source browser extension for YNAB that lets users see their category and account balances at a glance, add transactions, and setup customizable notifications. See full feature list and installation links on the [extension website](https://peekforynab.com).
+A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peekforynab.com).
 
 ## Project layout
 
+- `assets/` Extension assets
+- `public/` Website images and shared scripts
 - `src/`
-  - `popup.tsx` Extension - popup component
-  - `options.tsx` Extension - options component
-  - `background.ts` Extension - background worker (refreshes data and the OAuth token)
-  - `app/` Website and server (Next.js)
+  - `popup.tsx` Extension popup page
+  - `options.tsx` Extension options page
+  - `background.ts` Extension background worker (refreshes data and the OAuth token)
+  - `middleware.ts` Website middleware (Next.js)
+  - `app/` Website pages and routes (Next.js)
     - `api/` API routes to fetch OAuth tokens from YNAB API
+  - `components/`
+    - `extension/` Extension components
+    - `icons/` Common icons
+    - `react-aria/` [React Aria](https://react-spectrum.adobe.com/react-aria/index.html) abstract components
+    - `website/` Website components
   - `lib/` Library and utility functions
     - `context/` [React Context](https://react.dev/learn/passing-data-deeply-with-context) that handles auth, data fetching, and storage for the extension
-  - `components/` View components
   - `styles/` CSS files
+  - `tabs/` Additional extension pages
+- `test/` Unit tests
 
 ## Building and running locally
 
