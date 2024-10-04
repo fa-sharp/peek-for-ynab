@@ -9,8 +9,18 @@ import OmniboxFiltered from "./OmniboxFiltered";
 import OmniboxTransaction from "./OmniboxTransaction";
 
 export default function Omnibox() {
-  const { budgetSettings, settings, setPopupState, omniboxInput, setOmniboxInput } =
-    useStorageContext();
+  const {
+    budgetSettings,
+    settings,
+    setPopupState,
+    omniboxInput,
+    setOmniboxInput,
+    editingItems,
+    saveAccount,
+    saveCategory,
+    savedAccounts,
+    savedCategories
+  } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
   const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { formState, handlers, onSaveTransaction, isSaving } = useTransaction();
@@ -59,7 +69,12 @@ export default function Omnibox() {
             openTxForm: (txAddState) => {
               setPopupState({ view: "txAdd", txAddState });
               setOmniboxInput("");
-            }
+            },
+            editingItems,
+            savedAccounts: savedAccounts?.[selectedBudgetData.id],
+            savedCategories: savedCategories?.[selectedBudgetData.id],
+            onPinItem: (type, id) =>
+              type === "account" ? saveAccount(id) : saveCategory(id)
           }}
         />
       ) : parsedQuery ? (

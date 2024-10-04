@@ -132,7 +132,10 @@ export default function OmniboxTransaction({
           <div className="flex-row gap-sm">
             Amount:
             <CurrencyView
-              milliUnits={stringValueToMillis(formState.amount, formState.amountType)}
+              milliUnits={stringValueToMillis(
+                formState.amount,
+                parsedQuery.type === "tx" ? formState.amountType : "Inflow"
+              )}
               currencyFormat={budget.currencyFormat}
             />
           </div>

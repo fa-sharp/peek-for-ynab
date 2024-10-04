@@ -1,8 +1,8 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts, category_groups, payees } from "test/mock/ynabApiData";
+import { accounts, category_groups } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
@@ -36,6 +36,7 @@ test("Can filter categories and accounts", async () => {
   expect(screen.queryByText(amexAccount.name)).toBeFalsy();
   await user.keyboard("amex");
   expect(screen.queryAllByText(amexAccount.name)[0], "CCP category").toBeTruthy();
+  expect(screen.queryByRole("heading", { name: "Credit Card Payments" })).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Add credit card payment" })).toBeTruthy();
   expect(screen.queryAllByText(amexAccount.name)[1], "Account").toBeTruthy();
   expect(screen.queryByRole("button", { name: "Add transaction" })).toBeTruthy();
