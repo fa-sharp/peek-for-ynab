@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Help } from "tabler-icons-react";
 
-import { IconButton } from "~components";
+import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useStorageContext } from "~lib/context";
 import type { BudgetSettings } from "~lib/context/storageContext";
@@ -10,14 +11,14 @@ import ReconcileAlertSettings from "./ReconcileAlertSettings";
 
 export default function NotificationSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();
-  const [settings, setSettings] = useBudgetSettings(budget.id);
+  const [budgetSettings, setBudgetSettings] = useBudgetSettings(budget.id);
   const [reconcileExpanded, setReconcileExpanded] = useState(false);
 
   const changeNotifSetting = <K extends keyof BudgetSettings["notifications"]>(
     key: K,
     value: BudgetSettings["notifications"][K]
   ) =>
-    setSettings((prev) => {
+    setBudgetSettings((prev) => {
       if (!prev) return undefined;
       return {
         ...prev,
@@ -27,14 +28,22 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
 
   return (
     <>
-      <h4 className="heading-small">Notifications</h4>
       <div className="flex-col gap-sm">
+        <h3 aria-labelledby="notification-heading" className="heading-medium">
+          <span id="notification-heading">Notifications</span>
+          <Tooltip
+            label="More info"
+            icon={<Help size={18} aria-hidden />}
+            placement="top">
+            <Dialog>Enable notifications for the following events in your budget.</Dialog>
+          </Tooltip>
+        </h3>
         <label
           className="flex-row gap-xs"
           title="Notify for overspent categories this month">
           <input
             type="checkbox"
-            checked={settings?.notifications.overspent ?? false}
+            checked={budgetSettings?.notifications.overspent ?? false}
             onChange={(e) => changeNotifSetting("overspent", e.target.checked)}
           />
           Overspending
@@ -44,7 +53,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           title="Check and notify for newly imported and/or unapproved transactions from your accounts">
           <input
             type="checkbox"
-            checked={settings?.notifications.checkImports ?? false}
+            checked={budgetSettings?.notifications.checkImports ?? false}
             onChange={(e) => changeNotifSetting("checkImports", e.target.checked)}
           />
           Unapproved transactions
@@ -54,25 +63,30 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           title="Notify if one of your linked accounts has a connection error/issue">
           <input
             type="checkbox"
-            checked={settings?.notifications.importError ?? false}
+            checked={budgetSettings?.notifications.importError ?? false}
             onChange={(e) => changeNotifSetting("importError", e.target.checked)}
           />
           Import errors
         </label>
-        <div
-          className="heading-small flex-row gap-xs cursor-pointer"
-          onClick={() => setReconcileExpanded(!reconcileExpanded)}>
-          <span title="Setup alerts for the last time you reconciled an account">
-            Reconciliation alerts
-          </span>
-          <IconButton
-            label={reconcileExpanded ? "Collapse" : "Expand"}
-            icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
-            onClick={() => setReconcileExpanded(!reconcileExpanded)}
-          />
-        </div>
-        {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
       </div>
+      <h3
+        aria-labelledby="reconcile-heading"
+        className="heading-medium flex-row gap-xs cursor-pointer"
+        onClick={() => setReconcileExpanded(!reconcileExpanded)}>
+        <span id="reconcile-heading">Reconciliation alerts</span>
+        <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
+          <Dialog>
+            Setup alerts to notify you if an account has not been reconciled in the given
+            amount of time.
+          </Dialog>
+        </Tooltip>
+        <IconButton
+          label={reconcileExpanded ? "Collapse" : "Expand"}
+          icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
+          onClick={() => setReconcileExpanded(!reconcileExpanded)}
+        />
+      </h3>
+      {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
     </>
   );
 }

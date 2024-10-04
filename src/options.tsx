@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { Refresh } from "tabler-icons-react";
+import { Help, Refresh } from "tabler-icons-react";
 
-import { BudgetSettings } from "~components";
+import { BudgetSettings, Dialog, Tooltip } from "~components";
 import {
   AppProvider,
   useAuthContext,
@@ -58,12 +58,12 @@ export function OptionsView() {
           </button>
         </>
       ) : (
-        <>
+        <div className="flex-col">
           <h1>Peek for YNAB</h1>
-          <h3 className="heading-big" style={{ marginTop: "0" }}>
-            Settings
-          </h3>
-          <div className="flex-col">
+          <div className="flex-col gap-sm">
+            <h2 className="heading-big" style={{ marginTop: "0" }}>
+              Settings
+            </h2>
             <label
               className="flex-row"
               title="Sync settings and pinned categories/accounts to your browser profile">
@@ -82,16 +82,6 @@ export function OptionsView() {
                 }}
               />
               🔄 Sync settings
-            </label>
-            <label
-              className="flex-row"
-              title="Display category/account names as emojis only">
-              <input
-                type="checkbox"
-                checked={settings.emojiMode}
-                onChange={(e) => changeSetting("emojiMode", e.target.checked)}
-              />
-              😉 Emoji mode
             </label>
             <label
               className="flex-row"
@@ -118,102 +108,108 @@ export function OptionsView() {
             </label>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Permissions
-          </h3>
-          <div className="flex-col">
-            <div>
-              <label className="flex-row mb-sm">
-                <input
-                  type="checkbox"
-                  checked={settings.currentTabAccess}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      const granted = await requestPermissions([
-                        "activeTab",
-                        "scripting"
-                      ]);
-                      if (granted) changeSetting("currentTabAccess", true);
-                    } else {
-                      await removePermissions(["activeTab", "scripting"]);
-                      changeSetting("currentTabAccess", false);
-                    }
-                  }}
-                />
-                Allow access to the currently open tab, to enable these features:
+          <div className="flex-col gap-sm">
+            <h2 className="heading-big">Permissions</h2>
+            <div className="flex-row">
+              <input
+                id="tab-permission"
+                type="checkbox"
+                checked={settings.currentTabAccess}
+                onChange={async (e) => {
+                  if (e.target.checked) {
+                    const granted = await requestPermissions(["activeTab", "scripting"]);
+                    if (granted) changeSetting("currentTabAccess", true);
+                  } else {
+                    await removePermissions(["activeTab", "scripting"]);
+                    changeSetting("currentTabAccess", false);
+                  }
+                }}
+              />
+              <label htmlFor="tab-permission">
+                Allow access to the current tab, to enable more transaction entry features
               </label>
-              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
-                <li>Automatically copy the selected amount into the transaction form</li>
-                <li>Copy the current URL into the memo field of the transaction</li>
-              </ul>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  <div>Features include:</div>
+                  <ol
+                    className="list"
+                    style={{ listStyle: "numeric", paddingLeft: "2em" }}>
+                    <li>
+                      Automatically copy the selected amount into the transaction form.
+                    </li>
+                    <li>Copy the current URL into the memo field of the transaction.</li>
+                  </ol>
+                </Dialog>
+              </Tooltip>
             </div>
-            <div>
-              <label className="flex-row mb-sm">
-                <input
-                  type="checkbox"
-                  checked={notificationEnabled}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      requestNotificationPermission();
-                    } else {
-                      removeNotificationPermission();
-                    }
-                  }}
-                />
+            <div className="flex-row mb-sm">
+              <input
+                id="notification-permission"
+                type="checkbox"
+                checked={notificationEnabled}
+                onChange={async (e) => {
+                  if (e.target.checked) {
+                    requestNotificationPermission();
+                  } else {
+                    removeNotificationPermission();
+                  }
+                }}
+              />
+              <label htmlFor="notification-permission">
                 Enable system notifications (⚠️ Experimental ⚠️)
               </label>
-              <ul style={{ marginBlock: 0, fontSize: ".9em" }}>
-                <li>
-                  Native notifications on your device (based on the notifications you
-                  setup for each budget below)
-                </li>
-                <li>
-                  You may also need to enable notifications for your browser in your
-                  system settings
-                </li>
-                <li>
-                  This setting is not synced and must be manually enabled on each device
-                </li>
-              </ul>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable system notifications based on the notifications you setup for
+                  each budget below. Keep in mind you may also need to enable
+                  notifications for your browser in your system settings.
+                </Dialog>
+              </Tooltip>
             </div>
           </div>
 
-          <h3 className="heading-big" style={{ marginTop: "1.2rem" }}>
-            Budgets
-          </h3>
-          <ul className="list flex-col mb-lg">
+          <h2 className="heading-big">Budgets</h2>
+          <ul className="list flex-col">
             {budgetsData?.map((budget) => (
               <BudgetSettings key={budget.id} budget={budget} />
             ))}
           </ul>
-          <button
-            title="Refresh the list of budgets from YNAB"
-            className="button rounded accent flex-row mb-lg"
-            onClick={() => refreshBudgets()}
-            disabled={isRefreshingBudgets}>
-            <Refresh size={14} aria-hidden />
-            {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
-          </button>
-          <button
-            className="button rounded gray flex-row mb-lg"
-            onClick={() =>
-              window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
-            }>
-            Help/FAQ
-          </button>
-          <button
-            className="button rounded warn"
-            onClick={async () => {
-              const confirmed = confirm(
-                "Are you sure? Logging out will clear all settings and data stored in your browser."
-              );
-              if (confirmed) {
-                await logout();
-              }
-            }}>
-            Logout
-          </button>
-        </>
+          <div>
+            <button
+              title="Refresh the list of budgets from YNAB"
+              className="button rounded accent flex-row mb-lg"
+              onClick={() => refreshBudgets()}
+              disabled={isRefreshingBudgets}>
+              <Refresh size={14} aria-hidden />
+              {isRefreshingBudgets ? "Refreshing..." : "Refresh budgets"}
+            </button>
+            <button
+              className="button rounded gray flex-row mb-lg"
+              onClick={() =>
+                window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
+              }>
+              Help/FAQ
+            </button>
+            <button
+              className="button rounded warn"
+              onClick={async () => {
+                const confirmed = confirm(
+                  "Are you sure? Logging out will clear all settings and data stored in your browser."
+                );
+                if (confirmed) {
+                  await logout();
+                }
+              }}>
+              Logout
+            </button>
+          </div>
+        </div>
       )}
     </section>
   );

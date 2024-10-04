@@ -19,6 +19,9 @@ import MemoField from "./extension/transaction/MemoField";
 import PayeeSelect from "./extension/transaction/PayeeSelect";
 import SubTransaction from "./extension/transaction/SubTransaction";
 import TransactionForm from "./extension/transaction/TransactionForm";
+import Dialog from "./react-aria/Dialog";
+import Menu from "./react-aria/Menu";
+import Tooltip from "./react-aria/Tooltip";
 
 export {
   AccountSelect,
@@ -31,9 +34,11 @@ export {
   CategorySelect,
   CategoryView,
   CurrencyView,
+  Dialog,
   IconButton,
   IconSpan,
   MemoField,
+  Menu,
   NewVersionAlert,
   NotificationsView,
   PayeeSelect,
@@ -43,5 +48,6 @@ export {
   SavedAccountsView,
   SavedCategoriesView,
   SubTransaction,
+  Tooltip,
   TransactionForm
 };

@@ -22,13 +22,13 @@ test("Can change a setting, and persist to storage", async () => {
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
-  result.current.changeSetting("emojiMode", true);
+  result.current.changeSetting("theme", "dark");
   await waitFor(() =>
-    expect(result.current.settings?.emojiMode, "emojiMode rendered").toBe(true)
+    expect(result.current.settings?.theme, "theme rendered").toBe("dark")
   );
 
   const { settings } = await chrome.storage.local.get("settings");
-  expect(JSON.parse(settings), "emojiMode persisted").toMatchObject({ emojiMode: true });
+  expect(JSON.parse(settings), "theme persisted").toMatchObject({ theme: "dark" });
 });
 
 test("Reads persisted settings on initialization", async () => {

@@ -34,7 +34,8 @@ test("Mouse behavior works as expected", async () => {
   render(
     <CategorySelect
       selectCategory={(c) => (selectedCategory = c)}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );
@@ -69,7 +70,8 @@ test("Keyboard behavior works as expected", async () => {
   render(
     <CategorySelect
       selectCategory={(c) => (selectedCategory = c)}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );
@@ -106,7 +108,8 @@ test("Filtering works as expected", async () => {
   render(
     <CategorySelect
       selectCategory={(c) => (selectedCategory = c)}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );
@@ -128,7 +131,8 @@ test("Ready to Assign appears as first category", async () => {
   render(
     <CategorySelect
       selectCategory={() => {}}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );
@@ -148,7 +152,8 @@ test("Credit Card Payment categories don't appear", async () => {
   render(
     <CategorySelect
       selectCategory={() => {}}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );
@@ -168,7 +173,8 @@ test("Clear button works as expected", async () => {
   render(
     <CategorySelect
       selectCategory={(c) => (selectedCategory = c)}
-      categories={result.current.categoriesData}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
     />,
     { wrapper }
   );

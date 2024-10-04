@@ -1,8 +1,9 @@
 import { useRef } from "react";
-import { Check, CircleC } from "tabler-icons-react";
+import { CircleC } from "tabler-icons-react";
 import { TransactionFlagColor } from "ynab";
 
 import { AmountField, IconButton, MemoField } from "~components";
+import { CheckIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import useTransaction from "~lib/useTransaction";
 import { flagColorToEmoji, getTodaysDateISO } from "~lib/utils";
@@ -13,13 +14,14 @@ import TransactionFormSplit from "./TransactionFormSplit";
 
 /** Form that lets user add a transaction. */
 export default function TransactionForm() {
-  const { selectedBudgetData, accountsData, categoriesData, payeesData } =
-    useYNABContext();
+  const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { settings, setPopupState } = useStorageContext();
 
   const { formState, derivedState, handlers, onSaveTransaction, isSaving } =
     useTransaction();
   const memoRef = useRef<HTMLInputElement>(null);
+
+  if (!budgetMainData) return <div>Loading...</div>;
 
   return (
     <section style={{ minWidth: "270px" }}>
@@ -30,35 +32,27 @@ export default function TransactionForm() {
         <div className="flex-col gap-0">
           <label className="flex-row">
             Split transaction?
-            {formState.isSplit ? (
-              <IconButton
-                label="Split (click to switch)"
-                icon={<Check color="var(--currency-green)" />}
-                onClick={() => handlers.setIsSplit(false)}
-              />
-            ) : (
-              <IconButton
-                label="Not a split (click to switch)"
-                icon={<Check color="#aaa" />}
-                onClick={() => handlers.setIsSplit(true)}
-              />
-            )}
+            <IconButton
+              role="switch"
+              aria-checked={formState.isSplit ? "true" : "false"}
+              icon={
+                <CheckIcon color={formState.isSplit ? "var(--currency-green)" : "#aaa"} />
+              }
+              onClick={() => handlers.setIsSplit((prev) => !prev)}
+            />
           </label>
           <label className="flex-row">
             Transfer/Payment?
-            {formState.isTransfer ? (
-              <IconButton
-                label="Transfer (click to switch)"
-                icon={<Check color="var(--currency-green)" />}
-                onClick={() => handlers.setIsTransfer(false)}
-              />
-            ) : (
-              <IconButton
-                label="Not a transfer (click to switch)"
-                icon={<Check color="#aaa" />}
-                onClick={() => handlers.setIsTransfer(true)}
-              />
-            )}
+            <IconButton
+              role="switch"
+              aria-checked={formState.isTransfer ? "true" : "false"}
+              icon={
+                <CheckIcon
+                  color={formState.isTransfer ? "var(--currency-green)" : "#aaa"}
+                />
+              }
+              onClick={() => handlers.setIsTransfer((prev) => !prev)}
+            />
           </label>
         </div>
         <AmountField
@@ -73,9 +67,7 @@ export default function TransactionForm() {
             {...{
               formState,
               handlers,
-              accountsData,
-              categoriesData,
-              payeesData,
+              budgetMainData,
               memoRef,
               isSaving
             }}
@@ -85,8 +77,7 @@ export default function TransactionForm() {
             {...{
               formState,
               handlers,
-              accountsData,
-              categoriesData,
+              budgetMainData,
               memoRef,
               isBudgetToTrackingTransfer: derivedState.isBudgetToTrackingTransfer,
               totalSubTxsAmount: derivedState.totalSubTxsAmount,
@@ -109,26 +100,25 @@ export default function TransactionForm() {
             totalSubTxsAmount={derivedState.totalSubTxsAmount}
             currencyFormat={selectedBudgetData?.currencyFormat}
             isSaving={isSaving}
+            budgetMainData={budgetMainData}
           />
         )}
         <div className="flex-row justify-between mt-sm">
           <label className="flex-row">
-            Status:
-            {formState.cleared ? (
-              <IconButton
-                label="Cleared (click to switch)"
-                icon={<CircleC fill="var(--currency-green)" color="white" />}
-                onClick={() => handlers.setCleared(false)}
-                disabled={isSaving}
-              />
-            ) : (
-              <IconButton
-                label="Uncleared (click to switch)"
-                icon={<CircleC color="gray" />}
-                onClick={() => handlers.setCleared(true)}
-                disabled={isSaving}
-              />
-            )}
+            Cleared:
+            <IconButton
+              role="switch"
+              aria-checked={formState.cleared ? "true" : "false"}
+              icon={
+                <CircleC
+                  aria-hidden
+                  fill={formState.cleared ? "var(--currency-green)" : "var(--background)"}
+                  color={formState.cleared ? "var(--background)" : "gray"}
+                />
+              }
+              onClick={() => handlers.setCleared((prev) => !prev)}
+              disabled={isSaving}
+            />
           </label>
           <label className="flex-row">
             Flag:

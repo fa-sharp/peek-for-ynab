@@ -1,24 +1,21 @@
 import { clsx } from "clsx";
-import type { MouseEventHandler, ReactElement } from "react";
+import type { ComponentPropsWithoutRef, ReactElement } from "react";
 
 /** An icon that functions as a button. Uses HTML <button> element with `aria-label` for accessibility */
 export default function IconButton({
   icon,
-  onClick,
   label,
   accent,
   rounded,
   spin,
-  disabled
+  ...props
 }: {
-  label: string;
-  onClick?: MouseEventHandler;
+  label?: string;
   icon: ReactElement;
   accent?: boolean;
   rounded?: boolean;
   spin?: boolean;
-  disabled?: boolean;
-}) {
+} & ComponentPropsWithoutRef<"button">) {
   return (
     <button
       type="button"
@@ -29,8 +26,7 @@ export default function IconButton({
         spin,
         accent
       })}
-      onClick={onClick}
-      disabled={disabled}>
+      {...props}>
       {icon}
     </button>
   );

@@ -7,6 +7,7 @@ import { useStorageContext } from "~lib/context";
 import type { BudgetSettings } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 
+import ConfettiSettings from "./ConfettiSettings";
 import NotificationSettings from "./NotificationSettings";
 import TransactionSettings from "./TransactionSettings";
 
@@ -48,7 +49,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
 function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
   return (
     <fieldset
-      className="rounded mt-sm"
+      className="flex-col rounded mt-sm"
       style={{
         marginLeft: "1.8em",
         padding: "0 1em 0.5em",
@@ -57,6 +58,7 @@ function BudgetSettingsDetail({ budget }: { budget: CachedBudget }) {
       <legend>Budget settings</legend>
       <TransactionSettings budget={budget} />
       <NotificationSettings budget={budget} />
+      <ConfettiSettings budget={budget} />
     </fieldset>
   );
 }

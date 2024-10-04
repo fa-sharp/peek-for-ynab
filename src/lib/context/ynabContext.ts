@@ -10,8 +10,9 @@ import {
   fetchCategoryGroupsForBudget,
   fetchPayeesForBudget
 } from "~lib/api";
+import { useConfetti } from "~lib/hooks";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS, findAllEmoji } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -25,6 +26,13 @@ export interface CachedPayee {
   id: string;
   name: string;
   transferId?: string | null;
+}
+
+export interface BudgetMainData {
+  accountsData: ynab.Account[];
+  categoriesData: ynab.Category[];
+  categoryGroupsData: ynab.CategoryGroupWithCategories[];
+  payeesData?: CachedPayee[];
 }
 
 const useYNABProvider = () => {
@@ -95,6 +103,21 @@ const useYNABProvider = () => {
     },
     select: (data) => data?.categoryGroups
   });
+
+  const useGetCategoryGroupsForBudget = (budgetId: string) =>
+    useQuery({
+      queryKey: ["categoryGroups", { budgetId }],
+      enabled: Boolean(ynabAPI),
+      queryFn: async ({ queryKey }) => {
+        if (!ynabAPI) return;
+        return await fetchCategoryGroupsForBudget(
+          ynabAPI,
+          budgetId,
+          queryClient.getQueryState(queryKey)
+        );
+      },
+      select: (data) => data?.categoryGroups
+    });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
   const categoriesData = useMemo(
@@ -184,6 +207,17 @@ const useYNABProvider = () => {
     );
   }, [accountsData, savedAccounts, selectedBudgetId]);
 
+  /** Group commonly used data into one object */
+  const budgetMainData: BudgetMainData | null = useMemo(() => {
+    if (!accountsData || !categoriesData || !categoryGroupsData) return null;
+    return {
+      accountsData,
+      categoriesData,
+      categoryGroupsData,
+      payeesData
+    };
+  }, [accountsData, categoriesData, categoryGroupsData, payeesData]);
+
   const useGetAccountsForBudget = (budgetId: string) =>
     useQuery({
       queryKey: ["accounts", { budgetId }],
@@ -199,7 +233,9 @@ const useYNABProvider = () => {
       select: (data) => data?.accounts
     });
 
-  const [addedTransaction, setAddedTransaction] = useState<ynab.NewTransaction | null>(
+  const { launchConfetti } = useConfetti();
+
+  const [addedTransaction, setAddedTransaction] = useState<ynab.TransactionDetail | null>(
     null
   );
 
@@ -216,11 +252,31 @@ const useYNABProvider = () => {
         if (!transaction.payee_id) refetchPayees();
       }, 350);
 
-      setAddedTransaction(transaction);
-      setTimeout(() => setAddedTransaction(null), 6 * 1000);
+      if (response.data.transaction) {
+        const { transaction } = response.data;
+        setAddedTransaction(transaction);
+        setTimeout(() => setAddedTransaction(null), 4 * 1000);
+        if (
+          budgetSettings?.confetti?.allCategories ||
+          (transaction.category_id &&
+            budgetSettings?.confetti?.categories.includes(transaction.category_id))
+        ) {
+          const emojis = [
+            ...budgetSettings.confetti.emojis,
+            ...findAllEmoji(transaction.category_name || "")
+          ];
+          launchConfetti(emojis);
+        }
+      }
     },
-
-    [refreshCategoriesAndAccounts, refetchPayees, selectedBudgetId, ynabAPI]
+    [
+      ynabAPI,
+      selectedBudgetId,
+      budgetSettings?.confetti,
+      refreshCategoriesAndAccounts,
+      refetchPayees,
+      launchConfetti
+    ]
   );
 
   return {
@@ -240,6 +296,8 @@ const useYNABProvider = () => {
     accountsError,
     /** API data: List of all payees in current budget */
     payeesData,
+    /** API data: Accounts, category groups, categories, and payees in current budget */
+    budgetMainData,
     /** API data: Unapproved transactions in current budget */
     unapprovedTxs,
     /** API data: Currently selected budget */
@@ -252,6 +310,8 @@ const useYNABProvider = () => {
     refreshBudgets,
     isRefreshingBudgets,
     refreshCategoriesAndAccounts,
+    /** Get category data for the specific budget */
+    useGetCategoryGroupsForBudget,
     /** Get accounts for the specified budget */
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */

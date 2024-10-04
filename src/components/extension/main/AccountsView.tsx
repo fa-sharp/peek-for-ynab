@@ -1,7 +1,8 @@
+import { clsx } from "clsx";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { AlertTriangle, Circle, LockOpen } from "tabler-icons-react";
-import type { Account, CurrencyFormat } from "ynab";
+import type { Account, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useYNABContext } from "~lib/context";
@@ -12,7 +13,7 @@ import {
 } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { AccountAlerts } from "~lib/notifications";
-import { findEmoji, formatCurrency, formatDateMonthAndDay } from "~lib/utils";
+import { formatDateMonthAndDay } from "~lib/utils";
 
 import {
   AddTransactionIcon,
@@ -160,7 +161,7 @@ function AccountTypeView({
 }
 
 export const AccountView = ({
-  account: { name, balance, last_reconciled_at },
+  account: { id, name, balance, last_reconciled_at },
   currencyFormat,
   actionElementsLeft,
   actionElementsRight,
@@ -174,23 +175,19 @@ export const AccountView = ({
   actionElementsRight?: ReactElement | null;
   alerts?: AccountAlerts[string];
   settings: AppSettings;
-  addedTransaction?: boolean;
+  addedTransaction?: TransactionDetail | null;
 }) => {
-  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
-
   return (
     <div
-      className="balance-display"
-      title={
-        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
-      }>
+      className={clsx("balance-display", {
+        highlighted:
+          settings.animations &&
+          (addedTransaction?.account_id === id ||
+            addedTransaction?.transfer_account_id === id)
+      })}>
       <div className="flex-row gap-sm min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? (
-          <span className="font-big">{foundEmoji}</span>
-        ) : (
-          <div className="hide-overflow">{name}</div>
-        )}
+        <div className="hide-overflow">{name}</div>
         {!!alerts?.numUnapprovedTxs && (
           <IconSpan
             label={`${alerts.numUnapprovedTxs} unapproved transaction${alerts.numUnapprovedTxs > 1 ? "s" : ""}`}
@@ -215,7 +212,7 @@ export const AccountView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations && addedTransaction}
+          animationEnabled={settings.animations && !!addedTransaction}
         />
         {actionElementsRight}
       </div>

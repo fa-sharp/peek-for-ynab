@@ -1,6 +1,7 @@
 import type { CurrencyFormat } from "ynab";
 
 import { CurrencyView, SubTransaction } from "~components";
+import type { BudgetMainData } from "~lib/context/ynabContext";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
   leftOverSubTxsAmount: number;
   currencyFormat?: CurrencyFormat;
   isSaving: boolean;
+  budgetMainData: BudgetMainData;
 }
 
 export default function TransactionFormSplit({
@@ -18,7 +20,8 @@ export default function TransactionFormSplit({
   totalSubTxsAmount,
   leftOverSubTxsAmount,
   currencyFormat,
-  isSaving
+  isSaving,
+  budgetMainData
 }: Props) {
   return (
     <>
@@ -31,6 +34,7 @@ export default function TransactionFormSplit({
           autoFocus={idx > 0}
           allowTransfer={!formState.isTransfer}
           disabled={isSaving}
+          budgetMainData={budgetMainData}
           setAmount={(newAmount) =>
             handlers.setSubTxs((prev) =>
               prev.with(idx, {

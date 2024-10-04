@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { AlertTriangle } from "tabler-icons-react";
@@ -5,7 +6,8 @@ import type {
   Account,
   Category,
   CategoryGroupWithCategories,
-  CurrencyFormat
+  CurrencyFormat,
+  TransactionDetail
 } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan } from "~components";
@@ -13,12 +15,7 @@ import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib
 import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
 import type { CachedBudget } from "~lib/context/ynabContext";
 import type { CategoryAlerts } from "~lib/notifications";
-import {
-  findCCAccount,
-  findEmoji,
-  formatCurrency,
-  millisToStringValue
-} from "~lib/utils";
+import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
   AddCCPaymentIcon,
@@ -191,7 +188,7 @@ export function CategoryGroupView({
 }
 
 export const CategoryView = ({
-  categoryData: { name, balance },
+  categoryData: { id, name, balance },
   currencyFormat,
   settings,
   alerts,
@@ -205,23 +202,16 @@ export const CategoryView = ({
   actionElementsLeft?: ReactElement | null;
   alerts?: CategoryAlerts[string];
   settings: AppSettings;
-  addedTransaction?: boolean;
+  addedTransaction?: TransactionDetail | null;
 }) => {
-  const foundEmoji = settings.emojiMode ? findEmoji(name) : null;
-
   return (
     <div
-      className="balance-display"
-      title={
-        foundEmoji ? `${name}: ${formatCurrency(balance, currencyFormat)}` : undefined
-      }>
+      className={clsx("balance-display", {
+        highlighted: settings.animations && addedTransaction?.category_id === id
+      })}>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
-        {foundEmoji ? (
-          <span className="font-big">{foundEmoji}</span>
-        ) : (
-          <div className="hide-overflow">{name}</div>
-        )}
+        <div className="hide-overflow">{name}</div>
         {alerts?.overspent && (
           <IconSpan
             label="Overspent"
@@ -234,7 +224,7 @@ export const CategoryView = ({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations && addedTransaction}
+          animationEnabled={settings.animations && !!addedTransaction}
         />
         {actionElementsRight}
       </div>

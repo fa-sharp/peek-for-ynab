@@ -15,10 +15,8 @@ import {
   SwitchHorizontal
 } from "tabler-icons-react";
 
-import { BudgetSelect, IconButton } from "~components";
+import { BudgetSelect, IconButton, Menu } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-
-import PopupNavMenu from "./PopupNavMenu";
 
 /** Whether data is considered fresh for display, based on `lastUpdated` time (<4 minutes old) */
 const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
@@ -133,10 +131,8 @@ export default function PopupNav() {
         }
         spin={Boolean(globalIsFetching)}
       />
-      <div className="flex-row gap-xs">
+      <div className="flex-row gap-sm">
         <BudgetSelect
-          emojiMode={settings.emojiMode}
-          animationsEnabled={settings.animations}
           shownBudgets={shownBudgetsData}
           selectedBudgetId={selectedBudgetId}
           setSelectedBudgetId={setSelectedBudgetId}
@@ -146,8 +142,6 @@ export default function PopupNav() {
           onClick={openBudget}
           icon={<ExternalLink aria-hidden />}
         />
-      </div>
-      <div className="flex-row gap-xs">
         {popupState.editMode && (
           <IconButton
             label="Done editing"
@@ -155,12 +149,11 @@ export default function PopupNav() {
             icon={<PencilOff aria-hidden />}
           />
         )}
-        <PopupNavMenu
+        <Menu
           label="Menu"
           icon={<Menu2 aria-hidden />}
           onAction={onMenuAction}
-          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}
-          animationsEnabled={settings.animations}>
+          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}>
           <Item key="addTransaction" textValue="Add transaction">
             <div className="flex-row gap-sm">
               <Plus aria-hidden size={20} />
@@ -197,7 +190,7 @@ export default function PopupNav() {
               Settings
             </div>
           </Item>
-        </PopupNavMenu>
+        </Menu>
       </div>
     </nav>
   );
