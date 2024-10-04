@@ -13,18 +13,27 @@ import TransactionFormMain from "./TransactionFormMain";
 import TransactionFormMainTransfer from "./TransactionFormMainTransfer";
 import TransactionFormSplit from "./TransactionFormSplit";
 
+/** Form that lets user add a transaction. */
 export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { settings, setPopupState } = useStorageContext();
 
-  if (!budgetMainData) return <div>Loading...</div>;
   return (
-    <TransactionFormInner
-      budgetMainData={budgetMainData}
-      selectedBudgetData={selectedBudgetData}
-      settings={settings}
-      resetPopupState={() => setPopupState({ view: "main", txAddState: {} })}
-    />
+    <section>
+      <div className="heading-big">
+        <div role="heading">Add Transaction</div>
+      </div>
+      {!budgetMainData ? (
+        <div>Loading...</div>
+      ) : (
+        <TransactionFormInner
+          budgetMainData={budgetMainData}
+          selectedBudgetData={selectedBudgetData}
+          settings={settings}
+          resetPopupState={() => setPopupState({ view: "main", txAddState: {} })}
+        />
+      )}
+    </section>
   );
 }
 
@@ -35,7 +44,6 @@ interface Props {
   resetPopupState: () => void;
 }
 
-/** Form that lets user add a transaction. */
 export function TransactionFormInner({
   budgetMainData,
   selectedBudgetData,
@@ -49,146 +57,141 @@ export function TransactionFormInner({
   if (!budgetMainData) return <div>Loading...</div>;
 
   return (
-    <section>
-      <div className="heading-big">
-        <div role="heading">Add Transaction</div>
+    <form className="flex-col" onSubmit={onSaveTransaction}>
+      <div className="flex-col gap-0">
+        <label className="flex-row">
+          Split transaction?
+          <IconButton
+            role="switch"
+            aria-checked={formState.isSplit ? "true" : "false"}
+            icon={
+              <CheckIcon color={formState.isSplit ? "var(--currency-green)" : "#aaa"} />
+            }
+            onClick={() => handlers.setIsSplit((prev) => !prev)}
+          />
+        </label>
+        <label className="flex-row">
+          Transfer/Payment?
+          <IconButton
+            role="switch"
+            aria-checked={formState.isTransfer ? "true" : "false"}
+            icon={
+              <CheckIcon
+                color={formState.isTransfer ? "var(--currency-green)" : "#aaa"}
+              />
+            }
+            onClick={() => handlers.setIsTransfer((prev) => !prev)}
+          />
+        </label>
       </div>
-      <form className="flex-col" onSubmit={onSaveTransaction}>
-        <div className="flex-col gap-0">
-          <label className="flex-row">
-            Split transaction?
-            <IconButton
-              role="switch"
-              aria-checked={formState.isSplit ? "true" : "false"}
-              icon={
-                <CheckIcon color={formState.isSplit ? "var(--currency-green)" : "#aaa"} />
-              }
-              onClick={() => handlers.setIsSplit((prev) => !prev)}
-            />
-          </label>
-          <label className="flex-row">
-            Transfer/Payment?
-            <IconButton
-              role="switch"
-              aria-checked={formState.isTransfer ? "true" : "false"}
-              icon={
-                <CheckIcon
-                  color={formState.isTransfer ? "var(--currency-green)" : "#aaa"}
-                />
-              }
-              onClick={() => handlers.setIsTransfer((prev) => !prev)}
-            />
-          </label>
-        </div>
-        <AmountField
-          amount={formState.amount}
-          amountType={formState.amountType}
-          disabled={isSaving}
-          setAmount={handlers.setAmount}
-          setAmountType={handlers.setAmountType}
+      <AmountField
+        amount={formState.amount}
+        amountType={formState.amountType}
+        disabled={isSaving}
+        setAmount={handlers.setAmount}
+        setAmountType={handlers.setAmountType}
+      />
+      {!formState.isTransfer ? (
+        <TransactionFormMain
+          {...{
+            formState,
+            handlers,
+            budgetMainData,
+            memoRef,
+            isSaving
+          }}
         />
-        {!formState.isTransfer ? (
-          <TransactionFormMain
-            {...{
-              formState,
-              handlers,
-              budgetMainData,
-              memoRef,
-              isSaving
-            }}
-          />
-        ) : (
-          <TransactionFormMainTransfer
-            {...{
-              formState,
-              handlers,
-              budgetMainData,
-              memoRef,
-              isBudgetToTrackingTransfer: derivedState.isBudgetToTrackingTransfer,
-              totalSubTxsAmount: derivedState.totalSubTxsAmount,
-              isSaving
-            }}
-          />
-        )}
-        <MemoField
-          ref={memoRef}
-          memo={formState.memo}
-          setMemo={handlers.setMemo}
-          disabled={isSaving}
-          settings={settings}
+      ) : (
+        <TransactionFormMainTransfer
+          {...{
+            formState,
+            handlers,
+            budgetMainData,
+            memoRef,
+            isBudgetToTrackingTransfer: derivedState.isBudgetToTrackingTransfer,
+            totalSubTxsAmount: derivedState.totalSubTxsAmount,
+            isSaving
+          }}
         />
-        {formState.isSplit && (
-          <TransactionFormSplit
-            formState={formState}
-            handlers={handlers}
-            leftOverSubTxsAmount={derivedState.leftOverSubTxsAmount}
-            totalSubTxsAmount={derivedState.totalSubTxsAmount}
-            currencyFormat={selectedBudgetData?.currencyFormat}
-            isSaving={isSaving}
-            budgetMainData={budgetMainData}
-          />
-        )}
-        <div className="flex-row justify-between mt-sm">
-          <label className="flex-row">
-            Cleared:
-            <IconButton
-              role="switch"
-              aria-checked={formState.cleared ? "true" : "false"}
-              icon={
-                <CircleC
-                  aria-hidden
-                  fill={formState.cleared ? "var(--currency-green)" : "var(--background)"}
-                  color={formState.cleared ? "var(--background)" : "gray"}
-                />
-              }
-              onClick={() => handlers.setCleared((prev) => !prev)}
-              disabled={isSaving}
-            />
-          </label>
-          <label className="flex-row">
-            Flag:
-            <select
-              className="select rounded"
-              value={formState.flag}
-              onChange={(e) => handlers.setFlag(e.target.value)}
-              disabled={isSaving}>
-              <option value="">None</option>
-              {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
-                <option key={flagValue} value={flagValue}>
-                  {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <label className="form-input">
-          Date
-          <input
-            required
-            type="date"
-            value={formState.date}
-            max={getTodaysDateISO()}
-            onChange={(e) => handlers.setDate(e.target.value)}
+      )}
+      <MemoField
+        ref={memoRef}
+        memo={formState.memo}
+        setMemo={handlers.setMemo}
+        disabled={isSaving}
+        settings={settings}
+      />
+      {formState.isSplit && (
+        <TransactionFormSplit
+          formState={formState}
+          handlers={handlers}
+          leftOverSubTxsAmount={derivedState.leftOverSubTxsAmount}
+          totalSubTxsAmount={derivedState.totalSubTxsAmount}
+          currencyFormat={selectedBudgetData?.currencyFormat}
+          isSaving={isSaving}
+          budgetMainData={budgetMainData}
+        />
+      )}
+      <div className="flex-row justify-between mt-sm">
+        <label className="flex-row">
+          Cleared:
+          <IconButton
+            role="switch"
+            aria-checked={formState.cleared ? "true" : "false"}
+            icon={
+              <CircleC
+                aria-hidden
+                fill={formState.cleared ? "var(--currency-green)" : "var(--background)"}
+                color={formState.cleared ? "var(--background)" : "gray"}
+              />
+            }
+            onClick={() => handlers.setCleared((prev) => !prev)}
             disabled={isSaving}
           />
         </label>
-        <div className="error-message">{formState.errorMessage}</div>
-        <div className="flex-row flex-row-reverse mt-lg">
-          <button
-            type="submit"
-            className="button rounded accent flex-1"
+        <label className="flex-row">
+          Flag:
+          <select
+            className="select rounded"
+            value={formState.flag}
+            onChange={(e) => handlers.setFlag(e.target.value)}
             disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-          <button
-            type="button"
-            className="button gray rounded flex-1"
-            onClick={resetPopupState}
-            disabled={isSaving}>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </section>
+            <option value="">None</option>
+            {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
+              <option key={flagValue} value={flagValue}>
+                {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <label className="form-input">
+        Date
+        <input
+          required
+          type="date"
+          value={formState.date}
+          max={getTodaysDateISO()}
+          onChange={(e) => handlers.setDate(e.target.value)}
+          disabled={isSaving}
+        />
+      </label>
+      <div className="error-message">{formState.errorMessage}</div>
+      <div className="flex-row flex-row-reverse mt-lg">
+        <button
+          type="submit"
+          className="button rounded accent flex-1"
+          disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </button>
+        <button
+          type="button"
+          className="button gray rounded flex-1"
+          onClick={resetPopupState}
+          disabled={isSaving}>
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }

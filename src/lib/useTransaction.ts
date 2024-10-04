@@ -1,4 +1,11 @@
-import { type FormEventHandler, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type FormEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { IS_PRODUCTION } from "./constants";
@@ -95,6 +102,16 @@ export default function useTransaction() {
   // Other form state
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Reset form state if switching budgets
+  const originalBudgetId = useRef(popupState?.budgetId);
+  useEffect(() => {
+    if (popupState && popupState.budgetId !== originalBudgetId.current) {
+      setAccount(null);
+      setCategory(null);
+      originalBudgetId.current = popupState.budgetId;
+    }
+  }, [popupState]);
 
   // Try parsing user's selection as the amount upon opening the form
   useEffect(() => {

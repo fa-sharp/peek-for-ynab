@@ -9,7 +9,8 @@ import {
   Omnibox,
   PopupNav,
   SavedAccountsView,
-  SavedCategoriesView
+  SavedCategoriesView,
+  TransactionForm
 } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
@@ -74,23 +75,24 @@ export default function PopupMain() {
   );
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <>
       {newVersionAlert && <NewVersionAlert />}
       <PopupNav />
-      {categoriesData && accountsData && (
+      {popupState?.view === "txAdd" && <TransactionForm />}
+      {popupState?.view === "main" && categoriesData && accountsData && (
         <>
           <NotificationsView />
           <Omnibox />
           {!omniboxInput && (
-            <>
+            <DragDropContext onDragEnd={onDragEnd}>
               <SavedCategoriesView />
               <SavedAccountsView />
               <AllCategoriesView />
               <AllAccountsView />
-            </>
+            </DragDropContext>
           )}
         </>
       )}
-    </DragDropContext>
+    </>
   );
 }

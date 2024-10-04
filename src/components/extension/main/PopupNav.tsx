@@ -3,6 +3,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { type Key, useCallback, useMemo } from "react";
 import {
   AlertTriangle,
+  ArrowBack,
   BoxMultiple,
   Check,
   ExternalLink,
@@ -83,6 +84,9 @@ export default function PopupNav() {
         case "openOptions":
           chrome?.runtime?.openOptionsPage();
           break;
+        case "backToMain":
+          setPopupState({ view: "main" });
+          break;
       }
     },
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
@@ -135,7 +139,9 @@ export default function PopupNav() {
         <BudgetSelect
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
-          setSelectedBudgetId={(id) => setPopupState({ budgetId: id })}
+          setSelectedBudgetId={(id) => {
+            setPopupState({ budgetId: id, txAddState: {} });
+          }}
         />
         <IconButton
           label="Open this budget in YNAB"
@@ -153,45 +159,55 @@ export default function PopupNav() {
           label="Menu"
           icon={<Menu2 aria-hidden />}
           onAction={onMenuAction}
+          items={createMenuItems(editingItems, popupState.view === "main")}
           disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}>
-          <Item key="addTransaction" textValue="Add transaction">
-            <div className="flex-row gap-sm">
-              <Plus aria-hidden size={20} />
-              Add transaction
-            </div>
-          </Item>
-          <Item key="addTransfer" textValue="Add transfer/payment">
-            <div className="flex-row gap-sm">
-              <SwitchHorizontal aria-hidden size={20} />
-              Add transfer/payment
-            </div>
-          </Item>
-          <Item
-            key="editItems"
-            textValue={editingItems ? "Done editing" : "Edit pinned items"}>
-            <div className="flex-row gap-sm">
-              {editingItems ? (
-                <PencilOff aria-hidden size={20} />
-              ) : (
-                <Pencil aria-hidden size={20} />
-              )}
-              {editingItems ? "Done editing" : "Edit pinned items"}
-            </div>
-          </Item>
-          <Item key="openWindow" textValue="Open in new window">
-            <div className="flex-row gap-sm">
-              <BoxMultiple aria-hidden size={20} />
-              Open in new window
-            </div>
-          </Item>
-          <Item key="openOptions" textValue="Settings">
-            <div className="flex-row gap-sm">
-              <Settings aria-hidden size={20} />
-              Settings
-            </div>
-          </Item>
+          {(item) => (
+            <Item key={item.key} textValue={item.text}>
+              <div className="flex-row gap-sm">
+                {item.icon} {item.text}
+              </div>
+            </Item>
+          )}
         </Menu>
       </div>
     </nav>
   );
 }
+
+const createMenuItems = (editingItems: boolean, onMainPage: boolean) => [
+  ...(onMainPage
+    ? [
+        {
+          key: "addTransaction",
+          text: "Add transaction",
+          icon: <Plus aria-hidden size={20} />
+        },
+        {
+          key: "addTransfer",
+          text: "Add transfer/payment",
+          icon: <SwitchHorizontal aria-hidden size={20} />
+        },
+        {
+          key: "editItems",
+          text: editingItems ? "Done editing" : "Edit pinned items",
+          icon: editingItems ? (
+            <PencilOff aria-hidden size={20} />
+          ) : (
+            <Pencil aria-hidden size={20} />
+          )
+        }
+      ]
+    : [
+        {
+          key: "backToMain",
+          text: "Back to main view",
+          icon: <ArrowBack aria-hidden size={20} />
+        }
+      ]),
+  {
+    key: "openWindow",
+    text: "Open in new window",
+    icon: <BoxMultiple aria-hidden size={20} />
+  },
+  { key: "openOptions", text: "Settings", icon: <Settings aria-hidden size={20} /> }
+];
