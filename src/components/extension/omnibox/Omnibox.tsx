@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { X } from "tabler-icons-react";
 
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
@@ -56,6 +57,15 @@ export default function Omnibox() {
           onChange={(e) => setOmniboxInput(e.target.value)}
           disabled={isSaving}
         />
+        {omniboxInput.length > 0 && (
+          <button
+            type="button"
+            className="select-button-right icon-button"
+            aria-label="Clear"
+            onClick={() => setOmniboxInput("")}>
+            <X aria-hidden />
+          </button>
+        )}
       </label>
       {filtered ? (
         <OmniboxFiltered
