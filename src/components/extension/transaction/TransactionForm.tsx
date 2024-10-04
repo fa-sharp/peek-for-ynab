@@ -63,7 +63,7 @@ export function TransactionFormInner({
           Split transaction?
           <IconButton
             role="switch"
-            aria-checked={formState.isSplit ? "true" : "false"}
+            aria-checked={formState.isSplit}
             icon={
               <CheckIcon color={formState.isSplit ? "var(--currency-green)" : "#aaa"} />
             }
@@ -74,7 +74,7 @@ export function TransactionFormInner({
           Transfer/Payment?
           <IconButton
             role="switch"
-            aria-checked={formState.isTransfer ? "true" : "false"}
+            aria-checked={formState.isTransfer}
             icon={
               <CheckIcon
                 color={formState.isTransfer ? "var(--currency-green)" : "#aaa"}
@@ -137,7 +137,7 @@ export function TransactionFormInner({
           Cleared:
           <IconButton
             role="switch"
-            aria-checked={formState.cleared ? "true" : "false"}
+            aria-checked={formState.cleared}
             icon={
               <CircleC
                 aria-hidden
