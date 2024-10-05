@@ -1,7 +1,14 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { type ForwardedRef, forwardRef, useCallback, useRef, useState } from "react";
+import {
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 
 import type { CachedPayee } from "~lib/types";
 import { searchWithinString } from "~lib/utils";
@@ -29,10 +36,9 @@ function PayeeSelect(
   { payees, initialPayee, selectPayee, disabled, required = true }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const [payeeList, setPayeeList] = useState(() => {
-    if (!payees) return [];
-    return [...payees.filter((payee) => payee.transferId == null)];
-  });
+  const [payeeList, setPayeeList] = useState<CachedPayee[]>([]);
+  useEffect(() => payees && setPayeeList(payees.filter(getFilter())), [payees]);
+
   const getPayeeKey = useCallback((index: number) => payeeList[index].id, [payeeList]);
 
   const listRef = useRef<HTMLUListElement>(null);

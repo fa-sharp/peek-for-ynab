@@ -5,6 +5,7 @@ import {
   Fragment,
   forwardRef,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState
@@ -55,12 +56,16 @@ function CategorySelect(
     [ignoredCategoryIds]
   );
 
-  const [categoryList, setCategoryList] = useState(
-    categories ? categories.filter(getFilter()) : []
-  );
-
   const inputRef = useRef<HTMLInputElement | null>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [categoryList, setCategoryList] = useState<Category[]>([]);
+  useEffect(
+    () =>
+      categories &&
+      setCategoryList(categories.filter(getFilter(inputRef.current?.value))),
+    [categories, getFilter]
+  );
 
   const {
     isOpen,
