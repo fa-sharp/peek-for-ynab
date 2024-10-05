@@ -25,6 +25,7 @@ test("Can filter categories and accounts", async () => {
 
   const user = userEvent.setup();
   const input = screen.getByRole("textbox");
+  await user.tab();
   expect(input).toHaveFocus();
 
   expect(screen.queryByText(eatingOutCategory.name)).toBeFalsy();
