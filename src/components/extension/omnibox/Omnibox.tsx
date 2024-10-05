@@ -51,12 +51,6 @@ export default function Omnibox() {
   return (
     <form className="mb-lg flex-col" onSubmit={onSaveTransaction}>
       <label className="form-input">
-        <input
-          placeholder="filter or type 'add', 'transfer'..."
-          value={omniboxInput}
-          onChange={(e) => setOmniboxInput(e.target.value)}
-          disabled={isSaving}
-        />
         {omniboxInput.length > 0 && (
           <button
             type="button"
@@ -66,6 +60,12 @@ export default function Omnibox() {
             <X aria-hidden />
           </button>
         )}
+        <input
+          placeholder="filter or type 'add', 'transfer'..."
+          value={omniboxInput}
+          onChange={(e) => setOmniboxInput(e.target.value)}
+          disabled={isSaving}
+        />
       </label>
       {filtered ? (
         <OmniboxFiltered
