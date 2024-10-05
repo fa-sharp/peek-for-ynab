@@ -15,34 +15,51 @@ import {
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupMain() {
-  const {
-    popupState,
-    setEditingItems,
-    omniboxInput,
-    savedCategories,
-    savedAccounts,
-    saveCategoriesForBudget,
-    saveAccountsForBudget,
-    setPopupState
-  } = useStorageContext();
-  const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
-    useYNABContext();
+  const { popupState } = useStorageContext();
   const { newVersionAlert } = useNotificationsContext();
 
-  // activate edit mode if there are no pinned categories or accounts yet
-  useEffect(() => {
-    if (
-      popupState &&
-      savedCategories &&
-      savedAccounts &&
-      !savedCategories[popupState.budgetId]?.length &&
-      !savedAccounts[popupState.budgetId]?.length
-    )
-      setEditingItems(true);
-  }, [popupState, savedAccounts, savedCategories, setEditingItems, setPopupState]);
+  return (
+    <>
+      {newVersionAlert && <NewVersionAlert />}
+      <PopupNav />
+      {popupState?.view === "txAdd" && <TransactionForm />}
+      {popupState?.view === "main" && <MainView />}
+    </>
+  );
+}
 
-  /** Callback when dragging and dropping pinned categories and accounts */
-  const onDragEnd: OnDragEndResponder = useCallback(
+const MainView = () => {
+  const { omniboxInput } = useStorageContext();
+  const { categoriesData, accountsData } = useYNABContext();
+  const onDragEnd = useDragEndCallback();
+
+  useActivateEditModeIfNoPinnedItems();
+
+  if (!categoriesData || !accountsData) return null;
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <NotificationsView />
+      <Omnibox />
+      {!omniboxInput && (
+        <>
+          <SavedCategoriesView />
+          <SavedAccountsView />
+          <AllCategoriesView />
+          <AllAccountsView />
+        </>
+      )}
+    </DragDropContext>
+  );
+};
+
+/** Callback when dragging and dropping pinned categories and accounts */
+const useDragEndCallback = (): OnDragEndResponder => {
+  const { popupState, saveCategoriesForBudget, saveAccountsForBudget } =
+    useStorageContext();
+  const { savedAccountsData, savedCategoriesData } = useYNABContext();
+
+  return useCallback(
     (result) => {
       if (!result.destination || !popupState?.budgetId) return;
       if (
@@ -73,26 +90,21 @@ export default function PopupMain() {
       popupState?.budgetId
     ]
   );
+};
 
-  return (
-    <>
-      {newVersionAlert && <NewVersionAlert />}
-      <PopupNav />
-      {popupState?.view === "txAdd" && <TransactionForm />}
-      {popupState?.view === "main" && categoriesData && accountsData && (
-        <>
-          <NotificationsView />
-          <Omnibox />
-          {!omniboxInput && (
-            <DragDropContext onDragEnd={onDragEnd}>
-              <SavedCategoriesView />
-              <SavedAccountsView />
-              <AllCategoriesView />
-              <AllAccountsView />
-            </DragDropContext>
-          )}
-        </>
-      )}
-    </>
-  );
-}
+/** Activate edit mode if there are no pinned categories or accounts yet */
+const useActivateEditModeIfNoPinnedItems = () => {
+  const { popupState, setEditingItems, savedCategories, savedAccounts, setPopupState } =
+    useStorageContext();
+
+  useEffect(() => {
+    if (
+      popupState &&
+      savedCategories &&
+      savedAccounts &&
+      !savedCategories[popupState.budgetId]?.length &&
+      !savedAccounts[popupState.budgetId]?.length
+    )
+      setEditingItems(true);
+  }, [popupState, savedAccounts, savedCategories, setEditingItems, setPopupState]);
+};
