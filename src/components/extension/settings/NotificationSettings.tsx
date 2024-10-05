@@ -29,7 +29,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
   return (
     <>
       <div className="flex-col gap-sm">
-        <h3 aria-labelledby="notification-heading" className="heading-medium">
+        <h3 aria-labelledby="notification-heading" className="heading-small">
           <span id="notification-heading">Notifications</span>
           <Tooltip
             label="More info"
@@ -71,7 +71,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
       </div>
       <h3
         aria-labelledby="reconcile-heading"
-        className="heading-medium flex-row gap-xs cursor-pointer"
+        className="heading-small cursor-pointer"
         onClick={() => setReconcileExpanded(!reconcileExpanded)}>
         <span id="reconcile-heading">Reconciliation alerts</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">

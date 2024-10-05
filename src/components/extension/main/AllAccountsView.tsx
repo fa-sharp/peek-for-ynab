@@ -38,7 +38,7 @@ export default function AllAccountsView() {
   return (
     <>
       <div
-        className={"heading-big cursor-pointer"}
+        className={"heading-medium cursor-pointer"}
         onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-controls={controlsId}
@@ -111,7 +111,7 @@ function AccountTypeView({
   return (
     <>
       <div
-        className="heading-medium heading-bordered cursor-pointer"
+        className="heading-small heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-controls={controlsId}

@@ -49,7 +49,7 @@ export default function Omnibox() {
   if (!selectedBudgetData || !budgetMainData || !settings) return null;
 
   return (
-    <form className="mb-lg flex-col" onSubmit={onSaveTransaction}>
+    <form className="flex-col mb-lg" onSubmit={onSaveTransaction}>
       <label className="form-input">
         {omniboxInput.length > 0 && (
           <button

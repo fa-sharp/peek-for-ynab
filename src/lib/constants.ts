@@ -32,7 +32,8 @@ export const DEFAULT_POPUP_STATE: PopupState = {
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
   currentTabAccess: false,
   theme: "auto",
-  animations: true
+  animations: true,
+  omnibox: false
 });
 
 export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({

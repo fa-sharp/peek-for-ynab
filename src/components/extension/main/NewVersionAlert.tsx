@@ -14,7 +14,7 @@ function NewVersionAlert() {
   };
 
   return (
-    <div className="heading-small flex-row gap-xs justify-center mb-lg">
+    <div className="heading-small gap-xs justify-center mb-lg">
       <Rocket size={20} color="var(--error)" aria-hidden />
       {LATEST_VERSION_ALERT_TEXT}
       <IconButton

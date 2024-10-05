@@ -26,7 +26,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
   return (
     <>
       <div className="flex-col gap-sm">
-        <h4 aria-labelledby="tx-heading" className="heading-medium">
+        <h4 aria-labelledby="tx-heading" className="heading-small">
           <span id="tx-heading">Transaction defaults</span>
           <Tooltip
             label="More info"

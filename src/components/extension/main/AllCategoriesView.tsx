@@ -45,7 +45,9 @@ function CategoriesView() {
 
   return (
     <>
-      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="heading-medium cursor-pointer"
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-expanded={expanded}
           aria-controls={controlsId}
@@ -108,7 +110,7 @@ export function CategoryGroupView({
   return (
     <li>
       <div
-        className="heading-medium heading-bordered cursor-pointer"
+        className="heading-small heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-controls={controlsId}

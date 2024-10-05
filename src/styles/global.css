@@ -184,12 +184,17 @@ input[type="checkbox"] {
 
   margin-block: var(--spacing-xs);
 
-  font-size: 1.1em;
+  font-size: 1.15em;
   font-weight: 600;
 }
 
 .heading-small {
-  margin-block: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  margin-block: var(--spacing-xs);
+
   font-size: 1.05em;
   font-weight: 600;
 }

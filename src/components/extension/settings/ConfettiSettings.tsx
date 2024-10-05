@@ -82,7 +82,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
     <div>
       <h3
         aria-labelledby="confetti-heading"
-        className="heading-medium flex-row gap-xs cursor-pointer"
+        className="heading-small cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span id="confetti-heading">Confetti</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
@@ -160,11 +160,11 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
             </div>
           )}
           <div className="flex-row">
-            <b>Emojis: </b>
+            <h4 className="heading-small">Emojis:</h4>
             {!settings.confetti || settings.confetti.emojis.length === 0 ? (
               "(None selected)"
             ) : (
-              <ul className="list flex-row">
+              <ul className="list flex-row flex-wrap">
                 {settings.confetti.emojis.map((emoji, idx) => (
                   <li key={idx}>
                     <button

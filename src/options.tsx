@@ -65,31 +65,46 @@ export function OptionsView() {
             <h2 className="heading-big" style={{ marginTop: "0" }}>
               Settings
             </h2>
-            <label
-              className="flex-row"
-              title="Sync settings and pinned categories/accounts to your browser profile">
+            <div className="flex-row">
               <input
+                id="sync-enabled"
                 type="checkbox"
                 checked={syncEnabled}
                 onChange={(e) => {
                   const confirmMessage = syncEnabled
-                    ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
-                    : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
+                    ? "Are you sure? This will reset your settings and pinned items, and stop syncing with your browser profile."
+                    : "Are you sure? This will reset your settings and pinned items, and start syncing with your browser profile.";
                   if (confirm(confirmMessage)) changeSetting("sync", e.target.checked);
                 }}
               />
-              🔄 Sync settings
-            </label>
-            <label
-              className="flex-row"
-              title="Enable animations of changing balances and other elements">
+              <label htmlFor="sync-enabled">Sync settings</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Sync your settings and pinned items to your browser profile. Must be
+                  signed into your browser for this to work.
+                </Dialog>
+              </Tooltip>
+            </div>
+            <div className="flex-row">
               <input
+                id="animations-enabled"
                 type="checkbox"
                 checked={!!settings.animations}
                 onChange={(e) => changeSetting("animations", e.target.checked)}
               />
-              🪄 Animations
-            </label>
+              <label htmlFor="animations-enabled">Animations</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable animations of changing balances and other elements.
+                </Dialog>
+              </Tooltip>
+            </div>
             <label className="flex-row">
               Theme:
               <select
