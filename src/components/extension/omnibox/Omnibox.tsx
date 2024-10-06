@@ -14,6 +14,7 @@ export default function Omnibox() {
     budgetSettings,
     settings,
     setPopupState,
+    setTxState,
     omniboxInput,
     setOmniboxInput,
     editingItems,
@@ -51,15 +52,6 @@ export default function Omnibox() {
   return (
     <form className="flex-col mb-lg" onSubmit={onSaveTransaction}>
       <label className="form-input">
-        {omniboxInput.length > 0 && (
-          <button
-            type="button"
-            className="select-button-right icon-button"
-            aria-label="Clear"
-            onClick={() => setOmniboxInput("")}>
-            <X aria-hidden />
-          </button>
-        )}
         <input
           placeholder="filter or type 'add', 'transfer'..."
           value={omniboxInput}
@@ -75,8 +67,9 @@ export default function Omnibox() {
             filtered,
             settings,
             currentAlerts,
-            openTxForm: (txAddState) => {
-              setPopupState({ view: "txAdd", txAddState });
+            openTxForm: async (txAddState) => {
+              await setTxState(txAddState);
+              setPopupState({ view: "txAdd" });
               setOmniboxInput("");
             },
             editingItems,
@@ -96,8 +89,9 @@ export default function Omnibox() {
             isSaving,
             parsedQuery,
             defaultAccountId: budgetSettings?.transactions.defaultAccountId,
-            openTxForm: (txAddState) => {
-              setPopupState({ view: "txAdd", txAddState });
+            openTxForm: async (txAddState) => {
+              await setTxState(txAddState);
+              setPopupState({ view: "txAdd" });
               setOmniboxInput("");
             }
           }}

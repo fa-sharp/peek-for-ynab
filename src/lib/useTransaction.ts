@@ -29,35 +29,35 @@ export default function useTransaction() {
     settings,
     budgetSettings,
     popupState,
+    txState,
+    setTxState,
     setPopupState,
     setOmniboxInput,
     setBudgetSettings
   } = useStorageContext();
 
-  const { txAddState } = popupState || {};
-
   // Transaction state
-  const [isTransfer, setIsTransfer] = useState(txAddState?.isTransfer ?? false);
+  const [isTransfer, setIsTransfer] = useState(txState?.isTransfer ?? false);
   const [date, setDate] = useState(getTodaysDateISO);
-  const [amount, setAmount] = useState(txAddState?.amount || "");
+  const [amount, setAmount] = useState(txState?.amount || "");
   const [cleared, setCleared] = useState(
     () =>
-      accountsData?.find((a) => a.id === txAddState?.accountId)?.type === "cash" ||
+      accountsData?.find((a) => a.id === txState?.accountId)?.type === "cash" ||
       !!budgetSettings?.transactions.cleared
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    txAddState?.amountType || "Outflow"
+    txState?.amountType || "Outflow"
   );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    txAddState?.payee || null
+    txState?.payee || null
   );
   const [category, setCategory] = useState(() => {
-    if (!txAddState?.categoryId) return null;
-    return categoriesData?.find((c) => c.id === txAddState?.categoryId) || null;
+    if (!txState?.categoryId) return null;
+    return categoriesData?.find((c) => c.id === txState?.categoryId) || null;
   });
   const [account, setAccount] = useState(() => {
-    if (txAddState?.accountId)
-      return accountsData?.find((a) => a.id === txAddState?.accountId) || null;
+    if (txState?.accountId)
+      return accountsData?.find((a) => a.id === txState?.accountId) || null;
     if (budgetSettings?.transactions.defaultAccountId)
       return (
         accountsData?.find(
@@ -66,7 +66,7 @@ export default function useTransaction() {
       );
     return null;
   });
-  const [memo, setMemo] = useState(txAddState?.memo || "");
+  const [memo, setMemo] = useState(txState?.memo || "");
   const [flag, setFlag] = useState("");
 
   // Split transaction state
@@ -103,10 +103,24 @@ export default function useTransaction() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
+  useEffect(() => {
+    setTxState({
+      amount,
+      amountType,
+      isTransfer,
+      payee: payee && "id" in payee ? payee : undefined,
+      categoryId: category?.id,
+      accountId: account?.id,
+      memo
+    });
+  }, [account, amount, amountType, category, isTransfer, memo, payee, setTxState]);
+
   // Reset form state if switching budgets
   const originalBudgetId = useRef(popupState?.budgetId);
   useEffect(() => {
     if (popupState && popupState.budgetId !== originalBudgetId.current) {
+      setPayee(null);
       setAccount(null);
       setCategory(null);
       originalBudgetId.current = popupState.budgetId;

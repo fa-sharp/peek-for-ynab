@@ -16,7 +16,7 @@ import TransactionFormSplit from "./TransactionFormSplit";
 /** Form that lets user add a transaction. */
 export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
-  const { settings, setPopupState } = useStorageContext();
+  const { settings, setPopupState, setTxState } = useStorageContext();
 
   return (
     <section>
@@ -30,7 +30,10 @@ export default function TransactionFormWrapper() {
           budgetMainData={budgetMainData}
           selectedBudgetData={selectedBudgetData}
           settings={settings}
-          resetPopupState={() => setPopupState({ view: "main", txAddState: {} })}
+          resetPopupState={async () => {
+            await setTxState({});
+            setPopupState({ view: "main" });
+          }}
         />
       )}
     </section>

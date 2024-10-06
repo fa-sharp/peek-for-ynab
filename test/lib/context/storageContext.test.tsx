@@ -138,7 +138,7 @@ test("Can remove all local data", async () => {
   await result.current.removeAllData();
 
   waitFor(() => expect(result.current.popupState?.budgetId).toBeFalsy());
-  waitFor(() => expect(result.current.popupState?.txAddState).toBeFalsy());
+  waitFor(() => expect(result.current.txState).toBeFalsy());
   waitFor(() => expect(result.current.savedCategories).toStrictEqual({}));
   waitFor(() => expect(result.current.savedAccounts).toStrictEqual({}));
 

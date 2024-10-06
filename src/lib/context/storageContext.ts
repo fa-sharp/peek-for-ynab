@@ -15,7 +15,13 @@ import {
   TOKEN_STORAGE,
   TOKEN_STORAGE_KEY
 } from "~lib/constants";
-import type { AppSettings, BudgetSettings, PopupState, TokenData } from "~lib/types";
+import type {
+  AppSettings,
+  BudgetSettings,
+  PopupState,
+  TokenData,
+  TxAddInitialState
+} from "~lib/types";
 
 /** Map of budget IDs to string arrays. Useful type for storage. */
 interface BudgetToStringArrayMap {
@@ -49,12 +55,18 @@ const useStorageProvider = () => {
       if (!popupState) return;
       const newPopupState = { ...popupState, ...newState };
       _setPopupRender(newPopupState); // ensure popup state change is rendered ASAP
-      _setPopupState(newPopupState);
+      return _setPopupState(newPopupState);
     },
     [_setPopupRender, _setPopupState, popupState]
   );
 
-  /** Whether user can edita and re-arrange the pinned categories and accounts */
+  /** Initial state of the transaction form (persisted locally) */
+  const [txState, setTxState] = useExtensionStorage<TxAddInitialState | undefined>(
+    { key: "txState", instance: CHROME_LOCAL_STORAGE },
+    (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
+  );
+
+  /** Whether user can edit and re-arrange the pinned categories and accounts */
   const [editingItems, setEditingItems] = useState(false);
 
   /** Omnibox input state */
@@ -270,6 +282,8 @@ const useStorageProvider = () => {
     setTokenRefreshNeeded,
     popupState,
     setPopupState,
+    txState,
+    setTxState,
     editingItems,
     setEditingItems,
     omniboxInput,

@@ -148,17 +148,17 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
       : getPossibleTransferFieldCombinations(parsedQuery, data);
   IS_DEV && console.log("Received tx fields from omnibox:", tx);
 
+  await CHROME_LOCAL_STORAGE.set("txState", {
+    amount: parsedQuery.amount,
+    payee: tx?.payee,
+    accountId: tx?.account?.id,
+    categoryId: tx?.category?.id,
+    memo: parsedQuery.memo?.trim(),
+    isTransfer: parsedQuery.type === "transfer"
+  });
   await CHROME_LOCAL_STORAGE.set("popupState", {
     view: "txAdd",
-    budgetId: budgetId,
-    txAddState: {
-      amount: parsedQuery.amount,
-      payee: tx?.payee,
-      accountId: tx?.account?.id,
-      categoryId: tx?.category?.id,
-      memo: parsedQuery.memo?.trim(),
-      isTransfer: parsedQuery.type === "transfer"
-    }
+    budgetId: budgetId
   } satisfies PopupState);
   chrome.action.openPopup();
 });

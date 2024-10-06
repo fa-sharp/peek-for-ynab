@@ -22,6 +22,7 @@ export default function AllAccountsView() {
     savedAccounts,
     saveAccount,
     setPopupState,
+    setTxState,
     popupState,
     editingItems,
     settings
@@ -61,7 +62,10 @@ export default function AllAccountsView() {
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+              onAddTx={async (txAddState) => {
+                await setTxState(txAddState);
+                setPopupState({ view: "txAdd" });
+              }}
             />
           </li>
           <li>
@@ -74,7 +78,10 @@ export default function AllAccountsView() {
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+              onAddTx={async (txAddState) => {
+                await setTxState(txAddState);
+                setPopupState({ view: "txAdd" });
+              }}
             />
           </li>
         </ul>

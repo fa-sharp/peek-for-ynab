@@ -24,6 +24,7 @@ function CategoriesView() {
     savedCategories,
     saveCategory,
     setPopupState,
+    setTxState,
     popupState,
     editingItems,
     settings
@@ -70,7 +71,10 @@ function CategoriesView() {
               editMode={editingItems}
               settings={settings}
               onSaveCategory={(categoryId) => saveCategory(categoryId)}
-              onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
+              onAddTx={async (txAddState) => {
+                await setTxState(txAddState);
+                setPopupState({ view: "txAdd" });
+              }}
             />
           ))}
         </ul>

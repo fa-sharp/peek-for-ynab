@@ -32,7 +32,8 @@ export default function PopupNav() {
     editingItems,
     setEditingItems,
     popupState,
-    setPopupState
+    setPopupState,
+    setTxState
   } = useStorageContext();
   const {
     budgetsData,
@@ -64,16 +65,14 @@ export default function PopupNav() {
   }, []);
 
   const onMenuAction = useCallback(
-    (key: Key) => {
+    async (key: Key) => {
       switch (key) {
         case "addTransaction":
           setPopupState({ view: "txAdd" });
           break;
         case "addTransfer":
-          setPopupState({
-            view: "txAdd",
-            txAddState: { isTransfer: true, accountId: "none" }
-          });
+          await setTxState({ isTransfer: true, accountId: "none" });
+          setPopupState({ view: "txAdd" });
           break;
         case "editItems":
           setEditingItems(!editingItems);
@@ -85,11 +84,12 @@ export default function PopupNav() {
           chrome?.runtime?.openOptionsPage();
           break;
         case "backToMain":
+          await setTxState({});
           setPopupState({ view: "main" });
           break;
       }
     },
-    [editingItems, openPopupWindow, setEditingItems, setPopupState]
+    [editingItems, openPopupWindow, setEditingItems, setPopupState, setTxState]
   );
 
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
@@ -140,7 +140,7 @@ export default function PopupNav() {
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
           setSelectedBudgetId={(id) => {
-            setPopupState({ budgetId: id, txAddState: {} });
+            setTxState({}).then(() => setPopupState({ budgetId: id }));
           }}
         />
         <IconButton

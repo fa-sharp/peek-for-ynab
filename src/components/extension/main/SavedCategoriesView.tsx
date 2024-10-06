@@ -12,8 +12,14 @@ import {
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const { removeCategory, settings, editingItems, popupState, setPopupState } =
-    useStorageContext();
+  const {
+    removeCategory,
+    settings,
+    editingItems,
+    popupState,
+    setPopupState,
+    setTxState
+  } = useStorageContext();
   const { accountsData, selectedBudgetData, savedCategoriesData, addedTransaction } =
     useYNABContext();
   const { currentAlerts } = useNotificationsContext();
@@ -79,10 +85,9 @@ export default function SavedCategoriesView() {
                               icon={<AddTransactionIcon />}
                               label="Add transaction"
                               onClick={() =>
-                                setPopupState({
-                                  view: "txAdd",
-                                  txAddState: { categoryId: category.id }
-                                })
+                                setTxState({ categoryId: category.id }).then(() =>
+                                  setPopupState({ view: "txAdd" })
+                                )
                               }
                             />
                           ) : (
@@ -93,21 +98,22 @@ export default function SavedCategoriesView() {
                               label="Add credit card payment"
                               onClick={() =>
                                 ccAccount.transfer_payee_id &&
-                                setPopupState({
-                                  view: "txAdd",
-                                  txAddState: {
-                                    isTransfer: true,
-                                    amount:
-                                      category.balance >= 0
-                                        ? millisToStringValue(
-                                            category.balance,
-                                            currencyFormat
-                                          )
-                                        : undefined,
-                                    amountType: "Inflow",
-                                    accountId: ccAccount.id
-                                  }
-                                })
+                                setTxState({
+                                  isTransfer: true,
+                                  amount:
+                                    category.balance >= 0
+                                      ? millisToStringValue(
+                                          category.balance,
+                                          currencyFormat
+                                        )
+                                      : undefined,
+                                  amountType: "Inflow",
+                                  accountId: ccAccount.id
+                                }).then(() =>
+                                  setPopupState({
+                                    view: "txAdd"
+                                  })
+                                )
                               }
                             />
                           )}

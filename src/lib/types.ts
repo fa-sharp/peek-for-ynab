@@ -17,8 +17,6 @@ export interface PopupState {
   view: "main" | "txAdd";
   /** Currently selected budget ID. Could be an empty string if no budget is selected. */
   budgetId: string;
-  /** Initial state of the transaction form */
-  txAddState?: TxAddInitialState;
 }
 
 export interface AppSettings {

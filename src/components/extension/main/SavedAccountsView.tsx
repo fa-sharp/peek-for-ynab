@@ -8,7 +8,7 @@ import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, setPopupState, popupState, editingItems, settings } =
+  const { removeAccount, setPopupState, popupState, editingItems, settings, setTxState } =
     useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
@@ -65,10 +65,9 @@ export default function SavedAccountsView() {
                           icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
-                            setPopupState({
-                              view: "txAdd",
-                              txAddState: { accountId: account.id }
-                            })
+                            setTxState({ accountId: account.id }).then(() =>
+                              setPopupState({ view: "txAdd" })
+                            )
                           }
                         />
                       </aside>
