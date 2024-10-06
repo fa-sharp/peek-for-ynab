@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { X } from "tabler-icons-react";
 
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
@@ -89,8 +88,7 @@ export default function Omnibox() {
             isSaving,
             parsedQuery,
             defaultAccountId: budgetSettings?.transactions.defaultAccountId,
-            openTxForm: async (txAddState) => {
-              await setTxState(txAddState);
+            openTxForm: () => {
               setPopupState({ view: "txAdd" });
               setOmniboxInput("");
             }

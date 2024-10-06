@@ -6,11 +6,11 @@ import {
   useRef,
   useState
 } from "react";
-import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
+import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { IS_PRODUCTION } from "./constants";
 import { useStorageContext, useYNABContext } from "./context";
-import type { CachedPayee } from "./types";
+import type { CachedPayee, SubTxState, TxAddInitialState } from "./types";
 import {
   checkPermissions,
   executeScriptInCurrentTab,
@@ -30,8 +30,8 @@ export default function useTransaction() {
     budgetSettings,
     popupState,
     txState,
-    setTxState,
     setPopupState,
+    setTxState,
     setOmniboxInput,
     setBudgetSettings
   } = useStorageContext();
@@ -70,20 +70,14 @@ export default function useTransaction() {
   const [flag, setFlag] = useState("");
 
   // Split transaction state
-  const [isSplit, setIsSplit] = useState(false);
-  const [subTxs, setSubTxs] = useState<
-    Array<{
-      amount: string;
-      amountType: "Inflow" | "Outflow";
-      payee: CachedPayee | { name: string } | null;
-      category: Category | null;
-      memo?: string;
-    }>
-  >([{ amount: "", amountType: "Outflow", payee: null, category: null }]);
+  const [isSplit, setIsSplit] = useState(txState?.isSplit ?? false);
+  const [subTxs, setSubTxs] = useState<Array<SubTxState>>(
+    txState?.subTxs || [{ amount: "", amountType: "Outflow", isTransfer: false }]
+  );
   const onAddSubTx = useCallback(() => {
     setSubTxs((prev) => [
       ...prev,
-      { amount: "", amountType: "Outflow", payee: null, category: null }
+      { amount: "", amountType: "Outflow", isTransfer: false }
     ]);
   }, []);
   const onRemoveSubTx = useCallback(() => {
@@ -104,17 +98,20 @@ export default function useTransaction() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
-  useEffect(() => {
-    setTxState({
-      amount,
-      amountType,
-      isTransfer,
-      payee: payee && "id" in payee ? payee : undefined,
-      categoryId: category?.id,
-      accountId: account?.id,
-      memo
-    });
-  }, [account, amount, amountType, category, isTransfer, memo, payee, setTxState]);
+  usePersistFormState({
+    amount,
+    amountType,
+    isTransfer,
+    payee,
+    categoryId: category?.id,
+    accountId: account?.id,
+    memo,
+    isSplit,
+    subTxs
+  });
+
+  // Try parsing user's current selection as the initial amount
+  useParseAmountFromUserSelection(!!settings?.currentTabAccess, setAmount);
 
   // Reset form state if switching budgets
   const originalBudgetId = useRef(popupState?.budgetId);
@@ -126,23 +123,6 @@ export default function useTransaction() {
       originalBudgetId.current = popupState.budgetId;
     }
   }, [popupState]);
-
-  // Try parsing user's selection as the amount upon opening the form
-  useEffect(() => {
-    if (!settings?.currentTabAccess) return;
-    checkPermissions(["activeTab", "scripting"]).then((granted) => {
-      if (!granted) return;
-      executeScriptInCurrentTab(() => getSelection()?.toString())
-        .then((selection) => {
-          if (!selection) return;
-          const parsedNumber = parseLocaleNumber(selection);
-          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
-        })
-        .catch((err) => {
-          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
-        });
-    });
-  }, [settings?.currentTabAccess]);
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
@@ -249,7 +229,7 @@ export default function useTransaction() {
         subtransactions: isSplit
           ? subTxs.map((subTx) => ({
               amount: stringValueToMillis(subTx.amount, subTx.amountType),
-              category_id: subTx.category?.id,
+              category_id: subTx.categoryId,
               payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
               payee_name:
                 subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name,
@@ -257,6 +237,7 @@ export default function useTransaction() {
             }))
           : undefined
       });
+      await setTxState({});
       setOmniboxInput("");
       setPopupState({ view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -293,3 +274,31 @@ export default function useTransaction() {
     }
   };
 }
+
+const usePersistFormState = (currentState: TxAddInitialState) => {
+  const { setTxState } = useStorageContext();
+  useEffect(() => {
+    setTxState(currentState);
+  }, [currentState, setTxState]);
+};
+
+const useParseAmountFromUserSelection = (
+  enabled: boolean,
+  setAmount: (amount: string) => void
+) => {
+  useEffect(() => {
+    if (!enabled) return;
+    checkPermissions(["activeTab", "scripting"]).then((granted) => {
+      if (!granted) return;
+      executeScriptInCurrentTab(() => getSelection()?.toString())
+        .then((selection) => {
+          if (!selection) return;
+          const parsedNumber = parseLocaleNumber(selection);
+          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+        })
+        .catch((err) => {
+          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+        });
+    });
+  }, [enabled, setAmount]);
+};

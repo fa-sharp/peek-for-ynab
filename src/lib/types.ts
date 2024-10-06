@@ -95,7 +95,19 @@ export interface TxAddInitialState {
   amountType?: "Inflow" | "Outflow";
   accountId?: string;
   categoryId?: string;
-  payee?: CachedPayee;
+  payee?: CachedPayee | { name: string } | null;
   isTransfer?: boolean;
+  memo?: string;
+  isSplit?: boolean;
+  subTxs?: Array<SubTxState>;
+}
+
+/** Split transaction state  */
+export interface SubTxState {
+  amount: string;
+  amountType: "Inflow" | "Outflow";
+  payee?: CachedPayee | { name: string } | null;
+  isTransfer: boolean;
+  categoryId?: string;
   memo?: string;
 }

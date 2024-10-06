@@ -1,15 +1,14 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
 import type { Category } from "ynab";
 
-import type { BudgetMainData, CachedPayee } from "~lib/types";
+import type { BudgetMainData, CachedPayee, SubTxState } from "~lib/types";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
 interface Props {
   splitIndex: number;
-  amount: string;
-  amountType: "Inflow" | "Outflow";
+  txState: SubTxState;
   allowTransfer?: boolean;
   autoFocus?: boolean;
   disabled?: boolean;
@@ -17,14 +16,14 @@ interface Props {
   setAmountType: (amountType: "Inflow" | "Outflow") => void;
   setPayee: (payee: CachedPayee | { name: string } | null) => void;
   setCategory: (category: Category | null) => void;
+  setIsTransfer: (isTransfer: boolean) => void;
   setMemo: (memo: string) => void;
   budgetMainData: BudgetMainData;
 }
 
 export default function SubTransaction({
   splitIndex,
-  amount,
-  amountType,
+  txState,
   allowTransfer = true,
   autoFocus = false,
   disabled = false,
@@ -32,13 +31,21 @@ export default function SubTransaction({
   setAmountType,
   setPayee,
   setCategory,
+  setIsTransfer,
   setMemo,
   budgetMainData
 }: Props) {
-  const [showPayee, setShowPayee] = useState(false);
-  const [showCategory, setShowCategory] = useState(true);
-  const [showMemo, setShowMemo] = useState(false);
-  const [isTransfer, setIsTransfer] = useState(false);
+  const [showPayee, setShowPayee] = useState(!!txState.payee);
+  const [showMemo, setShowMemo] = useState(!!txState.memo);
+  const [showCategory, setShowCategory] = useState(() => {
+    if (txState.isTransfer && txState.payee && "id" in txState.payee) {
+      const transferAccount = budgetMainData.accountsData.find(
+        (a) => a.transfer_payee_id === (txState.payee as { id: string }).id
+      );
+      if (transferAccount && transferAccount.on_budget) return false;
+    }
+    return true;
+  });
 
   const payeeRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLInputElement>(null);
@@ -48,16 +55,17 @@ export default function SubTransaction({
     <fieldset className="flex-col gap-sm rounded" disabled={disabled}>
       <legend>Split {splitIndex + 1}</legend>
       <AmountField
-        amount={amount}
-        amountType={amountType}
+        amount={txState.amount}
+        amountType={txState.amountType}
         autoFocus={autoFocus}
         setAmount={setAmount}
         setAmountType={setAmountType}
       />
       {showPayee &&
-        (!isTransfer ? (
+        (!txState.isTransfer ? (
           <PayeeSelect
             ref={payeeRef}
+            initialPayee={txState.payee}
             payees={budgetMainData.payeesData}
             selectPayee={setPayee}
             required={false}
@@ -65,7 +73,14 @@ export default function SubTransaction({
         ) : (
           <AccountSelect
             ref={payeeRef}
-            label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+            currentAccount={
+              txState.payee && "id" in txState.payee
+                ? budgetMainData.accountsData.find(
+                    (a) => a.transfer_payee_id === (txState.payee as { id: string }).id
+                  )
+                : null
+            }
+            label={txState.amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
             accounts={budgetMainData.accountsData}
             selectAccount={(account) => {
               if (!account || !account.transfer_payee_id) {
@@ -90,6 +105,11 @@ export default function SubTransaction({
       {showCategory && (
         <CategorySelect
           ref={categoryRef}
+          initialCategory={
+            !txState.categoryId
+              ? null
+              : budgetMainData.categoriesData.find((c) => c.id === txState.categoryId)
+          }
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={setCategory}
@@ -102,6 +122,7 @@ export default function SubTransaction({
           <input
             ref={memoRef}
             autoComplete="off"
+            value={txState.memo}
             onChange={(e) => setMemo(e.target.value)}
           />
         </label>

@@ -29,8 +29,7 @@ export default function TransactionFormSplit({
         <SubTransaction
           key={idx}
           splitIndex={idx}
-          amount={subTx.amount}
-          amountType={subTx.amountType}
+          txState={subTx}
           autoFocus={idx > 0}
           allowTransfer={!formState.isTransfer}
           disabled={isSaving}
@@ -55,7 +54,7 @@ export default function TransactionFormSplit({
             handlers.setSubTxs((prev) =>
               prev.with(idx, {
                 ...prev[idx],
-                category: newCategory
+                categoryId: newCategory?.id
               })
             )
           }
@@ -64,6 +63,14 @@ export default function TransactionFormSplit({
               prev.with(idx, {
                 ...prev[idx],
                 payee: newPayee
+              })
+            )
+          }
+          setIsTransfer={(isTransfer) =>
+            handlers.setSubTxs((prev) =>
+              prev.with(idx, {
+                ...prev[idx],
+                isTransfer
               })
             )
           }

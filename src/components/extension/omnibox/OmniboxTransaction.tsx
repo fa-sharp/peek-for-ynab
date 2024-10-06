@@ -8,7 +8,7 @@ import {
   getPossibleTransferFields,
   getPossibleTxFields
 } from "~lib/omnibox";
-import type { BudgetMainData, CachedBudget, TxAddInitialState } from "~lib/types";
+import type { BudgetMainData, CachedBudget } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 import { getIgnoredCategoryIdsForTx, stringValueToMillis } from "~lib/utils";
 
@@ -37,7 +37,7 @@ interface Props {
   formState: TransactionFormState;
   handlers: TransactionFormHandlers;
   isSaving: boolean;
-  openTxForm: (txState: TxAddInitialState) => void;
+  openTxForm: () => void;
   defaultAccountId?: string;
 }
 
@@ -164,18 +164,7 @@ export default function OmniboxTransaction({
             className="flex-1 flex-row justify-center button accent rounded"
             onClick={(e) => {
               e.preventDefault();
-              openTxForm({
-                amount: formState.amount,
-                amountType: formState.amountType,
-                accountId: formState.account?.id,
-                categoryId: formState.category?.id,
-                payee:
-                  formState.payee && "id" in formState.payee
-                    ? formState.payee
-                    : undefined,
-                isTransfer: formState.isTransfer,
-                memo: formState.memo
-              });
+              openTxForm();
             }}
             disabled={isSaving}>
             <Pencil aria-hidden size={19} /> Edit and save
