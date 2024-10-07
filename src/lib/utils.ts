@@ -188,3 +188,27 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
   if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
   return null;
 };
+
+/**
+ * Wait for an internet connection to be established.
+ * @param timeoutMs - The maximum time to wait for a connection, in milliseconds. Default is 10 seconds.
+ * @returns A Promise that resolves when an internet connection is established, or rejects if the timeout is reached.
+ */
+export function waitForInternetConnection(timeoutMs: number = 10 * 1000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    if (navigator.onLine) {
+      setTimeout(resolve, 1000); // wait additional second for connection stability
+    } else {
+      const intervalId = setInterval(() => {
+        if (navigator.onLine) {
+          clearInterval(intervalId);
+          setTimeout(resolve, 1000);
+        } else if (Date.now() - startTime > timeoutMs) {
+          clearInterval(intervalId);
+          reject(new Error("No internet connection!"));
+        }
+      }, 1000);
+    }
+  });
+}

@@ -20,7 +20,7 @@ import {
   parseTxInput
 } from "~lib/omnibox";
 import type { PopupState } from "~lib/types";
-import { searchWithinString } from "~lib/utils";
+import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 // Listen for token refresh signal
 TOKEN_STORAGE.watch({
@@ -36,10 +36,11 @@ TOKEN_STORAGE.watch({
 
 // Setup periodic background refresh
 const BACKGROUND_ALARM_NAME = "backgroundRefresh";
-chrome.alarms.onAlarm.addListener((alarm: chrome.alarms.Alarm) => {
+chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   if (alarm.name === BACKGROUND_ALARM_NAME) {
     try {
-      backgroundDataRefresh();
+      await waitForInternetConnection();
+      await backgroundDataRefresh();
     } catch (err) {
       console.error("Background refresh: Error", err);
     }
