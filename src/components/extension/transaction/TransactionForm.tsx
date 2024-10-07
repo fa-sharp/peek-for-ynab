@@ -162,7 +162,7 @@ export function TransactionFormInner({
             <option value="">None</option>
             {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
               <option key={flagValue} value={flagValue}>
-                {`${flagColorToEmoji(flagValue) || ""} ${flagName}`}
+                {`${flagName} ${flagColorToEmoji(flagValue) || ""}`}
               </option>
             ))}
           </select>

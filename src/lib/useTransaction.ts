@@ -67,7 +67,7 @@ export default function useTransaction() {
     return null;
   });
   const [memo, setMemo] = useState(txState?.memo || "");
-  const [flag, setFlag] = useState("");
+  const [flag, setFlag] = useState(txState?.flag || "");
 
   // Split transaction state
   const [isSplit, setIsSplit] = useState(txState?.isSplit ?? false);
@@ -98,21 +98,18 @@ export default function useTransaction() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
-  const savedFormState = useMemo<TxAddInitialState>(
-    () => ({
-      amount,
-      amountType,
-      isTransfer,
-      payee,
-      categoryId: category?.id,
-      accountId: account?.id,
-      memo,
-      isSplit,
-      subTxs
-    }),
-    [account, amount, amountType, category, isSplit, isTransfer, memo, payee, subTxs]
-  );
-  usePersistFormState(savedFormState);
+  usePersistFormState({
+    amount,
+    amountType,
+    isTransfer,
+    payee,
+    categoryId: category?.id,
+    accountId: account?.id,
+    memo,
+    flag,
+    isSplit,
+    subTxs
+  });
 
   // Try parsing user's current selection as the initial amount
   useParseAmountFromUserSelection(!!settings?.currentTabAccess, setAmount);
@@ -279,11 +276,34 @@ export default function useTransaction() {
   };
 }
 
-const usePersistFormState = (currentState: TxAddInitialState) => {
+const usePersistFormState = (txState: TxAddInitialState) => {
   const { setTxState } = useStorageContext();
   useEffect(() => {
-    setTxState(currentState);
-  }, [currentState, setTxState]);
+    setTxState({
+      accountId: txState.accountId,
+      amount: txState.amount,
+      amountType: txState.amountType,
+      categoryId: txState.categoryId,
+      flag: txState.flag,
+      isSplit: txState.isSplit,
+      isTransfer: txState.isTransfer,
+      memo: txState.memo,
+      payee: txState.payee,
+      subTxs: txState.subTxs
+    });
+  }, [
+    setTxState,
+    txState.accountId,
+    txState.amount,
+    txState.amountType,
+    txState.categoryId,
+    txState.flag,
+    txState.isSplit,
+    txState.isTransfer,
+    txState.memo,
+    txState.payee,
+    txState.subTxs
+  ]);
 };
 
 const useParseAmountFromUserSelection = (

@@ -98,6 +98,7 @@ export interface TxAddInitialState {
   payee?: CachedPayee | { name: string } | null;
   isTransfer?: boolean;
   memo?: string;
+  flag?: string;
   isSplit?: boolean;
   subTxs?: Array<SubTxState>;
 }
