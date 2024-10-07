@@ -100,21 +100,23 @@ export default function TransactionFormSplit({
           </button>
         )}
       </div>
-      <div className="heading-medium balance-display mt-sm">
-        Total of splits:
-        <CurrencyView
-          milliUnits={totalSubTxsAmount}
-          currencyFormat={currencyFormat}
-          colorsEnabled
-        />
-      </div>
-      <div className="heading-medium balance-display mb-sm">
-        Amount remaining:
-        <CurrencyView
-          milliUnits={leftOverSubTxsAmount}
-          currencyFormat={currencyFormat}
-          colorsEnabled
-        />
+      <div>
+        <div className="heading-small balance-display">
+          Total of splits:
+          <CurrencyView
+            milliUnits={totalSubTxsAmount}
+            currencyFormat={currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="heading-small balance-display">
+          Amount remaining:
+          <CurrencyView
+            milliUnits={leftOverSubTxsAmount}
+            currencyFormat={currencyFormat}
+            colorsEnabled
+          />
+        </div>
       </div>
     </>
   );
