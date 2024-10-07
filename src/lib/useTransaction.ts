@@ -98,17 +98,21 @@ export default function useTransaction() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
-  usePersistFormState({
-    amount,
-    amountType,
-    isTransfer,
-    payee,
-    categoryId: category?.id,
-    accountId: account?.id,
-    memo,
-    isSplit,
-    subTxs
-  });
+  const savedFormState = useMemo<TxAddInitialState>(
+    () => ({
+      amount,
+      amountType,
+      isTransfer,
+      payee,
+      categoryId: category?.id,
+      accountId: account?.id,
+      memo,
+      isSplit,
+      subTxs
+    }),
+    [account, amount, amountType, category, isSplit, isTransfer, memo, payee, subTxs]
+  );
+  usePersistFormState(savedFormState);
 
   // Try parsing user's current selection as the initial amount
   useParseAmountFromUserSelection(!!settings?.currentTabAccess, setAmount);
