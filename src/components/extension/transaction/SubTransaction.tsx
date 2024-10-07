@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
-import type { Category } from "ynab";
 
-import type { BudgetMainData, CachedPayee, SubTxState } from "~lib/types";
+import type { BudgetMainData, SubTxState } from "~lib/types";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
@@ -12,27 +11,17 @@ interface Props {
   allowTransfer?: boolean;
   autoFocus?: boolean;
   disabled?: boolean;
-  setAmount: (amount: string) => void;
-  setAmountType: (amountType: "Inflow" | "Outflow") => void;
-  setPayee: (payee: CachedPayee | { name: string } | null) => void;
-  setCategory: (category: Category | null) => void;
-  setIsTransfer: (isTransfer: boolean) => void;
-  setMemo: (memo: string) => void;
+  setField: <T extends keyof SubTxState>(field: T, value: SubTxState[T]) => void;
   budgetMainData: BudgetMainData;
 }
 
 export default function SubTransaction({
   splitIndex,
   txState,
+  setField,
   allowTransfer = true,
   autoFocus = false,
   disabled = false,
-  setAmount,
-  setAmountType,
-  setPayee,
-  setCategory,
-  setIsTransfer,
-  setMemo,
   budgetMainData
 }: Props) {
   const [showPayee, setShowPayee] = useState(!!txState.payee);
@@ -58,8 +47,8 @@ export default function SubTransaction({
         amount={txState.amount}
         amountType={txState.amountType}
         autoFocus={autoFocus}
-        setAmount={setAmount}
-        setAmountType={setAmountType}
+        setAmount={(amount) => setField("amount", amount)}
+        setAmountType={(amountType) => setField("amountType", amountType)}
       />
       {showPayee &&
         (!txState.isTransfer ? (
@@ -67,7 +56,7 @@ export default function SubTransaction({
             ref={payeeRef}
             initialPayee={txState.payee}
             payees={budgetMainData.payeesData}
-            selectPayee={setPayee}
+            selectPayee={(payee) => setField("payee", payee)}
             required={false}
           />
         ) : (
@@ -84,17 +73,17 @@ export default function SubTransaction({
             accounts={budgetMainData.accountsData}
             selectAccount={(account) => {
               if (!account || !account.transfer_payee_id) {
-                setPayee(null);
+                setField("payee", null);
                 setShowCategory(true);
               } else {
-                setPayee({
+                setField("payee", {
                   id: account.transfer_payee_id,
                   name: account.name,
                   transferId: account.id
                 });
                 if (account.on_budget) {
                   setShowCategory(false);
-                  setCategory(null);
+                  setField("categoryId", undefined);
                 } else {
                   setShowCategory(true);
                 }
@@ -112,7 +101,7 @@ export default function SubTransaction({
           }
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
-          selectCategory={setCategory}
+          selectCategory={(category) => setField("categoryId", category?.id)}
           placeholder=""
         />
       )}
@@ -123,7 +112,7 @@ export default function SubTransaction({
             ref={memoRef}
             autoComplete="off"
             value={txState.memo}
-            onChange={(e) => setMemo(e.target.value)}
+            onChange={(e) => setField("memo", e.target.value)}
           />
         </label>
       )}
@@ -156,7 +145,7 @@ export default function SubTransaction({
             className="button gray rounded flex-row gap-xs"
             onClick={() => {
               setShowPayee(true);
-              setIsTransfer(true);
+              setField("isTransfer", true);
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
             <Plus aria-label="Add" size={12} /> Transfer

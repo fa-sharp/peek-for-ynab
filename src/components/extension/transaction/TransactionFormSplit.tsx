@@ -34,53 +34,8 @@ export default function TransactionFormSplit({
           allowTransfer={!formState.isTransfer}
           disabled={isSaving}
           budgetMainData={budgetMainData}
-          setAmount={(newAmount) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                amount: newAmount
-              })
-            )
-          }
-          setAmountType={(newAmountType) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                amountType: newAmountType
-              })
-            )
-          }
-          setCategory={(newCategory) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                categoryId: newCategory?.id
-              })
-            )
-          }
-          setPayee={(newPayee) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                payee: newPayee
-              })
-            )
-          }
-          setIsTransfer={(isTransfer) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                isTransfer
-              })
-            )
-          }
-          setMemo={(newMemo) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                memo: newMemo
-              })
-            )
+          setField={(field, val) =>
+            handlers.setSubTxs((prev) => prev.with(idx, { ...prev[idx], [field]: val }))
           }
         />
       ))}
