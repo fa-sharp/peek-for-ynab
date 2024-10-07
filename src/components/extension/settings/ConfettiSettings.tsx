@@ -1,16 +1,12 @@
-import { type FormEventHandler, useMemo, useRef, useState } from "react";
+import { type FormEventHandler, useId, useMemo, useRef, useState } from "react";
 import { Help, Plus, X } from "tabler-icons-react";
 
-import { Dialog, Tooltip } from "~components";
-import IconButton from "~components/IconButton";
+import { CategorySelect, Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { DEFAULT_BUDGET_SETTINGS } from "~lib/constants";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { BudgetSettings, CachedBudget } from "~lib/types";
 import { findEmoji } from "~lib/utils";
-
-import CategorySelect from "../transaction/CategorySelect";
 
 export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();
@@ -22,6 +18,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   const [expanded, setExpanded] = useState(false);
   const [addingCategory, setAddingCategory] = useState(false);
   const [addingEmoji, setAddingEmoji] = useState(false);
+  const controlsId = useId();
 
   const categoriesData = useMemo(
     () => categoryGroupsData?.flatMap((cg) => cg.categories),
@@ -82,10 +79,10 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
   if (!settings) return null;
 
   return (
-    <div className="flex-col gap-sm">
+    <div>
       <h3
         aria-labelledby="confetti-heading"
-        className="heading-medium flex-row gap-xs cursor-pointer"
+        className="heading-small cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <span id="confetti-heading">Confetti</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
@@ -96,13 +93,15 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
           </Dialog>
         </Tooltip>
         <IconButton
+          aria-controls={controlsId}
+          aria-expanded={expanded}
           label={expanded ? "Collapse" : "Expand"}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
           onClick={() => setExpanded(!expanded)}
         />
       </h3>
       {expanded && (
-        <>
+        <div id={controlsId} className="flex-col gap-sm">
           <label className="flex-row gap-xs">
             <input
               type="checkbox"
@@ -161,11 +160,11 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
             </div>
           )}
           <div className="flex-row">
-            <b>Emojis: </b>
+            <h4 className="heading-small">Emojis:</h4>
             {!settings.confetti || settings.confetti.emojis.length === 0 ? (
               "(None selected)"
             ) : (
-              <ul className="list flex-row">
+              <ul className="list flex-row flex-wrap">
                 {settings.confetti.emojis.map((emoji, idx) => (
                   <li key={idx}>
                     <button
@@ -206,7 +205,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
               </button>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

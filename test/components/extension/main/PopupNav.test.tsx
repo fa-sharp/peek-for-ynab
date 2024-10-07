@@ -3,7 +3,7 @@ import { userEvent } from "@testing-library/user-event";
 import { validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
 import { budgets } from "test/mock/ynabApiData";
-import { afterEach, beforeEach, expect, test } from "vitest";
+import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { PopupNav } from "~components";
@@ -12,12 +12,10 @@ import { useStorageContext } from "~lib/context";
 beforeEach(async () => {
   await chrome.storage.local.set({
     tokenData: JSON.stringify(validToken),
-    budgets: JSON.stringify([budgets[0].id, budgets[1].id])
+    budgets: JSON.stringify([budgets[0].id, budgets[1].id]),
+    popupState: JSON.stringify({ view: "main", budgetId: budgets[0].id })
   });
-  window.localStorage.setItem("selectedBudget", `"${budgets[0].id}"`);
 });
-
-afterEach(() => window.localStorage.removeItem("selectedBudget"));
 
 test("Correct budget is selected", async () => {
   const wrapper = createTestAppWrapper();
@@ -84,13 +82,13 @@ test("Menu buttons change the popup state as expected", async () => {
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
-  expect(result.current.popupState.editMode).toBeFalsy();
+  expect(result.current.editingItems).toBeFalsy();
   await user.click(screen.getByLabelText("Menu"));
   await user.click(screen.getByText("Edit", { exact: false }));
-  expect(result.current.popupState.editMode, "edit mode activated").toEqual(true);
+  expect(result.current.editingItems, "edit mode activated").toEqual(true);
 
-  expect(result.current.popupState.view).toEqual("main");
+  expect(result.current.popupState?.view).toEqual("main");
   await user.click(screen.getByLabelText("Menu"));
   await user.click(screen.getByText("Add transaction"));
-  expect(result.current.popupState.view, "transaction form opened").toEqual("txAdd");
+  expect(result.current.popupState?.view, "transaction form opened").toEqual("txAdd");
 });

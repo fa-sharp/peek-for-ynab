@@ -2,8 +2,7 @@ import { CircleC, Help, InfoCircle } from "tabler-icons-react";
 
 import { AccountSelect, Dialog, Tooltip } from "~components";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { BudgetSettings, CachedBudget } from "~lib/types";
 
 export default function TransactionSettings({ budget }: { budget: CachedBudget }) {
   const { useBudgetSettings } = useStorageContext();
@@ -27,7 +26,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
   return (
     <>
       <div className="flex-col gap-sm">
-        <h4 aria-labelledby="tx-heading" className="heading-medium">
+        <h4 aria-labelledby="tx-heading" className="heading-small">
           <span id="tx-heading">Transaction defaults</span>
           <Tooltip
             label="More info"

@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Help } from "tabler-icons-react";
 
 import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useStorageContext } from "~lib/context";
-import type { BudgetSettings } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { BudgetSettings, CachedBudget } from "~lib/types";
 
 import ReconcileAlertSettings from "./ReconcileAlertSettings";
 
@@ -13,6 +12,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
   const { useBudgetSettings } = useStorageContext();
   const [budgetSettings, setBudgetSettings] = useBudgetSettings(budget.id);
   const [reconcileExpanded, setReconcileExpanded] = useState(false);
+  const reconcileControlsId = useId();
 
   const changeNotifSetting = <K extends keyof BudgetSettings["notifications"]>(
     key: K,
@@ -29,7 +29,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
   return (
     <>
       <div className="flex-col gap-sm">
-        <h3 aria-labelledby="notification-heading" className="heading-medium">
+        <h3 aria-labelledby="notification-heading" className="heading-small">
           <span id="notification-heading">Notifications</span>
           <Tooltip
             label="More info"
@@ -71,7 +71,7 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
       </div>
       <h3
         aria-labelledby="reconcile-heading"
-        className="heading-medium flex-row gap-xs cursor-pointer"
+        className="heading-small cursor-pointer"
         onClick={() => setReconcileExpanded(!reconcileExpanded)}>
         <span id="reconcile-heading">Reconciliation alerts</span>
         <Tooltip label="More info" icon={<Help size={18} aria-hidden />} placement="top">
@@ -81,12 +81,16 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
           </Dialog>
         </Tooltip>
         <IconButton
+          aria-controls={reconcileControlsId}
+          aria-expanded={reconcileExpanded}
           label={reconcileExpanded ? "Collapse" : "Expand"}
           icon={reconcileExpanded ? <CollapseListIcon /> : <ExpandListIcon />}
           onClick={() => setReconcileExpanded(!reconcileExpanded)}
         />
       </h3>
-      {reconcileExpanded && <ReconcileAlertSettings budget={budget} />}
+      {reconcileExpanded && (
+        <ReconcileAlertSettings id={reconcileControlsId} budget={budget} />
+      )}
     </>
   );
 }

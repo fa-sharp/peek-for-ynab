@@ -20,9 +20,9 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { settings, syncEnabled, changeSetting } = useStorageContext();
+  const { popupState, settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
-  const { loginWithOAuth, loggedIn, logout } = useAuthContext();
+  const { authLoading, loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   useSetColorTheme();
 
@@ -34,7 +34,8 @@ export function OptionsView() {
     remove: removeNotificationPermission
   } = useNotificationPermission();
 
-  if (!settings) return null;
+  // check if auth and storage are hydrated to avoid flashes
+  if (authLoading || !settings || !popupState) return null;
 
   return (
     <section
@@ -64,35 +65,46 @@ export function OptionsView() {
             <h2 className="heading-big" style={{ marginTop: "0" }}>
               Settings
             </h2>
-            <label
-              className="flex-row"
-              title="Sync settings and pinned categories/accounts to your browser profile">
+            <div className="flex-row">
               <input
+                id="sync-enabled"
                 type="checkbox"
                 checked={syncEnabled}
                 onChange={(e) => {
                   const confirmMessage = syncEnabled
-                    ? "Are you sure? This will reset your pinned categories, accounts, & budgets and stop syncing with your browser profile."
-                    : "Are you sure? This will reset any currently pinned categories, accounts, & budgets and start syncing with your browser profile.";
-                  const confirmed = confirm(confirmMessage);
-                  if (confirmed) {
-                    changeSetting("sync", e.target.checked);
-                    location.reload();
-                  }
+                    ? "Are you sure? This will reset your settings and pinned items, and stop syncing with your browser profile."
+                    : "Are you sure? This will reset your settings and pinned items, and start syncing with your browser profile.";
+                  if (confirm(confirmMessage)) changeSetting("sync", e.target.checked);
                 }}
               />
-              🔄 Sync settings
-            </label>
-            <label
-              className="flex-row"
-              title="Enable animations of changing balances and other elements">
+              <label htmlFor="sync-enabled">Sync settings</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Sync your settings and pinned items to your browser profile. Must be
+                  signed into your browser for this to work.
+                </Dialog>
+              </Tooltip>
+            </div>
+            <div className="flex-row">
               <input
+                id="animations-enabled"
                 type="checkbox"
                 checked={!!settings.animations}
                 onChange={(e) => changeSetting("animations", e.target.checked)}
               />
-              🪄 Animations
-            </label>
+              <label htmlFor="animations-enabled">Animations</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable animations of changing balances and other elements.
+                </Dialog>
+              </Tooltip>
+            </div>
             <label className="flex-row">
               Theme:
               <select
@@ -142,6 +154,25 @@ export function OptionsView() {
                     </li>
                     <li>Copy the current URL into the memo field of the transaction.</li>
                   </ol>
+                </Dialog>
+              </Tooltip>
+            </div>
+            <div className="flex-row">
+              <input
+                id="omnibox-permission"
+                type="checkbox"
+                checked={!!settings.omnibox}
+                onChange={async (e) => changeSetting("omnibox", e.target.checked)}
+              />
+              <label htmlFor="omnibox-permission">Enable URL/address bar features</label>
+              <Tooltip
+                label="More info"
+                icon={<Help size={18} aria-hidden />}
+                placement="top">
+                <Dialog>
+                  Enable entering transactions via the URL/address bar, with automatic
+                  suggestions from your payees, categories, and accounts. You can type in
+                  &quot;peek <kbd>space</kbd>&quot; to see the various options.
                 </Dialog>
               </Tooltip>
             </div>

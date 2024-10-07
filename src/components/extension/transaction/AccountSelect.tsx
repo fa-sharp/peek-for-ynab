@@ -5,6 +5,7 @@ import {
   Fragment,
   forwardRef,
   useCallback,
+  useEffect,
   useRef,
   useState
 } from "react";
@@ -38,8 +39,6 @@ function AccountSelect(
 ) {
   const { selectedBudgetData } = useYNABContext();
 
-  const [accountList, setAccountList] = useState(accounts ? [...accounts] : []);
-
   const getFilter = useCallback((inputValue?: string) => {
     return (account: Account) =>
       !inputValue || searchWithinString(account.name, inputValue);
@@ -47,6 +46,12 @@ function AccountSelect(
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [accountList, setAccountList] = useState<Account[]>([]);
+  useEffect(
+    () => accounts && setAccountList(accounts.filter(getFilter(inputRef.current?.value))),
+    [accounts, getFilter]
+  );
 
   const {
     isOpen,

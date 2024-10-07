@@ -1,20 +1,10 @@
-import { clsx } from "clsx";
-import type { ReactElement } from "react";
-import { useState } from "react";
-import { AlertTriangle } from "tabler-icons-react";
-import type {
-  Account,
-  Category,
-  CategoryGroupWithCategories,
-  CurrencyFormat,
-  TransactionDetail
-} from "ynab";
+import { useId, useState } from "react";
+import type { Account, CategoryGroupWithCategories } from "ynab";
 
-import { CurrencyView, IconButton, IconSpan } from "~components";
+import { CategoryView, IconButton, IconSpan } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import type { AppSettings, TxAddInitialState } from "~lib/context/storageContext";
-import type { CachedBudget } from "~lib/context/ynabContext";
 import type { CategoryAlerts } from "~lib/notifications";
+import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
@@ -34,43 +24,61 @@ function CategoriesView() {
     savedCategories,
     saveCategory,
     setPopupState,
+    setTxState,
     popupState,
-    settings,
-    selectedBudgetId
+    editingItems,
+    settings
   } = useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
+  if (
+    !popupState ||
+    !selectedBudgetData ||
+    !categoryGroupsData ||
+    !savedCategories ||
+    !settings
+  )
     return null;
 
   return (
     <>
-      <div className="heading-big cursor-pointer" onClick={() => setExpanded(!expanded)}>
+      <div
+        className="heading-medium cursor-pointer"
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-expanded={expanded}
+          aria-controls={controlsId}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIconBold /> : <ExpandListIconBold />}
         />
         <div role="heading">Categories</div>
       </div>
-      {expanded &&
-        categoryGroupsData.map((categoryGroup) => (
-          <CategoryGroupView
-            key={categoryGroup.id}
-            categoryGroup={categoryGroup}
-            categoryAlerts={currentAlerts?.[selectedBudgetId]?.cats}
-            budgetData={selectedBudgetData}
-            accountsData={accountsData}
-            savedCategories={savedCategories[selectedBudgetId]}
-            editMode={popupState.editMode}
-            settings={settings}
-            onSaveCategory={(categoryId) => saveCategory(categoryId)}
-            onAddTx={(txAddState) => setPopupState({ view: "txAdd", txAddState })}
-          />
-        ))}
+      {expanded && (
+        <ul id={controlsId} className="list">
+          {categoryGroupsData.map((categoryGroup) => (
+            <CategoryGroupView
+              key={categoryGroup.id}
+              categoryGroup={categoryGroup}
+              categoryAlerts={currentAlerts?.[selectedBudgetData.id]?.cats}
+              budgetData={selectedBudgetData}
+              accountsData={accountsData}
+              savedCategories={savedCategories[selectedBudgetData.id]}
+              editMode={editingItems}
+              settings={settings}
+              onSaveCategory={(categoryId) => saveCategory(categoryId)}
+              onAddTx={async (txAddState) => {
+                await setTxState(txAddState);
+                setPopupState({ view: "txAdd" });
+              }}
+            />
+          ))}
+        </ul>
+      )}
     </>
   );
 }
@@ -98,16 +106,19 @@ export function CategoryGroupView({
   onAddTx: (initialState: TxAddInitialState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const controlsId = useId();
 
   // Skip Ready to Assign category group
   if (categoryGroup.name === "Internal Master Category") return null;
 
   return (
-    <>
+    <li>
       <div
-        className="heading-medium heading-bordered cursor-pointer"
+        className="heading-small heading-bordered cursor-pointer"
         onClick={() => setExpanded(!expanded)}>
         <IconButton
+          aria-controls={controlsId}
+          aria-expanded={expanded}
           label={expanded ? "Collapse" : "Expand"}
           onClick={() => setExpanded(!expanded)}
           icon={expanded ? <CollapseListIcon /> : <ExpandListIcon />}
@@ -115,7 +126,7 @@ export function CategoryGroupView({
         <div role="heading">{categoryGroup.name}</div>
       </div>
       {expanded && (
-        <ul className="list">
+        <ul id={controlsId} className="list">
           {categoryGroup.categories.map((category) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
@@ -183,53 +194,8 @@ export function CategoryGroupView({
           })}
         </ul>
       )}
-    </>
+    </li>
   );
 }
-
-export const CategoryView = ({
-  categoryData: { id, name, balance },
-  currencyFormat,
-  settings,
-  alerts,
-  actionElementsRight,
-  actionElementsLeft,
-  addedTransaction
-}: {
-  categoryData: Category;
-  currencyFormat?: CurrencyFormat;
-  actionElementsRight?: ReactElement | null;
-  actionElementsLeft?: ReactElement | null;
-  alerts?: CategoryAlerts[string];
-  settings: AppSettings;
-  addedTransaction?: TransactionDetail | null;
-}) => {
-  return (
-    <div
-      className={clsx("balance-display", {
-        highlighted: settings.animations && addedTransaction?.category_id === id
-      })}>
-      <div className="flex-row min-w-0">
-        {actionElementsLeft}
-        <div className="hide-overflow">{name}</div>
-        {alerts?.overspent && (
-          <IconSpan
-            label="Overspent"
-            icon={<AlertTriangle color="var(--stale)" size={18} aria-hidden />}
-          />
-        )}
-      </div>
-      <div className="flex-row">
-        <CurrencyView
-          milliUnits={balance}
-          currencyFormat={currencyFormat}
-          colorsEnabled={true}
-          animationEnabled={settings.animations && !!addedTransaction}
-        />
-        {actionElementsRight}
-      </div>
-    </div>
-  );
-};
 
 export default CategoriesView;

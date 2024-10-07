@@ -1,7 +1,7 @@
 import type { CurrencyFormat } from "ynab";
 
 import { CurrencyView, SubTransaction } from "~components";
-import type { BudgetMainData } from "~lib/context/ynabContext";
+import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {
@@ -29,51 +29,13 @@ export default function TransactionFormSplit({
         <SubTransaction
           key={idx}
           splitIndex={idx}
-          amount={subTx.amount}
-          amountType={subTx.amountType}
+          txState={subTx}
           autoFocus={idx > 0}
           allowTransfer={!formState.isTransfer}
           disabled={isSaving}
           budgetMainData={budgetMainData}
-          setAmount={(newAmount) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                amount: newAmount
-              })
-            )
-          }
-          setAmountType={(newAmountType) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                amountType: newAmountType
-              })
-            )
-          }
-          setCategory={(newCategory) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                category: newCategory
-              })
-            )
-          }
-          setPayee={(newPayee) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                payee: newPayee
-              })
-            )
-          }
-          setMemo={(newMemo) =>
-            handlers.setSubTxs((prev) =>
-              prev.with(idx, {
-                ...prev[idx],
-                memo: newMemo
-              })
-            )
+          setField={(field, val) =>
+            handlers.setSubTxs((prev) => prev.with(idx, { ...prev[idx], [field]: val }))
           }
         />
       ))}
@@ -93,21 +55,23 @@ export default function TransactionFormSplit({
           </button>
         )}
       </div>
-      <div className="heading-medium balance-display mt-sm">
-        Total of splits:
-        <CurrencyView
-          milliUnits={totalSubTxsAmount}
-          currencyFormat={currencyFormat}
-          colorsEnabled
-        />
-      </div>
-      <div className="heading-medium balance-display mb-sm">
-        Amount remaining:
-        <CurrencyView
-          milliUnits={leftOverSubTxsAmount}
-          currencyFormat={currencyFormat}
-          colorsEnabled
-        />
+      <div>
+        <div className="heading-small balance-display">
+          Total of splits:
+          <CurrencyView
+            milliUnits={totalSubTxsAmount}
+            currencyFormat={currencyFormat}
+            colorsEnabled
+          />
+        </div>
+        <div className="heading-small balance-display">
+          Amount remaining:
+          <CurrencyView
+            milliUnits={leftOverSubTxsAmount}
+            currencyFormat={currencyFormat}
+            colorsEnabled
+          />
+        </div>
       </div>
     </>
   );

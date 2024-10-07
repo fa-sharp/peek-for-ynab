@@ -2,45 +2,66 @@ import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import { useCallback, useEffect } from "react";
 
 import {
-  AccountsView,
-  CategoriesView,
+  AllAccountsView,
+  AllCategoriesView,
   NewVersionAlert,
   NotificationsView,
+  Omnibox,
   PopupNav,
   SavedAccountsView,
-  SavedCategoriesView
+  SavedCategoriesView,
+  TransactionForm
 } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 export default function PopupMain() {
-  const {
-    savedCategories,
-    savedAccounts,
-    saveCategoriesForBudget,
-    saveAccountsForBudget,
-    setPopupState,
-    selectedBudgetId
-  } = useStorageContext();
-  const { categoriesData, accountsData, savedCategoriesData, savedAccountsData } =
-    useYNABContext();
+  const { popupState } = useStorageContext();
   const { newVersionAlert } = useNotificationsContext();
 
-  // activate edit mode if there are no pinned categories or accounts yet
-  useEffect(() => {
-    if (
-      selectedBudgetId &&
-      savedCategories &&
-      savedAccounts &&
-      !savedCategories[selectedBudgetId]?.length &&
-      !savedAccounts[selectedBudgetId]?.length
-    )
-      setPopupState({ view: "main", editMode: true });
-  }, [savedAccounts, savedCategories, selectedBudgetId, setPopupState]);
+  return (
+    <>
+      {newVersionAlert && <NewVersionAlert />}
+      <PopupNav />
+      {popupState?.view === "txAdd" && <TransactionForm />}
+      {popupState?.view === "main" && <MainView />}
+    </>
+  );
+}
 
-  /** Callback when dragging and dropping pinned categories and accounts */
-  const onDragEnd: OnDragEndResponder = useCallback(
+const MainView = () => {
+  const { omniboxInput } = useStorageContext();
+  const { categoriesData, accountsData } = useYNABContext();
+  const onDragEnd = useDragEndCallback();
+
+  useActivateEditModeIfNoPinnedItems();
+
+  if (!categoriesData || !accountsData) return null;
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <NotificationsView />
+      <Omnibox />
+      {!omniboxInput && (
+        <>
+          <SavedCategoriesView />
+          <SavedAccountsView />
+          <AllCategoriesView />
+          <AllAccountsView />
+        </>
+      )}
+    </DragDropContext>
+  );
+};
+
+/** Callback when dragging and dropping pinned categories and accounts */
+const useDragEndCallback = (): OnDragEndResponder => {
+  const { popupState, saveCategoriesForBudget, saveAccountsForBudget } =
+    useStorageContext();
+  const { savedAccountsData, savedCategoriesData } = useYNABContext();
+
+  return useCallback(
     (result) => {
-      if (!result.destination) return;
+      if (!result.destination || !popupState?.budgetId) return;
       if (
         result.source.droppableId === "savedCategories" &&
         result.destination.droppableId === "savedCategories"
@@ -49,7 +70,7 @@ export default function PopupMain() {
         const savedCategoryIds = savedCategoriesData.map((c) => c.id);
         const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
         savedCategoryIds.splice(result.destination.index, 0, categoryId);
-        saveCategoriesForBudget(selectedBudgetId, savedCategoryIds);
+        saveCategoriesForBudget(popupState.budgetId, savedCategoryIds);
       } else if (
         result.source.droppableId === "savedAccounts" &&
         result.destination.droppableId === "savedAccounts"
@@ -58,7 +79,7 @@ export default function PopupMain() {
         const savedAccountIds = savedAccountsData.map((a) => a.id);
         const [accountId] = savedAccountIds.splice(result.source.index, 1);
         savedAccountIds.splice(result.destination.index, 0, accountId);
-        saveAccountsForBudget(selectedBudgetId, savedAccountIds);
+        saveAccountsForBudget(popupState.budgetId, savedAccountIds);
       }
     },
     [
@@ -66,23 +87,24 @@ export default function PopupMain() {
       saveCategoriesForBudget,
       savedAccountsData,
       savedCategoriesData,
-      selectedBudgetId
+      popupState?.budgetId
     ]
   );
+};
 
-  return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {newVersionAlert && <NewVersionAlert />}
-      <PopupNav />
-      {categoriesData && accountsData && (
-        <>
-          <NotificationsView />
-          <SavedCategoriesView />
-          <SavedAccountsView />
-          <CategoriesView />
-          <AccountsView />
-        </>
-      )}
-    </DragDropContext>
-  );
-}
+/** Activate edit mode if there are no pinned categories or accounts yet */
+const useActivateEditModeIfNoPinnedItems = () => {
+  const { popupState, setEditingItems, savedCategories, savedAccounts, setPopupState } =
+    useStorageContext();
+
+  useEffect(() => {
+    if (
+      popupState &&
+      savedCategories &&
+      savedAccounts &&
+      !savedCategories[popupState.budgetId]?.length &&
+      !savedAccounts[popupState.budgetId]?.length
+    )
+      setEditingItems(true);
+  }, [popupState, savedAccounts, savedCategories, setEditingItems, setPopupState]);
+};

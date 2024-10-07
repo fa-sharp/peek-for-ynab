@@ -2,7 +2,7 @@ import { type ForwardedRef, type SetStateAction, forwardRef } from "react";
 import { WorldWww } from "tabler-icons-react";
 
 import IconButton from "~components/IconButton";
-import type { AppSettings } from "~lib/context/storageContext";
+import type { AppSettings } from "~lib/types";
 import { executeScriptInCurrentTab, requestPermissions } from "~lib/utils";
 
 type Props = {

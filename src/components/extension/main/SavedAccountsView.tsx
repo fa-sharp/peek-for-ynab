@@ -8,10 +8,12 @@ import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, setPopupState, popupState, settings } = useStorageContext();
+  const { removeAccount, setPopupState, popupState, editingItems, settings, setTxState } =
+    useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
   if (
+    !popupState ||
     !savedAccountsData ||
     !selectedBudgetData ||
     !settings ||
@@ -20,7 +22,7 @@ export default function SavedAccountsView() {
     return null;
 
   return (
-    <Droppable droppableId="savedAccounts" isDropDisabled={!popupState.editMode}>
+    <Droppable droppableId="savedAccounts" isDropDisabled={!editingItems}>
       {(provided) => (
         <ul
           {...provided.droppableProps}
@@ -32,7 +34,7 @@ export default function SavedAccountsView() {
               draggableId={account.id}
               key={account.id}
               index={idx}
-              isDragDisabled={!popupState.editMode}>
+              isDragDisabled={!editingItems}>
               {(provided) => (
                 <li
                   ref={provided.innerRef}
@@ -47,7 +49,7 @@ export default function SavedAccountsView() {
                     settings={settings}
                     addedTransaction={addedTransaction}
                     actionElementsLeft={
-                      !popupState.editMode ? null : (
+                      !editingItems ? null : (
                         <IconButton
                           label="Unpin"
                           onClick={() => removeAccount(account.id)}
@@ -63,10 +65,9 @@ export default function SavedAccountsView() {
                           icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
-                            setPopupState({
-                              view: "txAdd",
-                              txAddState: { accountId: account.id }
-                            })
+                            setTxState({ accountId: account.id }).then(() =>
+                              setPopupState({ view: "txAdd" })
+                            )
                           }
                         />
                       </aside>

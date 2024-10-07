@@ -4,7 +4,8 @@ import { expect, test } from "vitest";
 
 import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
-import { StorageProvider, type TokenData } from "~lib/context/storageContext";
+import { StorageProvider } from "~lib/context/storageContext";
+import type { TokenData } from "~lib/types";
 
 test("Can render storage hook successfully, with default settings", async () => {
   const { result } = renderHook(useStorageContext, {
@@ -12,7 +13,7 @@ test("Can render storage hook successfully, with default settings", async () => 
   });
   await waitFor(() => expect(result.current.tokenData).toBeNull());
 
-  expect(result.current.popupState.view).toBe("main");
+  expect(result.current.popupState?.view).toBe("main");
   expect(result.current.settings).toMatchObject(DEFAULT_SETTINGS);
 });
 
@@ -71,8 +72,8 @@ test("Can add and persist saved category", async () => {
 
   const budgetId = randomUUID();
   const categoryId = randomUUID();
-  result.current.setSelectedBudgetId(budgetId);
-  await waitFor(() => expect(result.current.selectedBudgetId).toBe(budgetId));
+  result.current.setPopupState({ budgetId });
+  await waitFor(() => expect(result.current.popupState?.budgetId).toBe(budgetId));
 
   result.current.saveCategory(categoryId);
   await waitFor(() =>
@@ -94,8 +95,8 @@ test("Can remove saved category", async () => {
   await waitFor(() => expect(result.current.savedCategories).toBeTruthy());
 
   const budgetId = randomUUID();
-  result.current.setSelectedBudgetId(budgetId);
-  await waitFor(() => expect(result.current.selectedBudgetId).toBe(budgetId));
+  result.current.setPopupState({ budgetId });
+  await waitFor(() => expect(result.current.popupState?.budgetId).toBe(budgetId));
 
   const category1 = randomUUID();
   const category2 = randomUUID();
@@ -136,7 +137,8 @@ test("Can remove all local data", async () => {
 
   await result.current.removeAllData();
 
-  waitFor(() => expect(result.current.selectedBudgetId).toBeFalsy());
+  waitFor(() => expect(result.current.popupState?.budgetId).toBeFalsy());
+  waitFor(() => expect(result.current.txState).toBeFalsy());
   waitFor(() => expect(result.current.savedCategories).toStrictEqual({}));
   waitFor(() => expect(result.current.savedAccounts).toStrictEqual({}));
 

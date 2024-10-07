@@ -11,40 +11,23 @@ import {
   fetchPayeesForBudget
 } from "~lib/api";
 import { useConfetti } from "~lib/hooks";
+import type { BudgetMainData, CachedBudget } from "~lib/types";
 
-import { IS_DEV, ONE_DAY_IN_MILLIS, findAllEmoji } from "../utils";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
+import { findAllEmoji } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
-
-export interface CachedBudget {
-  id: string;
-  name: string;
-  currencyFormat?: ynab.CurrencyFormat;
-}
-
-export interface CachedPayee {
-  id: string;
-  name: string;
-  transferId?: string | null;
-}
-
-export interface BudgetMainData {
-  accountsData: ynab.Account[];
-  categoriesData: ynab.Category[];
-  categoryGroupsData: ynab.CategoryGroupWithCategories[];
-  payeesData?: CachedPayee[];
-}
 
 const useYNABProvider = () => {
   const { tokenExpired } = useAuthContext();
   const {
     tokenData,
-    selectedBudgetId,
     budgetSettings,
     savedAccounts,
     savedCategories,
+    popupState,
+    setPopupState,
     shownBudgetIds,
-    setSelectedBudgetId,
     setShownBudgetIds
   } = useStorageContext();
 
@@ -72,7 +55,7 @@ const useYNABProvider = () => {
       // If no budgets have been selected by the user, select the most recently modified budget
       if (shownBudgetIds && shownBudgetIds.length === 0 && budgets[0]) {
         setShownBudgetIds([budgets[0].id]);
-        setSelectedBudgetId(budgets[0].id);
+        setPopupState({ budgetId: budgets[0].id });
       }
       return budgets;
     }
@@ -80,8 +63,8 @@ const useYNABProvider = () => {
 
   /** Data from the currently selected budget */
   const selectedBudgetData = useMemo(
-    () => budgetsData?.find((b) => b.id === selectedBudgetId) || null,
-    [budgetsData, selectedBudgetId]
+    () => budgetsData?.find((b) => b.id === popupState?.budgetId) || null,
+    [budgetsData, popupState?.budgetId]
   );
 
   /** Fetch category data from API for the selected budget. Re-runs if the user selects another budget */
@@ -91,13 +74,13 @@ const useYNABProvider = () => {
     error: categoriesError,
     refetch: refetchCategoryGroups
   } = useQuery({
-    queryKey: ["categoryGroups", { budgetId: selectedBudgetId }],
-    enabled: Boolean(ynabAPI && selectedBudgetId),
+    queryKey: ["categoryGroups", { budgetId: popupState?.budgetId }],
+    enabled: Boolean(ynabAPI && popupState?.budgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !popupState?.budgetId) return;
       return await fetchCategoryGroupsForBudget(
         ynabAPI,
-        selectedBudgetId,
+        popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
     },
@@ -127,8 +110,8 @@ const useYNABProvider = () => {
 
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
-    if (!categoriesData) return null;
-    return savedCategories?.[selectedBudgetId]?.reduce<ynab.Category[]>(
+    if (!categoriesData || !popupState?.budgetId) return null;
+    return savedCategories?.[popupState.budgetId]?.reduce<ynab.Category[]>(
       (newArray, savedCategoryId) => {
         const categoryData = categoriesData.find(
           (category) => category.id === savedCategoryId
@@ -138,7 +121,7 @@ const useYNABProvider = () => {
       },
       []
     );
-  }, [categoriesData, savedCategories, selectedBudgetId]);
+  }, [categoriesData, savedCategories, popupState?.budgetId]);
 
   /** Fetch accounts for the selected budget */
   const {
@@ -147,13 +130,13 @@ const useYNABProvider = () => {
     error: accountsError,
     refetch: refetchAccounts
   } = useQuery({
-    queryKey: ["accounts", { budgetId: selectedBudgetId }],
-    enabled: Boolean(ynabAPI && selectedBudgetId),
+    queryKey: ["accounts", { budgetId: popupState?.budgetId }],
+    enabled: Boolean(ynabAPI && popupState?.budgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !popupState?.budgetId) return;
       return await fetchAccountsForBudget(
         ynabAPI,
-        selectedBudgetId,
+        popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
     },
@@ -167,26 +150,26 @@ const useYNABProvider = () => {
 
   /** Check for new/unapproved transactions in selected budget (if user wants notifications) */
   const { data: unapprovedTxs } = useQuery({
-    queryKey: ["unapproved", { budgetId: selectedBudgetId }],
+    queryKey: ["unapproved", { budgetId: popupState?.budgetId }],
     enabled: Boolean(
-      ynabAPI && selectedBudgetId && budgetSettings?.notifications.checkImports
+      ynabAPI && popupState?.budgetId && budgetSettings?.notifications.checkImports
     ),
     queryFn: async () => {
-      if (!ynabAPI) return;
-      return await checkUnapprovedTxsForBudget(ynabAPI, selectedBudgetId);
+      if (!ynabAPI || !popupState?.budgetId) return;
+      return await checkUnapprovedTxsForBudget(ynabAPI, popupState.budgetId);
     }
   });
 
   /** Fetch payees for the selected budget */
   const { data: payeesData, refetch: refetchPayees } = useQuery({
-    queryKey: ["payees", { budgetId: selectedBudgetId }],
+    queryKey: ["payees", { budgetId: popupState?.budgetId }],
     staleTime: ONE_DAY_IN_MILLIS,
-    enabled: Boolean(ynabAPI && selectedBudgetId),
+    enabled: Boolean(ynabAPI && popupState?.budgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI) return;
+      if (!ynabAPI || !popupState?.budgetId) return;
       return await fetchPayeesForBudget(
         ynabAPI,
-        selectedBudgetId,
+        popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
     },
@@ -195,9 +178,9 @@ const useYNABProvider = () => {
 
   /** Select data of only saved accounts from `accountsData` */
   const savedAccountsData = useMemo(() => {
-    if (!accountsData) return null;
+    if (!accountsData || !popupState?.budgetId) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return savedAccounts?.[selectedBudgetId]?.reduce<ynab.Account[]>(
+    return savedAccounts?.[popupState.budgetId]?.reduce<ynab.Account[]>(
       (newArray, savedAccountId) => {
         const accountData = accountsData.find((a) => a.id === savedAccountId);
         if (accountData) newArray.push(accountData);
@@ -205,11 +188,12 @@ const useYNABProvider = () => {
       },
       []
     );
-  }, [accountsData, savedAccounts, selectedBudgetId]);
+  }, [accountsData, savedAccounts, popupState?.budgetId]);
 
   /** Group commonly used data into one object */
   const budgetMainData: BudgetMainData | null = useMemo(() => {
-    if (!accountsData || !categoriesData || !categoryGroupsData) return null;
+    if (!accountsData || !categoriesData || !categoryGroupsData || !payeesData)
+      return null;
     return {
       accountsData,
       categoriesData,
@@ -241,8 +225,8 @@ const useYNABProvider = () => {
 
   const addTransaction = useCallback(
     async (transaction: ynab.NewTransaction) => {
-      if (!ynabAPI || !selectedBudgetId) return;
-      const response = await ynabAPI.transactions.createTransaction(selectedBudgetId, {
+      if (!ynabAPI || !popupState?.budgetId) return;
+      const response = await ynabAPI.transactions.createTransaction(popupState.budgetId, {
         transaction
       });
       IS_DEV &&
@@ -271,10 +255,12 @@ const useYNABProvider = () => {
     },
     [
       ynabAPI,
-      selectedBudgetId,
-      budgetSettings?.confetti,
+      popupState?.budgetId,
       refreshCategoriesAndAccounts,
       refetchPayees,
+      budgetSettings?.confetti?.allCategories,
+      budgetSettings?.confetti?.categories,
+      budgetSettings?.confetti?.emojis,
       launchConfetti
     ]
   );

@@ -1,7 +1,7 @@
 import { type RefObject, useRef } from "react";
 
 import { AccountSelect, CategorySelect, PayeeSelect } from "~components";
-import type { BudgetMainData } from "~lib/context/ynabContext";
+import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {
@@ -27,6 +27,7 @@ export default function TransactionFormMain({
     <>
       <PayeeSelect
         payees={budgetMainData.payeesData}
+        initialPayee={formState.payee}
         selectPayee={(selectedPayee) => {
           handlers.setPayee(selectedPayee);
           if ("id" in selectedPayee) {

@@ -1,15 +1,23 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { clsx } from "clsx";
 import { useCombobox } from "downshift";
-import { type ForwardedRef, forwardRef, useCallback, useRef, useState } from "react";
+import {
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 
-import type { CachedPayee } from "~lib/context/ynabContext";
+import type { CachedPayee } from "~lib/types";
 import { searchWithinString } from "~lib/utils";
 
 interface Props {
   payees?: CachedPayee[];
   /** If only name provided, assume new payee */
   selectPayee: (payee: CachedPayee | { name: string }) => void;
+  initialPayee?: CachedPayee | { name: string } | null;
   disabled?: boolean;
   required?: boolean;
 }
@@ -25,13 +33,12 @@ function estimateSize() {
 }
 
 function PayeeSelect(
-  { payees, selectPayee, disabled, required = true }: Props,
+  { payees, initialPayee, selectPayee, disabled, required = true }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const [payeeList, setPayeeList] = useState(() => {
-    if (!payees) return [];
-    return [...payees.filter((payee) => payee.transferId == null)];
-  });
+  const [payeeList, setPayeeList] = useState<CachedPayee[]>([]);
+  useEffect(() => payees && setPayeeList(payees.filter(getFilter())), [payees]);
+
   const getPayeeKey = useCallback((index: number) => payeeList[index].id, [payeeList]);
 
   const listRef = useRef<HTMLUListElement>(null);
@@ -51,11 +58,12 @@ function PayeeSelect(
     inputValue,
     highlightedIndex,
     selectedItem
-  } = useCombobox<CachedPayee | null>({
+  } = useCombobox<CachedPayee | { name: string } | null>({
     items: payeeList,
     itemToString(payee) {
       return payee ? payee.name : "";
     },
+    initialSelectedItem: initialPayee,
     onInputValueChange({ inputValue, selectedItem }) {
       setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
@@ -96,7 +104,10 @@ function PayeeSelect(
                   data-index={virtualItem.index}
                   className={clsx("select-dropdown-item virtual", {
                     highlighted: highlightedIndex === virtualItem.index,
-                    selected: selectedItem?.id === virtualItem.key
+                    selected:
+                      !!selectedItem &&
+                      "id" in selectedItem &&
+                      selectedItem?.id === virtualItem.key
                   })}
                   {...getItemProps({
                     ref: listVirtualizer.measureElement,

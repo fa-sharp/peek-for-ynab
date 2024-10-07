@@ -5,9 +5,15 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-import { ONE_DAY_IN_MILLIS } from "./utils";
+import { ONE_DAY_IN_MILLIS } from "./constants";
 
-const cachedQueryKeys = new Set(["budgets", "payees", "categoryGroups", "accounts"]);
+const cachedQueryKeys = new Set([
+  "budgets",
+  "payees",
+  "categoryGroups",
+  "accounts",
+  "import"
+]);
 
 export const createQueryClient = (options?: { staleTime?: number }) =>
   new QueryClient({

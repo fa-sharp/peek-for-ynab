@@ -6,8 +6,8 @@ import {
   type api
 } from "ynab";
 
-import type { CachedPayee } from "./context/ynabContext";
-import { IS_DEV } from "./utils";
+import { IS_DEV } from "./constants";
+import type { CachedPayee } from "./types";
 
 /** Fetch budgets from the YNAB API */
 export async function fetchBudgets(ynabAPI: api) {

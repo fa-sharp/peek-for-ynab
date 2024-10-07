@@ -4,20 +4,29 @@
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
 
-An open-source browser extension for YNAB that lets users see their category and account balances at a glance, add transactions, and setup customizable notifications. See full feature list and installation links on the [extension website](https://peekforynab.com).
+A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peekforynab.com).
 
 ## Project layout
 
+- `assets/` Extension assets
+- `public/` Website images and shared scripts
 - `src/`
-  - `popup.tsx` Extension - popup component
-  - `options.tsx` Extension - options component
-  - `background.ts` Extension - background worker (refreshes the token)
-  - `app/` Website and server (Next.js)
+  - `popup.tsx` Extension popup page
+  - `options.tsx` Extension options page
+  - `background.ts` Extension background worker (refreshes data and the OAuth token)
+  - `middleware.ts` Website middleware (Next.js)
+  - `app/` Website pages and routes (Next.js)
     - `api/` API routes to fetch OAuth tokens from YNAB API
+  - `components/`
+    - `extension/` Extension components
+    - `icons/` Common icons
+    - `react-aria/` [React Aria](https://react-spectrum.adobe.com/react-aria/index.html) abstract components
+    - `website/` Website components
   - `lib/` Library and utility functions
     - `context/` [React Context](https://react.dev/learn/passing-data-deeply-with-context) that handles auth, data fetching, and storage for the extension
-  - `components/` View components
   - `styles/` CSS files
+  - `tabs/` Additional extension pages
+- `test/` Unit tests
 
 ## Building and running locally
 
@@ -74,4 +83,4 @@ These are some principles that guide the Peek for YNAB project. Please take a mo
 - Data Privacy: The extension communicates directly with the YNAB API server (api.ynab.com) to retrieve the user's budget data. The Next.js API routes are solely used to retrieve OAuth tokens from YNAB (this needs to happen in a server-only context to protect the OAuth secret). The extension caches some data locally, in order to use YNAB's [delta requests](https://api.ynab.com/#deltas) for fast and efficient data fetching. This cached data is stored using [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). The user's settings are either stored locally or (if the user chooses) synced to the user's browser profile using the [Storage API](https://developer.chrome.com/docs/extensions/reference/api/storage#property-sync).
 - Permissions: The extension only uses the minimum amount of [browser permissions](https://developer.chrome.com/docs/extensions/reference/permissions-list) needed to do its basic functionality ([storage](https://developer.chrome.com/docs/extensions/reference/api/storage), [identity](https://developer.chrome.com/docs/extensions/reference/api/identity), and [alarms](https://developer.chrome.com/docs/extensions/reference/api/alarms)). If the user chooses, they can enable other permissions (e.g. reading the [active tab](https://developer.chrome.com/docs/extensions/develop/concepts/activeTab), enabling [system notifications](https://developer.chrome.com/docs/extensions/reference/api/notifications)) in the extension settings.
 - API usage: YNAB has generously made their public API free to use, and we aim to be respectful of that privilege. The extension tries to stay well under their [rate limit](https://api.ynab.com/#rate-limiting), by implementing some caching and limiting background requests to every 15 minutes.
-- Dependencies: The extension is designed to be very lightweight (production zipped build <1 MB), so we avoid adding more external libraries/dependencies. We lean into native browser APIs as much as possible.
+- Dependencies: The extension is designed to be very lightweight (production zipped build <1 MB), so we carefully consider adding any external dependencies that will increase the extension's bundle size. We prioritize using native browser APIs where possible. When external packages are necessary, we prefer small, well-maintained libraries that perform specific tasks (e.g. React Aria's abstract components).

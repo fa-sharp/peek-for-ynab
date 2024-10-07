@@ -3,7 +3,7 @@ import { type Key, useCallback, useMemo } from "react";
 import { ChevronDown } from "tabler-icons-react";
 
 import { Menu } from "~components";
-import type { CachedBudget } from "~lib/context/ynabContext";
+import type { CachedBudget } from "~lib/types";
 
 /** Dropdown that lets the user select a budget to view */
 export default function BudgetSelect({
