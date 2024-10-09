@@ -101,6 +101,8 @@ export interface TxAddInitialState {
   flag?: string;
   isSplit?: boolean;
   subTxs?: Array<SubTxState>;
+  cleared?: boolean;
+  date?: string;
 }
 
 /** Split transaction state  */

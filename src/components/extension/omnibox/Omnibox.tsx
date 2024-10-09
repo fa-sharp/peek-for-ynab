@@ -52,7 +52,7 @@ export default function Omnibox() {
     <form className="flex-col mb-lg" onSubmit={onSaveTransaction}>
       <label className="form-input">
         <input
-          placeholder="filter or type 'add', 'transfer'..."
+          placeholder="search, 'add', 'transfer'..."
           value={omniboxInput}
           onChange={(e) => setOmniboxInput(e.target.value)}
           disabled={isSaving}

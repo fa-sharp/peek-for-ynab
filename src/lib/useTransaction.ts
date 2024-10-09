@@ -38,12 +38,13 @@ export default function useTransaction() {
 
   // Transaction state
   const [isTransfer, setIsTransfer] = useState(txState?.isTransfer ?? false);
-  const [date, setDate] = useState(getTodaysDateISO);
+  const [date, setDate] = useState(txState?.date || getTodaysDateISO);
   const [amount, setAmount] = useState(txState?.amount || "");
   const [cleared, setCleared] = useState(
     () =>
-      accountsData?.find((a) => a.id === txState?.accountId)?.type === "cash" ||
-      !!budgetSettings?.transactions.cleared
+      txState?.cleared ??
+      (accountsData?.find((a) => a.id === txState?.accountId)?.type === "cash" ||
+        !!budgetSettings?.transactions.cleared)
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
     txState?.amountType || "Outflow"
@@ -108,7 +109,9 @@ export default function useTransaction() {
     memo,
     flag,
     isSplit,
-    subTxs
+    subTxs,
+    cleared,
+    date
   });
 
   // Try parsing user's current selection as the initial amount
@@ -289,7 +292,9 @@ const usePersistFormState = (txState: TxAddInitialState) => {
       isTransfer: txState.isTransfer,
       memo: txState.memo,
       payee: txState.payee,
-      subTxs: txState.subTxs
+      subTxs: txState.subTxs,
+      cleared: txState.cleared,
+      date: txState.date
     });
   }, [
     setTxState,
@@ -302,7 +307,9 @@ const usePersistFormState = (txState: TxAddInitialState) => {
     txState.isTransfer,
     txState.memo,
     txState.payee,
-    txState.subTxs
+    txState.subTxs,
+    txState.cleared,
+    txState.date
   ]);
 };
 
