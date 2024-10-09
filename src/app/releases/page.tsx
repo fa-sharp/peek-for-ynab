@@ -10,6 +10,48 @@ function IndexPage() {
   return (
     <>
       <h2>Release Notes</h2>
+      <h3>0.22.0 - Oct 9, 2024</h3>
+      <ul>
+        <li>
+          🔎 A new search bar to quickly filter your categories and accounts (inspired by{" "}
+          <a
+            href="https://github.com/toolkit-for-ynab/toolkit-for-ynab"
+            target="_blank"
+            rel="noreferrer">
+            Toolkit for YNAB
+          </a>
+          ). You can also enter transactions directly from the search bar by typing{" "}
+          <code>add</code> or <code>transfer</code>.
+        </li>
+        <li>
+          🎉 Optionally enable confetti celebrations after adding a transaction! You can
+          set this up for categories that you choose in the settings page.
+        </li>
+        <li>
+          🪄 The transaction form is restored if you close the popup in the middle of
+          adding a transaction, or if you open the form in a new window.
+        </li>
+        <li>
+          ❓ Some helpful tooltips are added in the settings page to explain all the
+          options.
+        </li>
+      </ul>
+      <div className="flex-row">
+        <Image
+          src="/img/screenshots/search-bar-add.png"
+          alt={"Adding transaction via the search bar"}
+          className="screenshot"
+          width={250}
+          height={250}
+        />
+        <Image
+          src="/img/screenshots/search-bar-filter.png"
+          alt={"Filtering categories via the search bar"}
+          className="screenshot"
+          width={250}
+          height={125}
+        />
+      </div>
       <h3>0.21.0 - Sep 24, 2024</h3>
       <ul>
         <li>
@@ -72,14 +114,6 @@ function IndexPage() {
           of the website/authentication server.
         </li>
       </ul>
-      <Image
-        src="/img/screenshots/notification-settings.gif"
-        alt={"Demo of notification settings"}
-        className="screenshot"
-        width={220}
-        height={240}
-        unoptimized
-      />
       <h3>0.19.1 - Apr 12, 2024</h3>
       <ul>
         <li>Split transaction support!</li>
