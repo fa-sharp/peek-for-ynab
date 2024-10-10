@@ -13,7 +13,7 @@ test("Can render storage hook successfully, with default settings", async () => 
   });
   await waitFor(() => expect(result.current.tokenData).toBeNull());
 
-  expect(result.current.popupState.view).toBe("main");
+  expect(result.current.popupState?.view).toBe("main");
   expect(result.current.settings).toMatchObject(DEFAULT_SETTINGS);
 });
 
@@ -23,13 +23,13 @@ test("Can change a setting, and persist to storage", async () => {
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
-  result.current.changeSetting("emojiMode", true);
+  result.current.changeSetting("theme", "dark");
   await waitFor(() =>
-    expect(result.current.settings?.emojiMode, "emojiMode rendered").toBe(true)
+    expect(result.current.settings?.theme, "theme rendered").toBe("dark")
   );
 
   const { settings } = await chrome.storage.local.get("settings");
-  expect(JSON.parse(settings), "emojiMode persisted").toMatchObject({ emojiMode: true });
+  expect(JSON.parse(settings), "theme persisted").toMatchObject({ theme: "dark" });
 });
 
 test("Reads persisted settings on initialization", async () => {
@@ -72,8 +72,8 @@ test("Can add and persist saved category", async () => {
 
   const budgetId = randomUUID();
   const categoryId = randomUUID();
-  result.current.setSelectedBudgetId(budgetId);
-  await waitFor(() => expect(result.current.selectedBudgetId).toBe(budgetId));
+  result.current.setPopupState({ budgetId });
+  await waitFor(() => expect(result.current.popupState?.budgetId).toBe(budgetId));
 
   result.current.saveCategory(categoryId);
   await waitFor(() =>
@@ -95,8 +95,8 @@ test("Can remove saved category", async () => {
   await waitFor(() => expect(result.current.savedCategories).toBeTruthy());
 
   const budgetId = randomUUID();
-  result.current.setSelectedBudgetId(budgetId);
-  await waitFor(() => expect(result.current.selectedBudgetId).toBe(budgetId));
+  result.current.setPopupState({ budgetId });
+  await waitFor(() => expect(result.current.popupState?.budgetId).toBe(budgetId));
 
   const category1 = randomUUID();
   const category2 = randomUUID();
@@ -137,7 +137,8 @@ test("Can remove all local data", async () => {
 
   await result.current.removeAllData();
 
-  waitFor(() => expect(result.current.selectedBudgetId).toBeFalsy());
+  waitFor(() => expect(result.current.popupState?.budgetId).toBeFalsy());
+  waitFor(() => expect(result.current.txState).toBeFalsy());
   waitFor(() => expect(result.current.savedCategories).toStrictEqual({}));
   waitFor(() => expect(result.current.savedAccounts).toStrictEqual({}));
 

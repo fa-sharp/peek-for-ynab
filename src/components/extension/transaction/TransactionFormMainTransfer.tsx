@@ -1,7 +1,7 @@
 import { type RefObject, useRef } from "react";
-import type { Account, Category } from "ynab";
 
 import { AccountSelect, CategorySelect } from "~components";
+import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
 
 interface Props {
@@ -9,8 +9,7 @@ interface Props {
   handlers: TransactionFormHandlers;
   totalSubTxsAmount: number;
   isBudgetToTrackingTransfer: boolean;
-  accountsData?: Account[];
-  categoriesData?: Category[];
+  budgetMainData: BudgetMainData;
   memoRef?: RefObject<HTMLInputElement>;
   isSaving: boolean;
 }
@@ -19,8 +18,7 @@ interface Props {
 export default function TransactionFormMainTransfer({
   formState,
   handlers,
-  accountsData,
-  categoriesData,
+  budgetMainData,
   totalSubTxsAmount,
   isBudgetToTrackingTransfer,
   memoRef,
@@ -38,10 +36,10 @@ export default function TransactionFormMainTransfer({
   return (
     <>
       <AccountSelect
-        accounts={accountsData}
+        accounts={budgetMainData.accountsData}
         currentAccount={
           formState.payee && "transferId" in formState.payee
-            ? accountsData?.find(
+            ? budgetMainData.accountsData?.find(
                 (a) => a.id === (formState.payee as { transferId: string }).transferId
               ) || null
             : null
@@ -74,7 +72,8 @@ export default function TransactionFormMainTransfer({
         <CategorySelect
           ref={categoryRef}
           currentCategory={formState.category}
-          categories={categoriesData}
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={(selectedCategory) => {
             handlers.setCategory(selectedCategory);
             if (selectedCategory) memoRef?.current?.focus();
@@ -85,7 +84,7 @@ export default function TransactionFormMainTransfer({
       <AccountSelect
         ref={accountRef}
         currentAccount={formState.account}
-        accounts={accountsData}
+        accounts={budgetMainData.accountsData}
         selectAccount={(selectedAccount) => {
           handlers.setAccount(selectedAccount);
           if (selectedAccount) {

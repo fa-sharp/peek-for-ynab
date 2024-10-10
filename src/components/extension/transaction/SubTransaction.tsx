@@ -1,45 +1,40 @@
 import { useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
-import type { Category } from "ynab";
 
-import { useYNABContext } from "~lib/context";
-import type { CachedPayee } from "~lib/types";
+import type { BudgetMainData, SubTxState } from "~lib/types";
 
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
 interface Props {
   splitIndex: number;
-  amount: string;
-  amountType: "Inflow" | "Outflow";
+  txState: SubTxState;
   allowTransfer?: boolean;
   autoFocus?: boolean;
   disabled?: boolean;
-  setAmount: (amount: string) => void;
-  setAmountType: (amountType: "Inflow" | "Outflow") => void;
-  setPayee: (payee: CachedPayee | { name: string } | null) => void;
-  setCategory: (category: Category | null) => void;
-  setMemo: (memo: string) => void;
+  setField: <T extends keyof SubTxState>(field: T, value: SubTxState[T]) => void;
+  budgetMainData: BudgetMainData;
 }
 
 export default function SubTransaction({
   splitIndex,
-  amount,
-  amountType,
+  txState,
+  setField,
   allowTransfer = true,
   autoFocus = false,
   disabled = false,
-  setAmount,
-  setAmountType,
-  setPayee,
-  setCategory,
-  setMemo
+  budgetMainData
 }: Props) {
-  const { accountsData, categoriesData, payeesData } = useYNABContext();
-
-  const [showPayee, setShowPayee] = useState(false);
-  const [showCategory, setShowCategory] = useState(true);
-  const [showMemo, setShowMemo] = useState(false);
-  const [isTransfer, setIsTransfer] = useState(false);
+  const [showPayee, setShowPayee] = useState(!!txState.payee);
+  const [showMemo, setShowMemo] = useState(!!txState.memo);
+  const [showCategory, setShowCategory] = useState(() => {
+    if (txState.isTransfer && txState.payee && "id" in txState.payee) {
+      const transferAccount = budgetMainData.accountsData.find(
+        (a) => a.transfer_payee_id === (txState.payee as { id: string }).id
+      );
+      if (transferAccount && transferAccount.on_budget) return false;
+    }
+    return true;
+  });
 
   const payeeRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLInputElement>(null);
@@ -49,38 +44,46 @@ export default function SubTransaction({
     <fieldset className="flex-col gap-sm rounded" disabled={disabled}>
       <legend>Split {splitIndex + 1}</legend>
       <AmountField
-        amount={amount}
-        amountType={amountType}
+        amount={txState.amount}
+        amountType={txState.amountType}
         autoFocus={autoFocus}
-        setAmount={setAmount}
-        setAmountType={setAmountType}
+        setAmount={(amount) => setField("amount", amount)}
+        setAmountType={(amountType) => setField("amountType", amountType)}
       />
       {showPayee &&
-        (!isTransfer ? (
+        (!txState.isTransfer ? (
           <PayeeSelect
             ref={payeeRef}
-            payees={payeesData}
-            selectPayee={setPayee}
+            initialPayee={txState.payee}
+            payees={budgetMainData.payeesData}
+            selectPayee={(payee) => setField("payee", payee)}
             required={false}
           />
         ) : (
           <AccountSelect
             ref={payeeRef}
-            label={amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
-            accounts={accountsData}
+            currentAccount={
+              txState.payee && "id" in txState.payee
+                ? budgetMainData.accountsData.find(
+                    (a) => a.transfer_payee_id === (txState.payee as { id: string }).id
+                  )
+                : null
+            }
+            label={txState.amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
+            accounts={budgetMainData.accountsData}
             selectAccount={(account) => {
               if (!account || !account.transfer_payee_id) {
-                setPayee(null);
+                setField("payee", null);
                 setShowCategory(true);
               } else {
-                setPayee({
+                setField("payee", {
                   id: account.transfer_payee_id,
                   name: account.name,
                   transferId: account.id
                 });
                 if (account.on_budget) {
                   setShowCategory(false);
-                  setCategory(null);
+                  setField("categoryId", undefined);
                 } else {
                   setShowCategory(true);
                 }
@@ -91,8 +94,14 @@ export default function SubTransaction({
       {showCategory && (
         <CategorySelect
           ref={categoryRef}
-          categories={categoriesData}
-          selectCategory={setCategory}
+          currentCategory={
+            !txState.categoryId
+              ? null
+              : budgetMainData.categoriesData.find((c) => c.id === txState.categoryId)
+          }
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
+          selectCategory={(category) => setField("categoryId", category?.id)}
           placeholder=""
         />
       )}
@@ -102,7 +111,8 @@ export default function SubTransaction({
           <input
             ref={memoRef}
             autoComplete="off"
-            onChange={(e) => setMemo(e.target.value)}
+            value={txState.memo}
+            onChange={(e) => setField("memo", e.target.value)}
           />
         </label>
       )}
@@ -135,7 +145,7 @@ export default function SubTransaction({
             className="button gray rounded flex-row gap-xs"
             onClick={() => {
               setShowPayee(true);
-              setIsTransfer(true);
+              setField("isTransfer", true);
               setTimeout(() => payeeRef.current?.focus(), 50);
             }}>
             <Plus aria-label="Add" size={12} /> Transfer

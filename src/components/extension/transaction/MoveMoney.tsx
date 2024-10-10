@@ -8,21 +8,23 @@ import { millisToStringValue, stringValueToMillis } from "~lib/utils";
 /** Form that lets user move money to/from category, or between categories */
 export default function MoveMoney() {
   const { popupState, setPopupState } = useStorageContext();
-  const { categoriesData, monthData, selectedBudgetData, moveMoney } = useYNABContext();
+  const { budgetMainData, monthData, selectedBudgetData, moveMoney } = useYNABContext();
 
-  const [amount, setAmount] = useState(popupState.moveMoneyState?.amount || "");
+  const [amount, setAmount] = useState(popupState?.moveMoneyState?.amount || "");
   const [fromCategory, setFromCategory] = useState(() => {
-    if (!popupState.moveMoneyState?.fromCategoryId) return null;
+    if (!popupState?.moveMoneyState?.fromCategoryId) return null;
     return (
-      categoriesData?.find((c) => c.id === popupState.moveMoneyState?.fromCategoryId) ||
-      null
+      budgetMainData?.categoriesData.find(
+        (c) => c.id === popupState?.moveMoneyState?.fromCategoryId
+      ) || null
     );
   });
   const [toCategory, setToCategory] = useState(() => {
-    if (!popupState.moveMoneyState?.toCategoryId) return null;
+    if (!popupState?.moveMoneyState?.toCategoryId) return null;
     return (
-      categoriesData?.find((c) => c.id === popupState.moveMoneyState?.toCategoryId) ||
-      null
+      budgetMainData?.categoriesData.find(
+        (c) => c.id === popupState.moveMoneyState?.toCategoryId
+      ) || null
     );
   });
 
@@ -58,7 +60,7 @@ export default function MoveMoney() {
         subtractFromCategoryId: fromCategory?.id,
         addToCategoryId: toCategory?.id
       });
-      setPopupState(popupState.moveMoneyState?.returnTo || { view: "main" });
+      setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while moving money: ", err);
@@ -66,6 +68,8 @@ export default function MoveMoney() {
     }
     setIsSaving(false);
   };
+
+  if (!budgetMainData) return null;
 
   return (
     <section>
@@ -100,7 +104,8 @@ export default function MoveMoney() {
           movingMoney
           label="From"
           placeholder="(Leave blank to move from Ready to Assign)"
-          categories={categoriesData}
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
           currentCategory={fromCategory}
           selectCategory={(selectedCategory) => {
             setFromCategory(selectedCategory);
@@ -168,7 +173,8 @@ export default function MoveMoney() {
           movingMoney
           label="To"
           placeholder="(Leave blank to move to Ready to Assign)"
-          categories={categoriesData}
+          categories={budgetMainData.categoriesData}
+          categoryGroupsData={budgetMainData.categoryGroupsData}
           currentCategory={toCategory}
           selectCategory={(selectedCategory) => {
             setToCategory(selectedCategory);
@@ -200,7 +206,7 @@ export default function MoveMoney() {
             type="button"
             className="button gray rounded mt-lg flex-1"
             onClick={() =>
-              setPopupState(popupState.moveMoneyState?.returnTo || { view: "main" })
+              setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" })
             }
             disabled={isSaving}>
             Cancel

@@ -5,19 +5,26 @@ import {
   Fragment,
   forwardRef,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Category, CurrencyFormat } from "ynab";
+import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
-import { useYNABContext } from "~lib/context";
-import { formatCurrency, searchWithinString } from "~lib/utils";
+import type { CachedBudget } from "~lib/types";
+import {
+  formatCurrency,
+  getIgnoredCategoryIdsForTx,
+  searchWithinString
+} from "~lib/utils";
 
 interface Props {
   currentCategory?: Category | null;
-  categories?: Category[];
+  categories: Category[];
+  categoryGroupsData: CategoryGroupWithCategories[];
+  budgetData?: CachedBudget | null;
   selectCategory: (category: Category | null) => void;
   label?: string;
   disabled?: boolean;
@@ -33,21 +40,15 @@ function CategorySelect(
     disabled,
     label,
     placeholder,
-    movingMoney
+    movingMoney,
+    categoryGroupsData,
+    budgetData
   }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const { categoryGroupsData, selectedBudgetData } = useYNABContext();
-
-  /** Ignored categories when adding a transaction (Deferred Income, CCP categories) */
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
-    const ignoredIds = new Set(
-      categoryGroupsData.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
-    );
-    // Only ignore Inflow: RTA category if we're moving money
-    if (!movingMoney) ignoredIds.delete(categoryGroupsData[0]?.categories[0]?.id);
-    return ignoredIds;
+    return getIgnoredCategoryIdsForTx(categoryGroupsData, movingMoney);
   }, [categoryGroupsData, movingMoney]);
 
   const getFilter = useCallback(
@@ -59,12 +60,16 @@ function CategorySelect(
     [ignoredCategoryIds]
   );
 
-  const [categoryList, setCategoryList] = useState(
-    categories ? categories.filter(getFilter()) : []
-  );
-
   const inputRef = useRef<HTMLInputElement | null>(null);
   const clearButtonRef = useRef<HTMLButtonElement>(null);
+
+  const [categoryList, setCategoryList] = useState<Category[]>([]);
+  useEffect(
+    () =>
+      categories &&
+      setCategoryList(categories.filter(getFilter(inputRef.current?.value))),
+    [categories, getFilter]
+  );
 
   const {
     isOpen,
@@ -85,7 +90,7 @@ function CategorySelect(
       if (category.name === "Inflow: Ready to Assign") return category.name;
       return `${category.name} (${formatCurrency(
         category.balance,
-        selectedBudgetData?.currencyFormat
+        budgetData?.currencyFormat
       )})`;
     },
     onInputValueChange({ inputValue }) {
@@ -142,7 +147,7 @@ function CategorySelect(
         )}
 
         <ul
-          className={`select-dropdown-list ${isOpen ? "rounded" : ""}`}
+          className={`select-dropdown-list ${isOpen ? "rounded shadow" : ""}`}
           {...getMenuProps()}>
           {!isOpen ? null : categoryList.length === 0 ? (
             <li className="select-dropdown-item">--Category not found!--</li>
@@ -177,7 +182,7 @@ function CategorySelect(
                           })}>
                           {formatCategoryWithBalance(
                             category,
-                            selectedBudgetData?.currencyFormat
+                            budgetData?.currencyFormat
                           )}
                         </li>
                       );

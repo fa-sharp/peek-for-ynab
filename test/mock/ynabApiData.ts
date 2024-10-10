@@ -152,7 +152,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     ]
   },
   {
-    id: "879ae5c3-9794-434c-9d3e-9ed3e184c198",
+    id: "70e91c44-0cb2-40f5-88c3-22456eff17af",
     name: "Credit Card Payments",
     hidden: false,
     deleted: false,

@@ -3,6 +3,7 @@ import { useIsFetching } from "@tanstack/react-query";
 import { type Key, useCallback, useMemo } from "react";
 import {
   AlertTriangle,
+  ArrowBack,
   BoxMultiple,
   Check,
   ExternalLink,
@@ -15,10 +16,8 @@ import {
   SwitchHorizontal
 } from "tabler-icons-react";
 
-import { BudgetSelect, IconButton } from "~components";
+import { BudgetSelect, IconButton, Menu } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-
-import PopupNavMenu from "./PopupNavMenu";
 
 /** Whether data is considered fresh for display, based on `lastUpdated` time (<4 minutes old) */
 const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
@@ -27,13 +26,14 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 export default function PopupNav() {
   const { tokenExpired } = useAuthContext();
   const {
-    selectedBudgetId,
     settings,
     tokenRefreshNeeded,
-    popupState,
     shownBudgetIds,
+    editingItems,
+    setEditingItems,
+    popupState,
     setPopupState,
-    setSelectedBudgetId
+    setTxState
   } = useStorageContext();
   const {
     budgetsData,
@@ -52,8 +52,8 @@ export default function PopupNav() {
   );
 
   const openBudget = useCallback(() => {
-    window.open(`https://app.ynab.com/${selectedBudgetId}/budget`, "_blank");
-  }, [selectedBudgetId]);
+    window.open(`https://app.ynab.com/${popupState?.budgetId}/budget`, "_blank");
+  }, [popupState?.budgetId]);
 
   const openPopupWindow = useCallback(() => {
     window.open(
@@ -65,19 +65,17 @@ export default function PopupNav() {
   }, []);
 
   const onMenuAction = useCallback(
-    (key: Key) => {
+    async (key: Key) => {
       switch (key) {
         case "addTransaction":
           setPopupState({ view: "txAdd" });
           break;
         case "addTransfer":
-          setPopupState({
-            view: "txAdd",
-            txAddState: { isTransfer: true, accountId: "none" }
-          });
+          await setTxState({ isTransfer: true, accountId: "none" });
+          setPopupState({ view: "txAdd" });
           break;
         case "editItems":
-          setPopupState({ view: "main", editMode: !popupState.editMode });
+          setEditingItems(!editingItems);
           break;
         case "openWindow":
           openPopupWindow();
@@ -85,15 +83,19 @@ export default function PopupNav() {
         case "openOptions":
           chrome?.runtime?.openOptionsPage();
           break;
+        case "backToMain":
+          await setTxState({});
+          setPopupState({ view: "main" });
+          break;
       }
     },
-    [openPopupWindow, popupState.editMode, setPopupState]
+    [editingItems, openPopupWindow, setEditingItems, setPopupState, setTxState]
   );
 
   if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
   if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
-  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
+  if (!shownBudgetsData || !settings || !popupState) return null; // storage not hydrated yet
 
   return (
     <nav className="flex-row justify-between mb-lg">
@@ -114,7 +116,7 @@ export default function PopupNav() {
             <Refresh aria-hidden />
           ) : categoriesError || accountsError ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : !selectedBudgetId ||
+          ) : !popupState?.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (
             <Check aria-hidden color="var(--success)" />
@@ -125,7 +127,7 @@ export default function PopupNav() {
         onClick={() => refreshCategoriesAndAccounts()}
         disabled={
           Boolean(globalIsFetching) ||
-          !selectedBudgetId ||
+          !popupState?.budgetId ||
           (!categoriesError &&
             !accountsError &&
             isDataFreshForDisplay(categoriesLastUpdated) &&
@@ -133,72 +135,79 @@ export default function PopupNav() {
         }
         spin={Boolean(globalIsFetching)}
       />
-      <div className="flex-row gap-xs">
+      <div className="flex-row gap-sm">
         <BudgetSelect
-          emojiMode={settings.emojiMode}
-          animationsEnabled={settings.animations}
           shownBudgets={shownBudgetsData}
-          selectedBudgetId={selectedBudgetId}
-          setSelectedBudgetId={setSelectedBudgetId}
+          selectedBudgetId={popupState.budgetId}
+          setSelectedBudgetId={(id) => {
+            setTxState({}).then(() => setPopupState({ budgetId: id }));
+          }}
         />
         <IconButton
           label="Open this budget in YNAB"
           onClick={openBudget}
           icon={<ExternalLink aria-hidden />}
         />
-      </div>
-      <div className="flex-row gap-xs">
-        {popupState.editMode && (
+        {editingItems && (
           <IconButton
             label="Done editing"
-            onClick={() => setPopupState({ view: "main" })}
+            onClick={() => setEditingItems(false)}
             icon={<PencilOff aria-hidden />}
           />
         )}
-        <PopupNavMenu
+        <Menu
           label="Menu"
           icon={<Menu2 aria-hidden />}
           onAction={onMenuAction}
-          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}
-          animationsEnabled={settings.animations}>
-          <Item key="addTransaction" textValue="Add transaction">
-            <div className="flex-row gap-sm">
-              <Plus aria-hidden size={20} />
-              Add transaction
-            </div>
-          </Item>
-          <Item key="addTransfer" textValue="Add transfer/payment">
-            <div className="flex-row gap-sm">
-              <SwitchHorizontal aria-hidden size={20} />
-              Add transfer/payment
-            </div>
-          </Item>
-          <Item
-            key="editItems"
-            textValue={popupState.editMode ? "Done editing" : "Edit pinned items"}>
-            <div className="flex-row gap-sm">
-              {popupState.editMode ? (
-                <PencilOff aria-hidden size={20} />
-              ) : (
-                <Pencil aria-hidden size={20} />
-              )}
-              {popupState.editMode ? "Done editing" : "Edit pinned items"}
-            </div>
-          </Item>
-          <Item key="openWindow" textValue="Open in new window">
-            <div className="flex-row gap-sm">
-              <BoxMultiple aria-hidden size={20} />
-              Open in new window
-            </div>
-          </Item>
-          <Item key="openOptions" textValue="Settings">
-            <div className="flex-row gap-sm">
-              <Settings aria-hidden size={20} />
-              Settings
-            </div>
-          </Item>
-        </PopupNavMenu>
+          items={createMenuItems(editingItems, popupState.view === "main")}
+          disabledKeys={window.name === "peekWindow" ? ["openWindow"] : []}>
+          {(item) => (
+            <Item key={item.key} textValue={item.text}>
+              <div className="flex-row gap-sm">
+                {item.icon} {item.text}
+              </div>
+            </Item>
+          )}
+        </Menu>
       </div>
     </nav>
   );
 }
+
+const createMenuItems = (editingItems: boolean, onMainPage: boolean) => [
+  ...(onMainPage
+    ? [
+        {
+          key: "addTransaction",
+          text: "Add transaction",
+          icon: <Plus aria-hidden size={20} />
+        },
+        {
+          key: "addTransfer",
+          text: "Add transfer/payment",
+          icon: <SwitchHorizontal aria-hidden size={20} />
+        },
+        {
+          key: "editItems",
+          text: editingItems ? "Done editing" : "Edit pinned items",
+          icon: editingItems ? (
+            <PencilOff aria-hidden size={20} />
+          ) : (
+            <Pencil aria-hidden size={20} />
+          )
+        }
+      ]
+    : [
+        {
+          key: "backToMain",
+          text: "Back to main view",
+          icon: <ArrowBack aria-hidden size={20} />
+        }
+      ]),
+  {
+    key: "openWindow",
+    text: "Open in new window",
+    icon: <BoxMultiple aria-hidden size={20} />
+  },
+  { key: "openOptions", text: "Settings", icon: <Settings aria-hidden size={20} /> }
+];

@@ -1,11 +1,4 @@
-import {
-  AccountDetailView,
-  CategoryDetailView,
-  MoveMoney,
-  PopupLogin,
-  PopupMain,
-  TransactionForm
-} from "~components";
+import { PopupLogin, PopupMain } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 
@@ -25,31 +18,18 @@ export function PopupView() {
 
   useSetColorTheme();
 
-  if (authLoading || !settings) return null;
+  // check if auth and storage are hydrated to avoid flashes
+  if (authLoading || !settings || !popupState) return null;
 
   return (
     <div
       style={{
         padding: "1em",
-        minWidth: settings.emojiMode ? "150px" : "260px",
+        minWidth: "260px",
         maxWidth: "360px",
         minHeight: "50px"
       }}>
-      {!loggedIn ? (
-        <PopupLogin />
-      ) : popupState.view === "main" ? (
-        <PopupMain />
-      ) : popupState.view === "txAdd" ? (
-        <TransactionForm />
-      ) : popupState.view === "detail" && popupState.detailState?.type === "account" ? (
-        <AccountDetailView />
-      ) : popupState.view === "detail" && popupState.detailState?.type === "category" ? (
-        <CategoryDetailView />
-      ) : popupState.view === "move" ? (
-        <MoveMoney />
-      ) : (
-        <div>Something went wrong 😢!</div>
-      )}
+      {!loggedIn ? <PopupLogin /> : <PopupMain />}
     </div>
   );
 }

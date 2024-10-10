@@ -1,14 +1,21 @@
-import { type FormEventHandler, useCallback, useEffect, useMemo, useState } from "react";
-import { type Category, TransactionClearedStatus, TransactionFlagColor } from "ynab";
+import {
+  type FormEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
 import { IS_PRODUCTION } from "./constants";
 import { useStorageContext, useYNABContext } from "./context";
-import type { CachedPayee } from "./types";
+import type { CachedPayee, SubTxState, TxAddInitialState } from "./types";
 import {
+  checkPermissions,
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,
-  requestPermissions,
   stringValueToMillis
 } from "./utils";
 
@@ -21,33 +28,37 @@ export default function useTransaction() {
   const {
     settings,
     budgetSettings,
-    popupState: { txAddState },
+    popupState,
+    txState,
     setPopupState,
+    setTxState,
+    setOmniboxInput,
     setBudgetSettings
   } = useStorageContext();
 
   // Transaction state
-  const [isTransfer, setIsTransfer] = useState(txAddState?.isTransfer ?? false);
-  const [date, setDate] = useState(getTodaysDateISO);
-  const [amount, setAmount] = useState(txAddState?.amount || "");
+  const [isTransfer, setIsTransfer] = useState(txState?.isTransfer ?? false);
+  const [date, setDate] = useState(txState?.date || getTodaysDateISO);
+  const [amount, setAmount] = useState(txState?.amount || "");
   const [cleared, setCleared] = useState(
     () =>
-      accountsData?.find((a) => a.id === txAddState?.accountId)?.type === "cash" ||
-      !!budgetSettings?.transactions.cleared
+      txState?.cleared ??
+      (accountsData?.find((a) => a.id === txState?.accountId)?.type === "cash" ||
+        !!budgetSettings?.transactions.cleared)
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    txAddState?.amountType || "Outflow"
+    txState?.amountType || "Outflow"
   );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    txAddState?.payee || null
+    txState?.payee || null
   );
   const [category, setCategory] = useState(() => {
-    if (!txAddState?.categoryId) return null;
-    return categoriesData?.find((c) => c.id === txAddState?.categoryId) || null;
+    if (!txState?.categoryId) return null;
+    return categoriesData?.find((c) => c.id === txState?.categoryId) || null;
   });
   const [account, setAccount] = useState(() => {
-    if (txAddState?.accountId)
-      return accountsData?.find((a) => a.id === txAddState?.accountId) || null;
+    if (txState?.accountId)
+      return accountsData?.find((a) => a.id === txState?.accountId) || null;
     if (budgetSettings?.transactions.defaultAccountId)
       return (
         accountsData?.find(
@@ -56,24 +67,18 @@ export default function useTransaction() {
       );
     return null;
   });
-  const [memo, setMemo] = useState("");
-  const [flag, setFlag] = useState("");
+  const [memo, setMemo] = useState(txState?.memo || "");
+  const [flag, setFlag] = useState(txState?.flag || "");
 
   // Split transaction state
-  const [isSplit, setIsSplit] = useState(false);
-  const [subTxs, setSubTxs] = useState<
-    Array<{
-      amount: string;
-      amountType: "Inflow" | "Outflow";
-      payee: CachedPayee | { name: string } | null;
-      category: Category | null;
-      memo?: string;
-    }>
-  >([{ amount: "", amountType: "Outflow", payee: null, category: null }]);
+  const [isSplit, setIsSplit] = useState(txState?.isSplit ?? false);
+  const [subTxs, setSubTxs] = useState<Array<SubTxState>>(
+    txState?.subTxs || [{ amount: "", amountType: "Outflow", isTransfer: false }]
+  );
   const onAddSubTx = useCallback(() => {
     setSubTxs((prev) => [
       ...prev,
-      { amount: "", amountType: "Outflow", payee: null, category: null }
+      { amount: "", amountType: "Outflow", isTransfer: false }
     ]);
   }, []);
   const onRemoveSubTx = useCallback(() => {
@@ -93,22 +98,35 @@ export default function useTransaction() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Try parsing user's selection as the amount upon opening the form
+  // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
+  usePersistFormState({
+    amount,
+    amountType,
+    isTransfer,
+    payee,
+    categoryId: category?.id,
+    accountId: account?.id,
+    memo,
+    flag,
+    isSplit,
+    subTxs,
+    cleared,
+    date
+  });
+
+  // Try parsing user's current selection as the initial amount
+  useParseAmountFromUserSelection(!!settings?.currentTabAccess, setAmount);
+
+  // Reset form state if switching budgets
+  const originalBudgetId = useRef(popupState?.budgetId);
   useEffect(() => {
-    if (!settings?.currentTabAccess) return;
-    requestPermissions(["activeTab", "scripting"]).then((granted) => {
-      if (!granted) return;
-      executeScriptInCurrentTab(() => getSelection()?.toString())
-        .then((selection) => {
-          if (!selection) return;
-          const parsedNumber = parseLocaleNumber(selection);
-          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
-        })
-        .catch((err) => {
-          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
-        });
-    });
-  }, [settings?.currentTabAccess]);
+    if (popupState && popupState.budgetId !== originalBudgetId.current) {
+      setPayee(null);
+      setAccount(null);
+      setCategory(null);
+      originalBudgetId.current = popupState.budgetId;
+    }
+  }, [popupState]);
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
@@ -215,7 +233,7 @@ export default function useTransaction() {
         subtransactions: isSplit
           ? subTxs.map((subTx) => ({
               amount: stringValueToMillis(subTx.amount, subTx.amountType),
-              category_id: subTx.category?.id,
+              category_id: subTx.categoryId,
               payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
               payee_name:
                 subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name,
@@ -223,7 +241,9 @@ export default function useTransaction() {
             }))
           : undefined
       });
-      setPopupState(txAddState?.returnTo || { view: "main" });
+      await setTxState({});
+      setOmniboxInput("");
+      setPopupState(txState?.returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
@@ -258,3 +278,58 @@ export default function useTransaction() {
     }
   };
 }
+
+const usePersistFormState = (txState: TxAddInitialState) => {
+  const { setTxState } = useStorageContext();
+  useEffect(() => {
+    setTxState({
+      accountId: txState.accountId,
+      amount: txState.amount,
+      amountType: txState.amountType,
+      categoryId: txState.categoryId,
+      flag: txState.flag,
+      isSplit: txState.isSplit,
+      isTransfer: txState.isTransfer,
+      memo: txState.memo,
+      payee: txState.payee,
+      subTxs: txState.subTxs,
+      cleared: txState.cleared,
+      date: txState.date
+    });
+  }, [
+    setTxState,
+    txState.accountId,
+    txState.amount,
+    txState.amountType,
+    txState.categoryId,
+    txState.flag,
+    txState.isSplit,
+    txState.isTransfer,
+    txState.memo,
+    txState.payee,
+    txState.subTxs,
+    txState.cleared,
+    txState.date
+  ]);
+};
+
+const useParseAmountFromUserSelection = (
+  enabled: boolean,
+  setAmount: (amount: string) => void
+) => {
+  useEffect(() => {
+    if (!enabled) return;
+    checkPermissions(["activeTab", "scripting"]).then((granted) => {
+      if (!granted) return;
+      executeScriptInCurrentTab(() => getSelection()?.toString())
+        .then((selection) => {
+          if (!selection) return;
+          const parsedNumber = parseLocaleNumber(selection);
+          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+        })
+        .catch((err) => {
+          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+        });
+    });
+  }, [enabled, setAmount]);
+};

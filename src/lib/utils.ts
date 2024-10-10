@@ -58,6 +58,18 @@ export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
     (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
   );
 
+/** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
+export const getIgnoredCategoryIdsForTx = (
+  data: ynab.CategoryGroupWithCategories[],
+  ignoreRta = false
+) => {
+  const ignoredIds = new Set(
+    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
+  );
+  if (!ignoreRta) ignoredIds.delete(data[0]?.categories[0]?.id);
+  return ignoredIds;
+};
+
 /** Check if a search query is contained in a string, in the context of searching (i.e. ignore case) */
 export const searchWithinString = (str: string, query: string) =>
   str.toLocaleLowerCase().includes(query.toLocaleLowerCase());
@@ -98,9 +110,12 @@ export const formatDateMonthAndDay = (date: Date) => {
 };
 
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
-export const parseLocaleNumber = (value: string, locales = navigator.languages) => {
+export const parseLocaleNumber = (
+  value: string,
+  locales = typeof navigator !== "undefined" ? navigator.languages : undefined
+) => {
   const example = Intl.NumberFormat(locales).format(1.1);
-  const cleanPattern = new RegExp(`[^-+0-9${example.charAt(1)}]`, "g");
+  const cleanPattern = new RegExp(`[^0-9${example.charAt(1)}]`, "g");
   const cleaned = value.replace(cleanPattern, "");
   const normalized = cleaned.replace(example.charAt(1), ".");
 
@@ -115,6 +130,10 @@ const emojiRegex =
 export const findEmoji = (s: string, limit = 2) => {
   const matches = s.match(emojiRegex);
   return matches ? matches.slice(0, limit).join("") : null;
+};
+
+export const findAllEmoji = (s: string): string[] => {
+  return s.match(emojiRegex) || [];
 };
 
 /**
@@ -178,3 +197,27 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
   if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
   return null;
 };
+
+/**
+ * Wait for an internet connection to be established.
+ * @param timeoutMs - The maximum time to wait for a connection, in milliseconds. Default is 10 seconds.
+ * @returns A Promise that resolves when an internet connection is established, or rejects if the timeout is reached.
+ */
+export function waitForInternetConnection(timeoutMs: number = 10 * 1000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    if (navigator.onLine) {
+      setTimeout(resolve, 1000); // wait additional second for connection stability
+    } else {
+      const intervalId = setInterval(() => {
+        if (navigator.onLine) {
+          clearInterval(intervalId);
+          setTimeout(resolve, 1000);
+        } else if (Date.now() - startTime > timeoutMs) {
+          clearInterval(intervalId);
+          reject(new Error("No internet connection!"));
+        }
+      }, 1000);
+    }
+  });
+}

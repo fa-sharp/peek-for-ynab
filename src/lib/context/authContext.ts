@@ -5,8 +5,9 @@ import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
+import type { TokenData } from "~lib/types";
+
 import { IS_PRODUCTION } from "../constants";
-import type { TokenData } from "../types";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {

@@ -13,12 +13,20 @@ import {
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const { removeCategory, settings, popupState, setPopupState } = useStorageContext();
+  const {
+    removeCategory,
+    settings,
+    editingItems,
+    popupState,
+    setPopupState,
+    setTxState
+  } = useStorageContext();
   const { accountsData, selectedBudgetData, savedCategoriesData, addedTransaction } =
     useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   if (
+    !popupState ||
     !selectedBudgetData ||
     !savedCategoriesData ||
     !settings ||
@@ -29,7 +37,7 @@ export default function SavedCategoriesView() {
   const { currencyFormat } = selectedBudgetData;
 
   return (
-    <Droppable droppableId="savedCategories" isDropDisabled={!popupState.editMode}>
+    <Droppable droppableId="savedCategories" isDropDisabled={!editingItems}>
       {(provided) => (
         <ul
           {...provided.droppableProps}
@@ -47,7 +55,7 @@ export default function SavedCategoriesView() {
                 draggableId={category.id}
                 key={category.id}
                 index={idx}
-                isDragDisabled={!popupState.editMode}>
+                isDragDisabled={!editingItems}>
                 {(provided) => (
                   <li
                     ref={provided.innerRef}
@@ -59,9 +67,9 @@ export default function SavedCategoriesView() {
                       currencyFormat={currencyFormat}
                       alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
                       settings={settings}
-                      addedTransaction={!!addedTransaction}
+                      addedTransaction={addedTransaction}
                       actionElementsLeft={
-                        !popupState.editMode ? null : (
+                        !editingItems ? null : (
                           <IconButton
                             label="Unpin"
                             onClick={() => removeCategory(category.id)}
@@ -72,47 +80,43 @@ export default function SavedCategoriesView() {
                       actionElementsRight={
                         <menu className="list flex-row gap-sm" aria-label="actions">
                           {!ccAccount ? (
-                            <li className="flex-row">
-                              <IconButton
-                                rounded
-                                accent
-                                icon={<AddTransactionIcon />}
-                                label="Add transaction"
-                                onClick={() =>
-                                  setPopupState({
-                                    view: "txAdd",
-                                    txAddState: { categoryId: category.id }
-                                  })
-                                }
-                              />
-                            </li>
+                            <IconButton
+                              rounded
+                              accent
+                              icon={<AddTransactionIcon />}
+                              label="Add transaction"
+                              onClick={() =>
+                                setTxState({ categoryId: category.id }).then(() =>
+                                  setPopupState({ view: "txAdd" })
+                                )
+                              }
+                            />
                           ) : (
-                            <li className="flex-row">
-                              <IconButton
-                                rounded
-                                accent
-                                icon={<AddCCPaymentIcon />}
-                                label="Add credit card payment"
-                                onClick={() =>
-                                  ccAccount.transfer_payee_id &&
+                            <IconButton
+                              rounded
+                              accent
+                              icon={<AddCCPaymentIcon />}
+                              label="Add credit card payment"
+                              onClick={() =>
+                                ccAccount.transfer_payee_id &&
+                                setTxState({
+                                  isTransfer: true,
+                                  amount:
+                                    category.balance >= 0
+                                      ? millisToStringValue(
+                                          category.balance,
+                                          currencyFormat
+                                        )
+                                      : undefined,
+                                  amountType: "Inflow",
+                                  accountId: ccAccount.id
+                                }).then(() =>
                                   setPopupState({
-                                    view: "txAdd",
-                                    txAddState: {
-                                      isTransfer: true,
-                                      amount:
-                                        category.balance >= 0
-                                          ? millisToStringValue(
-                                              category.balance,
-                                              currencyFormat
-                                            )
-                                          : undefined,
-                                      amountType: "Inflow",
-                                      accountId: ccAccount.id
-                                    }
+                                    view: "txAdd"
                                   })
-                                }
-                              />
-                            </li>
+                                )
+                              }
+                            />
                           )}
                           {category.category_group_name !== "Credit Card Payments" && (
                             <li className="flex-row">

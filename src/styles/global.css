@@ -65,6 +65,10 @@ button:focus-visible {
   outline-color: var(--border);
 }
 
+input[type="checkbox"] {
+  accent-color: var(--currency-green);
+}
+
 .flex-row {
   display: flex;
   align-items: center;
@@ -85,6 +89,10 @@ button:focus-visible {
 .flex-grow {
   flex-grow: 1;
   flex-shrink: 0;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
 .flex-1 {
@@ -177,12 +185,17 @@ button:focus-visible {
 
   margin-block: var(--spacing-xs);
 
-  font-size: 1.1em;
+  font-size: 1.15em;
   font-weight: 600;
 }
 
 .heading-small {
-  margin-block: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  margin-block: var(--spacing-xs);
+
   font-size: 1.05em;
   font-weight: 600;
 }
@@ -197,14 +210,20 @@ button:focus-visible {
   align-items: center;
   gap: var(--spacing-lg);
 
-  padding: 3px 0px;
+  padding: 3px 1px;
   border-bottom: solid 1px var(--border-light);
+
+  outline: transparent solid 2px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
 }
-.balance-display:not(:hover) span.hidden {
-  color: transparent;
+.balance-display.highlighted {
+  outline-color: var(--border);
+  border-radius: var(--border-radius);
 }
 
-li:last-child .balance-display {
+li:last-child > .balance-display {
   border-bottom-color: transparent;
 }
 
@@ -222,17 +241,21 @@ li:last-child .balance-display {
   text-align: center;
 }
 .button.small {
-  padding: 2px 5px;
+  padding: var(--spacing-xs) 0.4em;
   border: none;
   flex-shrink: 0;
 }
+.button.focus {
+  outline: 2px solid var(--border);
+}
 
 .icon-button {
+  display: inline-flex;
   padding: 1px;
+  vertical-align: text-bottom;
 
   background: none;
   border: none;
-  line-height: 0;
   cursor: pointer;
 }
 .icon-button:active {
@@ -249,6 +272,12 @@ li:last-child .balance-display {
 }
 .icon-button[disabled] {
   cursor: unset;
+}
+
+.icon-span {
+  display: inline-flex;
+  vertical-align: text-bottom;
+  padding: 1px;
 }
 
 .list {
@@ -285,6 +314,15 @@ li:last-child .balance-display {
 .menu > li:hover,
 .menu > li:focus-visible {
   background-color: var(--highlight);
+  outline-color: var(--border);
+}
+
+.dialog {
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  max-width: 250px;
+}
+.dialog:focus-visible {
   outline-color: var(--border);
 }
 
@@ -340,6 +378,10 @@ li:last-child .balance-display {
   border-radius: var(--border-radius);
 }
 
+.shadow {
+  box-shadow: var(--border-light) 0px 2px 6px 1px;
+}
+
 .accent:not(:disabled) {
   background-color: var(--accent);
 }
@@ -376,6 +418,10 @@ li:last-child .balance-display {
 }
 .currency.negative {
   color: var(--currency-red);
+}
+
+.max-w-32 {
+  max-width: 8rem;
 }
 
 .mt-sm {
@@ -454,6 +500,11 @@ li:last-child .balance-display {
 
 .slide-up {
   animation: slide-up 0.2s forwards;
+}
+@media (prefers-reduced-motion) {
+  .slide-up {
+    animation: none;
+  }
 }
 
 @keyframes slide-up {

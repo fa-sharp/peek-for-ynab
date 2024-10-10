@@ -35,9 +35,10 @@ test("Data fetched with valid token, and first budget auto-selected", async () =
 
   await waitFor(() => expect(result.current.ynab.budgetsData).toBeTruthy());
   expect(result.current.ynab.budgetsData).toHaveLength(2);
-  expect(result.current.storage.selectedBudgetId, "first budget is auto-selected").toBe(
-    budgets[0].id
-  );
+  expect(
+    result.current.storage.popupState?.budgetId,
+    "first budget is auto-selected"
+  ).toBe(budgets[0].id);
 });
 
 test("Saved categories data loaded properly", async () => {

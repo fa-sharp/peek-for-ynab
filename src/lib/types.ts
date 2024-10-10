@@ -1,4 +1,9 @@
-import type { CurrencyFormat } from "ynab";
+import type {
+  Account,
+  Category,
+  CategoryGroupWithCategories,
+  CurrencyFormat
+} from "ynab";
 
 export interface TokenData {
   accessToken: string;
@@ -6,15 +11,25 @@ export interface TokenData {
   expires: number;
 }
 
+/** Current popup state */
+export interface PopupState {
+  /** Current page/view */
+  view: "main" | "txAdd" | "detail" | "move";
+  /** Currently selected budget ID. Could be an empty string if no budget is selected. */
+  budgetId: string;
+  detailState?: DetailViewState;
+  moveMoneyState?: MoveMoneyInitialState;
+}
+
 export interface AppSettings {
-  /** Category and account names are reduced to emojis */
-  emojiMode: boolean;
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
   theme?: "auto" | "dark" | "light";
-  /** Whether animations are enabled. @default false */
+  /** Whether animations are enabled. @default true */
   animations?: boolean;
+  /** Whether omnibox is enabled. @default false */
+  omnibox?: boolean;
 }
 
 /** Budget-specific settings */
@@ -30,21 +45,36 @@ export interface BudgetSettings {
     /** Default account for purchases */
     defaultAccountId?: string;
   };
+  confetti?: BudgetConfettiSettings;
 }
 
 /** Notification settings for a specific budget */
 export interface BudgetNotificationSettings {
-  /** Notify when a category is overspent @default false */
+  /** Notify when a category is overspent @default false  */
   overspent: boolean;
-  /** Check for new bank imports and notify if there are unapproved transactions @default false  */
+  /** Check for new bank imports and notify if there are unapproved transactions @default false   */
   checkImports: boolean;
-  /** Notify when a bank connection is showing an error @default false */
+  /** Notify when a bank connection is showing an error @default false  */
   importError: boolean;
   /** Reminders for reconciliation - stored as a map
-   * of accountId to max # of days since last reconciliation @default {} // no reminders */
+   * of accountId to max # of days since last reconciliation @default {} // no reminders  */
   reconcileAlerts: {
     [accountId: string]: number | undefined;
   };
+}
+
+export interface BudgetConfettiSettings {
+  allCategories: boolean;
+  categories: string[];
+  emojis: string[];
+}
+
+/** Payees, category groups, categories, and accounts */
+export interface BudgetMainData {
+  accountsData: Account[];
+  categoriesData: Category[];
+  categoryGroupsData: CategoryGroupWithCategories[];
+  payeesData: CachedPayee[];
 }
 
 /** Budget data cached by the app */
@@ -73,12 +103,28 @@ export interface TxAddInitialState {
   amountType?: "Inflow" | "Outflow";
   accountId?: string;
   categoryId?: string;
-  payee?: CachedPayee;
+  payee?: CachedPayee | { name: string } | null;
   isTransfer?: boolean;
+  memo?: string;
+  flag?: string;
+  isSplit?: boolean;
+  subTxs?: Array<SubTxState>;
+  cleared?: boolean;
+  date?: string;
   returnTo?: {
     view: "main" | "detail";
     detailState?: DetailViewState;
   };
+}
+
+/** Split transaction state  */
+export interface SubTxState {
+  amount: string;
+  amountType: "Inflow" | "Outflow";
+  payee?: CachedPayee | { name: string } | null;
+  isTransfer: boolean;
+  categoryId?: string;
+  memo?: string;
 }
 
 /** Initial state of the move money screen */

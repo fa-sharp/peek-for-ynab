@@ -11,19 +11,19 @@ function IndexPage() {
       <h3>A Chrome extension to quickly check on your spending plan</h3>
       <div className="flex-row gap-lg">
         <Image
-          src="/img/screenshots/light-pinned.png"
+          src="/img/screenshots/popup-light.png"
           alt={"Extension screenshot in light mode"}
           className="screenshot"
-          width={380}
-          height={300}
+          width={300}
+          height={310}
           priority
         />
         <Image
-          src="/img/screenshots/dark-pinned.png"
+          src="/img/screenshots/popup-dark.png"
           alt={"Extension screenshot in dark mode"}
           className="screenshot"
-          width={380}
-          height={300}
+          width={300}
+          height={310}
           priority
         />
       </div>

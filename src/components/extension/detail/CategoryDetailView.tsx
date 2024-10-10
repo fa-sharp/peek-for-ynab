@@ -7,13 +7,13 @@ import { useStorageContext, useYNABContext } from "~lib/context";
 
 const CategoryTxsView = () => {
   const { useGetCategoryTxs, categoriesData, selectedBudgetData } = useYNABContext();
-  const { settings, popupState, setPopupState } = useStorageContext();
+  const { settings, popupState, setPopupState, setTxState } = useStorageContext();
 
   const category = useMemo(
-    () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
-    [categoriesData, popupState.detailState?.id]
+    () => categoriesData?.find((c) => c.id === popupState?.detailState?.id),
+    [categoriesData, popupState?.detailState?.id]
   );
-  const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
+  const { data: categoryTxs } = useGetCategoryTxs(popupState?.detailState?.id, 30);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
@@ -69,19 +69,16 @@ const CategoryTxsView = () => {
         <button
           className="button rounded accent flex-row gap-sm"
           onClick={() =>
-            setPopupState({
-              view: "txAdd",
-              txAddState: {
-                categoryId: category.id,
-                returnTo: {
-                  view: "detail",
-                  detailState: {
-                    type: "category",
-                    id: category.id
-                  }
+            setTxState({
+              categoryId: category.id,
+              returnTo: {
+                view: "detail",
+                detailState: {
+                  type: "category",
+                  id: category.id
                 }
               }
-            })
+            }).then(() => setPopupState({ view: "txAdd" }))
           }>
           <AddTransactionIcon /> Transaction
         </button>

@@ -2,6 +2,7 @@
 import { expect, test } from "vitest";
 
 import {
+  findAllEmoji,
   findEmoji,
   formatCurrency,
   getTodaysDateISO,
@@ -46,8 +47,12 @@ test("'parseLocaleNumber' can parse numbers in different locales correctly", () 
   expect(parseLocaleNumber("€420.420,42", ["de-DE"]), "de-DE, EUR").toBe(420_420.42);
 });
 
-test("'findEmoji' successfully finds emojis in strings", () => {
+test("'findAllEmoji' successfully finds emojis in strings", () => {
   expect(findEmoji("🧑‍🎓 School"), "emoji at beginning").toBe("🧑‍🎓");
   expect(findEmoji("Giving ❤️‍🩹"), "emoji at end").toBe("❤️‍🩹");
-  expect(findEmoji("Love 😍 the 🌎 Earth 🌲", 3), "emojis interspersed").toBe("😍🌎🌲");
+  expect(findAllEmoji("Love 😍 the 🌎 Earth 🌲"), "emojis interspersed").toMatchObject([
+    "😍",
+    "🌎",
+    "🌲"
+  ]);
 });
