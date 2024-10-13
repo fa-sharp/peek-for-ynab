@@ -111,7 +111,8 @@ export default function useTransaction() {
     isSplit,
     subTxs,
     cleared,
-    date
+    date,
+    returnTo: txState?.returnTo
   });
 
   // Try parsing user's current selection as the initial amount
@@ -294,7 +295,8 @@ const usePersistFormState = (txState: TxAddInitialState) => {
       payee: txState.payee,
       subTxs: txState.subTxs,
       cleared: txState.cleared,
-      date: txState.date
+      date: txState.date,
+      returnTo: txState.returnTo
     });
   }, [
     setTxState,
@@ -309,7 +311,8 @@ const usePersistFormState = (txState: TxAddInitialState) => {
     txState.payee,
     txState.subTxs,
     txState.cleared,
-    txState.date
+    txState.date,
+    txState.returnTo
   ]);
 };
 

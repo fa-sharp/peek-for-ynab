@@ -227,7 +227,7 @@ const useYNABProvider = () => {
 
   const useGetAccountTxs = (accountId?: string, sinceDaysAgo?: number) =>
     useQuery({
-      enabled: !!accountId && !!popupState?.budgetId,
+      enabled: Boolean(ynabAPI && accountId && popupState?.budgetId),
       queryKey: [
         "txs",
         { budgetId: popupState?.budgetId, accountId, sinceDaysAgo }
@@ -255,7 +255,7 @@ const useYNABProvider = () => {
 
   const useGetCategoryTxs = (categoryId?: string, sinceDaysAgo?: number) =>
     useQuery({
-      enabled: !!categoryId && !!popupState?.budgetId,
+      enabled: Boolean(ynabAPI && categoryId && popupState?.budgetId),
       queryKey: [
         "txs",
         { budgetId: popupState?.budgetId, categoryId, sinceDaysAgo }
