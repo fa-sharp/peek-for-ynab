@@ -1,6 +1,6 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { CategoryView, IconButton } from "~components";
+import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
@@ -78,7 +78,7 @@ export default function SavedCategoriesView() {
                         )
                       }
                       actionElementsRight={
-                        <menu className="list flex-row gap-sm" aria-label="actions">
+                        <Toolbar className="list flex-row gap-sm" aria-label="actions">
                           {!ccAccount ? (
                             <IconButton
                               rounded
@@ -119,25 +119,23 @@ export default function SavedCategoriesView() {
                             />
                           )}
                           {category.category_group_name !== "Credit Card Payments" && (
-                            <li className="flex-row">
-                              <IconButton
-                                accent
-                                rounded
-                                icon={<DetailIcon />}
-                                label="Details/Activity"
-                                onClick={() =>
-                                  setPopupState({
-                                    view: "detail",
-                                    detailState: {
-                                      type: "category",
-                                      id: category.id
-                                    }
-                                  })
-                                }
-                              />
-                            </li>
+                            <IconButton
+                              accent
+                              rounded
+                              icon={<DetailIcon />}
+                              label="Details/Activity"
+                              onClick={() =>
+                                setPopupState({
+                                  view: "detail",
+                                  detailState: {
+                                    type: "category",
+                                    id: category.id
+                                  }
+                                })
+                              }
+                            />
                           )}
-                        </menu>
+                        </Toolbar>
                       }
                     />
                   </li>

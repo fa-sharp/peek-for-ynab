@@ -1,6 +1,6 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { AccountView, IconButton } from "~components";
+import { AccountView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
 import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
@@ -58,35 +58,31 @@ export default function SavedAccountsView() {
                       )
                     }
                     actionElementsRight={
-                      <menu className="list flex-row gap-sm" aria-label="actions">
-                        <li className="flex-row">
-                          <IconButton
-                            rounded
-                            accent
-                            icon={<AddTransactionIcon />}
-                            label="Add transaction"
-                            onClick={() =>
-                              setTxState({ accountId: account.id }).then(() =>
-                                setPopupState({ view: "txAdd" })
-                              )
-                            }
-                          />
-                        </li>
-                        <li className="flex-row">
-                          <IconButton
-                            accent
-                            rounded
-                            icon={<DetailIcon />}
-                            label="Details/Activity"
-                            onClick={() =>
-                              setPopupState({
-                                view: "detail",
-                                detailState: { type: "account", id: account.id }
-                              })
-                            }
-                          />
-                        </li>
-                      </menu>
+                      <Toolbar className="list flex-row gap-sm" aria-label="actions">
+                        <IconButton
+                          rounded
+                          accent
+                          icon={<AddTransactionIcon />}
+                          label="Add transaction"
+                          onClick={() =>
+                            setTxState({ accountId: account.id }).then(() =>
+                              setPopupState({ view: "txAdd" })
+                            )
+                          }
+                        />
+                        <IconButton
+                          accent
+                          rounded
+                          icon={<DetailIcon />}
+                          label="Details/Activity"
+                          onClick={() =>
+                            setPopupState({
+                              view: "detail",
+                              detailState: { type: "account", id: account.id }
+                            })
+                          }
+                        />
+                      </Toolbar>
                     }
                   />
                 </li>
