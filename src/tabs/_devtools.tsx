@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Storage, type StorageAreaName } from "@plasmohq/storage";
 
+import { BACKGROUND_ALARM_NAME } from "~lib/constants";
 import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
 
 /** Devtools page for inspecting auth state, storage, etc. */
@@ -16,12 +17,20 @@ function Devtools() {
   const [data, setData] = useState<Record<string, string>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
+  const [backgroundAlarm, setBackgroundAlarm] = useState<chrome.alarms.Alarm | null>(
+    null
+  );
 
   // Get permissions
   useEffect(() => {
     chrome.permissions
       .getAll()
       .then((val) => setPermissions(val.permissions?.join(", ") || ""));
+  }, []);
+
+  // Get background alarm
+  useEffect(() => {
+    chrome.alarms.get(BACKGROUND_ALARM_NAME).then((alarm) => setBackgroundAlarm(alarm));
   }, []);
 
   // Get storage and listen for storage events
@@ -94,10 +103,23 @@ function Devtools() {
           </div>
         </>
       )}
-
       <h3>Browser Permissions</h3>
       {permissions}
-
+      <h3>Background Refresh</h3>
+      {!backgroundAlarm ? (
+        <div>No alarm found.</div>
+      ) : (
+        <div>
+          Next refresh at {new Date(backgroundAlarm.scheduledTime).toLocaleTimeString()}.{" "}
+          Repeats every {backgroundAlarm.periodInMinutes} minutes.
+        </div>
+      )}
+      <div>
+        <button
+          onClick={() => chrome.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
+          Clear alarm
+        </button>
+      </div>
       <h3>Browser Storage</h3>
       <div>
         Storage Area:{" "}
@@ -151,7 +173,6 @@ function Devtools() {
               </div>
             )
         )}
-
       <h3>API Cache</h3>
       <div>
         <button onClick={loadCache}>Refresh</button>

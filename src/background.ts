@@ -4,6 +4,7 @@ import {
   refreshToken
 } from "~lib/backgroundRefresh";
 import {
+  BACKGROUND_ALARM_NAME,
   CHROME_LOCAL_STORAGE,
   CHROME_SESSION_STORAGE,
   IS_DEV,
@@ -19,7 +20,7 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput
 } from "~lib/omnibox";
-import type { PopupState } from "~lib/types";
+import type { PopupState, TxAddInitialState } from "~lib/types";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 // Listen for token refresh signal
@@ -35,7 +36,6 @@ TOKEN_STORAGE.watch({
 });
 
 // Setup periodic background refresh
-const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   if (alarm.name === BACKGROUND_ALARM_NAME) {
     try {
@@ -151,12 +151,13 @@ chrome.omnibox.onInputEntered.addListener(async (text) => {
 
   await CHROME_LOCAL_STORAGE.set("txState", {
     amount: parsedQuery.amount,
+    amountType: "amountType" in parsedQuery ? parsedQuery.amountType : "Outflow",
     payee: tx?.payee,
     accountId: tx?.account?.id,
     categoryId: tx?.category?.id,
     memo: parsedQuery.memo?.trim(),
     isTransfer: parsedQuery.type === "transfer"
-  });
+  } satisfies TxAddInitialState);
   await CHROME_LOCAL_STORAGE.set("popupState", {
     view: "txAdd",
     budgetId: budgetId
