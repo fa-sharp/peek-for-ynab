@@ -135,7 +135,7 @@ export default function PopupNav() {
         }
         spin={Boolean(globalIsFetching)}
       />
-      <div className="flex-row gap-sm">
+      <div className="flex-row gap-xs">
         <BudgetSelect
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
