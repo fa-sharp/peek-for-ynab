@@ -20,15 +20,15 @@ const CategoryTxsView = () => {
   return (
     <section>
       <div className="flex-row justify-between mb-sm">
-        <h2 className="heading-big">{category.name}</h2>
+        <h2 className="heading-medium">{category.name}</h2>
         <IconButton
           icon={<ArrowBack aria-hidden />}
           label="Back to main view"
           onClick={() => setPopupState({ view: "main" })}
         />
       </div>
-      <ul className="list flex-col gap-sm mb-lg" aria-label="Category details">
-        <li className="balance-display heading-medium">
+      <ul className="list mb-lg" aria-label="Category details">
+        <li className="balance-display heading-small">
           Available Balance:
           <CurrencyView
             milliUnits={category.balance}

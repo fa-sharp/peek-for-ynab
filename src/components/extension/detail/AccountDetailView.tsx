@@ -86,7 +86,7 @@ const AccountTxsView = () => {
   return (
     <section>
       <div className="flex-row justify-between mb-sm">
-        <h2 className="heading-big">
+        <h2 className="heading-medium">
           {account.name}
           <IconButton
             label="Open this account in YNAB"
@@ -100,14 +100,14 @@ const AccountTxsView = () => {
           onClick={() => setPopupState({ view: "main" })}
         />
       </div>
-      <ul className="list flex-col gap-sm mb-lg" aria-label="Account details">
+      <ul className="list mb-lg" aria-label="Account details">
         {hasImportError && (
           <li className="flex-row">
             <ImportErrorIcon />
             Import issue/error!
           </li>
         )}
-        <li className="balance-display heading-medium">
+        <li className="balance-display heading-small">
           Working Balance:
           <CurrencyView
             key={`working-${account.id}`}
@@ -120,7 +120,7 @@ const AccountTxsView = () => {
         {(account.type === AccountType.CreditCard ||
           account.type === AccountType.LineOfCredit) &&
           ccpCategory && (
-            <li className="balance-display heading-medium">
+            <li className="balance-display heading-small">
               Payment Category:
               <CurrencyView
                 key={`ccp-${account.id}`}

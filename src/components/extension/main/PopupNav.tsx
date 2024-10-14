@@ -140,7 +140,9 @@ export default function PopupNav() {
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
           setSelectedBudgetId={(id) => {
-            setTxState({}).then(() => setPopupState({ budgetId: id }));
+            setTxState({}).then(() =>
+              setPopupState({ budgetId: id, detailState: undefined })
+            );
           }}
         />
         <IconButton

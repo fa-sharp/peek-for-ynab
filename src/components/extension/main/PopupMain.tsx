@@ -27,6 +27,7 @@ export default function PopupMain() {
       <PopupNav />
       {popupState?.view === "txAdd" && <TransactionForm />}
       {popupState?.view === "main" && <MainView />}
+      {popupState?.view === "detail" && !popupState.detailState && <MainView />}
       {popupState?.view === "detail" && popupState.detailState?.type === "account" && (
         <AccountDetailView />
       )}
