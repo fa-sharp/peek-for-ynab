@@ -443,6 +443,10 @@ li:last-child > .balance-display {
   margin-bottom: var(--spacing-lg);
 }
 
+.py-xs {
+  padding-block: var(--spacing-xs);
+}
+
 .pt-sm {
   padding-top: var(--spacing-sm);
 }
@@ -453,6 +457,10 @@ li:last-child > .balance-display {
 
 .pb-lg {
   padding-bottom: var(--spacing-lg);
+}
+
+.divide-y > * ~ * {
+  border-top: solid 1px var(--border-light);
 }
 
 .font-bold {

@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import {
+  ArrowsSplit,
+  Bell,
+  CurrencyPound,
+  Eye,
+  Pin,
+  Plus,
+  Sunglasses
+} from "tabler-icons-react";
 
 export const metadata: Metadata = {
   title: "Peek for YNAB"
@@ -8,7 +17,9 @@ export const metadata: Metadata = {
 function IndexPage() {
   return (
     <>
-      <h3>A Chrome extension to quickly check on your spending plan</h3>
+      <h2 className="heading-big mb-lg">
+        A Chrome extension to quickly check on your spending plan
+      </h2>
       <div className="flex-row gap-lg">
         <Image
           src="/img/screenshots/popup-light.png"
@@ -41,17 +52,31 @@ function IndexPage() {
           />
         </a>
       </div>
-      <h2>Features</h2>
-      <ul>
-        <li>View your current category and account balances</li>
-        <li>Pin your favorite categories and accounts</li>
-        <li>Add transactions directly from the extension</li>
-        <li>
-          Customizable alerts for overspending, new imports, and reconciliation reminders
+      <h2 className="heading-big">Features</h2>
+      <ul className="list divide-y">
+        <li className="flex-row py-xs">
+          <Eye aria-hidden /> View your current category and account balances
         </li>
-        <li>Support for split transactions</li>
-        <li>Support for multiple budgets</li>
-        <li>Dark mode</li>
+        <li className="flex-row py-xs">
+          <Pin aria-hidden /> Pin your favorite categories and accounts
+        </li>
+        <li className="flex-row py-xs">
+          <Plus aria-hidden /> Add transactions directly from the extension
+        </li>
+        <li className="flex-row py-xs">
+          <Bell aria-hidden /> Customizable alerts for overspending, new imports, and
+          reconciliation reminders
+        </li>
+        <li className="flex-row py-xs">
+          <ArrowsSplit aria-hidden />
+          Support for split transactions
+        </li>
+        <li className="flex-row py-xs">
+          <CurrencyPound aria-hidden /> Support for multiple budgets and currencies
+        </li>
+        <li className="flex-row py-xs">
+          <Sunglasses aria-hidden /> Dark mode
+        </li>
       </ul>
     </>
   );

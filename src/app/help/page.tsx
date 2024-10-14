@@ -90,16 +90,22 @@ function HelpPage() {
           <h3>What does the icon in the upper left corner represent?</h3>
           <ul>
             <li>
-              <Check color="var(--success)" />
+              <div className="icon-span">
+                <Check color="var(--success)" />
+              </div>
               &nbsp;Category and account data has been successfully retrieved from YNAB.
             </li>
             <li>
-              <AlertTriangle color="var(--stale)" />
+              <div className="icon-span">
+                <AlertTriangle color="var(--stale)" />
+              </div>
               &nbsp;There was an error fetching data from YNAB, and/or the data is out of
               date. You can click on the icon to refresh the data.
             </li>
             <li>
-              <Refresh />
+              <div className="icon-span">
+                <Refresh />
+              </div>
               &nbsp;Data is being retrieved/refreshed from YNAB.
             </li>
           </ul>
