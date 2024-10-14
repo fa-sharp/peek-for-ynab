@@ -68,6 +68,7 @@ export default function PopupNav() {
     async (key: Key) => {
       switch (key) {
         case "addTransaction":
+          await setTxState({});
           setPopupState({ view: "txAdd" });
           break;
         case "addTransfer":
