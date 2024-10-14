@@ -10,7 +10,11 @@ import {
 } from "~lib/omnibox";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
 import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
-import { getIgnoredCategoryIdsForTx, stringValueToMillis } from "~lib/utils";
+import {
+  getIgnoredCategoryIdsForTx,
+  getTodaysDateISO,
+  stringValueToMillis
+} from "~lib/utils";
 
 import OmniboxTransactionFields from "./OmniboxTransactionFields";
 import OmniboxTransferFields from "./OmniboxTransferFields";
@@ -72,6 +76,7 @@ export default function OmniboxTransaction({
   const canSubmitImmediately =
     !!formState.amount && !!formState.payee && !!formState.account;
 
+  useEffect(() => handlers.setDate(getTodaysDateISO()), [handlers]);
   useEffect(() => {
     if (!parsedQuery || !results) return;
     handlers.setAmount(parsedQuery.amount || initialAmount.current);
