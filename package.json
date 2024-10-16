@@ -61,7 +61,7 @@
     "ynab": "^2.6.0"
   },
   "devDependencies": {
-    "@hello-pangea/dnd": "^16.6.0",
+    "@hello-pangea/dnd": "^17.0.0",
     "@next/eslint-plugin-next": "^14.2.15",
     "@react-types/shared": "^3.25.0",
     "@testing-library/react": "^15.0.7",
