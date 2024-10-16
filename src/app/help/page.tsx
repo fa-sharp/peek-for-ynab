@@ -82,8 +82,10 @@ function HelpPage() {
           <p>
             If you will enter a lot of your transactions using the extension, you may want
             to leave them Unapproved so that you will be prompted to double-check and
-            Approve the transactions in YNAB. In the settings page, click the gear ⚙️ icon
-            next to the budget name, and then uncheck the <b>Approved</b> setting.
+            Approve the transactions in YNAB. In the settings page, look for the budget
+            settings (click the gear ⚙️ icon next to the budget name to expand the
+            settings if needed), and then under <b>Transaction defaults</b>, uncheck the{" "}
+            <b>Approved</b> setting.
           </p>
         </li>
         <li>
