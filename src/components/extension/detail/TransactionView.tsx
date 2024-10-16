@@ -113,7 +113,7 @@ export default function TransactionView({
       {isSplit && (
         <ul
           aria-label="Split categories"
-          className="list flex-col gap-sm font-small p-inline-lg">
+          className="list flex-col gap-sm font-small px-lg">
           {tx.subtransactions.map((subTx) => (
             <SubTransactionView
               key={subTx.id}

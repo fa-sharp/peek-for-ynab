@@ -1,0 +1,26 @@
+// Base styles
+
+html {
+  font-size: 100%;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.8rem;
+  margin: 0;
+  background-color: var(--background);
+}
+
+button {
+  color: currentColor;
+  font-family: inherit;
+  font-size: inherit;
+
+  &:focus-visible {
+    outline-color: var(--border);
+  }
+}
+
+input[type="checkbox"] {
+  accent-color: var(--currency-green);
+}

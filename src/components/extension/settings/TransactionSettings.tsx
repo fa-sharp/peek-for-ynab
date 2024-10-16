@@ -62,7 +62,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
         </label>
         {!settings?.transactions.rememberAccount &&
           (accountsError ? (
-            <div className="error-message">Error getting accounts!</div>
+            <div className="text-error">Error getting accounts!</div>
           ) : accounts ? (
             <AccountSelect
               label="Default account"

@@ -180,7 +180,7 @@ export function TransactionFormInner({
           disabled={isSaving}
         />
       </label>
-      <div className="error-message">{formState.errorMessage}</div>
+      <div className="text-error">{formState.errorMessage}</div>
       <div className="flex-row flex-row-reverse mt-lg">
         <button
           type="submit"

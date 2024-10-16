@@ -196,7 +196,7 @@ export default function MoveMoney() {
             to make a payment instead?
           </div>
         )}
-        <div className="error-message">{errorMessage}</div>
+        <div className="text-error">{errorMessage}</div>
         <div className="flex-row flex-row-reverse">
           <button
             ref={saveButtonRef}

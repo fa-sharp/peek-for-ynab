@@ -1,0 +1,168 @@
+// Background, color, and border utilities
+.rounded {
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+}
+
+.shadow {
+  box-shadow: var(--border-light) 0px 2px 6px 1px;
+}
+
+.accent {
+  &:not(:disabled) {
+    background-color: var(--accent);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+  }
+}
+
+.warn {
+  &:not(:disabled) {
+    background-color: var(--warn);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--warn-hover);
+  }
+}
+
+.gray {
+  &:not(:disabled) {
+    background-color: var(--gray);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--gray-hover);
+  }
+}
+
+.currency {
+  font-weight: 500;
+
+  &.positive {
+    color: var(--currency-green);
+  }
+
+  &.negative {
+    color: var(--currency-red);
+  }
+}
+
+// Flex utilities
+.flex {
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    &-reverse {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  &-grow {
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+
+  &-wrap {
+    flex-wrap: wrap;
+  }
+
+  &-1 {
+    flex: 1 1 0%;
+  }
+}
+
+.justify {
+  &-between {
+    justify-content: space-between;
+  }
+
+  &-center {
+    justify-content: center;
+  }
+}
+
+.gap {
+  &-0 {
+    gap: 0px;
+  }
+  &-xs {
+    gap: var(--spacing-xs);
+  }
+  &-sm {
+    gap: var(--spacing-sm);
+  }
+  &-lg {
+    gap: var(--spacing-lg);
+  }
+}
+
+// Size and spacing utilities
+.min-w-0 {
+  min-width: 0;
+}
+
+.max-w-32 {
+  max-width: 8rem;
+}
+
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+.mt-xxl {
+  margin-top: 5em;
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+.pt-sm {
+  padding-top: var(--spacing-sm);
+}
+
+.pb-sm {
+  padding-bottom: var(--spacing-sm);
+}
+.pb-lg {
+  padding-bottom: var(--spacing-lg);
+}
+
+.py-xs {
+  padding-block: var(--spacing-xs);
+}
+
+.px-lg {
+  padding-inline: var(--spacing-lg);
+}
+
+// Border utilities
+.border-t-light,
+.divide-y > * ~ * {
+  border-top: solid 1px var(--border-light);
+}
+
+// Misc utilities
+.cursor-pointer {
+  cursor: pointer;
+}

@@ -1,0 +1,49 @@
+// CSS variables
+
+:root {
+  // Colors
+  --accent: hsl(204, 65%, 85%);
+  --accent-hover: hsl(204, 60%, 76%);
+  --background: #fff;
+  --warn: hsl(0, 54%, 79%);
+  --warn-hover: hsl(0, 75%, 72%);
+  --highlight: hsl(204, 48%, 87%);
+  --border: #4d4d4d;
+  --border-light: #c4c4c4;
+  --currency-green: #357f16;
+  --currency-red: #a84646;
+  --action: #525252;
+  --error: #da2626;
+  --success: #58be2d;
+  --stale: #ff8c00;
+  --gray: hsl(0, 0%, 96%);
+  --gray-hover: hsl(0, 0%, 89%);
+
+  // Spacing + sizes
+  --border-radius: 4px;
+  --spacing-xs: 0.15em;
+  --spacing-sm: 0.25em;
+  --spacing-md: 0.4em;
+  --spacing-lg: 0.75em;
+}
+
+// Dark theme
+:root.dark {
+  --background: #252525;
+  --border: #bababa;
+  --border-light: #6e6e6e;
+  --action: #ffffff;
+  --accent: hsl(210, 34%, 38%);
+  --accent-hover: hsl(210, 39%, 48%);
+  --success: #63d035;
+  --warn: hsl(0, 33%, 50%);
+  --warn-hover: hsl(0, 33%, 59%);
+  --error: #ff6c6c;
+  --highlight: hsla(0, 0%, 91%, 0.2);
+  --currency-green: #61d231;
+  --currency-red: #ff9595;
+  --gray: hsl(0, 0%, 26%);
+  --gray-hover: hsl(0, 0%, 36%);
+
+  color: white;
+}
