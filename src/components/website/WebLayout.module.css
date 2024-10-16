@@ -3,19 +3,27 @@
   margin-inline: auto;
 }
 
-.nav {
+.nav ul {
   display: flex;
   gap: 1rem;
 
+  list-style: none;
+  padding: 0;
   font-size: 1rem;
 }
 
-.currentPage {
-  font-weight: bold;
+.nav a {
+  text-decoration: none;
+}
+
+.nav a.currentPage {
+  color: var(--currency-green);
+  text-decoration: underline wavy;
+  text-underline-offset: 5px;
 }
 
 .mainContent {
-  max-width: 85ch;
+  max-width: 80ch;
   margin-inline: auto;
 }
 
@@ -23,4 +31,5 @@
   margin-top: 2.5rem;
   padding: 6px 10px;
   border-top: solid 1px var(--border-light);
+  font-size: 0.95em;
 }

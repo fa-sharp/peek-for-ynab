@@ -10,6 +10,8 @@ function IndexPage() {
   return (
     <>
       <h2>Release Notes</h2>
+      <h3>0.22.1 - Oct 15, 2024</h3>
+      Minor fixes and security updates
       <h3>0.22.0 - Oct 9, 2024</h3>
       <ul>
         <li>

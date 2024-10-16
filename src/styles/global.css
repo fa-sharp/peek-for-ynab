@@ -448,6 +448,10 @@ li:last-child > .balance-display {
   margin-bottom: var(--spacing-lg);
 }
 
+.py-xs {
+  padding-block: var(--spacing-xs);
+}
+
 .pt-sm {
   padding-top: var(--spacing-sm);
 }
@@ -464,7 +468,8 @@ li:last-child > .balance-display {
   padding-inline: var(--spacing-lg);
 }
 
-.border-t-light {
+.border-t-light,
+.divide-y > * ~ * {
   border-top: solid 1px var(--border-light);
 }
 

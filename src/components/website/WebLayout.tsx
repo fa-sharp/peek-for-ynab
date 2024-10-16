@@ -12,22 +12,40 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className={styles.pageContent}>
       <nav className={styles.nav}>
-        <Link href="/" className={pathname === "/" ? styles.currentPage : ""}>
-          Home
-        </Link>
-        <Link href="/help" className={pathname === "/help" ? styles.currentPage : ""}>
-          Help/FAQ
-        </Link>
-        <Link
-          href="/releases"
-          className={pathname === "/releases" ? styles.currentPage : ""}>
-          Release Notes
-        </Link>
-        <Link
-          href="/privacy"
-          className={pathname === "/privacy" ? styles.currentPage : ""}>
-          Privacy Policy
-        </Link>
+        <ul>
+          <li>
+            <Link
+              href="/"
+              className={pathname === "/" ? styles.currentPage : ""}
+              aria-current={pathname === "/" ? "page" : "false"}>
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/help"
+              className={pathname === "/help" ? styles.currentPage : ""}
+              aria-current={pathname === "/help" ? "page" : "false"}>
+              Help/FAQ
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/releases"
+              className={pathname === "/releases" ? styles.currentPage : ""}
+              aria-current={pathname === "/releases" ? "page" : "false"}>
+              Release Notes
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/privacy"
+              className={pathname === "/privacy" ? styles.currentPage : ""}
+              aria-current={pathname === "/privacy" ? "page" : "false"}>
+              Privacy Policy
+            </Link>
+          </li>
+        </ul>
       </nav>
       <main className={styles.mainContent}>
         <h1>Peek for YNAB</h1>

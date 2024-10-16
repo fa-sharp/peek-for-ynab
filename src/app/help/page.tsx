@@ -82,24 +82,32 @@ function HelpPage() {
           <p>
             If you will enter a lot of your transactions using the extension, you may want
             to leave them Unapproved so that you will be prompted to double-check and
-            Approve the transactions in YNAB. In the settings page, click the gear ⚙️ icon
-            next to the budget name, and then uncheck the <b>Approved</b> setting.
+            Approve the transactions in YNAB. In the settings page, look for the budget
+            settings (click the gear ⚙️ icon next to the budget name to expand the
+            settings if needed), and then under <b>Transaction defaults</b>, uncheck the{" "}
+            <b>Approved</b> setting.
           </p>
         </li>
         <li>
           <h3>What does the icon in the upper left corner represent?</h3>
           <ul>
             <li>
-              <Check color="var(--success)" />
+              <div className="icon-span">
+                <Check color="var(--success)" />
+              </div>
               &nbsp;Category and account data has been successfully retrieved from YNAB.
             </li>
             <li>
-              <AlertTriangle color="var(--stale)" />
+              <div className="icon-span">
+                <AlertTriangle color="var(--stale)" />
+              </div>
               &nbsp;There was an error fetching data from YNAB, and/or the data is out of
               date. You can click on the icon to refresh the data.
             </li>
             <li>
-              <Refresh />
+              <div className="icon-span">
+                <Refresh />
+              </div>
               &nbsp;Data is being retrieved/refreshed from YNAB.
             </li>
           </ul>
@@ -108,7 +116,7 @@ function HelpPage() {
           <h3>I have an issue, bug report, or further questions.</h3>
           <p>
             Please keep in mind that Peek for YNAB is a third-party extension, and is not
-            officialy supported by YNAB (i.e. please <b>do not</b> reach out to their
+            officially supported by YNAB (i.e. please <b>do not</b> reach out to their
             support team for bug reports or feature requests). You may contact the
             developer at peek (at) fasharp (dot) io.
           </p>

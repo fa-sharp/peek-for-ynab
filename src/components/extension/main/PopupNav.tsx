@@ -68,6 +68,7 @@ export default function PopupNav() {
     async (key: Key) => {
       switch (key) {
         case "addTransaction":
+          await setTxState({});
           setPopupState({ view: "txAdd" });
           break;
         case "addTransfer":
@@ -135,7 +136,7 @@ export default function PopupNav() {
         }
         spin={Boolean(globalIsFetching)}
       />
-      <div className="flex-row gap-sm">
+      <div className="flex-row gap-xs">
         <BudgetSelect
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}

@@ -14,6 +14,7 @@ export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const TOKEN_STORAGE_KEY = "tokenData";
 export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
+export const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 
 export const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 export const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
