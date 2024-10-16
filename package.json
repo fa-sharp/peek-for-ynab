@@ -1,5 +1,6 @@
 {
-  "name": "ynab-chrome-widget",
+  "name": "peek-for-ynab",
+  "private": true,
   "displayName": "Peek for YNAB",
   "version": "0.22.1",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
