@@ -33,8 +33,6 @@ import { RadioButton, RadioButtonGroup } from "./react-aria/RadioButton";
 import Toolbar from "./react-aria/Toolbar";
 import Tooltip from "./react-aria/Tooltip";
 
-import Toolbar from "./react-aria/Toolbar";
-
 export {
   AccountDetailView,
   AccountSelect,
