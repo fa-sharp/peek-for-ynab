@@ -4,3 +4,19 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      production:
+        dependency-type: production
+        exclude-patterns:
+          - "@tanstack/*"
+          - "@react-aria/*"
+          - "@react-stately/*"
+      development:
+        dependency-type: development
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      react-aria:
+        patterns:
+          - "@react-aria/*"
+          - "@react-stately/*"
