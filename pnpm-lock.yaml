@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@hello-pangea/dnd':
+        specifier: ^16.6.0
+        version: 16.6.0(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@plasmohq/storage':
         specifier: ^1.12.0
         version: 1.12.0(react@18.3.1)
@@ -117,9 +120,6 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0
     devDependencies:
-      '@hello-pangea/dnd':
-        specifier: ^16.6.0
-        version: 16.6.0(@types/react-dom@18.3.1)(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@next/eslint-plugin-next':
         specifier: ^14.2.15
         version: 14.2.15
