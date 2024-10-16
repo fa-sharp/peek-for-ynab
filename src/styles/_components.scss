@@ -59,6 +59,10 @@ li:last-child > .balance-display {
 
   &:active {
     transform: scale(0.95);
+
+    @media (prefers-reduced-motion) {
+      transform: none;
+    }
   }
 
   &.rounded {
@@ -68,12 +72,6 @@ li:last-child > .balance-display {
 
   &[disabled] {
     cursor: unset;
-  }
-}
-
-@media (prefers-reduced-motion) {
-  .icon-button:active {
-    transform: none;
   }
 }
 

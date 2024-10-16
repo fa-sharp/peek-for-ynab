@@ -25,10 +25,8 @@
 
 .slide-up {
   animation: slide-up 0.2s forwards;
-}
 
-@media (prefers-reduced-motion) {
-  .slide-up {
+  @media (prefers-reduced-motion) {
     animation: none;
   }
 }
