@@ -60,7 +60,10 @@ export default function MoveMoney() {
         subtractFromCategoryId: fromCategory?.id,
         addToCategoryId: toCategory?.id
       });
-      setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" });
+      setPopupState({
+        ...(popupState?.moveMoneyState?.returnTo || { view: "main" }),
+        moveMoneyState: undefined
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while moving money: ", err);
@@ -78,7 +81,7 @@ export default function MoveMoney() {
       </div>
       <div className="mt-lg mb-lg">
         ⚠️ Money moves made here will not show up in the &ldquo;Recent Moves&rdquo;
-        section in YNAB. ⚠️
+        section in YNAB.
       </div>
       <form className="flex-col" onSubmit={onMoveMoney}>
         <label className="form-input">
@@ -103,7 +106,7 @@ export default function MoveMoney() {
           ref={fromCategoryRef}
           movingMoney
           label="From"
-          placeholder="(Leave blank to move from Ready to Assign)"
+          placeholder="(Blank to move from Ready to Assign)"
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
           currentCategory={fromCategory}
@@ -172,7 +175,7 @@ export default function MoveMoney() {
           ref={toCategoryRef}
           movingMoney
           label="To"
-          placeholder="(Leave blank to move to Ready to Assign)"
+          placeholder="(Blank to move to Ready to Assign)"
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
           currentCategory={toCategory}
@@ -206,7 +209,10 @@ export default function MoveMoney() {
             type="button"
             className="button gray rounded mt-lg flex-1"
             onClick={() =>
-              setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" })
+              setPopupState({
+                ...(popupState?.moveMoneyState?.returnTo || { view: "main" }),
+                moveMoneyState: undefined
+              })
             }
             disabled={isSaving}>
             Cancel

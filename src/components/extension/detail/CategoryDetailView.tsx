@@ -24,7 +24,7 @@ const CategoryTxsView = () => {
         <IconButton
           icon={<ArrowBack aria-hidden />}
           label="Back to main view"
-          onClick={() => setPopupState({ view: "main" })}
+          onClick={() => setPopupState({ view: "main", detailState: undefined })}
         />
       </div>
       <ul className="list mb-lg" aria-label="Category details">
