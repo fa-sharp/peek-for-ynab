@@ -86,7 +86,11 @@ export default function PopupNav() {
           break;
         case "backToMain":
           await setTxState({});
-          setPopupState({ view: "main" });
+          setPopupState({
+            view: "main",
+            detailState: undefined,
+            moveMoneyState: undefined
+          });
           break;
       }
     },
