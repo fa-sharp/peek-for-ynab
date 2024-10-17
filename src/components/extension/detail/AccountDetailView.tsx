@@ -241,7 +241,7 @@ export default AccountTxsView;
 
 const AccountActivityView = ({ accountId }: { accountId: string }) => {
   const { setPopupState } = useStorageContext();
-  const { useGetAccountTxs, selectedBudgetData } = useYNABContext();
+  const { useGetAccountTxs, selectedBudgetData, addedTransaction } = useYNABContext();
 
   const [sinceDaysAgo, setSinceDaysAgo] = useState(15);
   const { data: accountTxs, isFetching: isFetchingTxs } = useGetAccountTxs(
@@ -265,6 +265,7 @@ const AccountActivityView = ({ accountId }: { accountId: string }) => {
                 }
                 detailLeft="category"
                 currencyFormat={selectedBudgetData.currencyFormat}
+                highlighted={tx.id === addedTransaction?.id}
               />
             </li>
           ))}

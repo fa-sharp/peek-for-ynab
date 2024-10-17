@@ -29,6 +29,15 @@ li:last-child > .balance-display {
   gap: var(--spacing-xs);
   padding: 0 var(--spacing-xs) var(--spacing-sm);
   border-bottom: solid 1px var(--border-light);
+  outline: transparent solid 2px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
+
+  &.highlighted {
+    outline-color: var(--border);
+    border-radius: var(--border-radius);
+  }
 }
 
 // Button with textual label

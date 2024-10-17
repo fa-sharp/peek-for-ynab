@@ -1,3 +1,4 @@
+import { clsx } from "clsx";
 import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
 import * as ynab from "ynab";
 
@@ -17,19 +18,21 @@ export default function TransactionView({
   goToDetailView,
   detailRight = "memo",
   detailLeft = "category",
-  currencyFormat
+  currencyFormat,
+  highlighted
 }: {
   tx: ynab.TransactionDetail | ynab.HybridTransaction;
   goToDetailView: (detailState: DetailViewState) => void;
   detailRight?: "memo";
   detailLeft?: "category" | "account";
   currencyFormat?: ynab.CurrencyFormat;
+  highlighted?: boolean;
 }) {
   const date = ynab.utils.convertFromISODateString(tx.date);
   const isSplit = "subtransactions" in tx && tx.subtransactions.length > 0;
 
   return (
-    <div className="tx-display">
+    <div className={clsx("tx-display", { highlighted })}>
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
           {!tx.approved && <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon />} />}

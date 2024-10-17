@@ -6,7 +6,8 @@ import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIco
 import { useStorageContext, useYNABContext } from "~lib/context";
 
 const CategoryTxsView = () => {
-  const { useGetCategoryTxs, categoriesData, selectedBudgetData } = useYNABContext();
+  const { useGetCategoryTxs, categoriesData, selectedBudgetData, addedTransaction } =
+    useYNABContext();
   const { settings, popupState, setPopupState, setTxState } = useStorageContext();
 
   const category = useMemo(
@@ -116,6 +117,7 @@ const CategoryTxsView = () => {
                 }
                 detailLeft="account"
                 currencyFormat={selectedBudgetData.currencyFormat}
+                highlighted={tx.id === addedTransaction?.id}
               />
             </li>
           ))}
