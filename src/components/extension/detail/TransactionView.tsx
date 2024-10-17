@@ -108,7 +108,11 @@ export default function TransactionView({
             </button>
           )}
         </div>
-        {detailRight === "memo" && <div className="hide-overflow">{tx.memo}</div>}
+        {detailRight === "memo" && (
+          <div className="hide-overflow" title={tx.memo || undefined}>
+            {tx.memo}
+          </div>
+        )}
       </div>
       {isSplit && (
         <ul
