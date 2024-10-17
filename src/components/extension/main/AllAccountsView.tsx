@@ -1,15 +1,21 @@
 import { useId, useState } from "react";
 import type { Account } from "ynab";
 
-import { AccountView, IconButton, IconSpan } from "~components";
+import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
-import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
+import type {
+  AppSettings,
+  CachedBudget,
+  DetailViewState,
+  TxAddInitialState
+} from "~lib/types";
 
 import {
   AddTransactionIcon,
   CollapseListIcon,
   CollapseListIconBold,
+  DetailIcon,
   ExpandListIcon,
   ExpandListIconBold,
   PinItemIcon,
@@ -66,6 +72,9 @@ export default function AllAccountsView() {
                 await setTxState(txAddState);
                 setPopupState({ view: "txAdd" });
               }}
+              onOpenDetailView={(detailState) =>
+                setPopupState({ view: "detail", detailState })
+              }
             />
           </li>
           <li>
@@ -82,6 +91,9 @@ export default function AllAccountsView() {
                 await setTxState(txAddState);
                 setPopupState({ view: "txAdd" });
               }}
+              onOpenDetailView={(detailState) =>
+                setPopupState({ view: "detail", detailState })
+              }
             />
           </li>
         </ul>
@@ -100,7 +112,8 @@ function AccountTypeView({
   savedAccounts,
   settings,
   editMode,
-  onAddTx
+  onAddTx,
+  onOpenDetailView
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -111,6 +124,7 @@ function AccountTypeView({
   settings: AppSettings;
   editMode?: boolean;
   onAddTx: (initialState: TxAddInitialState) => void;
+  onOpenDetailView: (detailState: DetailViewState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
@@ -150,7 +164,7 @@ function AccountTypeView({
                   )
                 }
                 actionElementsRight={
-                  <aside className="balance-actions" aria-label="actions">
+                  <Toolbar className="list flex-row gap-sm" aria-label="actions">
                     <IconButton
                       rounded
                       accent
@@ -158,7 +172,16 @@ function AccountTypeView({
                       label="Add transaction"
                       onClick={() => onAddTx({ accountId: account.id })}
                     />
-                  </aside>
+                    <IconButton
+                      accent
+                      rounded
+                      icon={<DetailIcon />}
+                      label="Details/Activity"
+                      onClick={() =>
+                        onOpenDetailView({ type: "account", id: account.id })
+                      }
+                    />
+                  </Toolbar>
                 }
               />
             </li>

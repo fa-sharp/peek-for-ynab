@@ -86,17 +86,34 @@ export default function SavedCategoriesView() {
                       actionElementsRight={
                         <Toolbar className="list flex-row gap-sm" aria-label="actions">
                           {!ccAccount ? (
-                            <IconButton
-                              rounded
-                              accent
-                              icon={<AddTransactionIcon />}
-                              label="Add transaction"
-                              onClick={() =>
-                                setTxState({ categoryId: category.id }).then(() =>
-                                  setPopupState({ view: "txAdd" })
-                                )
-                              }
-                            />
+                            <>
+                              <IconButton
+                                rounded
+                                accent
+                                icon={<AddTransactionIcon />}
+                                label="Add transaction"
+                                onClick={() =>
+                                  setTxState({ categoryId: category.id }).then(() =>
+                                    setPopupState({ view: "txAdd" })
+                                  )
+                                }
+                              />
+                              <IconButton
+                                accent
+                                rounded
+                                icon={<DetailIcon />}
+                                label="Details/Activity"
+                                onClick={() =>
+                                  setPopupState({
+                                    view: "detail",
+                                    detailState: {
+                                      type: "category",
+                                      id: category.id
+                                    }
+                                  })
+                                }
+                              />
+                            </>
                           ) : (
                             <IconButton
                               rounded
@@ -121,23 +138,6 @@ export default function SavedCategoriesView() {
                                     view: "txAdd"
                                   })
                                 )
-                              }
-                            />
-                          )}
-                          {category.category_group_name !== "Credit Card Payments" && (
-                            <IconButton
-                              accent
-                              rounded
-                              icon={<DetailIcon />}
-                              label="Details/Activity"
-                              onClick={() =>
-                                setPopupState({
-                                  view: "detail",
-                                  detailState: {
-                                    type: "category",
-                                    id: category.id
-                                  }
-                                })
                               }
                             />
                           )}

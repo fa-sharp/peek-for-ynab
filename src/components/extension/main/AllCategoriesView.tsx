@@ -1,10 +1,15 @@
 import { useId, useState } from "react";
 import type { Account, CategoryGroupWithCategories } from "ynab";
 
-import { CategoryView, IconButton, IconSpan } from "~components";
+import { CategoryView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
-import type { AppSettings, CachedBudget, TxAddInitialState } from "~lib/types";
+import type {
+  AppSettings,
+  CachedBudget,
+  DetailViewState,
+  TxAddInitialState
+} from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
@@ -12,6 +17,7 @@ import {
   AddTransactionIcon,
   CollapseListIcon,
   CollapseListIconBold,
+  DetailIcon,
   ExpandListIcon,
   ExpandListIconBold,
   PinItemIcon,
@@ -75,6 +81,9 @@ function CategoriesView() {
                 await setTxState(txAddState);
                 setPopupState({ view: "txAdd" });
               }}
+              onOpenDetailView={(detailState) =>
+                setPopupState({ view: "detail", detailState })
+              }
             />
           ))}
         </ul>
@@ -93,7 +102,8 @@ export function CategoryGroupView({
   onSaveCategory,
   editMode,
   settings,
-  onAddTx
+  onAddTx,
+  onOpenDetailView
 }: {
   categoryGroup: CategoryGroupWithCategories;
   categoryAlerts?: CategoryAlerts;
@@ -104,6 +114,7 @@ export function CategoryGroupView({
   editMode?: boolean;
   settings: AppSettings;
   onAddTx: (initialState: TxAddInitialState) => void;
+  onOpenDetailView: (detailState: DetailViewState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
@@ -154,15 +165,29 @@ export function CategoryGroupView({
                     )
                   }
                   actionElementsRight={
-                    <aside className="balance-actions" aria-label="actions">
+                    <Toolbar className="list flex-row gap-sm" aria-label="actions">
                       {!ccAccount ? (
-                        <IconButton
-                          rounded
-                          accent
-                          icon={<AddTransactionIcon />}
-                          label="Add transaction"
-                          onClick={() => onAddTx({ categoryId: category.id })}
-                        />
+                        <>
+                          <IconButton
+                            rounded
+                            accent
+                            icon={<AddTransactionIcon />}
+                            label="Add transaction"
+                            onClick={() => onAddTx({ categoryId: category.id })}
+                          />
+                          <IconButton
+                            accent
+                            rounded
+                            icon={<DetailIcon />}
+                            label="Details/Activity"
+                            onClick={() =>
+                              onOpenDetailView({
+                                type: "category",
+                                id: category.id
+                              })
+                            }
+                          />
+                        </>
                       ) : (
                         <IconButton
                           rounded
@@ -186,7 +211,7 @@ export function CategoryGroupView({
                           }
                         />
                       )}
-                    </aside>
+                    </Toolbar>
                   }
                 />
               </li>
