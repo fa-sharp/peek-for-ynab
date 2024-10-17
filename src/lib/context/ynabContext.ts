@@ -375,6 +375,10 @@ const useYNABProvider = () => {
     ]
   );
 
+  const [moved, setMoved] = useState<{ from?: ynab.Category; to?: ynab.Category } | null>(
+    null
+  );
+
   const moveMoney = useCallback(
     async ({
       subtractFromCategoryId,
@@ -408,6 +412,9 @@ const useYNABProvider = () => {
       ]);
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
       setTimeout(() => refreshCategoriesAndAccounts(), 350);
+
+      setMoved({ from: fromCategory, to: toCategory });
+      setTimeout(() => setMoved(null), 4 * 1000);
     },
     [categoriesData, popupState?.budgetId, ynabAPI, refreshCategoriesAndAccounts]
   );
@@ -456,7 +463,9 @@ const useYNABProvider = () => {
     useGetAccountTxs,
     useGetCategoryTxs,
     /** Move money in the current budget */
-    moveMoney
+    moveMoney,
+    /** The recently moved category/categories. Can be used to trigger animations/effects. */
+    moved
   };
 };
 

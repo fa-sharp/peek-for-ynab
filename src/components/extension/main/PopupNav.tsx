@@ -75,6 +75,9 @@ export default function PopupNav() {
           await setTxState({ isTransfer: true, accountId: "none" });
           setPopupState({ view: "txAdd" });
           break;
+        case "moveMoney":
+          setPopupState({ view: "move", moveMoneyState: undefined });
+          break;
         case "editItems":
           setEditingItems(!editingItems);
           break;
@@ -192,6 +195,11 @@ const createMenuItems = (editingItems: boolean, onMainPage: boolean) => [
         {
           key: "addTransfer",
           text: "Add transfer/payment",
+          icon: <SwitchHorizontal aria-hidden size={20} />
+        },
+        {
+          key: "moveMoney",
+          text: "Move money",
           icon: <SwitchHorizontal aria-hidden size={20} />
         },
         {

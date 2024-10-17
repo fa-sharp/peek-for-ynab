@@ -14,7 +14,8 @@ export default function CategoryView({
   alerts,
   actionElementsRight,
   actionElementsLeft,
-  addedTransaction
+  addedTransaction,
+  moved
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
@@ -23,6 +24,7 @@ export default function CategoryView({
   alerts?: CategoryAlerts[string];
   settings: AppSettings;
   addedTransaction?: TransactionDetail | null;
+  moved?: { from?: Category; to?: Category } | null;
 }) {
   return (
     <div
@@ -30,7 +32,9 @@ export default function CategoryView({
         highlighted:
           settings.animations &&
           (addedTransaction?.category_id === id ||
-            addedTransaction?.subtransactions.some((sub) => sub.category_id === id))
+            addedTransaction?.subtransactions.some((sub) => sub.category_id === id) ||
+            moved?.from?.id === id ||
+            moved?.to?.id === id)
       })}>
       <div className="flex-row min-w-0">
         {actionElementsLeft}
@@ -47,7 +51,7 @@ export default function CategoryView({
           milliUnits={balance}
           currencyFormat={currencyFormat}
           colorsEnabled={true}
-          animationEnabled={settings.animations && !!addedTransaction}
+          animationEnabled={settings.animations && (!!addedTransaction || !!moved)}
         />
         {actionElementsRight}
       </div>
