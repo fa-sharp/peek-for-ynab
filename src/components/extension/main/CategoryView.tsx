@@ -1,9 +1,9 @@
 import { clsx } from "clsx";
 import type { ReactElement } from "react";
-import { AlertTriangle } from "tabler-icons-react";
 import type { Category, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconSpan } from "~components";
+import { OverspendingAlertIcon } from "~components/icons/AlertIcons";
 import type { CategoryAlerts } from "~lib/notifications";
 import type { AppSettings } from "~lib/types";
 
@@ -40,10 +40,7 @@ export default function CategoryView({
         {actionElementsLeft}
         <div className="hide-overflow">{name}</div>
         {alerts?.overspent && (
-          <IconSpan
-            label="Overspent"
-            icon={<AlertTriangle color="var(--stale)" size={18} aria-hidden />}
-          />
+          <IconSpan label="Overspent" icon={<OverspendingAlertIcon />} />
         )}
       </div>
       <div className="flex-row">

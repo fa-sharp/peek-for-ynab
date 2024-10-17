@@ -1,9 +1,13 @@
 import { clsx } from "clsx";
 import type { ReactElement } from "react";
-import { AlertTriangle, Circle, LockOpen } from "tabler-icons-react";
 import type { Account, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconSpan } from "~components";
+import {
+  ImportErrorIcon,
+  ReconcileAlertIcon,
+  UnapprovedAlertIcon
+} from "~components/icons/AlertIcons";
 import type { AccountAlerts } from "~lib/notifications";
 import type { AppSettings } from "~lib/types";
 import { formatDateMonthAndDay } from "~lib/utils";
@@ -42,19 +46,16 @@ export default function AccountView({
         {!!alerts?.numUnapprovedTxs && (
           <IconSpan
             label={`${alerts.numUnapprovedTxs} unapproved transaction${alerts.numUnapprovedTxs > 1 ? "s" : ""}`}
-            icon={<Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} />}
+            icon={<UnapprovedAlertIcon />}
           />
         )}
         {alerts?.importError && (
-          <IconSpan
-            label="Import issue"
-            icon={<AlertTriangle aria-hidden color="var(--stale)" size={18} />}
-          />
+          <IconSpan label="Import issue" icon={<ImportErrorIcon />} />
         )}
         {alerts?.reconcile && last_reconciled_at && (
           <IconSpan
             label={`Last reconciled on ${formatDateMonthAndDay(new Date(last_reconciled_at))}`}
-            icon={<LockOpen aria-hidden color="var(--stale)" size={18} />}
+            icon={<ReconcileAlertIcon />}
           />
         )}
       </div>
