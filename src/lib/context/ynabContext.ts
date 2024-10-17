@@ -14,7 +14,7 @@ import { useConfetti } from "~lib/hooks";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
-import { findAllEmoji } from "../utils";
+import { findAllEmoji, getNDaysAgoISO } from "../utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -123,6 +123,22 @@ const useYNABProvider = () => {
     );
   }, [categoriesData, savedCategories, popupState?.budgetId]);
 
+  /** Current month data (Ready to Assign, total activity, etc.) for the selected budget */
+  const { data: monthData } = useQuery({
+    queryKey: ["month", { budgetId: popupState?.budgetId }],
+    enabled: Boolean(ynabAPI && !!popupState?.budgetId && popupState.view === "move"),
+    queryFn: async () => {
+      if (!ynabAPI || !popupState?.budgetId) return;
+      const response = await ynabAPI.months.getBudgetMonth(
+        popupState.budgetId,
+        "current"
+      );
+      const { month } = response.data;
+      IS_DEV && console.log("Fetched month data!", month);
+      return month;
+    }
+  });
+
   /** Fetch accounts for the selected budget */
   const {
     data: accountsData,
@@ -144,8 +160,15 @@ const useYNABProvider = () => {
   });
 
   const refreshCategoriesAndAccounts = useCallback(
-    () => Promise.all([refetchCategoryGroups(), refetchAccounts()]),
-    [refetchAccounts, refetchCategoryGroups]
+    () =>
+      Promise.all([
+        refetchCategoryGroups(),
+        refetchAccounts(),
+        queryClient.invalidateQueries({
+          queryKey: ["month", { budgetId: popupState?.budgetId }]
+        })
+      ]),
+    [queryClient, refetchAccounts, refetchCategoryGroups, popupState?.budgetId]
   );
 
   /** Check for new/unapproved transactions in selected budget (if user wants notifications) */
@@ -202,6 +225,62 @@ const useYNABProvider = () => {
     };
   }, [accountsData, categoriesData, categoryGroupsData, payeesData]);
 
+  const useGetAccountTxs = (accountId?: string, sinceDaysAgo?: number) =>
+    useQuery({
+      enabled: Boolean(ynabAPI && accountId && popupState?.budgetId),
+      queryKey: [
+        "txs",
+        { budgetId: popupState?.budgetId, accountId, sinceDaysAgo }
+      ] as const,
+      placeholderData: (prevData, prevQuery) => {
+        if (prevQuery?.queryKey[1].accountId === accountId && prevData) return prevData;
+        return null;
+      },
+      queryFn: async () => {
+        if (!ynabAPI || !accountId || !popupState?.budgetId) return null;
+        const response = await ynabAPI.transactions.getTransactionsByAccount(
+          popupState?.budgetId,
+          accountId,
+          sinceDaysAgo
+            ? getNDaysAgoISO(sinceDaysAgo)
+            : ynab.utils.getCurrentMonthInISOFormat()
+        );
+        const txs = response.data.transactions.sort((a, b) =>
+          a.date <= b.date ? 1 : -1
+        );
+        IS_DEV && console.log("Fetched account transactions!", txs);
+        return txs;
+      }
+    });
+
+  const useGetCategoryTxs = (categoryId?: string, sinceDaysAgo?: number) =>
+    useQuery({
+      enabled: Boolean(ynabAPI && categoryId && popupState?.budgetId),
+      queryKey: [
+        "txs",
+        { budgetId: popupState?.budgetId, categoryId, sinceDaysAgo }
+      ] as const,
+      placeholderData: (prevData, prevQuery) => {
+        if (prevQuery?.queryKey[1].categoryId === categoryId && prevData) return prevData;
+        return null;
+      },
+      queryFn: async () => {
+        if (!ynabAPI || !categoryId || !popupState?.budgetId) return null;
+        const response = await ynabAPI.transactions.getTransactionsByCategory(
+          popupState.budgetId,
+          categoryId,
+          sinceDaysAgo
+            ? getNDaysAgoISO(sinceDaysAgo)
+            : ynab.utils.getCurrentMonthInISOFormat()
+        );
+        const txs = response.data.transactions.sort((a, b) =>
+          a.date <= b.date ? 1 : -1
+        );
+        IS_DEV && console.log("Fetched category transactions!", txs);
+        return txs;
+      }
+    });
+
   const useGetAccountsForBudget = (budgetId: string) =>
     useQuery({
       queryKey: ["accounts", { budgetId }],
@@ -251,6 +330,36 @@ const useYNABProvider = () => {
           ];
           launchConfetti(emojis);
         }
+        transaction?.category_id &&
+          queryClient.invalidateQueries({
+            queryKey: [
+              "txs",
+              {
+                budgetId: popupState.budgetId,
+                categoryId: transaction.category_id
+              }
+            ]
+          });
+        transaction?.account_id &&
+          queryClient.invalidateQueries({
+            queryKey: [
+              "txs",
+              {
+                budgetId: popupState.budgetId,
+                accountId: transaction.account_id
+              }
+            ]
+          });
+        transaction?.transfer_account_id &&
+          queryClient.invalidateQueries({
+            queryKey: [
+              "txs",
+              {
+                budgetId: popupState.budgetId,
+                accountId: transaction.transfer_account_id
+              }
+            ]
+          });
       }
     },
     [
@@ -261,8 +370,53 @@ const useYNABProvider = () => {
       budgetSettings?.confetti?.allCategories,
       budgetSettings?.confetti?.categories,
       budgetSettings?.confetti?.emojis,
+      queryClient,
       launchConfetti
     ]
+  );
+
+  const [moved, setMoved] = useState<{ from?: ynab.Category; to?: ynab.Category } | null>(
+    null
+  );
+
+  const moveMoney = useCallback(
+    async ({
+      subtractFromCategoryId,
+      addToCategoryId,
+      amountInMillis
+    }: {
+      subtractFromCategoryId?: string;
+      addToCategoryId?: string;
+      amountInMillis: number;
+    }) => {
+      if (!ynabAPI || !popupState?.budgetId) return;
+      const fromCategory = categoriesData?.find((c) => c.id === subtractFromCategoryId);
+      const toCategory = categoriesData?.find((c) => c.id === addToCategoryId);
+      const [subtractResponse, addResponse] = await Promise.all([
+        fromCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              popupState.budgetId,
+              "current",
+              fromCategory.id,
+              { category: { budgeted: fromCategory.budgeted - amountInMillis } }
+            )
+          : Promise.resolve("No 'from' category"),
+        toCategory
+          ? ynabAPI.categories.updateMonthCategory(
+              popupState.budgetId,
+              "current",
+              toCategory.id,
+              { category: { budgeted: toCategory.budgeted + amountInMillis } }
+            )
+          : Promise.resolve("No 'to' category")
+      ]);
+      IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
+      setTimeout(() => refreshCategoriesAndAccounts(), 350);
+
+      setMoved({ from: fromCategory, to: toCategory });
+      setTimeout(() => setMoved(null), 4 * 1000);
+    },
+    [categoriesData, popupState?.budgetId, ynabAPI, refreshCategoriesAndAccounts]
   );
 
   return {
@@ -273,6 +427,8 @@ const useYNABProvider = () => {
     categoriesLastUpdated,
     /** API data: Flattened list of all non-hidden categories (without category groups) in current budget */
     categoriesData,
+    /** API data: Current month data, with Ready to Assign, total activity, etc. */
+    monthData,
     /** API data: Error while fetching categories */
     categoriesError,
     /** API data: List of all open accounts in current budget*/
@@ -303,7 +459,13 @@ const useYNABProvider = () => {
     /** Add a new transaction to the current budget */
     addTransaction,
     /** The recently added transaction. Can be used to trigger animations/effects. */
-    addedTransaction
+    addedTransaction,
+    useGetAccountTxs,
+    useGetCategoryTxs,
+    /** Move money in the current budget */
+    moveMoney,
+    /** The recently moved category/categories. Can be used to trigger animations/effects. */
+    moved
   };
 };
 

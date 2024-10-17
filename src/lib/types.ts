@@ -14,9 +14,11 @@ export interface TokenData {
 /** Current popup state */
 export interface PopupState {
   /** Current page/view */
-  view: "main" | "txAdd";
+  view: "main" | "txAdd" | "detail" | "move";
   /** Currently selected budget ID. Could be an empty string if no budget is selected. */
   budgetId: string;
+  detailState?: DetailViewState;
+  moveMoneyState?: MoveMoneyInitialState;
 }
 
 export interface AppSettings {
@@ -89,6 +91,12 @@ export interface CachedPayee {
   transferId?: string | null;
 }
 
+/** State of the account/category detail screen */
+export interface DetailViewState {
+  type: "account" | "category";
+  id: string;
+}
+
 /** Initial state of the add transaction screen */
 export interface TxAddInitialState {
   amount?: string;
@@ -103,6 +111,10 @@ export interface TxAddInitialState {
   subTxs?: Array<SubTxState>;
   cleared?: boolean;
   date?: string;
+  returnTo?: {
+    view: "main" | "detail";
+    detailState?: DetailViewState;
+  };
 }
 
 /** Split transaction state  */
@@ -113,4 +125,15 @@ export interface SubTxState {
   isTransfer: boolean;
   categoryId?: string;
   memo?: string;
+}
+
+/** Initial state of the move money screen */
+export interface MoveMoneyInitialState {
+  amount?: string;
+  fromCategoryId?: string;
+  toCategoryId?: string;
+  returnTo?: {
+    view: "main" | "detail";
+    detailState?: DetailViewState;
+  };
 }

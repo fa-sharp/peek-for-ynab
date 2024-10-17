@@ -67,7 +67,7 @@ const NotificationsView = () => {
   if (!currentAlerts || !popupState || numNotifications === 0) return null;
 
   return (
-    <div className={clsx("flex-col gap-0 rounded mb-lg", { "pb-sm": expanded })}>
+    <div className={clsx("flex-col gap-0 rounded mb-md", { "pb-sm": expanded })}>
       <div
         className="flex-row gap-sm justify-center font-bold cursor-pointer"
         onClick={() => setExpanded(!expanded)}>

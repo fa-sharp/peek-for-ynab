@@ -144,7 +144,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
                 ) : (
                   <CategorySelect
                     ref={categoryRef}
-                    initialCategory={null}
+                    currentCategory={null}
                     categories={categoriesToAdd}
                     categoryGroupsData={categoryGroupsData}
                     placeholder="Add category"

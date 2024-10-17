@@ -94,7 +94,7 @@ export default function SubTransaction({
       {showCategory && (
         <CategorySelect
           ref={categoryRef}
-          initialCategory={
+          currentCategory={
             !txState.categoryId
               ? null
               : budgetMainData.categoriesData.find((c) => c.id === txState.categoryId)
@@ -116,7 +116,7 @@ export default function SubTransaction({
           />
         </label>
       )}
-      <div className="flex-row" style={{ fontSize: ".9em" }}>
+      <div className="flex-row font-small">
         {!showPayee && (
           <button
             type="button"

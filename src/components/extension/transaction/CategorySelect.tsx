@@ -21,31 +21,35 @@ import {
 } from "~lib/utils";
 
 interface Props {
-  initialCategory?: Category | null;
+  currentCategory?: Category | null;
   categories: Category[];
   categoryGroupsData: CategoryGroupWithCategories[];
   budgetData?: CachedBudget | null;
   selectCategory: (category: Category | null) => void;
+  label?: string;
   disabled?: boolean;
   placeholder?: string;
+  movingMoney?: boolean;
 }
 
 function CategorySelect(
   {
-    initialCategory,
-    selectCategory,
+    currentCategory,
     categories,
-    categoryGroupsData,
-    budgetData,
+    selectCategory,
     disabled,
-    placeholder
+    label,
+    placeholder,
+    movingMoney,
+    categoryGroupsData,
+    budgetData
   }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
-    return getIgnoredCategoryIdsForTx(categoryGroupsData);
-  }, [categoryGroupsData]);
+    return getIgnoredCategoryIdsForTx(categoryGroupsData, movingMoney);
+  }, [categoryGroupsData, movingMoney]);
 
   const getFilter = useCallback(
     (inputValue?: string) => {
@@ -80,7 +84,7 @@ function CategorySelect(
     selectedItem
   } = useCombobox<Category | null>({
     items: categoryList,
-    initialSelectedItem: initialCategory,
+    selectedItem: currentCategory,
     itemToString(category) {
       if (!category) return "";
       if (category.name === "Inflow: Ready to Assign") return category.name;
@@ -101,7 +105,7 @@ function CategorySelect(
 
   return (
     <div className="form-input">
-      <label {...getLabelProps()}>Category</label>
+      <label {...getLabelProps()}>{label || "Category"}</label>
       <div className="flex-col">
         <input
           {...getInputProps({

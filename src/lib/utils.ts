@@ -59,11 +59,14 @@ export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   );
 
 /** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
-export const getIgnoredCategoryIdsForTx = (data: ynab.CategoryGroupWithCategories[]) => {
+export const getIgnoredCategoryIdsForTx = (
+  data: ynab.CategoryGroupWithCategories[],
+  ignoreRta = false
+) => {
   const ignoredIds = new Set(
     data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
   );
-  ignoredIds.delete(data[0]?.categories[0]?.id); // Don't ignore Inflow: RTA category
+  if (!ignoreRta) ignoredIds.delete(data[0]?.categories[0]?.id);
   return ignoredIds;
 };
 
@@ -76,6 +79,12 @@ export const searchWithinString = (str: string, query: string) =>
  */
 export const getTodaysDateISO = () => {
   const date = new Date();
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().substring(0, 10);
+};
+
+export const getNDaysAgoISO = (days: number) => {
+  const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return date.toISOString().substring(0, 10);
 };

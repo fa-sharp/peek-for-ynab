@@ -1,9 +1,9 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { AccountView, IconButton } from "~components";
+import { AccountView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 
-import { AddTransactionIcon, PinnedItemIcon } from "../../icons/ActionIcons";
+import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
@@ -58,7 +58,7 @@ export default function SavedAccountsView() {
                       )
                     }
                     actionElementsRight={
-                      <aside className="balance-actions" aria-label="actions">
+                      <Toolbar className="list flex-row gap-sm" aria-label="actions">
                         <IconButton
                           rounded
                           accent
@@ -70,7 +70,19 @@ export default function SavedAccountsView() {
                             )
                           }
                         />
-                      </aside>
+                        <IconButton
+                          accent
+                          rounded
+                          icon={<DetailIcon />}
+                          label="Details/Activity"
+                          onClick={() =>
+                            setPopupState({
+                              view: "detail",
+                              detailState: { type: "account", id: account.id }
+                            })
+                          }
+                        />
+                      </Toolbar>
                     }
                   />
                 </li>

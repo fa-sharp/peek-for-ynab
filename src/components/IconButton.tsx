@@ -6,6 +6,7 @@ export default function IconButton({
   icon,
   label,
   accent,
+  gray,
   rounded,
   spin,
   ...props
@@ -13,6 +14,7 @@ export default function IconButton({
   label?: string;
   icon: ReactElement;
   accent?: boolean;
+  gray?: boolean;
   rounded?: boolean;
   spin?: boolean;
 } & ComponentPropsWithoutRef<"button">) {
@@ -24,7 +26,8 @@ export default function IconButton({
       className={clsx("icon-button", {
         rounded,
         spin,
-        accent
+        accent,
+        gray
       })}
       {...props}>
       {icon}

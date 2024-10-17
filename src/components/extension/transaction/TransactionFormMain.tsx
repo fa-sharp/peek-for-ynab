@@ -41,7 +41,7 @@ export default function TransactionFormMain({
       {!formState.isSplit && (!formState.account || formState.account.on_budget) && (
         <CategorySelect
           ref={categoryRef}
-          initialCategory={formState.category}
+          currentCategory={formState.category}
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={(selectedCategory) => {

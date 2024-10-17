@@ -4,6 +4,7 @@ import {
   ChevronUp,
   CreditCard,
   type IconProps,
+  List,
   Pinned,
   Plus,
   SwitchHorizontal
@@ -21,14 +22,20 @@ export const PinnedItemIcon = () => (
 export const PinItemIcon = () => (
   <Pinned aria-hidden size={18} color="var(--action)" strokeWidth={1} />
 );
-export const AddTransactionIcon = () => (
-  <Plus aria-hidden size={18} color="var(--action)" strokeWidth={1} />
+export const AddTransactionIcon = (props?: IconProps) => (
+  <Plus aria-hidden size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
-export const AddTransferIcon = () => (
-  <SwitchHorizontal aria-hidden size={18} color="var(--action)" strokeWidth={1} />
+export const AddTransferIcon = (props?: IconProps) => (
+  <SwitchHorizontal
+    aria-hidden
+    size={18}
+    color="var(--action)"
+    strokeWidth={1}
+    {...props}
+  />
 );
-export const AddCCPaymentIcon = () => (
-  <CreditCard aria-hidden size={18} color="var(--action)" strokeWidth={1} />
+export const AddCCPaymentIcon = (props?: IconProps) => (
+  <CreditCard aria-hidden size={18} color="var(--action)" strokeWidth={1} {...props} />
 );
 
 export const ExpandListIcon = () => (
@@ -45,4 +52,7 @@ export const CollapseListIconBold = () => (
   <ChevronUp aria-hidden size={24} color="var(--action)" strokeWidth={2} />
 );
 
+export const DetailIcon = () => (
+  <List aria-hidden size={18} color="var(--action)" strokeWidth={1} />
+);
 export const CheckIcon = (props?: IconProps) => <Check aria-hidden {...props} />;

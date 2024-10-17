@@ -2,8 +2,11 @@ import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import { useCallback, useEffect } from "react";
 
 import {
+  AccountDetailView,
   AllAccountsView,
   AllCategoriesView,
+  CategoryDetailView,
+  MoveMoney,
   NewVersionAlert,
   NotificationsView,
   Omnibox,
@@ -24,6 +27,14 @@ export default function PopupMain() {
       <PopupNav />
       {popupState?.view === "txAdd" && <TransactionForm />}
       {popupState?.view === "main" && <MainView />}
+      {popupState?.view === "detail" && !popupState.detailState && <MainView />}
+      {popupState?.view === "detail" && popupState.detailState?.type === "account" && (
+        <AccountDetailView />
+      )}
+      {popupState?.view === "detail" && popupState.detailState?.type === "category" && (
+        <CategoryDetailView />
+      )}
+      {popupState?.view === "move" && <MoveMoney />}
     </>
   );
 }

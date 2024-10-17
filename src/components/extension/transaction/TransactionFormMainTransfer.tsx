@@ -71,7 +71,7 @@ export default function TransactionFormMainTransfer({
       {!formState.isSplit && isBudgetToTrackingTransfer && (
         <CategorySelect
           ref={categoryRef}
-          initialCategory={formState.category}
+          currentCategory={formState.category}
           categories={budgetMainData.categoriesData}
           categoryGroupsData={budgetMainData.categoryGroupsData}
           selectCategory={(selectedCategory) => {

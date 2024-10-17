@@ -1,0 +1,83 @@
+// Form field
+.form-input {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  input,
+  textarea {
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1em;
+
+    &:not(:disabled) {
+      color: currentColor;
+      background-color: var(--background);
+    }
+
+    &:focus {
+      outline-color: var(--border);
+    }
+  }
+
+  input.item-selected {
+    border: 1px solid transparent;
+    background: var(--accent);
+    color: currentColor;
+    padding-right: 1.6em;
+    text-overflow: ellipsis;
+  }
+}
+
+// Combobox dropdown list
+.select-dropdown {
+  &-list {
+    position: absolute;
+    top: 100%;
+    z-index: 100;
+    max-height: 8rem;
+    width: 99%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  &-heading {
+    padding-left: var(--spacing-sm);
+    margin-block: var(--spacing-sm);
+    font-size: 1.05em;
+    font-weight: 600;
+  }
+
+  &-item {
+    padding: 2px 0 2px var(--spacing-sm);
+    width: auto;
+    cursor: pointer;
+
+    &.highlighted {
+      background-color: var(--highlight);
+    }
+
+    &.selected {
+      font-weight: bold;
+    }
+
+    &.virtual {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 98%;
+    }
+  }
+}
+
+// Combobox clear button
+.select-button-right {
+  position: absolute;
+  right: 3px;
+  top: 1px;
+}

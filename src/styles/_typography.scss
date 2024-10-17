@@ -1,0 +1,55 @@
+// Heading styles
+@mixin heading-base {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+}
+
+.heading {
+  &-big {
+    @include heading-base;
+    margin-block: var(--spacing-sm);
+    font-size: 1.25em;
+  }
+
+  &-medium {
+    @include heading-base;
+    margin-block: var(--spacing-xs);
+    font-size: 1.15em;
+  }
+
+  &-small {
+    @include heading-base;
+    margin-block: var(--spacing-xs);
+    font-size: 1.05em;
+  }
+
+  &-bordered {
+    border-bottom: solid 1px var(--border-light);
+  }
+}
+
+// Utilities
+.font-bold {
+  font-size: 1.05em;
+  font-weight: 600;
+}
+
+.font-small {
+  font-size: 0.9em;
+}
+
+.font-big {
+  font-size: 2em;
+}
+
+.text-error {
+  color: var(--error);
+}
+
+.hide-overflow {
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+}

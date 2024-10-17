@@ -1,12 +1,13 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
-import { CategoryView, IconButton } from "~components";
+import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  DetailIcon,
   PinnedItemIcon
 } from "../../icons/ActionIcons";
 
@@ -20,8 +21,13 @@ export default function SavedCategoriesView() {
     setPopupState,
     setTxState
   } = useStorageContext();
-  const { accountsData, selectedBudgetData, savedCategoriesData, addedTransaction } =
-    useYNABContext();
+  const {
+    accountsData,
+    selectedBudgetData,
+    savedCategoriesData,
+    addedTransaction,
+    moved
+  } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   if (
@@ -67,6 +73,7 @@ export default function SavedCategoriesView() {
                       alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
                       settings={settings}
                       addedTransaction={addedTransaction}
+                      moved={moved}
                       actionElementsLeft={
                         !editingItems ? null : (
                           <IconButton
@@ -77,19 +84,36 @@ export default function SavedCategoriesView() {
                         )
                       }
                       actionElementsRight={
-                        <aside className="balance-actions" aria-label="actions">
+                        <Toolbar className="list flex-row gap-sm" aria-label="actions">
                           {!ccAccount ? (
-                            <IconButton
-                              rounded
-                              accent
-                              icon={<AddTransactionIcon />}
-                              label="Add transaction"
-                              onClick={() =>
-                                setTxState({ categoryId: category.id }).then(() =>
-                                  setPopupState({ view: "txAdd" })
-                                )
-                              }
-                            />
+                            <>
+                              <IconButton
+                                rounded
+                                accent
+                                icon={<AddTransactionIcon />}
+                                label="Add transaction"
+                                onClick={() =>
+                                  setTxState({ categoryId: category.id }).then(() =>
+                                    setPopupState({ view: "txAdd" })
+                                  )
+                                }
+                              />
+                              <IconButton
+                                accent
+                                rounded
+                                icon={<DetailIcon />}
+                                label="Details/Activity"
+                                onClick={() =>
+                                  setPopupState({
+                                    view: "detail",
+                                    detailState: {
+                                      type: "category",
+                                      id: category.id
+                                    }
+                                  })
+                                }
+                              />
+                            </>
                           ) : (
                             <IconButton
                               rounded
@@ -117,7 +141,7 @@ export default function SavedCategoriesView() {
                               }
                             />
                           )}
-                        </aside>
+                        </Toolbar>
                       }
                     />
                   </li>

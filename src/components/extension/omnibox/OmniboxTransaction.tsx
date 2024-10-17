@@ -156,7 +156,7 @@ export default function OmniboxTransaction({
             <OmniboxTransferFields {...{ formState, handlers, parsedQuery, results }} />
           )}
         {formState.memo && <div className="flex-row gap-sm">Memo: {formState.memo}</div>}
-        <div className="error-message">{formState.errorMessage}</div>
+        <div className="text-error">{formState.errorMessage}</div>
         <div className="flex-row mt-lg">
           <button
             type={canSubmitImmediately ? "submit" : "button"}

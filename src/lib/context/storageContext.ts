@@ -23,7 +23,7 @@ import type {
   TxAddInitialState
 } from "~lib/types";
 
-/** Map of budget IDs to string arrays. Useful type for storage. */
+/** Map of budget IDs to string arrays. */
 interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }

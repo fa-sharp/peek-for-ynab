@@ -1,0 +1,145 @@
+// Balance display
+.balance-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: 3px 1px;
+  border-bottom: solid 1px var(--border-light);
+  outline: transparent solid 2px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
+
+  &.highlighted {
+    outline-color: var(--border);
+    border-radius: var(--border-radius);
+  }
+}
+
+// No border for last balance display within a list
+li:last-child > .balance-display {
+  border-bottom-color: transparent;
+}
+
+// Transaction display
+.tx-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs) var(--spacing-sm);
+  border-bottom: solid 1px var(--border-light);
+  outline: transparent solid 2px;
+  transition:
+    outline-color 0.3s,
+    border-radius 0.3s;
+
+  &.highlighted {
+    outline-color: var(--border);
+    border-radius: var(--border-radius);
+  }
+}
+
+// Button with textual label
+.button {
+  cursor: pointer;
+  padding: var(--spacing-sm) 0.7em;
+  text-align: center;
+
+  &.small {
+    padding: var(--spacing-xs) 0.4em;
+    border: none;
+    flex-shrink: 0;
+  }
+
+  &.focus {
+    outline: 2px solid var(--border);
+  }
+}
+
+// Button with icon only
+.icon-button {
+  display: inline-flex;
+  padding: 1px;
+  vertical-align: text-bottom;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.95);
+
+    @media (prefers-reduced-motion) {
+      transform: none;
+    }
+  }
+
+  &.rounded {
+    border: none;
+    border-radius: 50%;
+  }
+
+  &[disabled] {
+    cursor: unset;
+  }
+}
+
+// Icon with no action
+.icon-span {
+  display: inline-flex;
+  vertical-align: text-bottom;
+  padding: 1px;
+}
+
+// custom <ul> element
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// custom <select> element
+.select {
+  padding: 0.3em;
+  font-family: inherit;
+  font-size: inherit;
+  background-color: var(--background);
+  color: currentColor;
+
+  &.small {
+    padding: 0.1em;
+  }
+}
+
+.menu {
+  background-color: var(--background);
+  list-style: none;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+
+  &:focus-visible {
+    outline-color: var(--border);
+  }
+
+  > li {
+    padding: var(--spacing-sm);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--highlight);
+      outline-color: var(--border);
+    }
+  }
+}
+
+.dialog {
+  background-color: var(--background);
+  padding: var(--spacing-md);
+  max-width: 250px;
+
+  &:focus-visible {
+    outline-color: var(--border);
+  }
+}
