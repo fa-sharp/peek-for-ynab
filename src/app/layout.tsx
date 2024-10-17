@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import "src/styles/global.css";
 import "src/styles/main.scss";
 import "src/styles/web.css";
 

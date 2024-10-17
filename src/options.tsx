@@ -11,6 +11,7 @@ import {
 import { useSetColorTheme } from "~lib/hooks";
 import { checkPermissions, removePermissions, requestPermissions } from "~lib/utils";
 
+import "./styles/global.css";
 import "./styles/main.scss";
 
 const OptionsWrapper = () => (

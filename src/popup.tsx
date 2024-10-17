@@ -2,6 +2,7 @@ import { PopupLogin, PopupMain } from "~components";
 import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 
+import "./styles/global.css";
 import "./styles/main.scss";
 
 function PopupWrapper() {
