@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { type ReactNode } from "react";
+import { BrandGithub } from "tabler-icons-react";
 
 import styles from "./WebLayout.module.css";
 
@@ -53,8 +54,15 @@ const WebLayout = ({ children }: { children: ReactNode }) => {
       </main>
       <footer className={styles.footer}>
         💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
-        Peek for YNAB is a third-party extension, and is not affiliated with or supported
-        by YNAB.
+        Source code available on{" "}
+        <a href="https://github.com/fa-sharp/peek-for-ynab">
+          <span className="icon-span">
+            <BrandGithub aria-hidden size={16} />
+          </span>
+          GitHub
+        </a>
+        . Peek for YNAB is a third-party extension, and is not affiliated with or
+        supported by YNAB.
       </footer>
     </div>
   );
