@@ -106,7 +106,7 @@ export default function PopupNav() {
   if (!shownBudgetsData || !settings || !popupState) return null; // storage not hydrated yet
 
   return (
-    <nav className="flex-row justify-between mb-sm">
+    <nav className="flex-row justify-between mb-md">
       <IconButton
         label={
           categoriesError || accountsError
