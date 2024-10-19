@@ -242,9 +242,10 @@ export default function useTransaction() {
             }))
           : undefined
       });
+      const { returnTo } = txState || {};
       await setTxState({});
       setOmniboxInput("");
-      setPopupState(txState?.returnTo || { view: "main" });
+      setPopupState(returnTo || { view: "main" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
