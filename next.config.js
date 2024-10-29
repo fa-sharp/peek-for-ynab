@@ -3,9 +3,7 @@
 /** @type {import("next").NextConfig} */
 const config = {
   output: "standalone",
-  experimental: {
-    serverComponentsExternalPackages: ["pino"]
-  },
+  serverExternalPackages: ["pino"],
   redirects: async () => [
     {
       source: "/:path*",

@@ -32,7 +32,7 @@ export default [
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    // FIXME wait for Next 15 "plugin:@next/next/recommended",
+    "plugin:@next/next/recommended",
     "prettier"
   ),
   {
@@ -68,7 +68,6 @@ export default [
       "react/react-in-jsx-scope": "off",
       "react-hooks/rules-of-hooks": "warn",
       "react-hooks/exhaustive-deps": "warn",
-      "@next/next/no-css-tags": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-unused-expressions": "off"
