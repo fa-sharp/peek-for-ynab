@@ -1,4 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
+import type { RequestHandler } from "msw";
 import { mockServer } from "test/mock/msw";
 import { savedAccounts, savedCategories, validToken } from "test/mock/userData";
 import { createTestAppWrapper } from "test/mock/wrapper";
@@ -15,7 +16,9 @@ test("No data fetched if token is missing", async () => {
   expect(result.current.categoryGroupsData).toBeFalsy();
   expect(result.current.accountsData).toBeFalsy();
 
-  expect(mockServer.listHandlers().every((h) => !h.isUsed)).toBe(true);
+  expect(mockServer.listHandlers().every((h) => !(h as RequestHandler).isUsed)).toBe(
+    true
+  );
 });
 
 test("Data fetched with valid token, and first budget auto-selected", async () => {
