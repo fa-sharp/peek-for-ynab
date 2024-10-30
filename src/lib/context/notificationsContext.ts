@@ -39,6 +39,7 @@ const useNotificationsProvider = () => {
       !budgetSettings ||
       !accountsData ||
       !categoriesData ||
+      !unapprovedTxs ||
       !popupState?.budgetId
     )
       return;
