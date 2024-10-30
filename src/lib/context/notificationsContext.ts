@@ -36,11 +36,11 @@ const useNotificationsProvider = () => {
   useEffect(() => {
     if (
       !currentAlertsHydrated ||
+      !popupState?.budgetId ||
       !budgetSettings ||
       !accountsData ||
       !categoriesData ||
-      !unapprovedTxs ||
-      !popupState?.budgetId
+      (!unapprovedTxs && budgetSettings.notifications.checkImports)
     )
       return;
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
