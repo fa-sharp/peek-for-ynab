@@ -12,8 +12,8 @@ importers:
         specifier: ^17.0.0
         version: 17.0.0(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@plasmohq/storage':
-        specifier: ^1.12.0
-        version: 1.12.0(react@18.3.1)
+        specifier: ^1.13.0
+        version: 1.13.0(react@18.3.1)
       '@react-aria/button':
         specifier: ^3.10.1
         version: 3.10.1(react@18.3.1)
@@ -114,8 +114,8 @@ importers:
         specifier: 1.55.0
         version: 1.55.0(react@18.3.1)
       use-local-storage-state:
-        specifier: ^19.4.1
-        version: 19.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^19.5.0
+        version: 19.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       ynab:
         specifier: ^2.6.0
         version: 2.6.0
@@ -1846,8 +1846,8 @@ packages:
     resolution: {integrity: sha512-/3oVbajt+DRqtbM0RkKFtfyZR8DVjcsYpj1jHqPParGVBiXwgP0D/8Bj5p5/5Iqihs08gzasTcjKcwQKKdj0og==}
     engines: {parcel: '>= 2.7.0'}
 
-  '@plasmohq/storage@1.12.0':
-    resolution: {integrity: sha512-LoCyO0PXl609ee8QKVEwVpkTyD/8WjYQhd0sxFomLxbdxsZC0LD4n8nv4nSegP5X8lYQBQnR/LMq4ZXoQh87wA==}
+  '@plasmohq/storage@1.13.0':
+    resolution: {integrity: sha512-ceFtWFDMXg6v9nePEVyTgMusFmnMK82eNBf9ac0nN0kjMZQ+5IVEaiAgnS/c+KS43b7W+NJPpCakh+flgLOpjg==}
     peerDependencies:
       react: ^16.8.6 || ^17 || ^18
     peerDependenciesMeta:
@@ -5295,8 +5295,8 @@ packages:
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
-  use-local-storage-state@19.4.1:
-    resolution: {integrity: sha512-AMDnatdkHuslnwMz5ahJAGubYgw7VY4QgWoN/6CWCjZtWdfBKIoHJZzYXbmmuCcdzoThbag7aUsyMqajKe7wmg==}
+  use-local-storage-state@19.5.0:
+    resolution: {integrity: sha512-sUJAyFvsmqMpBhdwaRr7GTKkkoxb6PWeNVvpBDrLuwQF1PpbJRKIbOYeLLeqJI7B3wdfFlLLCBbmOdopiSTBOw==}
     engines: {node: '>=14'}
     peerDependencies:
       react: '>=18'
@@ -7483,7 +7483,7 @@ snapshots:
       - walrus
       - whiskers
 
-  '@plasmohq/storage@1.12.0(react@18.3.1)':
+  '@plasmohq/storage@1.13.0(react@18.3.1)':
     dependencies:
       pify: 6.1.0
     optionalDependencies:
@@ -11307,7 +11307,7 @@ snapshots:
       querystringify: 2.2.0
       requires-port: 1.0.0
 
-  use-local-storage-state@19.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  use-local-storage-state@19.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
