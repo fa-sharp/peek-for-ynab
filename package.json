@@ -51,7 +51,7 @@
     "js-confetti": "^0.12.0",
     "json-formatter-js": "^2.5.18",
     "nanoid": "^5.0.9",
-    "next": "^15.0.3",
+    "next": "^15.1.2",
     "pino": "^9.5.0",
     "plasmo": "^0.89.4",
     "puro": "^0.8.4",
