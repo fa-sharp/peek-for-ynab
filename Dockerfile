@@ -12,6 +12,7 @@ WORKDIR /app
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN corepack prepare --activate
 
 # Install node modules
 COPY --link package.json pnpm-lock.yaml ./
