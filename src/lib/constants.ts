@@ -3,8 +3,8 @@ import { Storage } from "@plasmohq/storage";
 import type { AppSettings, BudgetSettings, PopupState } from "./types";
 
 /** Update these 2 variables to alert the user for a major new update/version */
-export const LATEST_VERSION_ALERT_NUM = 3;
-export const LATEST_VERSION_ALERT_TEXT = "New: Search bar and more!";
+export const LATEST_VERSION_ALERT_NUM = 4;
+export const LATEST_VERSION_ALERT_TEXT = "New: Detail views!";
 
 export const IS_DEV = process.env.NODE_ENV === "development";
 export const IS_PRODUCTION = process.env.NODE_ENV === "production";
