@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1
 
-ARG NODE_VERSION=20.17
+ARG NODE_VERSION=20.18
 FROM node:${NODE_VERSION}-slim AS builder
 
 LABEL fly_launch_runtime="Next.js"
