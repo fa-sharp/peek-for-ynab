@@ -10,7 +10,7 @@ interface Props {
   totalSubTxsAmount: number;
   isBudgetToTrackingTransfer: boolean;
   budgetMainData: BudgetMainData;
-  memoRef?: RefObject<HTMLInputElement>;
+  memoRef?: RefObject<HTMLInputElement | null>;
   isSaving: boolean;
 }
 

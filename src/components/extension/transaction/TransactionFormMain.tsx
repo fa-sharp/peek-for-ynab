@@ -8,7 +8,7 @@ interface Props {
   formState: TransactionFormState;
   handlers: TransactionFormHandlers;
   budgetMainData: BudgetMainData;
-  memoRef?: RefObject<HTMLInputElement>;
+  memoRef?: RefObject<HTMLInputElement | null>;
   isSaving: boolean;
 }
 
