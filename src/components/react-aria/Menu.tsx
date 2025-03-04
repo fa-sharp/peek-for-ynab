@@ -30,7 +30,7 @@ export default function Menu<T extends object>({
   placement?: Placement;
 }) {
   const state = useMenuTriggerState(props);
-  const triggerRef = useRef(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { menuTriggerProps, menuProps } = useMenuTrigger<T>({}, state, triggerRef);
 
   return (

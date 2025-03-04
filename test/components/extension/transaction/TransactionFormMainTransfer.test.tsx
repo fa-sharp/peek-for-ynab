@@ -29,7 +29,7 @@ test("Transfer form has expected keyboard tab order", async () => {
   );
   await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
 
-  const memoRef: RefObject<HTMLInputElement> = { current: null };
+  const memoRef: RefObject<HTMLInputElement | null> = { current: null };
   const user = userEvent.setup();
   render(
     <>

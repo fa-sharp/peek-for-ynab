@@ -8,7 +8,7 @@ export default function ReactAriaButton({
   title,
   ...props
 }: AriaButtonProps<"button"> & {
-  buttonRef: RefObject<HTMLButtonElement>;
+  buttonRef: RefObject<HTMLButtonElement | null>;
   className?: string;
   title?: string;
 }) {

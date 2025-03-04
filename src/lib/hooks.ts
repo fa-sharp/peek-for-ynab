@@ -35,7 +35,7 @@ export const useSetColorTheme = () => {
 };
 
 export const useConfetti = () => {
-  const confetti = useRef<JSConfetti>();
+  const confetti = useRef<JSConfetti | null>(null);
   useEffect(() => {
     if (process.env.VITEST) return; // skip this in tests
 
