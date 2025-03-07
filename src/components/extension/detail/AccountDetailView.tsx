@@ -155,12 +155,13 @@ const AccountTxsView = () => {
           <li className="balance-display">
             Last Reconciled:
             <div className="flex-row">
-              {hasReconcileAlert && (
-                <IconSpan
-                  label={`Reconciled more than ${budgetSettings?.notifications.reconcileAlerts[account.id]} days ago!`}
-                  icon={<ReconcileAlertIcon />}
-                />
-              )}
+              {hasReconcileAlert &&
+                budgetSettings?.notifications.reconcileAlerts[account.id] && (
+                  <IconSpan
+                    label={`Time to reconcile! (set to every ${budgetSettings.notifications.reconcileAlerts[account.id]} day${budgetSettings.notifications.reconcileAlerts[account.id]! > 1 ? "s" : ""})`}
+                    icon={<ReconcileAlertIcon />}
+                  />
+                )}
               {dateFormatter.format(new Date(account.last_reconciled_at))}
             </div>
           </li>

@@ -72,15 +72,20 @@ export const getBudgetAlerts = (
     if (notificationSettings.importError && account.direct_import_in_error)
       accountAlerts.importError = true;
 
-    // Check last time the account was reconciled
+    // Check last day the account was reconciled
     const maxReconcileDays = notificationSettings.reconcileAlerts?.[account.id];
-    if (
-      maxReconcileDays &&
-      account.last_reconciled_at &&
-      Date.now() - new Date(account.last_reconciled_at).valueOf() >
-        maxReconcileDays * ONE_DAY_IN_MILLIS
-    )
-      accountAlerts.reconcile = true;
+    if (maxReconcileDays && account.last_reconciled_at) {
+      const lastReconciledAt = new Date(account.last_reconciled_at);
+      lastReconciledAt.setHours(3, 0, 0, 0); // set to 3 AM to avoid notifications at midnight
+      const today = new Date();
+      const daysPassed = Math.floor(
+        (today.valueOf() - lastReconciledAt.valueOf()) / ONE_DAY_IN_MILLIS
+      );
+
+      if (daysPassed >= maxReconcileDays) {
+        accountAlerts.reconcile = true;
+      }
+    }
 
     // Save all account alerts
     if (!isEmptyObject(accountAlerts)) {
