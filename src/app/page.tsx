@@ -5,6 +5,7 @@ import {
   Bell,
   CurrencyPound,
   Eye,
+  List,
   Pin,
   Plus,
   Sunglasses
@@ -62,6 +63,9 @@ function IndexPage() {
         </li>
         <li className="flex-row py-xs">
           <Plus aria-hidden /> Add transactions directly from the extension
+        </li>
+        <li className="flex-row py-xs">
+          <List aria-hidden /> View recent transactions in categories and accounts
         </li>
         <li className="flex-row py-xs">
           <Bell aria-hidden /> Customizable alerts for overspending, new imports, and

@@ -10,6 +10,19 @@ function IndexPage() {
   return (
     <>
       <h2>Release Notes</h2>
+      <h3>0.23.0 - Mar 7, 2025</h3>
+      <ul>
+        <li>
+          Detail views of categories and accounts, to see additional balances and recent
+          transactions
+        </li>
+        <li>
+          Ability to quickly move money between categories and to/from Ready To Assign
+          (due to YNAB API limitations, these moves will <b>not</b> appear in Recent Moves
+          in YNAB)
+        </li>
+        <li>Security updates</li>
+      </ul>
       <h3>0.22.1 - Oct 15, 2024</h3>
       Minor fixes and security updates
       <h3>0.22.0 - Oct 9, 2024</h3>
