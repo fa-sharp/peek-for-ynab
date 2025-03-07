@@ -50,7 +50,7 @@ export default function TransactionView({
             />
           )}
           <div>{dateFormatter.format(date)}</div>
-          <div className="hide-overflow">
+          <div className="hide-overflow" title={tx.payee_name ?? ""}>
             {"parent_transaction_id" in tx && !!tx.parent_transaction_id && "(Split) "}
             {tx.payee_name}
           </div>
