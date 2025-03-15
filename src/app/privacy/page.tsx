@@ -24,6 +24,17 @@ function PrivacyPage() {
         No other data is passed to the authentication server.
       </p>
       <p>
+        We are not affiliated, associated, or in any way officially connected with YNAB,
+        or any of its subsidiaries or its affiliates. We are fans of YNAB and we wanted a
+        quick way to view your budget and add transactions, so we created this extension.
+        The official YNAB website can be found at{" "}
+        <a href="https://www.ynab.com" target="_blank" rel="noopener noreferrer">
+          https://www.ynab.com
+        </a>
+        . The names YNAB and You Need A Budget as well as related names, marks, emblems
+        and images are registered trademarks of YNAB.
+      </p>
+      <p>
         {APP_NAME} stores some information in your browser&apos;s local storage, including
         your extension settings and the list of categories and accounts you choose to pin.
         The extension also caches some data from your budgets, which allows the extension
@@ -49,7 +60,7 @@ function PrivacyPage() {
       </p>
       <br />
       <p style={{ color: "gray" }}>
-        <em>Last updated: Aug 24, 2024</em>
+        <em>Last updated: Mar 15, 2025</em>
       </p>
     </>
   );
