@@ -1,3 +1,4 @@
+import { Browser } from "#imports";
 import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
 import {
@@ -263,7 +264,7 @@ export function createBrowserBarSuggestions(
   amount?: string,
   memo?: string,
   amountType?: "Outflow" | "Inflow"
-): chrome.omnibox.SuggestResult[] {
+): Browser.omnibox.SuggestResult[] {
   return possibleTxFields.map(({ payee, category, account }) => ({
     content:
       type === "tx"

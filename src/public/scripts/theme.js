@@ -5,10 +5,9 @@
   const themeSetting = JSON.parse(window.localStorage.getItem("theme") || '"auto"');
   const prefersDarkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-  if (
-    (themeSetting === "auto" && prefersDarkModeQuery.matches) ||
-    themeSetting === "dark"
-  )
-    document.documentElement.classList.add("dark");
+  const shouldEnableDark =
+    (themeSetting === "auto" && prefersDarkModeQuery.matches) || themeSetting === "dark";
+
+  if (shouldEnableDark) document.documentElement.classList.add("dark");
   else document.documentElement.classList.remove("dark");
 })();

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import packageJson from "package.json";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Peek for YNAB"
 };
 
-const { displayName: APP_NAME } = packageJson;
+const APP_NAME = "Peek for YNAB";
 
 function PrivacyPage() {
   return (

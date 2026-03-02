@@ -1,10 +1,11 @@
+import { browser } from "#imports";
 import type { Account, Category, TransactionDetail } from "ynab";
+
+import notificationImageUrl from "~/assets/notification.png";
 
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "./constants";
 import type { BudgetNotificationSettings, CachedBudget } from "./types";
 import { formatCurrency, formatDateMonthAndDay, isEmptyObject } from "./utils";
-
-const notificationImage = new URL("../../assets/notification.png", import.meta.url);
 
 export interface CurrentAlerts {
   [budgetId: string]: BudgetAlerts | undefined;
@@ -181,10 +182,10 @@ export const updateIconAndTooltip = (
     0
   );
 
-  chrome.action?.setTitle({ title: tooltip.trimEnd() });
-  chrome.action?.setBadgeText({ text: String(numNotifications || "") });
-  chrome.action?.setBadgeTextColor({ color: "#000" });
-  chrome.action?.setBadgeBackgroundColor({ color: "#9dc9e7" });
+  browser.action?.setTitle({ title: tooltip.trimEnd() });
+  browser.action?.setBadgeText({ text: String(numNotifications || "") });
+  browser.action?.setBadgeTextColor({ color: "#000" });
+  browser.action?.setBadgeBackgroundColor({ color: "#9dc9e7" });
 };
 
 export const createSystemNotification = async (
@@ -218,10 +219,10 @@ export const createSystemNotification = async (
   message = message.trimEnd();
 
   if (!message) {
-    chrome.notifications?.clear(budgetData.id);
+    browser.notifications?.clear(budgetData.id);
   } else {
-    chrome.notifications?.create(budgetData.id, {
-      iconUrl: notificationImage.toString(),
+    browser.notifications?.create(budgetData.id, {
+      iconUrl: notificationImageUrl as unknown as string,
       title: budgetData.name,
       type: "basic",
       message,

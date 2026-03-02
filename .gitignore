@@ -11,7 +11,6 @@
 
 #cache
 .turbo
-.next
 .vercel
 
 # misc
@@ -28,9 +27,18 @@ yarn-error.log*
 # local env files
 .env*
 
+# Next.js
+.next
 out/
 build/
 dist/
+
+# wkt
+.output
+stats.html
+stats-*.json
+.wxt
+web-ext.config.ts
 
 # plasmo - https://www.plasmo.com
 .plasmo

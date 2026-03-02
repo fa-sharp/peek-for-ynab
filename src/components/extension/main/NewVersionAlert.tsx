@@ -10,7 +10,7 @@ function NewVersionAlert() {
 
   const onOpenReleaseNotes = async () => {
     await resetVersionAlert();
-    window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/releases`, "_blank");
+    window.open(`${import.meta.env.PUBLIC_MAIN_URL}/releases`, "_blank");
   };
 
   return (

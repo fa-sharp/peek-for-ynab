@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "src/styles/global.css";
 import "src/styles/main.scss";
 import "src/styles/web.css";
@@ -24,7 +23,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Script src="scripts/theme.js" strategy="beforeInteractive"></Script>
         <WebLayout>{children}</WebLayout>
       </body>
     </html>

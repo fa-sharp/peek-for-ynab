@@ -42,7 +42,7 @@ export async function refreshToken(): Promise<TokenData | null> {
 
   // refresh token
   let newTokenData: TokenData | null = null;
-  const refreshUrl = `${process.env.PLASMO_PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
+  const refreshUrl = `${import.meta.env.PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
   IS_DEV && console.log("Refreshing token!");
 
   try {

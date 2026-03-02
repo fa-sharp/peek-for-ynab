@@ -1,3 +1,4 @@
+import { browser } from "#imports";
 import { Item } from "@react-stately/collections";
 import { useIsFetching } from "@tanstack/react-query";
 import { type Key, useCallback, useMemo } from "react";
@@ -57,7 +58,7 @@ export default function PopupNav() {
 
   const openPopupWindow = useCallback(() => {
     window.open(
-      chrome.runtime.getURL("popup.html"),
+      browser.runtime.getURL("/popup.html"),
       "peekWindow",
       "width=320,height=500"
     );
@@ -85,7 +86,7 @@ export default function PopupNav() {
           openPopupWindow();
           break;
         case "openOptions":
-          chrome?.runtime?.openOptionsPage();
+          browser?.runtime?.openOptionsPage();
           break;
         case "backToMain":
           await setTxState({});

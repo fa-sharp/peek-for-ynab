@@ -1,3 +1,4 @@
+import { Browser, browser } from "#imports";
 import { type DehydratedState } from "@tanstack/react-query";
 import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
@@ -17,31 +18,33 @@ function Devtools() {
   const [data, setData] = useState<Record<string, string>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
-  const [backgroundAlarm, setBackgroundAlarm] = useState<chrome.alarms.Alarm | null>(
+  const [backgroundAlarm, setBackgroundAlarm] = useState<Browser.alarms.Alarm | null>(
     null
   );
 
   // Get permissions
   useEffect(() => {
-    chrome.permissions
+    browser.permissions
       .getAll()
       .then((val) => setPermissions(val.permissions?.join(", ") || ""));
   }, []);
 
   // Get background alarm
   useEffect(() => {
-    chrome.alarms.get(BACKGROUND_ALARM_NAME).then((alarm) => setBackgroundAlarm(alarm));
+    browser.alarms.get(BACKGROUND_ALARM_NAME).then((alarm) => {
+      if (alarm) setBackgroundAlarm(alarm);
+    });
   }, []);
 
   // Get storage and listen for storage events
   useEffect(() => {
     const storageListener = (changes: {
-      [key: string]: chrome.storage.StorageChange;
+      [key: string]: Browser.storage.StorageChange;
     }) => {
       setData((prevData) => {
         const newData = { ...prevData };
         Object.entries(changes).forEach(([key, change]) => {
-          newData[key] = change.newValue;
+          newData[key] = change.newValue as string;
         });
         return newData;
       });
@@ -116,7 +119,7 @@ function Devtools() {
       )}
       <div>
         <button
-          onClick={() => chrome.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
+          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
           Clear alarm
         </button>
       </div>

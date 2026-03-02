@@ -1,3 +1,5 @@
+import { browser } from "#imports";
+
 import { useAuthContext } from "~lib/context";
 
 const PopupLogin = () => {
@@ -7,8 +9,8 @@ const PopupLogin = () => {
       <button
         className="button rounded accent"
         onClick={
-          chrome?.runtime
-            ? () => chrome.runtime.openOptionsPage()
+          browser?.runtime
+            ? () => browser.runtime.openOptionsPage()
             : () => loginWithOAuth()
         }>
         🔑 Login
@@ -16,7 +18,7 @@ const PopupLogin = () => {
       <button
         className="button rounded accent"
         onClick={() =>
-          window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/privacy`, "_blank")
+          window.open(`${import.meta.env.PUBLIC_MAIN_URL}/privacy`, "_blank")
         }>
         🔒 Privacy Policy
       </button>

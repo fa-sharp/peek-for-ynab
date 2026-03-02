@@ -1,3 +1,4 @@
+import { browser } from "#imports";
 import * as ynab from "ynab";
 
 const currencyFormatterCache = new Map<string, (millis: number) => string>();
@@ -142,9 +143,9 @@ export const findAllEmoji = (s: string): string[] => {
  * @throws any errors that arise, including browser permission errors.
  */
 export const executeScriptInCurrentTab = async <T>(func: () => T) => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
   if (!tab.id) throw new Error("Couldn't identify open tab.");
-  const [{ result }] = await chrome.scripting.executeScript({
+  const [{ result }] = await browser.scripting.executeScript({
     func,
     target: { tabId: tab.id }
   });
@@ -159,10 +160,10 @@ type OptionalPermissions = "activeTab" | "scripting" | "notifications";
  */
 export const requestPermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) => {
-    chrome.permissions.request({ permissions }, (granted) => {
+    browser.permissions.request({ permissions }, (granted) => {
       if (granted) resolve(true);
       else {
-        console.error("Permission denied:", chrome.runtime.lastError);
+        console.error("Permission denied:", browser.runtime.lastError);
         resolve(false);
       }
     });
@@ -171,7 +172,7 @@ export const requestPermissions = (permissions: OptionalPermissions[]) =>
 /** Check if optional permissions exist */
 export const checkPermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) => {
-    chrome.permissions.contains({ permissions }, (granted) => {
+    browser.permissions.contains({ permissions }, (granted) => {
       resolve(granted);
     });
   });
@@ -179,10 +180,10 @@ export const checkPermissions = (permissions: OptionalPermissions[]) =>
 /** Remove optional permissions. */
 export const removePermissions = (permissions: OptionalPermissions[]) =>
   new Promise<boolean>((resolve) =>
-    chrome.permissions.remove({ permissions }, (removed) => {
+    browser.permissions.remove({ permissions }, (removed) => {
       if (removed) resolve(true);
       else {
-        console.error("Error removing permissions:", chrome.runtime.lastError);
+        console.error("Error removing permissions:", browser.runtime.lastError);
         resolve(false);
       }
     })

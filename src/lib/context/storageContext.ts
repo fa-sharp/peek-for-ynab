@@ -1,3 +1,4 @@
+import { browser } from "#imports";
 import { createProvider } from "puro";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
@@ -271,7 +272,7 @@ const useStorageProvider = () => {
       // Ensure token is removed first so we don't refetch API data
       removeToken();
     });
-    await chrome.storage.local.clear();
+    await browser.storage.local.clear();
     localStorage.clear();
   };
 

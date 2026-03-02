@@ -11,9 +11,6 @@ import {
 import { useSetColorTheme } from "~lib/hooks";
 import { checkPermissions, removePermissions, requestPermissions } from "~lib/utils";
 
-import "./styles/global.css";
-import "./styles/main.scss";
-
 const OptionsWrapper = () => (
   <AppProvider>
     <OptionsView />
@@ -224,7 +221,7 @@ export function OptionsView() {
             <button
               className="button rounded gray flex-row mb-lg"
               onClick={() =>
-                window.open(`${process.env.PLASMO_PUBLIC_MAIN_URL}/help`, "_blank")
+                window.open(`${import.meta.env.PUBLIC_MAIN_URL}/help`, "_blank")
               }>
               Help/FAQ
             </button>
