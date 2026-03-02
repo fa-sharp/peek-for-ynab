@@ -13,9 +13,13 @@ import {
   PopupNav,
   SavedAccountsView,
   SavedCategoriesView,
-  TransactionForm
+  TransactionForm,
 } from "~components";
-import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import {
+  useNotificationsContext,
+  useStorageContext,
+  useYNABContext,
+} from "~lib/context";
 
 export default function PopupMain() {
   const { popupState } = useStorageContext();
@@ -28,12 +32,10 @@ export default function PopupMain() {
       {popupState?.view === "txAdd" && <TransactionForm />}
       {popupState?.view === "main" && <MainView />}
       {popupState?.view === "detail" && !popupState.detailState && <MainView />}
-      {popupState?.view === "detail" && popupState.detailState?.type === "account" && (
-        <AccountDetailView />
-      )}
-      {popupState?.view === "detail" && popupState.detailState?.type === "category" && (
-        <CategoryDetailView />
-      )}
+      {popupState?.view === "detail" &&
+        popupState.detailState?.type === "account" && <AccountDetailView />}
+      {popupState?.view === "detail" &&
+        popupState.detailState?.type === "category" && <CategoryDetailView />}
       {popupState?.view === "move" && <MoveMoney />}
     </>
   );
@@ -98,14 +100,14 @@ const useDragEndCallback = (): OnDragEndResponder => {
       saveCategoriesForBudget,
       savedAccountsData,
       savedCategoriesData,
-      popupState?.budgetId
+      popupState?.budgetId,
     ]
   );
 };
 
 /** Activate edit mode if there are no pinned categories or accounts yet */
 const useActivateEditModeIfNoPinnedItems = () => {
-  const { popupState, setEditingItems, savedCategories, savedAccounts, setPopupState } =
+  const { popupState, setEditingItems, savedCategories, savedAccounts } =
     useStorageContext();
 
   useEffect(() => {
@@ -117,5 +119,5 @@ const useActivateEditModeIfNoPinnedItems = () => {
       !savedAccounts[popupState.budgetId]?.length
     )
       setEditingItems(true);
-  }, [popupState, savedAccounts, savedCategories, setEditingItems, setPopupState]);
+  }, [popupState, savedAccounts, savedCategories, setEditingItems]);
 };

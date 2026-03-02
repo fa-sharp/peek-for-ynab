@@ -7,7 +7,7 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 
 import type { CachedPayee } from "~lib/types";
@@ -39,7 +39,10 @@ function PayeeSelect(
   const [payeeList, setPayeeList] = useState<CachedPayee[]>([]);
   useEffect(() => payees && setPayeeList(payees.filter(getFilter())), [payees]);
 
-  const getPayeeKey = useCallback((index: number) => payeeList[index].id, [payeeList]);
+  const getPayeeKey = useCallback(
+    (index: number) => payeeList[index].id,
+    [payeeList]
+  );
 
   const listRef = useRef<HTMLUListElement>(null);
   const listVirtualizer = useVirtualizer({
@@ -47,7 +50,7 @@ function PayeeSelect(
     estimateSize,
     getScrollElement: () => listRef.current,
     getItemKey: getPayeeKey,
-    overscan: 2
+    overscan: 2,
   });
   const {
     isOpen,
@@ -57,7 +60,7 @@ function PayeeSelect(
     getItemProps,
     inputValue,
     highlightedIndex,
-    selectedItem
+    selectedItem,
   } = useCombobox<CachedPayee | { name: string } | null>({
     items: payeeList,
     itemToString(payee) {
@@ -67,7 +70,10 @@ function PayeeSelect(
     onInputValueChange({ inputValue, selectedItem }) {
       setPayeeList(payees?.filter(getFilter(inputValue)) || []);
       // If user is inputting a new payee name and it's not a transfer, create a new payee
-      if (inputValue !== undefined && (!selectedItem || inputValue !== selectedItem.name))
+      if (
+        inputValue !== undefined &&
+        (!selectedItem || inputValue !== selectedItem.name)
+      )
         selectPayee({ name: inputValue });
     },
     onSelectedItemChange({ selectedItem }) {
@@ -80,24 +86,32 @@ function PayeeSelect(
       )
         listVirtualizer.scrollToIndex(highlightedIndex);
     },
-    scrollIntoView: () => {}
+    scrollIntoView: () => undefined,
   });
 
   return (
     <div className="form-input">
       <label {...getLabelProps()}>Payee</label>
       <div className="flex-col">
-        <input required={required} {...getInputProps({ ref })} disabled={disabled} />
+        <input
+          required={required}
+          {...getInputProps({ ref })}
+          disabled={disabled}
+        />
         <ul
           className={clsx("select-dropdown-list", { "rounded shadow": isOpen })}
-          {...getMenuProps({ ref: listRef })}>
+          {...getMenuProps({ ref: listRef })}
+        >
           {!isOpen ? null : payeeList.length === 0 ? (
             <li className="select-dropdown-item">
               --New payee &apos;{inputValue}&apos;--
             </li>
           ) : (
             <>
-              <li key="total-size" style={{ height: listVirtualizer.getTotalSize() }} />
+              <li
+                key="total-size"
+                style={{ height: listVirtualizer.getTotalSize() }}
+              />
               {listVirtualizer.getVirtualItems().map((virtualItem) => (
                 <li
                   key={virtualItem.key}
@@ -107,16 +121,17 @@ function PayeeSelect(
                     selected:
                       !!selectedItem &&
                       "id" in selectedItem &&
-                      selectedItem?.id === virtualItem.key
+                      selectedItem?.id === virtualItem.key,
                   })}
                   {...getItemProps({
                     ref: listVirtualizer.measureElement,
                     item: payeeList[virtualItem.index],
-                    index: virtualItem.index
+                    index: virtualItem.index,
                   })}
                   style={{
-                    transform: `translateY(${virtualItem.start}px)`
-                  }}>
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
                   {payeeList[virtualItem.index].name}
                 </li>
               ))}

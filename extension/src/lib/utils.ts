@@ -1,5 +1,6 @@
-import { browser } from "#imports";
 import * as ynab from "ynab";
+
+import { browser } from "#imports";
 
 const currencyFormatterCache = new Map<string, (millis: number) => string>();
 
@@ -15,7 +16,7 @@ export const getCurrencyFormatter = (
     style: "currency",
     currency: currencyFormat.iso_code,
     currencyDisplay: "narrowSymbol",
-    minimumFractionDigits: currencyFormat.decimal_digits
+    minimumFractionDigits: currencyFormat.decimal_digits,
   });
   const newFormatter = (millis: number) => {
     const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
@@ -42,12 +43,15 @@ export const millisToStringValue = (
 ) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
 
 /** Convert a string value (e.g. from HTML number input) to milliUnits */
-export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
+export const stringValueToMillis = (
+  value: string,
+  type: "Inflow" | "Outflow"
+) =>
   type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
 
 export const isEmptyObject = (objectName: object) => {
   for (const prop in objectName) {
-    if (Object.prototype.hasOwnProperty.call(objectName, prop)) {
+    if (Object.hasOwn(objectName, prop)) {
       return false;
     }
   }
@@ -56,7 +60,8 @@ export const isEmptyObject = (objectName: object) => {
 
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
-    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
+    (a) =>
+      (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
   );
 
 /** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
@@ -93,14 +98,14 @@ export const getNDaysAgoISO = (days: number) => {
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
   day: "numeric",
-  timeZone: "UTC"
+  timeZone: "UTC",
 });
 
 const dateFormatterWithYear = new Intl.DateTimeFormat("default", {
   month: "numeric",
   day: "numeric",
   year: "2-digit",
-  timeZone: "UTC"
+  timeZone: "UTC",
 });
 
 /** Format a date with just the month and day. If not in the current year, include the year. */
@@ -124,7 +129,7 @@ export const parseLocaleNumber = (
 };
 
 const emojiRegex =
-  // eslint-disable-next-line no-misleading-character-class
+  // biome-ignore lint/suspicious/noMisleadingCharacterClass: false positive
   /[\p{Emoji_Presentation}|\p{Extended_Pictographic}\u{200d}\u{FE00}-\u{FE0F}\u{E0100}-\u{E01EF}]+/gu;
 
 /** Returns the emojis found in a string */
@@ -147,7 +152,7 @@ export const executeScriptInCurrentTab = async <T>(func: () => T) => {
   if (!tab.id) throw new Error("Couldn't identify open tab.");
   const [{ result }] = await browser.scripting.executeScript({
     func,
-    target: { tabId: tab.id }
+    target: { tabId: tab.id },
   });
   return result as T;
 };
@@ -189,7 +194,9 @@ export const removePermissions = (permissions: OptionalPermissions[]) =>
     })
   );
 
-export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
+export const flagColorToEmoji = (
+  flagColor: ynab.TransactionFlagColor | string
+) => {
   if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
   if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";
   if (flagColor === ynab.TransactionFlagColor.Orange) return "🟠";
@@ -204,7 +211,9 @@ export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) 
  * @param timeoutMs - The maximum time to wait for a connection, in milliseconds. Default is 10 seconds.
  * @returns A Promise that resolves when an internet connection is established, or rejects if the timeout is reached.
  */
-export function waitForInternetConnection(timeoutMs: number = 10 * 1000): Promise<void> {
+export function waitForInternetConnection(
+  timeoutMs: number = 10 * 1000
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     if (navigator.onLine) {

@@ -1,13 +1,15 @@
-import { Browser, browser } from "#imports";
+import { Storage, type StorageAreaName } from "@plasmohq/storage";
 import { type DehydratedState } from "@tanstack/react-query";
 import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Storage, type StorageAreaName } from "@plasmohq/storage";
-
+import { Browser, browser } from "#imports";
 import { BACKGROUND_ALARM_NAME } from "~lib/constants";
-import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
+import {
+  StorageProvider,
+  useStorageContext,
+} from "~lib/context/storageContext";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
@@ -18,9 +20,8 @@ function Devtools() {
   const [data, setData] = useState<Record<string, string>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
-  const [backgroundAlarm, setBackgroundAlarm] = useState<Browser.alarms.Alarm | null>(
-    null
-  );
+  const [backgroundAlarm, setBackgroundAlarm] =
+    useState<Browser.alarms.Alarm | null>(null);
 
   // Get permissions
   useEffect(() => {
@@ -59,19 +60,22 @@ function Devtools() {
     };
   }, [area]);
 
-  const loadCache = () =>
+  const loadCache = useCallback(() => {
     keys()
       .then(async (keys) => {
-        const entries = await Promise.all(keys.map(async (key) => [key, await get(key)]));
+        const entries = await Promise.all(
+          keys.map(async (key) => [key, await get(key)])
+        );
         return Object.fromEntries(entries);
       })
       .then(setCache);
+  }, []);
 
   const clearCache = () => clear().then(() => loadCache());
 
   useEffect(() => {
     loadCache();
-  }, []);
+  }, [loadCache]);
 
   return (
     <div
@@ -79,8 +83,9 @@ function Devtools() {
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        padding: 4
-      }}>
+        padding: 4,
+      }}
+    >
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
       {!tokenData ? (
@@ -94,11 +99,14 @@ function Devtools() {
             Refresh token: <SensitiveString data={tokenData.refreshToken} />
           </div>
           <div>
-            Token expires: {tokenData && new Date(tokenData.expires).toLocaleString()}
+            Token expires:{" "}
+            {tokenData && new Date(tokenData.expires).toLocaleString()}
           </div>
           <div>
             {!tokenRefreshNeeded ? (
-              <button onClick={() => setTokenRefreshNeeded(true)}>Force refresh</button>
+              <button onClick={() => setTokenRefreshNeeded(true)}>
+                Force refresh
+              </button>
             ) : (
               <button disabled>Refreshing...</button>
             )}
@@ -113,20 +121,27 @@ function Devtools() {
         <div>No alarm found.</div>
       ) : (
         <div>
-          Next refresh at {new Date(backgroundAlarm.scheduledTime).toLocaleTimeString()}.{" "}
+          Next refresh at{" "}
+          {new Date(backgroundAlarm.scheduledTime).toLocaleTimeString()}.{" "}
           Repeats every {backgroundAlarm.periodInMinutes} minutes.
         </div>
       )}
       <div>
         <button
-          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
+          onClick={() =>
+            browser.alarms.clearAll().then(() => setBackgroundAlarm(null))
+          }
+        >
           Clear alarm
         </button>
       </div>
       <h3>Browser Storage</h3>
       <div>
         Storage Area:{" "}
-        <select value={area} onChange={(e) => setArea(e.target.value as StorageAreaName)}>
+        <select
+          value={area}
+          onChange={(e) => setArea(e.target.value as StorageAreaName)}
+        >
           <option>local</option>
           <option>sync</option>
         </select>
@@ -136,8 +151,9 @@ function Devtools() {
         style={{
           display: "flex",
           paddingBottom: 4,
-          borderBottom: "solid 2px lightgray"
-        }}>
+          borderBottom: "solid 2px lightgray",
+        }}
+      >
         <div style={{ width: 110 }}>
           <b>Key</b>
         </div>
@@ -155,19 +171,22 @@ function Devtools() {
                 style={{
                   display: "flex",
                   paddingBlock: 3,
-                  borderBottom: "solid 1px lightgray"
-                }}>
+                  borderBottom: "solid 1px lightgray",
+                }}
+              >
                 <b
                   style={{
                     width: 110,
                     overflow: "hidden",
                     whiteSpace: "nowrap",
-                    textOverflow: "ellipsis"
-                  }}>
+                    textOverflow: "ellipsis",
+                  }}
+                >
                   {key}
                 </b>
                 <div>
-                  {value === undefined || typeof JSON.parse(value) !== "object" ? (
+                  {value === undefined ||
+                  typeof JSON.parse(value) !== "object" ? (
                     value
                   ) : (
                     <FormattedJSON value={JSON.parse(value)} />

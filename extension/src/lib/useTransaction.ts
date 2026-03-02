@@ -4,7 +4,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
 
@@ -16,11 +16,15 @@ import {
   executeScriptInCurrentTab,
   getTodaysDateISO,
   parseLocaleNumber,
-  stringValueToMillis
+  stringValueToMillis,
 } from "./utils";
 
-export type TransactionFormState = ReturnType<typeof useTransaction>["formState"];
-export type TransactionFormHandlers = ReturnType<typeof useTransaction>["handlers"];
+export type TransactionFormState = ReturnType<
+  typeof useTransaction
+>["formState"];
+export type TransactionFormHandlers = ReturnType<
+  typeof useTransaction
+>["handlers"];
 
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
@@ -33,7 +37,7 @@ export default function useTransaction() {
     setPopupState,
     setTxState,
     setOmniboxInput,
-    setBudgetSettings
+    setBudgetSettings,
   } = useStorageContext();
 
   // Transaction state
@@ -43,14 +47,15 @@ export default function useTransaction() {
   const [cleared, setCleared] = useState(
     () =>
       txState?.cleared ??
-      (accountsData?.find((a) => a.id === txState?.accountId)?.type === "cash" ||
-        !!budgetSettings?.transactions.cleared)
+      (accountsData?.find((a) => a.id === txState?.accountId)?.type ===
+        "cash" ||
+        !!budgetSettings?.transactions.cleared),
   );
   const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    txState?.amountType || "Outflow"
+    txState?.amountType || "Outflow",
   );
   const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    txState?.payee || null
+    txState?.payee || null,
   );
   const [category, setCategory] = useState(() => {
     if (!txState?.categoryId) return null;
@@ -62,7 +67,7 @@ export default function useTransaction() {
     if (budgetSettings?.transactions.defaultAccountId)
       return (
         accountsData?.find(
-          (a) => a.id === budgetSettings.transactions.defaultAccountId
+          (a) => a.id === budgetSettings.transactions.defaultAccountId,
         ) || null
       );
     return null;
@@ -73,12 +78,14 @@ export default function useTransaction() {
   // Split transaction state
   const [isSplit, setIsSplit] = useState(txState?.isSplit ?? false);
   const [subTxs, setSubTxs] = useState<Array<SubTxState>>(
-    txState?.subTxs || [{ amount: "", amountType: "Outflow", isTransfer: false }]
+    txState?.subTxs || [
+      { amount: "", amountType: "Outflow", isTransfer: false },
+    ],
   );
   const onAddSubTx = useCallback(() => {
     setSubTxs((prev) => [
       ...prev,
-      { amount: "", amountType: "Outflow", isTransfer: false }
+      { amount: "", amountType: "Outflow", isTransfer: false },
     ]);
   }, []);
   const onRemoveSubTx = useCallback(() => {
@@ -86,12 +93,15 @@ export default function useTransaction() {
   }, []);
   const totalSubTxsAmount = useMemo(
     () =>
-      subTxs.reduce((sum, tx) => sum + stringValueToMillis(tx.amount, tx.amountType), 0),
-    [subTxs]
+      subTxs.reduce(
+        (sum, tx) => sum + stringValueToMillis(tx.amount, tx.amountType),
+        0,
+      ),
+    [subTxs],
   );
   const leftOverSubTxsAmount = useMemo(
     () => stringValueToMillis(amount, amountType) - totalSubTxsAmount,
-    [amount, amountType, totalSubTxsAmount]
+    [amount, amountType, totalSubTxsAmount],
   );
 
   // Other form state
@@ -112,7 +122,7 @@ export default function useTransaction() {
     subTxs,
     cleared,
     date,
-    returnTo: txState?.returnTo
+    returnTo: txState?.returnTo,
   });
 
   // Try parsing user's current selection as the initial amount
@@ -131,8 +141,11 @@ export default function useTransaction() {
 
   /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
   const isBudgetToTrackingTransfer = useMemo(() => {
-    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId) return false;
-    const transferToAccount = accountsData?.find((a) => a.id === payee.transferId);
+    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId)
+      return false;
+    const transferToAccount = accountsData?.find(
+      (a) => a.id === payee.transferId,
+    );
     if (!transferToAccount) return false;
     return !transferToAccount.on_budget && !!account?.on_budget;
   }, [account?.on_budget, accountsData, isTransfer, payee]);
@@ -152,9 +165,9 @@ export default function useTransaction() {
       setIsTransfer,
       setIsSplit,
       onAddSubTx,
-      onRemoveSubTx
+      onRemoveSubTx,
     }),
-    [onAddSubTx, onRemoveSubTx]
+    [onAddSubTx, onRemoveSubTx],
   );
 
   const onSaveTransaction: FormEventHandler = async (event) => {
@@ -190,7 +203,9 @@ export default function useTransaction() {
       if (
         subTxs.some(
           (tx) =>
-            tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id
+            tx.payee &&
+            "id" in tx.payee &&
+            tx.payee.id === account.transfer_payee_id,
         )
       ) {
         setErrorMessage("Can't transfer to the same account!");
@@ -209,8 +224,11 @@ export default function useTransaction() {
         (prev) =>
           prev && {
             ...prev,
-            transactions: { ...prev.transactions, defaultAccountId: account.id }
-          }
+            transactions: {
+              ...prev.transactions,
+              defaultAccountId: account.id,
+            },
+          },
       );
 
     setIsSaving(true);
@@ -230,26 +248,33 @@ export default function useTransaction() {
           : TransactionClearedStatus.Uncleared,
         approved: budgetSettings?.transactions.approved,
         memo,
-        flag_color: flag ? (flag as unknown as TransactionFlagColor) : undefined,
+        flag_color: flag
+          ? (flag as unknown as TransactionFlagColor)
+          : undefined,
         subtransactions: isSplit
           ? subTxs.map((subTx) => ({
               amount: stringValueToMillis(subTx.amount, subTx.amountType),
               category_id: subTx.categoryId,
-              payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
+              payee_id:
+                subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
               payee_name:
-                subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name,
-              memo: subTx.memo
+                subTx.payee && "id" in subTx.payee
+                  ? undefined
+                  : subTx.payee?.name,
+              memo: subTx.memo,
             }))
-          : undefined
+          : undefined,
       });
       const { returnTo } = txState || {};
       await setTxState({});
       setOmniboxInput("");
       setPopupState(returnTo || { view: "main" });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: not important
     } catch (err: any) {
       console.error("Error while saving transaction: ", err);
-      setErrorMessage("Error adding transaction! " + (err?.error?.detail || ""));
+      setErrorMessage(
+        "Error adding transaction! " + (err?.error?.detail || ""),
+      );
     }
     setIsSaving(false);
   };
@@ -271,13 +296,13 @@ export default function useTransaction() {
       subTxs,
       isSplit,
       isTransfer,
-      errorMessage
+      errorMessage,
     },
     derivedState: {
       totalSubTxsAmount,
       leftOverSubTxsAmount,
-      isBudgetToTrackingTransfer
-    }
+      isBudgetToTrackingTransfer,
+    },
   };
 }
 
@@ -297,7 +322,7 @@ const usePersistFormState = (txState: TxAddInitialState) => {
       subTxs: txState.subTxs,
       cleared: txState.cleared,
       date: txState.date,
-      returnTo: txState.returnTo
+      returnTo: txState.returnTo,
     });
   }, [
     setTxState,
@@ -313,13 +338,13 @@ const usePersistFormState = (txState: TxAddInitialState) => {
     txState.subTxs,
     txState.cleared,
     txState.date,
-    txState.returnTo
+    txState.returnTo,
   ]);
 };
 
 const useParseAmountFromUserSelection = (
   enabled: boolean,
-  setAmount: (amount: string) => void
+  setAmount: (amount: string) => void,
 ) => {
   useEffect(() => {
     if (!enabled) return;
@@ -332,7 +357,8 @@ const useParseAmountFromUserSelection = (
           if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
         })
         .catch((err) => {
-          !IS_PRODUCTION && console.error("Error getting user's selection: ", err);
+          !IS_PRODUCTION &&
+            console.error("Error getting user's selection: ", err);
         });
     });
   }, [enabled, setAmount]);

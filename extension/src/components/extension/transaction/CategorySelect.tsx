@@ -8,16 +8,20 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
+import type {
+  Category,
+  CategoryGroupWithCategories,
+  CurrencyFormat,
+} from "ynab";
 
 import type { CachedBudget } from "~lib/types";
 import {
   formatCurrency,
   getIgnoredCategoryIdsForTx,
-  searchWithinString
+  searchWithinString,
 } from "~lib/utils";
 
 interface Props {
@@ -42,9 +46,9 @@ function CategorySelect(
     placeholder,
     movingMoney,
     categoryGroupsData,
-    budgetData
+    budgetData,
   }: Props,
-  ref: ForwardedRef<HTMLInputElement | null>
+  ref: ForwardedRef<HTMLInputElement | null>,
 ) {
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
@@ -57,7 +61,7 @@ function CategorySelect(
         !ignoredCategoryIds?.has(category.id) &&
         (!inputValue || searchWithinString(category.name, inputValue));
     },
-    [ignoredCategoryIds]
+    [ignoredCategoryIds],
   );
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -68,7 +72,7 @@ function CategorySelect(
     () =>
       categories &&
       setCategoryList(categories.filter(getFilter(inputRef.current?.value))),
-    [categories, getFilter]
+    [categories, getFilter],
   );
 
   const {
@@ -81,7 +85,7 @@ function CategorySelect(
     setHighlightedIndex,
     reset,
     highlightedIndex,
-    selectedItem
+    selectedItem,
   } = useCombobox<Category | null>({
     items: categoryList,
     selectedItem: currentCategory,
@@ -90,7 +94,7 @@ function CategorySelect(
       if (category.name === "Inflow: Ready to Assign") return category.name;
       return `${category.name} (${formatCurrency(
         category.balance,
-        budgetData?.currencyFormat
+        budgetData?.currencyFormat,
       )})`;
     },
     onInputValueChange({ inputValue }) {
@@ -100,7 +104,7 @@ function CategorySelect(
       if (selectedItem) {
         selectCategory(selectedItem);
       }
-    }
+    },
   });
 
   return (
@@ -111,8 +115,9 @@ function CategorySelect(
           {...getInputProps({
             ref: (node) => {
               inputRef.current = node;
-              ref && (ref instanceof Function ? ref(node) : (ref.current = node));
-            }
+              ref &&
+                (ref instanceof Function ? ref(node) : (ref.current = node));
+            },
           })}
           className={selectedItem ? "item-selected" : ""}
           placeholder={placeholder ?? "(Leave blank to auto-categorize)"}
@@ -128,7 +133,8 @@ function CategorySelect(
               reset();
               selectCategory(null);
               setTimeout(() => inputRef.current?.focus(), 50);
-            }}>
+            }}
+          >
             <X aria-hidden />
           </button>
         ) : (
@@ -141,20 +147,22 @@ function CategorySelect(
               openMenu();
               setHighlightedIndex(0);
               inputRef.current?.focus();
-            }}>
+            }}
+          >
             <ChevronDown aria-hidden />
           </button>
         )}
 
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded shadow" : ""}`}
-          {...getMenuProps()}>
+          {...getMenuProps()}
+        >
           {!isOpen ? null : categoryList.length === 0 ? (
             <li className="select-dropdown-item">--Category not found!--</li>
           ) : (
             categoryGroupsData
               ?.filter((group) =>
-                categoryList.find((c) => c.category_group_id === group.id)
+                categoryList.find((c) => c.category_group_id === group.id),
               )
               .map((group) => (
                 <Fragment key={group.id}>
@@ -167,22 +175,23 @@ function CategorySelect(
                     .filter((c) => c.category_group_id === group.id)
                     .map((category) => {
                       const itemIndex = categoryList.findIndex(
-                        (c) => c.id === category.id
+                        (c) => c.id === category.id,
                       );
                       return (
                         <li
                           className={clsx("select-dropdown-item", {
                             highlighted: highlightedIndex === itemIndex,
-                            selected: selectedItem?.id === category.id
+                            selected: selectedItem?.id === category.id,
                           })}
                           key={category.id}
                           {...getItemProps({
                             item: category,
-                            index: itemIndex
-                          })}>
+                            index: itemIndex,
+                          })}
+                        >
                           {formatCategoryWithBalance(
                             category,
-                            budgetData?.currencyFormat
+                            budgetData?.currencyFormat,
                           )}
                         </li>
                       );
@@ -196,7 +205,10 @@ function CategorySelect(
   );
 }
 
-function formatCategoryWithBalance(category: Category, currencyFormat?: CurrencyFormat) {
+function formatCategoryWithBalance(
+  category: Category,
+  currencyFormat?: CurrencyFormat,
+) {
   if (category.name === "Inflow: Ready to Assign") return <>{category.name}</>;
 
   return (
@@ -205,8 +217,9 @@ function formatCategoryWithBalance(category: Category, currencyFormat?: Currency
       <span
         className={clsx("currency", {
           positive: category.balance > 0,
-          negative: category.balance < 0
-        })}>
+          negative: category.balance < 0,
+        })}
+      >
         {formatCurrency(category.balance, currencyFormat)}
       </span>
       )
