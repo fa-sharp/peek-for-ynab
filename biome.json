@@ -28,7 +28,6 @@
         "noGlobalObjectCalls": "error",
         "noInvalidBuiltinInstantiation": "error",
         "noInvalidConstructorSuper": "error",
-        "noNextAsyncClientComponent": "warn",
         "noNonoctalDecimalEscape": "error",
         "noPrecisionLoss": "error",
         "noSelfAssign": "error",

@@ -5,11 +5,6 @@
     "strict": true,
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
-    "isolatedModules": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "isolatedModules": true
   }
 }
