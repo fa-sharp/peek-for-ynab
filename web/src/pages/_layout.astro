@@ -1,0 +1,145 @@
+---
+import "../../../extension/src/styles/global.css";
+import "../../../extension/src/styles/main.scss";
+
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<script is:inline src="/scripts/theme.js"></script>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="android-chrome-icon" sizes="192x192" href="/android-chrome-192x192.png" />
+		<link rel="android-chrome-icon" sizes="512x512" href="/android-chrome-512x512.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title ? `${title} | Peek for YNAB` : 'Peek for YNAB'}</title>
+	</head>
+	<body>
+	<div class="pageContent">
+      <nav>
+         <ul>
+          <li>
+            <a
+              href="/"
+              class={pathname === "/" ? "currentPage" : ""}
+              aria-current={pathname === "/" ? "page" : "false"}>
+              Home
+            </a>
+          </li>
+          <li>
+            <a
+              href="/help"
+              class={pathname === "/help" ? "currentPage" : ""}
+              aria-current={pathname === "/help" ? "page" : "false"}>
+              Help/FAQ
+            </a>
+          </li>
+          <li>
+              <a
+              href="/releases"
+              class={pathname === "/releases" ? "currentPage" : ""}
+              aria-current={pathname === "/releases" ? "page" : "false"}>
+              Release Notes
+            </a>
+          </li>
+          <li>
+            <a
+              href="/privacy"
+              class={pathname === "/privacy" ? "currentPage" : ""}
+              aria-current={pathname === "/privacy" ? "page" : "false"}>
+              Privacy Policy
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <main class="mainContent">
+          <h1>Peek for YNAB</h1>
+          <slot />
+      </main>
+      <footer>
+        💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
+        Source code available on{" "}
+        <a href="https://github.com/fa-sharp/peek-for-ynab">
+          <span class="icon-span">
+            <Icon name="tabler:brand-github" aria-hidden size={16} />
+          </span>
+          GitHub
+        </a>
+        . Peek for YNAB is a third-party extension, and is not affiliated with or
+        supported by YNAB.
+      </footer>
+	</div>
+	</body>
+</html>
+
+<style is:global>
+    body {
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+    a {
+        color: currentColor;
+    }
+    p {
+        line-height: 1.4rem;
+    }
+    li {
+        margin-block: 0.2rem;
+    }
+
+    .screenshot {
+        border: solid 2px var(--border-light);
+        border-radius: 5px;
+        height: auto;
+    }
+</style>
+
+<style>
+    .pageContent {
+        max-width: 90ch;
+        margin-inline: auto;
+    }
+
+    nav ul {
+        display: flex;
+        gap: 1rem;
+
+        list-style: none;
+        padding: 0;
+        font-size: 1rem;
+    }
+
+    nav a {
+        text-decoration: none;
+    }
+
+    nav a.currentPage {
+        color: var(--currency-green);
+        text-decoration: underline wavy;
+        text-underline-offset: 5px;
+    }
+
+    .mainContent {
+        max-width: 80ch;
+        margin-inline: auto;
+    }
+
+    footer {
+        margin-top: 2.5rem;
+        padding: 6px 10px;
+        border-top: solid 1px var(--border-light);
+        font-size: 0.95em;
+    }
+</style>

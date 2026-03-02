@@ -1,0 +1,26 @@
+{
+  "name": "web",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.4",
+    "@iconify-json/tabler": "^1.2.28",
+    "astro": "^5.17.1",
+    "astro-icon": "^1.1.5",
+    "sass": "^1.97.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.4"
+  },
+  "pnpm": {
+    "ignoredOptionalDependencies": [
+      "@parcel/watcher"
+    ]
+  }
+}

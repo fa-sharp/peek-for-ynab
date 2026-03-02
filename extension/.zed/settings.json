@@ -1,0 +1,9 @@
+{
+  "lsp": {
+    "vtsls": {
+      "settings": {
+        "typescript": { "tsdk": "extension/node_modules/typescript/lib" }
+      }
+    }
+  }
+}

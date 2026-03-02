@@ -4,7 +4,6 @@ import { defineConfig } from "wxt";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
-  publicDir: resolve("src/public"),
   imports: false, // disable auto-imports
   targetBrowsers: ["chrome", "firefox"],
   vite: () => ({
