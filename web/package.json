@@ -16,7 +16,8 @@
     "sass": "^1.97.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.4"
+    "@biomejs/biome": "2.4.4",
+    "sharp": "^0.34.5"
   },
   "pnpm": {
     "ignoredOptionalDependencies": [
