@@ -1,22 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: "/extension"
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
       production:
         dependency-type: production
-        exclude-patterns:
-          - "@tanstack/*"
-          - "@react-aria/*"
-          - "@react-stately/*"
       development:
         dependency-type: development
-      tanstack:
-        patterns:
-          - "@tanstack/*"
-      react-aria:
-        patterns:
-          - "@react-aria/*"
-          - "@react-stately/*"
