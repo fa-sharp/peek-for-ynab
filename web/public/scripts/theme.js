@@ -1,5 +1,8 @@
-/** Script to detect and set color theme before React loads, to avoid the infamous 'flash' */
-(function () {
+document.addEventListener("astro:after-swap", detectAndApplyTheme);
+detectAndApplyTheme();
+
+/** Detects the user's preferred color theme and applies it to the document. */
+function detectAndApplyTheme() {
   if (!window?.localStorage || !window?.matchMedia) return;
 
   const themeSetting = JSON.parse(window.localStorage.getItem("theme") || '"auto"');
@@ -10,4 +13,4 @@
 
   if (shouldEnableDark) document.documentElement.classList.add("dark");
   else document.documentElement.classList.remove("dark");
-})();
+}

@@ -1,8 +1,9 @@
 ---
+import { ClientRouter } from "astro:transitions";
+import { Icon } from "astro-icon/components";
+
 import "../../../extension/src/styles/global.css";
 import "../../../extension/src/styles/main.scss";
-
-import { Icon } from "astro-icon/components";
 
 interface Props {
   title?: string;
@@ -26,61 +27,62 @@ const pathname = Astro.routePattern;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title ? `${title} | Peek for YNAB` : 'Peek for YNAB'}</title>
 	</head>
+	<ClientRouter />
 	<body>
-	<div class="pageContent">
-      <nav>
-         <ul>
-          <li>
-            <a
-              href="/"
-              class={pathname === "/" ? "currentPage" : ""}
-              aria-current={pathname === "/" ? "page" : "false"}>
-              Home
+    	<div class="pageContent">
+        <nav>
+            <ul>
+            <li>
+                <a
+                href="/"
+                class={pathname === "/" ? "currentPage" : ""}
+                aria-current={pathname === "/" ? "page" : "false"}>
+                Home
+                </a>
+            </li>
+            <li>
+                <a
+                href="/help"
+                class={pathname === "/help" ? "currentPage" : ""}
+                aria-current={pathname === "/help" ? "page" : "false"}>
+                Help/FAQ
+                </a>
+            </li>
+            <li>
+                <a
+                href="/releases"
+                class={pathname === "/releases" ? "currentPage" : ""}
+                aria-current={pathname === "/releases" ? "page" : "false"}>
+                Release Notes
+                </a>
+            </li>
+            <li>
+                <a
+                href="/privacy"
+                class={pathname === "/privacy" ? "currentPage" : ""}
+                aria-current={pathname === "/privacy" ? "page" : "false"}>
+                Privacy Policy
+                </a>
+            </li>
+            </ul>
+        </nav>
+        <main class="mainContent">
+            <h1>Peek for YNAB</h1>
+            <slot />
+        </main>
+        <footer>
+            💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
+            Source code available on{" "}
+            <a href="https://github.com/fa-sharp/peek-for-ynab">
+            <span class="icon-span">
+                <Icon name="tabler:brand-github" aria-hidden size={16} />
+            </span>
+            GitHub
             </a>
-          </li>
-          <li>
-            <a
-              href="/help"
-              class={pathname === "/help" ? "currentPage" : ""}
-              aria-current={pathname === "/help" ? "page" : "false"}>
-              Help/FAQ
-            </a>
-          </li>
-          <li>
-              <a
-              href="/releases"
-              class={pathname === "/releases" ? "currentPage" : ""}
-              aria-current={pathname === "/releases" ? "page" : "false"}>
-              Release Notes
-            </a>
-          </li>
-          <li>
-            <a
-              href="/privacy"
-              class={pathname === "/privacy" ? "currentPage" : ""}
-              aria-current={pathname === "/privacy" ? "page" : "false"}>
-              Privacy Policy
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <main class="mainContent">
-          <h1>Peek for YNAB</h1>
-          <slot />
-      </main>
-      <footer>
-        💕 Built and maintained by <a href="https://github.com/fa-sharp">fa-sharp</a>.
-        Source code available on{" "}
-        <a href="https://github.com/fa-sharp/peek-for-ynab">
-          <span class="icon-span">
-            <Icon name="tabler:brand-github" aria-hidden size={16} />
-          </span>
-          GitHub
-        </a>
-        . Peek for YNAB is a third-party extension, and is not affiliated with or
-        supported by YNAB.
-      </footer>
-	</div>
+            . Peek for YNAB is a third-party extension, and is not affiliated with or
+            supported by YNAB.
+        </footer>
+    	</div>
 	</body>
 </html>
 
