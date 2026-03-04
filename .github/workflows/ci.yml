@@ -2,18 +2,26 @@ name: "CI"
 on:
   push:
 
+env:
+  NODE_VERSION: 22.22
+
 jobs:
   test:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: extension
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - uses: actions/setup-node@v4
+          package_json_file: extension/package.json
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+          cache-dependency-path: extension/pnpm-lock.yaml
       - run: pnpm install
 
       - name: Run all tests
@@ -21,15 +29,20 @@ jobs:
 
   build:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: extension
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - uses: actions/setup-node@v4
+          package_json_file: extension/package.json
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+          cache-dependency-path: extension/pnpm-lock.yaml
       - run: pnpm install
 
       - name: Lint
@@ -38,5 +51,35 @@ jobs:
       - name: Check types
         run: pnpm run typecheck
 
-      - name: Build extension
-        run: pnpm run build:plasmo
+      - name: Build
+        run: pnpm run build
+
+  website:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+        env:
+          YNAB_CLIENT_ID: fake-client-id
+          YNAB_SECRET: fake-client-secret

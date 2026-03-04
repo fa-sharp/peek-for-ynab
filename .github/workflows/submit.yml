@@ -4,32 +4,41 @@ on:
   release:
     types: [published]
 
+env:
+  NODE_VERSION: 22.22
+
+defaults:
+  run:
+    working-directory: extension
+
 jobs:
   submit:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
-
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
+          package_json_file: extension/package.json
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20.x
-          cache: pnpm
+          node-version: ${{ env.NODE_VERSION }}
+          package-manager-cache: false
+      - run: pnpm install
 
-      - name: Install deps
-        run: pnpm install
-
-      - name: Package the extension into a zip artifact
+      - name: Package into zip artifact
         env:
-          PLASMO_PUBLIC_MAIN_URL: https://peekforynab.com
-          PLASMO_PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
-        run: pnpm run build:plasmo:zip
+          PUBLIC_MAIN_URL: https://peek-for-ynab-v2.fly.dev
+          PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
+        run: pnpm run build:zip
 
-      - name: Browser Platform Publish
-        uses: PlasmoHQ/bpp@v3
-        with:
-          keys: ${{ secrets.SUBMIT_KEYS }}
-          artifact: build/chrome-mv3-prod.zip
+      - name: Submit to stores
+        run: pnpm wxt submit --chrome-zip build/*-chrome.zip
+        ## --firefox-zip build/*-firefox.zip --firefox-sources-zip build/*-sources.zip
+        env:
+          CHROME_PUBLISH_TARGET: "default"
+          CHROME_SKIP_SUBMIT_REVIEW: "false"
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}

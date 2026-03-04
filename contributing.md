@@ -3,7 +3,7 @@
 ### Style
 
 - If a component is becoming quite large (more than ~200 lines), break it up into smaller components, and extract functions/hooks where possible.
-- If using VSCode, make sure to have the Prettier extension installed, so that the editor auto-formats your code.
+- Make sure to have the [Biome](https://biomejs.dev/) extension installed for your editor, so that the editor can auto-format your code.
 
 ### Principles
 

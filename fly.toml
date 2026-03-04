@@ -1,32 +1,28 @@
-# fly.toml app configuration file generated for peek-for-ynab on 2024-08-22T01:08:29-04:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+app = "peek-for-ynab-v2"
+primary_region = "ewr"
 
-app = 'peek-for-ynab'
-primary_region = 'ewr'
+[build]
+dockerfile = "Dockerfile"
+
+[env]
+PORT = "8080"
+REQUEST_ID_HEADER = "Fly-Request-Id"
+TRUST_PROXY = "true"
 
 [http_service]
-internal_port = 3000
+internal_port = 8080
 force_https = true
-auto_stop_machines = 'stop'
+auto_stop_machines = "suspend"
 auto_start_machines = true
 min_machines_running = 0
-processes = ['app']
-
-[[statics]]
-guest_path = "/.next/static"
-url_prefix = "/_next/static"
-
-[[statics]]
-guest_path = "/public/img"
-url_prefix = "/img"
-
-[[statics]]
-guest_path = "/public/scripts"
-url_prefix = "/scripts"
+processes = ["app"]
 
 [[vm]]
-memory = '256mb'
-cpu_kind = 'shared'
+memory = "256mb"
+cpu_kind = "shared"
 cpus = 1
+memory_mb = 256
+
+[[statics]]
+guest_path = "/app/dist/client/_astro"
+url_prefix = "/_astro"

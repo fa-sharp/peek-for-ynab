@@ -1,0 +1,95 @@
+---
+import { Icon } from "astro-icon/components";
+
+import ChromeLogo from "../assets/chrome-logo.png";
+import PopupDark from "../assets/screenshots/popup-dark.png";
+import PopupLight from "../assets/screenshots/popup-light.png";
+import Layout from "./_layout.astro";
+import { Image } from "astro:assets";
+
+const iconSize = 26;
+---
+
+<Layout>
+    <h2 class="heading-big mb-lg">
+        A Chrome extension to quickly check on your spending plan
+        </h2>
+        <div class="flex-row gap-lg">
+        <Image
+            src={PopupLight}
+            alt="Extension screenshot in light mode"
+            class="screenshot"
+            width={300}
+            height={310}
+            layout="constrained"
+            priority
+        />
+        <Image
+            src={PopupDark}
+            alt="Extension screenshot in dark mode"
+            class="screenshot"
+            width={300}
+            height={310}
+            layout="constrained"
+            priority
+        />
+        </div>
+        <div class="browser-logos">
+        <a
+            href="https://chromewebstore.google.com/detail/peek-for-ynab/oakibhlecegcmjcjppmjkiaeedoljbmk?hl=en"
+            target="_blank"
+            rel="noreferrer"
+            title="Go to Chrome Web Store">
+            <Image
+            src={ChromeLogo}
+            alt="Chrome Web Store logo"
+            width={248}
+            height={75}
+            layout="constrained"
+            priority
+            />
+        </a>
+        </div>
+        <h2 class="heading-big">Features</h2>
+        <ul class="list divide-y">
+            <li class="flex-row py-xs">
+                <Icon name="tabler:eye" size={iconSize} /> View your current category and account balances
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:pin" size={iconSize}  /> Pin your favorite categories and accounts
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:plus" size={iconSize} /> Add transactions directly from the extension
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:list" size={iconSize} /> View recent transactions in categories and accounts
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:bell" size={iconSize} /> Customizable alerts for overspending, new imports, and
+                reconciliation reminders
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:arrows-split"  size={iconSize}/> Support for split transactions
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:currency-pound" size={iconSize} /> Support for multiple budgets and currencies
+            </li>
+            <li class="flex-row py-xs">
+                <Icon name="tabler:sunglasses" size={iconSize} /> Dark mode
+            </li>
+        </ul>
+</html>
+
+<style>
+    .browser-logos {
+        display: flex;
+        margin: 2rem 0;
+    }
+
+    .browser-logos > * {
+        background-color: white;
+        border: solid 1px var(--border);
+        border-radius: 5px;
+        line-height: 0;
+    }
+</style>

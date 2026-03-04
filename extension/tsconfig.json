@@ -1,0 +1,10 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "strict": true,
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    "isolatedModules": true
+  }
+}

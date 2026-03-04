@@ -1,38 +1,48 @@
-# syntax = docker/dockerfile:1
+ARG NODE_VERSION=22
+ARG NODE_MINOR_VERSION=22
 
-ARG NODE_VERSION=20.18
-FROM node:${NODE_VERSION}-slim AS builder
+### Base build image ###
+FROM node:${NODE_VERSION}.${NODE_MINOR_VERSION}-slim AS base
 
-LABEL fly_launch_runtime="Next.js"
-
-# Next.js app lives here
-WORKDIR /app
-
-# Setup pnpm
+WORKDIR /app/web
+ENV NODE_ENV=production
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-# Install node modules
-COPY --link package.json pnpm-lock.yaml ./
+COPY --link web/package.json web/pnpm-lock.yaml ./
 RUN corepack enable
 RUN corepack prepare --activate
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
-# Build Next.js app
-COPY --link . .
+### BUILDER ###
+FROM base AS builder
+
+# Install all dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# Build Astro app (copy shared styles from extension)
+COPY --link web .
+COPY --link extension/src/styles /app/extension/src/styles
+RUN --mount=type=cache,id=astro,target=/app/web/node_modules/.astro \
+    pnpm run build
+
+### PROD INSTALLER ###
+FROM base AS installer
+
+# Install prod dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --prod --frozen-lockfile
+
+### RUNNER ###
+FROM gcr.io/distroless/nodejs${NODE_VERSION}-debian12 AS runner
+WORKDIR /app
+
+# Copy built application and prod dependencies
+COPY --from=builder /app/web/dist ./dist
+COPY --from=builder /app/web/server ./server
+COPY --from=installer /app/web/node_modules ./node_modules
+COPY --from=installer /app/web/package.json ./package.json
+
 ENV NODE_ENV=production
-ARG WEBSITE_DOMAIN=""
-RUN --mount=type=cache,id=next,target=/app/.next/cache pnpm run build:next
-
-# Final stage for app image
-FROM gcr.io/distroless/nodejs20-debian12 AS runner
-
-# Copy built application
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
-
-EXPOSE 3000
-ENV NODE_ENV=production
-ENV HOSTNAME="0.0.0.0"
-CMD ["server.js"]
+ENV HOST="0.0.0.0"
+CMD ["server/index.js"]

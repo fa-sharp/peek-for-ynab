@@ -4,72 +4,73 @@
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
 
-A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peekforynab.com).
+A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peek-for-ynab-v2.fly.dev).
 
 ## Project layout
 
-- `assets/` Extension assets
-- `public/` Website images and shared scripts
-- `src/`
-  - `popup.tsx` Extension popup page
-  - `options.tsx` Extension options page
-  - `background.ts` Extension background worker (refreshes data and the OAuth token)
-  - `middleware.ts` Website middleware (Next.js)
-  - `app/` Website pages and routes (Next.js)
-    - `api/` API routes to fetch OAuth tokens from YNAB API
-  - `components/`
-    - `extension/` Extension components
-    - `icons/` Common icons
-    - `react-aria/` [React Aria](https://react-spectrum.adobe.com/react-aria/index.html) abstract components
-    - `website/` Website components
-  - `lib/` Library and utility functions
-    - `context/` [React Context](https://react.dev/learn/passing-data-deeply-with-context) that handles auth, data fetching, and storage for the extension
-  - `styles/` CSS files
-  - `tabs/` Additional extension pages
-- `test/` Unit tests
+- `extension/` Browser extension using WXT, React, and TypeScript
+  - `src/`
+    - `components/` React components
+    - `entrypoints/` Extension popup page, options page, and background script
+    - `lib/` Library and utility functions
+    - `styles/` Extension CSS / Sass styles
+  - `test/` Unit tests with Vitest
+- `web/` Website and server using Astro and Fastify
+  - `server/` Fastify server (serves Astro as middleware)
+  - `src/`
+    - `pages/` All website pages and routes (Astro)
 
 ## Building and running locally
 
+You must have Node.js (>= 22) and pnpm installed before proceeding.
+
 ### Environment variables
 
-Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.com/settings/developer), then set the following environment variables in a `.env` file :
+Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.com/settings/developer). Then, in both the `extension/` and `web/` directories, copy the `.env.example` file to `.env` and fill in the values.
 
-- `PLASMO_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes (when running locally, set this to `http://localhost:3000`)
-- `PLASMO_PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
-- `YNAB_SECRET`: OAuth secret (server-only variable, won't be exposed to the extension)
+### Backend / Web
+
+The server and website is created with [Astro](https://astro.build/). Pages and API routes are located in the `web/src/pages/` folder. You can run the development server via:
+
+```bash
+cd web
+pnpm install
+pnpm dev
+```
 
 ### Extension
 
-Run `pnpm install` to install all dependencies.
-
-This extension was developed using the [Plasmo framework](https://docs.plasmo.com/). You can run the extension's development server via:
+This extension is developed using the [WXT framework](https://wxt.dev/). To run the extension's development server, make sure the Astro server (see above) is running and then run:
 
 ```bash
-pnpm dev:plasmo
+cd extension
+pnpm install
+pnpm dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+A development browser should open automatically and load the extension.
 
-For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
 
-### Website
+## Building for production
 
-The website is created with [Next.js](https://nextjs.org/). Pages and API routes are located in the `src/app/` folder. You can run the development server via:
+### Extension
 
 ```bash
-pnpm dev:next
+cd extension
+pnpm build
 ```
 
-## Making production build
+The extension will be built to the `extension/build/chrome-mv3` folder. This can be loaded into Chrome by navigating to `chrome://extensions/` and clicking "Load unpacked".
 
-Extension:
+### Backend / Web
 
 ```bash
-pnpm build:plasmo
+cd web
+pnpm build
 ```
 
-Website:
+The Astro backend and website will be built as an Express-compatible middleware to the `web/dist/` folder. You can then run the Fastify server via:
 
 ```bash
-pnpm build:next
+pnpm start
 ```

@@ -1,0 +1,17 @@
+---
+import { getCollection } from "astro:content";
+
+import Layout from "./_layout.astro";
+import Release from "../components/Release.astro";
+
+const releaseNotes = (await getCollection("releaseNotes")).sort((a, b) =>
+  b.id.localeCompare(a.id)
+);
+---
+
+<Layout title="Release Notes">
+    <h2>Release Notes</h2>
+    {releaseNotes.map((note) => (
+      <Release release={note} />
+    ))}
+</Layout>

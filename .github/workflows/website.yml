@@ -6,17 +6,16 @@ on:
     branches:
       - main
     paths:
-      - "src/**"
+      - "web/**"
       - "Dockerfile"
       - "fly.toml"
-      - "package.json"
 jobs:
   deploy:
-    name: Deploy Next.js app
+    name: Deploy Astro app
     runs-on: ubuntu-latest
-    concurrency: deploy-group # optional: ensure only one action runs at a time
+    concurrency: deploy-group
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
