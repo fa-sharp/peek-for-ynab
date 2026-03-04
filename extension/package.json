@@ -42,7 +42,7 @@
     "clsx": "^2.1.1",
     "downshift": "^9.3.2",
     "idb-keyval": "^6.2.2",
-    "js-confetti": "^0.12.0",
+    "js-confetti": "^0.13.1",
     "json-formatter-js": "^2.5.23",
     "nanoid": "^5.1.6",
     "puro": "^0.8.4",
@@ -51,14 +51,14 @@
     "react-dom": "^19.2.4",
     "tabler-icons-react": "1.55.0",
     "use-local-storage-state": "^19.5.0",
-    "ynab": "^2.9.0"
+    "ynab": "^2.10.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.4",
+    "@biomejs/biome": "2.4.5",
     "@react-types/shared": "^3.33.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/chrome": "^0.0.315",
+    "@types/chrome": "^0.1.37",
     "@types/node": "^22.19.13",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
