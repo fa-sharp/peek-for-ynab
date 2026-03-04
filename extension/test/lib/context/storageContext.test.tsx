@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from "@testing-library/react";
 import { randomUUID } from "crypto";
+import { renderHook, waitFor } from "@testing-library/react";
 import { expect, test } from "vitest";
 
 import { DEFAULT_SETTINGS } from "~lib/constants";
@@ -9,7 +9,7 @@ import type { TokenData } from "~lib/types";
 
 test("Can render storage hook successfully, with default settings", async () => {
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.tokenData).toBeNull());
 
@@ -19,7 +19,7 @@ test("Can render storage hook successfully, with default settings", async () => 
 
 test("Can change a setting, and persist to storage", async () => {
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
@@ -28,19 +28,19 @@ test("Can change a setting, and persist to storage", async () => {
     expect(result.current.settings?.theme, "theme rendered").toBe("dark")
   );
 
-  const { settings } = await chrome.storage.local.get("settings");
+  const { settings } = await browser.storage.local.get("settings");
   expect(JSON.parse(settings), "theme persisted").toMatchObject({ theme: "dark" });
 });
 
 test("Reads persisted settings on initialization", async () => {
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     settings: JSON.stringify({
       ...DEFAULT_SETTINGS,
-      animations: false
-    })
+      animations: false,
+    }),
   });
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
@@ -49,24 +49,24 @@ test("Reads persisted settings on initialization", async () => {
 
 test("Can save token data", async () => {
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.tokenData).toBeNull());
 
   const token: TokenData = {
     accessToken: "access",
     refreshToken: "refresh",
-    expires: Date.now()
+    expires: Date.now(),
   };
   await result.current.setTokenData(token);
 
-  const { tokenData } = await chrome.storage.local.get("tokenData");
+  const { tokenData } = await browser.storage.local.get("tokenData");
   expect(JSON.parse(tokenData), "tokenData persisted").toMatchObject(token);
 });
 
 test("Can add and persist saved category", async () => {
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.savedCategories).toBeTruthy());
 
@@ -78,19 +78,19 @@ test("Can add and persist saved category", async () => {
   result.current.saveCategory(categoryId);
   await waitFor(() =>
     expect(result.current.savedCategories).toMatchObject({
-      [budgetId]: [categoryId]
+      [budgetId]: [categoryId],
     })
   );
 
-  const { cats } = await chrome.storage.local.get("cats");
+  const { cats } = await browser.storage.local.get("cats");
   expect(JSON.parse(cats), "saved categories persisted").toMatchObject({
-    [budgetId]: [categoryId]
+    [budgetId]: [categoryId],
   });
 });
 
 test("Can remove saved category", async () => {
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.savedCategories).toBeTruthy());
 
@@ -103,35 +103,35 @@ test("Can remove saved category", async () => {
   result.current.saveCategoriesForBudget(budgetId, [category1, category2]);
   await waitFor(() =>
     expect(result.current.savedCategories).toMatchObject({
-      [budgetId]: [category1, category2]
+      [budgetId]: [category1, category2],
     })
   );
 
   result.current.removeCategory(category1);
   await waitFor(() =>
     expect(result.current.savedCategories).toStrictEqual({
-      [budgetId]: [category2]
+      [budgetId]: [category2],
     })
   );
-  const { cats } = await chrome.storage.local.get("cats");
+  const { cats } = await browser.storage.local.get("cats");
   expect(JSON.parse(cats), "saved categories persisted").toStrictEqual({
-    [budgetId]: [category2]
+    [budgetId]: [category2],
   });
 });
 
 test("Can remove all local data", async () => {
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     cats: JSON.stringify({
-      [randomUUID()]: [randomUUID()]
+      [randomUUID()]: [randomUUID()],
     }),
     accounts: JSON.stringify({
-      [randomUUID()]: [randomUUID()]
-    })
+      [randomUUID()]: [randomUUID()],
+    }),
   });
   window.localStorage.setItem("selectedBudget", randomUUID());
 
   const { result } = renderHook(useStorageContext, {
-    wrapper: StorageProvider
+    wrapper: StorageProvider,
   });
   await waitFor(() => expect(result.current.settings).toBeTruthy());
 
@@ -142,8 +142,8 @@ test("Can remove all local data", async () => {
   waitFor(() => expect(result.current.savedCategories).toStrictEqual({}));
   waitFor(() => expect(result.current.savedAccounts).toStrictEqual({}));
 
-  const { cats } = await chrome.storage.local.get("cats");
-  const { accounts } = await chrome.storage.local.get("accounts");
+  const { cats } = await browser.storage.local.get("cats");
+  const { accounts } = await browser.storage.local.get("accounts");
   expect(cats).toBeUndefined();
   expect(accounts).toBeUndefined();
 });

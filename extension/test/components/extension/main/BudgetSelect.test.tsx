@@ -1,6 +1,6 @@
+import { randomUUID } from "crypto";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { randomUUID } from "crypto";
 import { expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
@@ -9,7 +9,7 @@ import type { CachedBudget } from "~lib/types";
 
 const createBudgets = (): CachedBudget[] => [
   { id: randomUUID(), name: "Budget 1" },
-  { id: randomUUID(), name: "Budget 2" }
+  { id: randomUUID(), name: "Budget 2" },
 ];
 
 test("can display budgets", async () => {

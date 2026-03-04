@@ -1,16 +1,18 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts, category_groups } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
+
 import "vitest-dom/extend-expect";
 
+import { browser } from "#imports";
 import { Omnibox } from "~components";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts, category_groups } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 

@@ -1,14 +1,15 @@
 import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { category_groups } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
-import "vitest-dom/extend-expect";
 import type { Category } from "ynab";
+import "vitest-dom/extend-expect";
 
+import { browser } from "#imports";
 import { CategorySelect } from "~components";
 import { useYNABContext } from "~lib/context";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { category_groups } from "~test/mock/ynabApiData";
 
 const electricCategory = category_groups
   .find((cg) => cg.name === "Bills")!
@@ -18,8 +19,8 @@ const shoppingCategory = category_groups
   .categories.find((c) => c.name.includes("Shopping"))!;
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 
@@ -130,7 +131,7 @@ test("Ready to Assign appears as first category", async () => {
   const user = userEvent.setup();
   render(
     <CategorySelect
-      selectCategory={() => {}}
+      selectCategory={() => undefined}
       categories={result.current.categoriesData!}
       categoryGroupsData={result.current.categoryGroupsData!}
     />,
@@ -151,7 +152,7 @@ test("Credit Card Payment categories don't appear", async () => {
   const user = userEvent.setup();
   render(
     <CategorySelect
-      selectCategory={() => {}}
+      selectCategory={() => undefined}
       categories={result.current.categoriesData!}
       categoryGroupsData={result.current.categoryGroupsData!}
     />,

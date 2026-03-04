@@ -1,14 +1,16 @@
 // @vitest-environment node
+
 import { randomUUID } from "crypto";
-import { accounts, budgets, category_groups } from "test/mock/ynabApiData";
 import { expect, test } from "vitest";
 
+import { browser } from "#imports";
 import {
   type BudgetAlerts,
   createSystemNotification,
   getBudgetAlerts,
-  getNumAlertsForBudget
+  getNumAlertsForBudget,
 } from "~lib/notifications";
+import { accounts, budgets, category_groups } from "~test/mock/ynabApiData";
 
 test("'getBudgetAlerts' returns expected object", () => {
   expect(
@@ -18,14 +20,14 @@ test("'getBudgetAlerts' returns expected object", () => {
         checkImports: false,
         importError: false,
         reconcileAlerts: {
-          [accounts[0].id]: 7
-        }
+          [accounts[0].id]: 7,
+        },
       },
       { accounts }
     )
   ).toMatchObject({
     accounts: { [accounts[0].id]: { name: accounts[0].name, reconcile: true } },
-    cats: {}
+    cats: {},
   } satisfies BudgetAlerts);
 
   expect(
@@ -35,8 +37,8 @@ test("'getBudgetAlerts' returns expected object", () => {
         checkImports: false,
         importError: false,
         reconcileAlerts: {
-          [accounts[0].id]: 7
-        }
+          [accounts[0].id]: 7,
+        },
       },
       { accounts, categories: category_groups.flatMap((cg) => cg.categories) }
     )
@@ -46,9 +48,9 @@ test("'getBudgetAlerts' returns expected object", () => {
       "4854168f-c898-4b5c-8e19-18a76c6cc436": {
         name: "Eating Out",
         balance: -50_000,
-        overspent: true
-      }
-    }
+        overspent: true,
+      },
+    },
   } satisfies BudgetAlerts);
 });
 
@@ -56,7 +58,7 @@ test("'getNumAlertsForBudget' returns expected number", () => {
   expect(
     getNumAlertsForBudget({
       accounts: {},
-      cats: {}
+      cats: {},
     })
   ).toBe(0);
 
@@ -64,17 +66,17 @@ test("'getNumAlertsForBudget' returns expected number", () => {
     getNumAlertsForBudget({
       accounts: {},
       cats: {},
-      numUnapprovedTxs: 1
+      numUnapprovedTxs: 1,
     })
   ).toBe(1);
 
   expect(
     getNumAlertsForBudget({
       accounts: {
-        [randomUUID()]: { name: "Checking", importError: true, reconcile: true }
+        [randomUUID()]: { name: "Checking", importError: true, reconcile: true },
       },
       cats: { [randomUUID()]: { name: "Groceries", balance: -10_000, overspent: true } },
-      numUnapprovedTxs: 3
+      numUnapprovedTxs: 3,
     })
   ).toBe(6);
 });
@@ -85,17 +87,17 @@ test("'createSystemNotification' doesn't create an empty notification", async ()
     {
       accounts: {},
       cats: {},
-      numUnapprovedTxs: 0
+      numUnapprovedTxs: 0,
     },
     {
       id: budget.id,
       name: budget.name,
-      currencyFormat: budget.currency_format
+      currencyFormat: budget.currency_format,
     }
   );
 
   expect(notificationText).toBe("");
-  expect(chrome.notifications.create).toHaveBeenCalledTimes(0);
+  expect(browser.notifications.create).toHaveBeenCalledTimes(0);
 });
 
 test("'createSystemNotification' creates expected notification", async () => {
@@ -103,22 +105,22 @@ test("'createSystemNotification' creates expected notification", async () => {
   const notificationText = await createSystemNotification(
     {
       accounts: {
-        [randomUUID()]: { name: "Checking", reconcile: true }
+        [randomUUID()]: { name: "Checking", reconcile: true },
       },
       cats: {
-        [randomUUID()]: { name: "Groceries", balance: -10_000, overspent: true }
+        [randomUUID()]: { name: "Groceries", balance: -10_000, overspent: true },
       },
-      numUnapprovedTxs: 1
+      numUnapprovedTxs: 1,
     },
     {
       id: budget.id,
       name: budget.name,
-      currencyFormat: budget.currency_format
+      currencyFormat: budget.currency_format,
     }
   );
 
   expect(notificationText).toContain("1 unapproved transaction");
   expect(notificationText).toContain("Reconcile: Checking");
   expect(notificationText).toContain("Overspent: Groceries");
-  expect(chrome.notifications.create).toHaveBeenCalledTimes(1);
+  expect(browser.notifications.create).toHaveBeenCalledTimes(1);
 });

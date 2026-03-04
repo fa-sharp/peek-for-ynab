@@ -1,17 +1,20 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
+
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts } from "~test/mock/ynabApiData";
 import "vitest-dom/extend-expect";
+
+import { browser } from "wxt/browser";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
 import type { TxAddInitialState } from "~lib/types";
 import useTransaction from "~lib/useTransaction";
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 
@@ -24,10 +27,10 @@ test("persists form state to extension storage", async () => {
     () => ({
       tx: useTransaction(),
       storage: useStorageContext(),
-      ynab: useYNABContext()
+      ynab: useYNABContext(),
     }),
     {
-      wrapper
+      wrapper,
     }
   );
   await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
@@ -41,16 +44,16 @@ test("persists form state to extension storage", async () => {
     expect(result.current.storage.txState).toMatchObject({
       amount: "123.45",
       accountId: checkingAccount.id,
-      flag: "orange"
+      flag: "orange",
     } satisfies TxAddInitialState)
   );
   await waitFor(async () =>
-    expect(JSON.parse((await chrome.storage.local.get("txState")).txState)).toMatchObject(
-      {
-        amount: "123.45",
-        accountId: checkingAccount.id,
-        flag: "orange"
-      } satisfies TxAddInitialState
-    )
+    expect(
+      JSON.parse((await browser.storage.local.get("txState")).txState as string)
+    ).toMatchObject({
+      amount: "123.45",
+      accountId: checkingAccount.id,
+      flag: "orange",
+    } satisfies TxAddInitialState)
   );
 });

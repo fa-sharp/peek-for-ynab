@@ -1,22 +1,23 @@
 import { render, renderHook, waitFor } from "@testing-library/react";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts, category_groups, payees } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
+import { browser } from "#imports";
 import OmniboxTransaction from "~components/extension/omnibox/OmniboxTransaction";
 import { useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
 import useTransaction from "~lib/useTransaction";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts, category_groups, payees } from "~test/mock/ynabApiData";
 
 const abcPayee = payees.find((p) => p.name === "ABC Stores")!;
 const groceriesCategory = category_groups[3].categories[0];
 const amexAccount = accounts[3];
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 
@@ -39,7 +40,7 @@ test("updates the form state for each field", async () => {
       handlers={result.current.tx.handlers}
       isSaving={result.current.tx.isSaving}
       parsedQuery={parsedQuery!}
-      openTxForm={() => {}}
+      openTxForm={() => undefined}
     />
   );
 
@@ -57,7 +58,7 @@ test("updates the form state for each field", async () => {
       handlers={result.current.tx.handlers}
       isSaving={result.current.tx.isSaving}
       parsedQuery={newParsedQuery!}
-      openTxForm={() => {}}
+      openTxForm={() => undefined}
     />
   );
   expect(result.current.tx.formState.amount).toBe("42.96");

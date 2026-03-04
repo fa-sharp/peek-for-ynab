@@ -1,21 +1,22 @@
 import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
-import "vitest-dom/extend-expect";
 import type { Account } from "ynab";
+import "vitest-dom/extend-expect";
 
+import { browser } from "#imports";
 import { AccountSelect } from "~components";
 import { useYNABContext } from "~lib/context";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts } from "~test/mock/ynabApiData";
 
 const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 

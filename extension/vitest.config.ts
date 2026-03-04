@@ -1,12 +1,10 @@
-import react from "@vitejs/plugin-react";
-import tsConfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
+import { WxtVitest } from "wxt/testing/vitest-plugin";
 
 export default defineConfig({
   test: {
-    setupFiles: ["vitest.setup.ts", "jest-webextension-mock"],
-    sequence: { setupFiles: "list" },
-    environment: "jsdom"
+    setupFiles: ["vitest.setup.ts"],
+    environment: "happy-dom",
   },
-  plugins: [tsConfigPaths(), react()]
+  plugins: [WxtVitest()],
 });

@@ -1,16 +1,17 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import type { RequestHandler } from "msw";
-import { mockServer } from "test/mock/msw";
-import { savedAccounts, savedCategories, validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { budgets } from "test/mock/ynabApiData";
 import { expect, test } from "vitest";
 
+import { browser } from "#imports";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import { mockServer } from "~test/mock/msw";
+import { savedAccounts, savedCategories, validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { budgets } from "~test/mock/ynabApiData";
 
 test("No data fetched if token is missing", async () => {
   const { result } = renderHook(useYNABContext, {
-    wrapper: createTestAppWrapper()
+    wrapper: createTestAppWrapper(),
   });
   await waitFor(() => expect(result.current.budgetsData).toBeFalsy());
   expect(result.current.categoryGroupsData).toBeFalsy();
@@ -22,17 +23,17 @@ test("No data fetched if token is missing", async () => {
 });
 
 test("Data fetched with valid token, and first budget auto-selected", async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 
   const { result } = renderHook(
     () => ({
       ynab: useYNABContext(),
-      storage: useStorageContext()
+      storage: useStorageContext(),
     }),
     {
-      wrapper: createTestAppWrapper()
+      wrapper: createTestAppWrapper(),
     }
   );
 
@@ -45,9 +46,9 @@ test("Data fetched with valid token, and first budget auto-selected", async () =
 });
 
 test("Saved categories data loaded properly", async () => {
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     tokenData: JSON.stringify(validToken),
-    cats: JSON.stringify(savedCategories)
+    cats: JSON.stringify(savedCategories),
   });
 
   const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
@@ -63,9 +64,9 @@ test("Saved categories data loaded properly", async () => {
 });
 
 test("Saved accounts data loaded properly", async () => {
-  await chrome.storage.local.set({
+  await browser.storage.local.set({
     tokenData: JSON.stringify(validToken),
-    accounts: JSON.stringify(savedAccounts)
+    accounts: JSON.stringify(savedAccounts),
   });
 
   const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
@@ -81,8 +82,8 @@ test("Saved accounts data loaded properly", async () => {
 });
 
 test("Payee data loaded with transfer IDs included", async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 
   const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });

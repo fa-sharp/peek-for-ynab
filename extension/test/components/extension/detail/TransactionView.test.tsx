@@ -1,14 +1,14 @@
+import { randomUUID } from "crypto";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { randomUUID } from "crypto";
-import { accounts, category_groups } from "test/mock/ynabApiData";
 import { expect, test } from "vitest";
-import "vitest-dom/extend-expect";
 import { TransactionClearedStatus, type TransactionDetail } from "ynab";
+import "vitest-dom/extend-expect";
 
 import { TransactionView } from "~components";
 import type { DetailViewState } from "~lib/types";
 import { getTodaysDateISO } from "~lib/utils";
+import { accounts, category_groups } from "~test/mock/ynabApiData";
 
 const amexAccount = accounts[3];
 const shoppingCategory = category_groups
@@ -26,7 +26,7 @@ const transaction: TransactionDetail = {
   cleared: TransactionClearedStatus.Uncleared,
   date: getTodaysDateISO(),
   deleted: false,
-  subtransactions: []
+  subtransactions: [],
 };
 
 test("Shows transaction details correctly", async () => {
@@ -49,6 +49,6 @@ test("Shows transaction details correctly", async () => {
   await user.click(screen.getByText(shoppingCategory.name));
   expect(detailState).toMatchObject({
     type: "category",
-    id: transaction.category_id!
+    id: transaction.category_id!,
   } satisfies DetailViewState);
 });

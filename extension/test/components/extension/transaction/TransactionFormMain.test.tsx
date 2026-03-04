@@ -1,21 +1,23 @@
 import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import type { RefObject } from "react";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
+
+import { browser } from "#imports";
 import "vitest-dom/extend-expect";
 
 import TransactionFormMain from "~components/extension/transaction/TransactionFormMain";
 import { useYNABContext } from "~lib/context";
 import useTransaction from "~lib/useTransaction";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts } from "~test/mock/ynabApiData";
 
 const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 
@@ -81,7 +83,7 @@ test("State is successfully updated when filling out the form", async () => {
 
   expect(result.current.transaction.formState).toMatchObject({
     category: { name: "Inflow: Ready to Assign" },
-    account: null
+    account: null,
   });
 
   screen.getByRole("combobox", { name: "Account" }).focus();
@@ -89,6 +91,6 @@ test("State is successfully updated when filling out the form", async () => {
 
   expect(result.current.transaction.formState).toMatchObject({
     category: { name: "Inflow: Ready to Assign" },
-    account: checkingAccount
+    account: checkingAccount,
   });
 });

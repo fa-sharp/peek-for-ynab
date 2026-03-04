@@ -1,22 +1,24 @@
 import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import type { RefObject } from "react";
-import { validToken } from "test/mock/userData";
-import { createTestAppWrapper } from "test/mock/wrapper";
-import { accounts } from "test/mock/ynabApiData";
 import { beforeEach, expect, test } from "vitest";
+
+import { browser } from "#imports";
 import "vitest-dom/extend-expect";
 
 import TransactionFormMainTransfer from "~components/extension/transaction/TransactionFormMainTransfer";
 import { useYNABContext } from "~lib/context";
 import useTransaction from "~lib/useTransaction";
+import { validToken } from "~test/mock/userData";
+import { createTestAppWrapper } from "~test/mock/wrapper";
+import { accounts } from "~test/mock/ynabApiData";
 
 const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
-  await chrome.storage.local.set({
-    tokenData: JSON.stringify(validToken)
+  await browser.storage.local.set({
+    tokenData: JSON.stringify(validToken),
   });
 });
 
@@ -89,7 +91,7 @@ test("Proper transfer payee and account state when filling out the form", async 
   expect(result.current.transaction.formState).toMatchObject({
     payee: { id: checkingAccount.transfer_payee_id, name: checkingAccount.name },
     category: null,
-    account: null
+    account: null,
   });
 
   screen.getByRole("combobox", { name: "Account (From)" }).focus();
@@ -98,6 +100,6 @@ test("Proper transfer payee and account state when filling out the form", async 
   expect(result.current.transaction.formState).toMatchObject({
     payee: { id: checkingAccount.transfer_payee_id, name: checkingAccount.name },
     category: null,
-    account: savingsAccount
+    account: savingsAccount,
   });
 });

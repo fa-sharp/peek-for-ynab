@@ -1,9 +1,7 @@
 // @vitest-environment node
 import { randomUUID } from "crypto";
-import { mockServer } from "test/mock/msw";
-import { accounts, budgets, category_groups, payees } from "test/mock/ynabApiData";
 import { expect, test } from "vitest";
-import { API, type Account, type Category, type Payee } from "ynab";
+import { type Account, API, type Category, type Payee } from "ynab";
 
 import {
   fetchAccountsForBudget,
@@ -13,8 +11,10 @@ import {
   mergeAccountsDataFromDelta,
   mergeCategoryGroupsDataFromDelta,
   mergePayeesDataFromDelta,
-  payeeCollator
+  payeeCollator,
 } from "~lib/api";
+import { mockServer } from "~test/mock/msw";
+import { accounts, budgets, category_groups, payees } from "~test/mock/ynabApiData";
 
 const frequentCategoryGroupIdx = 3;
 const groceriesCategoryIdx = 0;
@@ -25,15 +25,15 @@ const frequentCategoryGroup = {
   name: category_groups[3].name,
   hidden: category_groups[3].hidden,
   deleted: category_groups[3].deleted,
-  categories: []
+  categories: [],
 };
 
 test("'mergeCategoryGroupsDataFromDelta' handles updated category balance", () => {
   const deltaResponse = [
     {
       ...frequentCategoryGroup,
-      categories: [{ ...groceriesCategory, balance: 50_000 }]
-    }
+      categories: [{ ...groceriesCategory, balance: 50_000 }],
+    },
   ];
   expect(groceriesCategory.balance).toBe(0);
   const newData = mergeCategoryGroupsDataFromDelta(category_groups, deltaResponse);
@@ -55,13 +55,13 @@ test("'mergeCategoryGroupsDataFromDelta' handles new category", () => {
     budgeted: 0,
     category_group_id: frequentCategoryGroup.id,
     hidden: false,
-    deleted: false
+    deleted: false,
   };
   const deltaResponse = [
     {
       ...frequentCategoryGroup,
-      categories: [newCategory]
-    }
+      categories: [newCategory],
+    },
   ];
   const newData = mergeCategoryGroupsDataFromDelta(category_groups, deltaResponse);
   expect(newData.length).toEqual(category_groups.length);
@@ -75,8 +75,8 @@ test("'mergeCategoryGroupsDataFromDelta' handles deleted category", () => {
   const deltaResponse = [
     {
       ...frequentCategoryGroup,
-      categories: [{ ...groceriesCategory, deleted: true }]
-    }
+      categories: [{ ...groceriesCategory, deleted: true }],
+    },
   ];
   const newData = mergeCategoryGroupsDataFromDelta(category_groups, deltaResponse);
   expect(newData[frequentCategoryGroupIdx].categories.length).toEqual(
@@ -93,8 +93,8 @@ test("'mergeCategoryGroupsDataFromDelta' handles deleted category group", () => 
   const deltaResponse = [
     {
       ...frequentCategoryGroup,
-      deleted: true
-    }
+      deleted: true,
+    },
   ];
   const newData = mergeCategoryGroupsDataFromDelta(category_groups, deltaResponse);
   expect(newData.length).toEqual(category_groups.length - 1);
@@ -108,15 +108,15 @@ test("'mergeAccountsFromDelta' handles updated account balance", () => {
   const deltaResponse = [
     {
       ...checkingAccount,
-      balance: 1_500_000
-    }
+      balance: 1_500_000,
+    },
   ];
   expect(checkingAccount.balance).toBe(1_000_000);
   const newData = mergeAccountsDataFromDelta(accounts, deltaResponse);
   expect(newData.length).toEqual(accounts.length);
   expect(newData[checkingAccountIdx]).toMatchObject({
     ...checkingAccount,
-    balance: 1_500_000
+    balance: 1_500_000,
   });
 });
 
@@ -131,7 +131,7 @@ test("'mergeAccountsFromDelta' handles new account", () => {
     transfer_payee_id: randomUUID(),
     on_budget: true,
     closed: false,
-    deleted: false
+    deleted: false,
   };
   const newData = mergeAccountsDataFromDelta(accounts, [newAccount]);
   expect(newData.length).toEqual(accounts.length + 1);
@@ -142,8 +142,8 @@ test("'mergeAccountsFromDelta' handles deleted account", () => {
   const deltaResponse = [
     {
       ...checkingAccount,
-      deleted: true
-    }
+      deleted: true,
+    },
   ];
   const newData = mergeAccountsDataFromDelta(accounts, deltaResponse);
   expect(newData.length).toEqual(accounts.length - 1);
@@ -159,13 +159,13 @@ test("'mergePayeesFromDelta' handles and sorts new payee", () => {
   const newPayee = {
     id: randomUUID(),
     name: "BCD Stores",
-    deleted: false
+    deleted: false,
   };
   const newData = mergePayeesDataFromDelta(cachedPayees, [newPayee]);
   expect(newData.length).toEqual(cachedPayees.length + 1);
   expect(newData[1], "payee is inserted in sorted position").toMatchObject({
     id: newPayee.id,
-    name: newPayee.name
+    name: newPayee.name,
   });
 });
 
@@ -174,14 +174,14 @@ test("'mergePayeesFromDelta' handles updated payee", () => {
     {
       ...abcPayee,
       name: "ABCD Stores",
-      deleted: false
-    }
+      deleted: false,
+    },
   ];
   const newData = mergePayeesDataFromDelta(cachedPayees, deltaResponse);
   expect(newData.length).toEqual(cachedPayees.length);
   expect(newData[0]).toMatchObject({
     id: abcPayee.id,
-    name: deltaResponse[0].name
+    name: deltaResponse[0].name,
   });
 });
 
@@ -189,8 +189,8 @@ test("'mergeAccountsFromDelta' handles deleted payee", () => {
   const deltaResponse = [
     {
       ...abcPayee,
-      deleted: true
-    }
+      deleted: true,
+    },
   ];
   const newData = mergePayeesDataFromDelta(cachedPayees, deltaResponse);
   expect(newData.length).toEqual(cachedPayees.length - 1);
@@ -205,7 +205,7 @@ test("'fetchCategoryGroups' uses delta request when cache exists", async () => {
   });
   await fetchCategoryGroupsForBudget(new API("test"), budgets[0].id, {
     data: { categoryGroups: category_groups, serverKnowledge: 1500 },
-    dataUpdatedAt: Date.now()
+    dataUpdatedAt: Date.now(),
   });
   mockServer.events.removeAllListeners("request:start");
 });
@@ -218,7 +218,7 @@ test("'fetchAccounts' uses delta request when cache exists", async () => {
   });
   await fetchAccountsForBudget(new API("test"), budgets[0].id, {
     data: { accounts, serverKnowledge: 2000 },
-    dataUpdatedAt: Date.now()
+    dataUpdatedAt: Date.now(),
   });
   mockServer.events.removeAllListeners("request:start");
 });
@@ -231,7 +231,7 @@ test("'fetchPayees' uses delta request when cache exists", async () => {
   });
   await fetchPayeesForBudget(new API("test"), budgets[0].id, {
     data: { payees: cachedPayees, serverKnowledge: 2500 },
-    dataUpdatedAt: Date.now()
+    dataUpdatedAt: Date.now(),
   });
   mockServer.events.removeAllListeners("request:start");
 });

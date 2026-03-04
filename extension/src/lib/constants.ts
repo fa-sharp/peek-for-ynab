@@ -6,7 +6,7 @@ import type { AppSettings, BudgetSettings, PopupState } from "./types";
 export const LATEST_VERSION_ALERT_NUM = 4;
 export const LATEST_VERSION_ALERT_TEXT = "New: Detail views!";
 
-export const IS_DEV = import.meta.env.DEV;
+export const IS_DEV = import.meta.env.DEV && !import.meta.env.VITEST;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;

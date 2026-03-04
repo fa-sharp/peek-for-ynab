@@ -10,9 +10,9 @@ export const createTestAppWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false
-      }
-    }
+        retry: false,
+      },
+    },
   });
   return function wrapper({ children }: { children: ReactNode }) {
     return (

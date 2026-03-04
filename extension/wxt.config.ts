@@ -16,6 +16,7 @@ export default defineConfig({
   alias: {
     "~components": "src/components",
     "~lib": "src/lib",
+    "~test": "test",
   },
   autoIcons: { baseIconPath: "assets/icon512.png" },
   webExt: {
