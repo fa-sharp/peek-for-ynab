@@ -5,7 +5,26 @@ updates:
     schedule:
       interval: monthly
     groups:
-      production:
+      security:
         dependency-type: production
+        update-types:
+          - minor
+          - patch
+      major:
+        dependency-type: production
+        update-types:
+          - major
       development:
         dependency-type: development
+  - package-ecosystem: npm
+    directory: "/web"
+    schedule:
+      interval: monthly
+      groups:
+        security:
+          update-types:
+            - minor
+            - patch
+        major:
+          update-types:
+            - major
