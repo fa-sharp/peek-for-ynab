@@ -105,8 +105,8 @@ importers:
         specifier: ^19.5.0
         version: 19.5.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       ynab:
-        specifier: ^2.10.0
-        version: 2.10.0
+        specifier: ^3.1.0
+        version: 3.1.0
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.5
@@ -585,8 +585,8 @@ packages:
     resolution: {integrity: sha512-ZAoA40rNMPwSm+AeHpCq8STiNAwzWLJuP8Xv4CHIc9wv/PSuExjMrmjfYNj682vW0OOiZ1HKxzvjQr9XZIisQA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@exodus/bytes@1.14.1':
-    resolution: {integrity: sha512-OhkBFWI6GcRMUroChZiopRiSp2iAMvEBK47NhJooDqz1RERO4QuZIZnjP63TXX8GAiLABkYmX+fuQsdJ1dd2QQ==}
+  '@exodus/bytes@1.15.0':
+    resolution: {integrity: sha512-UY0nlA+feH81UGSHv92sLEPLCeZFjXOuHhrIo0HQydScuQc8s0A7kL/UdgwgDq8g8ilksmuoF35YVTNphV2aBQ==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       '@noble/hashes': ^1.8.0 || ^2.0.0
@@ -1395,8 +1395,8 @@ packages:
     resolution: {integrity: sha512-TGw5yVi4saajsSEgz25grObGHEUaDrniwvA2qwSC060KfqGPdglhvPMA2lPIoxs3PQIItj2iag35fONcQqgUaQ==}
     engines: {node: '>=12.0'}
 
-  agent-base@7.1.3:
-    resolution: {integrity: sha512-jRR5wdylq8CkOe6hei19GGZnxM6rBGwFl3Bg0YItGDimvjGtAvdZk4Pu6Cl4u4Igsws4a1fd1Vq3ezrhn4KmFw==}
+  agent-base@7.1.4:
+    resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
   ajv@6.14.0:
@@ -3552,8 +3552,8 @@ packages:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
 
-  ynab@2.10.0:
-    resolution: {integrity: sha512-zDH++4mbFpVDbDW1qIYS3pG3sPVtdth7c45aEfU7pVNqIcK6aVzK8eSksyOarrzaPKSq4OA9AXq1ixC7WGdpow==}
+  ynab@3.1.0:
+    resolution: {integrity: sha512-jmmsw3UqavbkJpW9/gIwSzUW9snZZKJ8bW4a77b4zQtjnnEQ3RdcQl7Uyi/c2xqsPzE+2dGY/mHzt5jzkyXhWQ==}
     engines: {node: '>=14'}
 
   yocto-queue@0.1.0:
@@ -3963,7 +3963,7 @@ snapshots:
       levn: 0.4.1
     optional: true
 
-  '@exodus/bytes@1.14.1':
+  '@exodus/bytes@1.15.0':
     optional: true
 
   '@formatjs/ecma402-abstract@2.3.6':
@@ -4828,7 +4828,7 @@ snapshots:
 
   adm-zip@0.5.16: {}
 
-  agent-base@7.1.3:
+  agent-base@7.1.4:
     optional: true
 
   ajv@6.14.0:
@@ -5542,7 +5542,7 @@ snapshots:
 
   html-encoding-sniffer@6.0.0:
     dependencies:
-      '@exodus/bytes': 1.14.1
+      '@exodus/bytes': 1.15.0
     transitivePeerDependencies:
       - '@noble/hashes'
     optional: true
@@ -5558,7 +5558,7 @@ snapshots:
 
   http-proxy-agent@7.0.2:
     dependencies:
-      agent-base: 7.1.3
+      agent-base: 7.1.4
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
@@ -5566,7 +5566,7 @@ snapshots:
 
   https-proxy-agent@7.0.6:
     dependencies:
-      agent-base: 7.1.3
+      agent-base: 7.1.4
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
@@ -5712,7 +5712,7 @@ snapshots:
       '@acemir/cssom': 0.9.31
       '@asamuzakjp/dom-selector': 6.8.1
       '@bramus/specificity': 2.4.2
-      '@exodus/bytes': 1.14.1
+      '@exodus/bytes': 1.15.0
       cssstyle: 6.2.0
       data-urls: 7.0.0
       decimal.js: 10.6.0
@@ -6940,7 +6940,7 @@ snapshots:
 
   whatwg-url@16.0.1:
     dependencies:
-      '@exodus/bytes': 1.14.1
+      '@exodus/bytes': 1.15.0
       tr46: 6.0.0
       webidl-conversions: 8.0.1
     transitivePeerDependencies:
@@ -7109,7 +7109,7 @@ snapshots:
       y18n: 5.0.8
       yargs-parser: 21.1.1
 
-  ynab@2.10.0:
+  ynab@3.1.0:
     dependencies:
       fetch-ponyfill: 7.1.0
     transitivePeerDependencies:
