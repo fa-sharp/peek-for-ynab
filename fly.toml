@@ -3,30 +3,22 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'peek-for-ynab'
-primary_region = 'ewr'
+app = "peek-for-ynab-v2"
+primary_region = "ewr"
 
 [http_service]
 internal_port = 3000
 force_https = true
-auto_stop_machines = 'stop'
+auto_stop_machines = "stop"
 auto_start_machines = true
 min_machines_running = 0
-processes = ['app']
+processes = ["app"]
 
 [[statics]]
-guest_path = "/.next/static"
-url_prefix = "/_next/static"
-
-[[statics]]
-guest_path = "/public/img"
-url_prefix = "/img"
-
-[[statics]]
-guest_path = "/public/scripts"
-url_prefix = "/scripts"
+guest_path = "/app/dist/client/_astro"
+url_prefix = "/_astro"
 
 [[vm]]
-memory = '256mb'
-cpu_kind = 'shared'
+memory = "256mb"
+cpu_kind = "shared"
 cpus = 1

@@ -4,12 +4,27 @@ import { defineConfig } from "wxt";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: "src",
+  outDir: "build",
   imports: false, // disable auto-imports
   targetBrowsers: ["chrome", "firefox"],
   vite: () => ({
     envPrefix: "PUBLIC_",
+    build: {
+      commonjsOptions: { transformMixedEsModules: true }, // needed for packages that use `require()`
+    },
   }),
-  manifest: {
+  alias: {
+    "~components": "src/components",
+    "~lib": "src/lib",
+  },
+  autoIcons: { baseIconPath: "assets/icon512.png" },
+  webExt: {
+    chromiumArgs: [`--user-data-dir=${resolve(".wxt/chrome-data")}`],
+    keepProfileChanges: true,
+  },
+  modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
+  manifest: () => ({
+    key: process.env.CRX_PUBLIC_KEY,
     name: "Peek for YNAB",
     homepage_url: "https://peekforynab.com",
     permissions: ["identity", "alarms", "storage"],
@@ -32,15 +47,5 @@ export default defineConfig({
         strict_min_version: "109.0",
       },
     },
-  },
-  alias: {
-    "~components": "src/components",
-    "~lib": "src/lib",
-  },
-  autoIcons: { baseIconPath: "assets/icon512.png" },
-  webExt: {
-    chromiumArgs: [`--user-data-dir=${resolve(".wxt/chrome-data")}`],
-    keepProfileChanges: true,
-  },
-  modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
+  }),
 });

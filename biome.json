@@ -2,11 +2,38 @@
   "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": { "ignoreUnknown": false },
-  "formatter": { "enabled": true, "indentStyle": "space" },
+  "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 90 },
   "javascript": {
     "formatter": { "quoteStyle": "double", "trailingCommas": "es5" }
   },
   "html": { "formatter": { "enabled": true, "indentScriptAndStyle": true } },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [":NODE:", ":PACKAGE:", ":BLANK_LINE:", ":ALIAS:", ":PATH:"]
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedImports": "off",
+            "noUnusedVariables": "off"
+          },
+          "style": { "useConst": "off", "useImportType": "off" }
+        }
+      }
+    }
+  ],
   "linter": {
     "enabled": true,
     "rules": {
@@ -114,38 +141,5 @@
       "!**/node_modules/*",
       "!**/build/*"
     ]
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedImports": "off",
-            "noUnusedVariables": "off"
-          },
-          "style": { "useConst": "off", "useImportType": "off" }
-        }
-      }
-    }
-  ],
-  "assist": {
-    "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": {
-          "level": "on",
-          "options": {
-            "groups": [
-              ":NODE:",
-              ":PACKAGE:",
-              ":BLANK_LINE:",
-              ":ALIAS:",
-              ":PATH:"
-            ]
-          }
-        }
-      }
-    }
   }
 }

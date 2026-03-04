@@ -23,18 +23,14 @@ export const TOKEN_STORAGE = new Storage({ area: "local" });
 
 export const DEFAULT_POPUP_STATE: PopupState = {
   view: "main",
-  budgetId:
-    // try reading initial value from `localStorage` (old way of storing the selected budget)
-    typeof window !== "undefined"
-      ? JSON.parse(window.localStorage.selectedBudget || '""')
-      : ""
+  budgetId: "",
 };
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
   currentTabAccess: false,
   theme: "auto",
   animations: true,
-  omnibox: false
+  omnibox: false,
 });
 
 export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({
@@ -42,16 +38,16 @@ export const DEFAULT_BUDGET_SETTINGS = Object.freeze<BudgetSettings>({
     checkImports: false,
     importError: false,
     overspent: false,
-    reconcileAlerts: {}
+    reconcileAlerts: {},
   },
   transactions: {
     approved: true,
     cleared: false,
-    rememberAccount: false
+    rememberAccount: false,
   },
   confetti: {
     allCategories: false,
     categories: [],
-    emojis: []
-  }
+    emojis: [],
+  },
 });

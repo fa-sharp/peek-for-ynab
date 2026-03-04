@@ -1,19 +1,36 @@
 import { QueryClient, type QueryFilters } from "@tanstack/react-query";
 import {
+  experimental_createQueryPersister,
   type PersistedQuery,
-  experimental_createPersister
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
 import { ONE_DAY_IN_MILLIS } from "./constants";
 
-const cachedQueryKeys = new Set([
+const CACHED_QUERY_KEYS = new Set([
   "budgets",
   "payees",
   "categoryGroups",
   "accounts",
-  "import"
+  "import",
 ]);
+
+const queryPersister = experimental_createQueryPersister<PersistedQuery>({
+  prefix: "ynab",
+  filters: {
+    predicate: ({ queryKey }) =>
+      typeof queryKey[0] === "string" && CACHED_QUERY_KEYS.has(queryKey[0]),
+  },
+  maxAge: ONE_DAY_IN_MILLIS * 7,
+  storage: {
+    getItem: (key) => get(key),
+    setItem: (key, val) => set(key, val),
+    removeItem: (key) => del(key),
+  },
+  serialize: (query) => query,
+  deserialize: (query) => query,
+  buster: "v2",
+});
 
 export const createQueryClient = (options?: { staleTime?: number }) =>
   new QueryClient({
@@ -21,27 +38,7 @@ export const createQueryClient = (options?: { staleTime?: number }) =>
       queries: {
         staleTime: options?.staleTime,
         retry: 1, // only retry once if there's an error,
-        persister: createIdbPersister("ynab", {
-          predicate: ({ queryKey }) =>
-            typeof queryKey[0] === "string" && cachedQueryKeys.has(queryKey[0])
-        })
-      }
-    }
-  });
-
-/** Creates an Indexed DB persister for React Query */
-function createIdbPersister(prefix: string, filters: QueryFilters) {
-  return experimental_createPersister<PersistedQuery>({
-    prefix,
-    filters,
-    maxAge: ONE_DAY_IN_MILLIS * 7,
-    storage: {
-      getItem: (key) => get(key),
-      setItem: (key, val) => set(key, val),
-      removeItem: (key) => del(key)
+        persister: queryPersister.persisterFn,
+      },
     },
-    serialize: (query) => query,
-    deserialize: (query) => query,
-    buster: "v2"
   });
-}

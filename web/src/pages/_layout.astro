@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const pathname = Astro.url.pathname;
+const pathname = Astro.routePattern;
 ---
 
 <script is:inline src="/scripts/theme.js"></script>

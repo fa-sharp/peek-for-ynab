@@ -1,10 +1,10 @@
-import { type Account, type Category, type TransactionDetail, api } from "ynab";
+import { type Account, api, type Category, type TransactionDetail } from "ynab";
 
 import {
   checkUnapprovedTxsForBudget,
   fetchAccountsForBudget,
   fetchBudgets,
-  fetchCategoryGroupsForBudget
+  fetchCategoryGroupsForBudget,
 } from "~lib/api";
 import {
   CHROME_LOCAL_STORAGE,
@@ -14,13 +14,13 @@ import {
   ONE_DAY_IN_MILLIS,
   REFRESH_SIGNAL_KEY,
   TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY
+  TOKEN_STORAGE_KEY,
 } from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
   getBudgetAlerts,
-  updateIconAndTooltip
+  updateIconAndTooltip,
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
 import type { BudgetSettings, TokenData } from "~lib/types";
@@ -42,19 +42,22 @@ export async function refreshToken(): Promise<TokenData | null> {
 
   // refresh token
   let newTokenData: TokenData | null = null;
-  const refreshUrl = `${import.meta.env.PUBLIC_MAIN_URL || ""}/api/auth/refresh`;
+  const refreshUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
+  refreshUrl.pathname = "/api/auth/refresh";
   IS_DEV && console.log("Refreshing token!");
 
   try {
-    const res = await fetch(`${refreshUrl}?refreshToken=${tokenData.refreshToken}`, {
-      method: "POST"
+    const res = await fetch(refreshUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: tokenData.refreshToken }),
     });
     if (!res.ok) {
       if (res.status === 401) await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
       throw {
         message: "Error from API while refreshing token",
         status: res.status,
-        error: await res.text()
+        error: await res.text(),
       };
     }
     newTokenData = await res.json();
@@ -100,12 +103,12 @@ export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);
   const queryClient = createQueryClient({
-    staleTime: 10 * 60 * 1000 // to prevent too many refetches, data is assumed fresh for 10 minutes
+    staleTime: 10 * 60 * 1000, // to prevent too many refetches, data is assumed fresh for 10 minutes
   });
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
     staleTime: ONE_DAY_IN_MILLIS * 7,
-    queryFn: () => fetchBudgets(ynabAPI)
+    queryFn: () => fetchBudgets(ynabAPI),
   });
 
   const alerts: CurrentAlerts = {};
@@ -129,14 +132,14 @@ export async function backgroundDataRefresh() {
       await queryClient.fetchQuery({
         queryKey,
         queryFn: async () =>
-          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids
+          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids,
       });
       await new Promise((r) => setTimeout(r, 100));
       await queryClient.fetchQuery({
         queryKey,
         staleTime: 50 * 60 * 1000, // 50 minutes
         queryFn: async () =>
-          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids
+          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids,
       });
       unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
     }
@@ -149,13 +152,13 @@ export async function backgroundDataRefresh() {
       await queryClient.fetchQuery({
         queryKey,
         queryFn: () =>
-          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey))
+          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey)),
       });
       await new Promise((r) => setTimeout(r, 100));
       const { accounts } = await queryClient.fetchQuery({
         queryKey,
         queryFn: () =>
-          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey))
+          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey)),
       });
       accountsData = accounts;
     }
@@ -169,7 +172,7 @@ export async function backgroundDataRefresh() {
             ynabAPI,
             budget.id,
             queryClient.getQueryState(queryKey)
-          )
+          ),
       });
       await new Promise((r) => setTimeout(r, 100));
       const { categoryGroups } = await queryClient.fetchQuery({
@@ -179,7 +182,7 @@ export async function backgroundDataRefresh() {
             ynabAPI,
             budget.id,
             queryClient.getQueryState(queryKey)
-          )
+          ),
       });
       categoriesData = categoryGroups.flatMap((cg) => cg.categories);
     }
@@ -187,7 +190,7 @@ export async function backgroundDataRefresh() {
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
       accounts: accountsData,
       categories: categoriesData,
-      unapprovedTxs
+      unapprovedTxs,
     });
     if (budgetAlerts) {
       alerts[budget.id] = budgetAlerts;

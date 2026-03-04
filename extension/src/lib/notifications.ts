@@ -1,8 +1,7 @@
-import { browser } from "#imports";
 import type { Account, Category, TransactionDetail } from "ynab";
 
+import { browser } from "#imports";
 import notificationImageUrl from "~/assets/notification.png";
-
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "./constants";
 import type { BudgetNotificationSettings, CachedBudget } from "./types";
 import { formatCurrency, formatDateMonthAndDay, isEmptyObject } from "./utils";
@@ -50,7 +49,7 @@ export const getBudgetAlerts = (
 ) => {
   const budgetAlerts: BudgetAlerts = {
     accounts: {},
-    cats: {}
+    cats: {},
   };
   if (notificationSettings.checkImports)
     budgetAlerts.numUnapprovedTxs = data.unapprovedTxs?.length;
@@ -93,7 +92,7 @@ export const getBudgetAlerts = (
       budgetAlerts.accounts[account.id] = {
         name: account.name,
         lastReconciledAt: account.last_reconciled_at || undefined,
-        ...accountAlerts
+        ...accountAlerts,
       };
     }
   });
@@ -110,7 +109,7 @@ export const getBudgetAlerts = (
       budgetAlerts.cats[category.id] = {
         name: category.name,
         balance: category.balance,
-        ...categoryAlerts
+        ...categoryAlerts,
       };
     }
   });
@@ -226,7 +225,7 @@ export const createSystemNotification = async (
       title: budgetData.name,
       type: "basic",
       message,
-      isClickable: true
+      isClickable: true,
     });
   }
 
