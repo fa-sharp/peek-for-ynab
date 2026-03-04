@@ -34,8 +34,8 @@ A browser extension for YNAB that lets users see their category and account bala
 
 Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.com/settings/developer), then set the following environment variables in a `.env` file :
 
-- `PLASMO_PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes (when running locally, set this to `http://localhost:3000`)
-- `PLASMO_PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
+- `PUBLIC_MAIN_URL`: The URL of the Next.js website and API routes (when running locally, set this to `http://localhost:3000`)
+- `PUBLIC_YNAB_CLIENT_ID`: OAuth client ID
 - `YNAB_SECRET`: OAuth secret (server-only variable, won't be exposed to the extension)
 
 ### Extension
