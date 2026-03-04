@@ -77,3 +77,9 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+        env:
+          YNAB_CLIENT_ID: fake-client-id
+          YNAB_SECRET: fake-client-secret

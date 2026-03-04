@@ -20,11 +20,11 @@ updates:
     directory: "/web"
     schedule:
       interval: monthly
-      groups:
-        security:
-          update-types:
-            - minor
-            - patch
-        major:
-          update-types:
-            - major
+    groups:
+      security:
+        update-types:
+          - minor
+          - patch
+      major:
+        update-types:
+          - major
