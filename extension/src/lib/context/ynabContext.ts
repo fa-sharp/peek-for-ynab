@@ -12,7 +12,6 @@ import {
 } from "~lib/api";
 import { useConfetti } from "~lib/hooks";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
-
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
 import { findAllEmoji, getNDaysAgoISO } from "../utils";
 import { useAuthContext } from "./authContext";
@@ -129,10 +128,7 @@ const useYNABProvider = () => {
     enabled: Boolean(ynabAPI && !!popupState?.budgetId && popupState.view === "move"),
     queryFn: async () => {
       if (!ynabAPI || !popupState?.budgetId) return;
-      const response = await ynabAPI.months.getBudgetMonth(
-        popupState.budgetId,
-        "current"
-      );
+      const response = await ynabAPI.months.getPlanMonth(popupState.budgetId, "current");
       const { month } = response.data;
       IS_DEV && console.log("Fetched month data!", month);
       return month;

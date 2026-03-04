@@ -4,7 +4,7 @@
   "files": { "ignoreUnknown": false },
   "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 90 },
   "javascript": {
-    "formatter": { "quoteStyle": "double", "trailingCommas": "es5" }
+    "formatter": { "quoteStyle": "double", "trailingCommas": "none" }
   },
   "html": {
     "formatter": { "enabled": false }
