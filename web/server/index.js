@@ -17,6 +17,7 @@ const prettyLog = {
 const app = fastify({
   disableRequestLogging: (req) => !isApiRequest(req.url),
   requestIdHeader: process.env.REQUEST_ID_HEADER,
+  trustProxy: process.env.TRUST_PROXY === "true",
   logger: {
     transport: process.env.NODE_ENV === "development" ? prettyLog : undefined,
   },
