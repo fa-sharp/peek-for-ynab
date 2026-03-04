@@ -8,6 +8,9 @@ env:
 jobs:
   test:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: extension
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -17,6 +20,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+          cache-dependency-path: extension/pnpm-lock.yaml
       - run: pnpm install
 
       - name: Run all tests
@@ -24,6 +28,9 @@ jobs:
 
   build:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: extension
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -33,6 +40,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+          cache-dependency-path: extension/pnpm-lock.yaml
       - run: pnpm install
 
       - name: Lint
@@ -46,6 +54,9 @@ jobs:
 
   website:
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -55,6 +66,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
       - run: pnpm install
 
       - name: Lint
