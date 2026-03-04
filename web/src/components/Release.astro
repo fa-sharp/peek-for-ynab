@@ -1,0 +1,16 @@
+---
+import { type CollectionEntry, render } from "astro:content";
+
+interface Props {
+  release: CollectionEntry<"releaseNotes">;
+}
+
+const { release } = Astro.props;
+const { Content } = await render(release);
+
+const dateFormatter = new Intl.DateTimeFormat("default", {
+  dateStyle: "medium",
+});
+---
+<h3>v{release.id} - {dateFormatter.format(release.data.date)}</h3>
+<Content />

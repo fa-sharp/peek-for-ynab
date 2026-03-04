@@ -1,12 +1,13 @@
 // @ts-check
 
+import mdx from "@astrojs/mdx";
 import node from "@astrojs/node";
 import { defineConfig, envField } from "astro/config";
 import icon from "astro-icon";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [icon()],
+  integrations: [icon(), mdx()],
   env: {
     schema: {
       YNAB_CLIENT_ID: envField.string({ context: "server", access: "secret" }),

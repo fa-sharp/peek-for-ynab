@@ -1,0 +1,32 @@
+---
+date: 2024-10-09
+---
+
+- 🔎 A new search bar to quickly filter your categories and accounts (inspired by [Toolkit for YNAB](https://github.com/toolkit-for-ynab/toolkit-for-ynab)). You can also enter transactions directly from the search bar by typing `add` or `transfer`.
+- 🎉 Optionally enable confetti celebrations after adding a transaction! You can set this up for categories that you choose in the settings page.
+- 🪄 The transaction form is restored if you close the popup in the middle of adding a transaction, or if you open the form in a new window.
+- ❓ Some helpful tooltips are added in the settings page to explain all the options.
+
+import { Image } from "astro:assets";
+
+import SearchBarAdd from "@assets/screenshots/search-bar-add.png";
+import SearchBarFilter from "@assets/screenshots/search-bar-filter.png";
+
+<div class="flex-row">
+    <Image 
+    src={SearchBarAdd} 
+    alt="Adding transaction via the search bar" 
+    class="screenshot"
+    layout="constrained"
+    width={250}
+    height={250}
+    />
+    <Image
+    src={SearchBarFilter}
+    alt="Filtering categories via the search bar"
+    class="screenshot"
+    layout="constrained"
+    width={275}
+    height={125}
+    />
+</div>

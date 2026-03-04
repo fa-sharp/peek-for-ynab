@@ -79,8 +79,8 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
     try {
       await app.close();
       process.exit(0);
-    } catch (error) {
-      app.log.error(error);
+    } catch (err) {
+      app.log.error({ err }, "Error while closing server");
       process.exit(1);
     }
   });
