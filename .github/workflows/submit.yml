@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  NODE_VERSION: 22
+  NODE_VERSION: 22.22
 
 defaults:
   run:
@@ -19,10 +19,11 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
+          package_json_file: extension/package.json
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
+          package-manager-cache: false
       - run: pnpm install
 
       - name: Package into zip artifact
