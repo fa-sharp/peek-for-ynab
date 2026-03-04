@@ -1,9 +1,9 @@
 import {
   type Account,
+  type api,
   type CategoryGroupWithCategories,
   GetTransactionsTypeEnum,
-  type Payee,
-  type api
+  type Payee
 } from "ynab";
 
 import { IS_DEV } from "./constants";
@@ -13,7 +13,7 @@ import type { CachedPayee } from "./types";
 export async function fetchBudgets(ynabAPI: api) {
   const {
     data: { budgets }
-  } = await ynabAPI.budgets.getBudgets();
+  } = await ynabAPI.plans.getPlans();
   // Sort budgets by last modified
   budgets.sort((a, b) =>
     a.last_modified_on &&
