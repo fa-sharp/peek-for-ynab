@@ -23,6 +23,7 @@ export default defineConfig({
     responsiveStyles: true,
   },
   adapter: node({
-    mode: "middleware",
+    // Use standalone mode for Vercel preview deployments, middleware by default
+    mode: process?.env.BUILD_MODE === "standalone" ? "standalone" : "middleware",
   }),
 });
