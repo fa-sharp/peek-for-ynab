@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { renderHook, waitFor } from "@testing-library/react";
 import { expect, test } from "vitest";
 
+import { browser } from "#imports";
 import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
 import { StorageProvider } from "~lib/context/storageContext";
@@ -29,7 +30,9 @@ test("Can change a setting, and persist to storage", async () => {
   );
 
   const { settings } = await browser.storage.local.get("settings");
-  expect(JSON.parse(settings), "theme persisted").toMatchObject({ theme: "dark" });
+  expect(JSON.parse(settings as string), "theme persisted").toMatchObject({
+    theme: "dark",
+  });
 });
 
 test("Reads persisted settings on initialization", async () => {
@@ -61,7 +64,7 @@ test("Can save token data", async () => {
   await result.current.setTokenData(token);
 
   const { tokenData } = await browser.storage.local.get("tokenData");
-  expect(JSON.parse(tokenData), "tokenData persisted").toMatchObject(token);
+  expect(JSON.parse(tokenData as string), "tokenData persisted").toMatchObject(token);
 });
 
 test("Can add and persist saved category", async () => {
@@ -83,7 +86,7 @@ test("Can add and persist saved category", async () => {
   );
 
   const { cats } = await browser.storage.local.get("cats");
-  expect(JSON.parse(cats), "saved categories persisted").toMatchObject({
+  expect(JSON.parse(cats as string), "saved categories persisted").toMatchObject({
     [budgetId]: [categoryId],
   });
 });
@@ -114,7 +117,7 @@ test("Can remove saved category", async () => {
     })
   );
   const { cats } = await browser.storage.local.get("cats");
-  expect(JSON.parse(cats), "saved categories persisted").toStrictEqual({
+  expect(JSON.parse(cats as string), "saved categories persisted").toStrictEqual({
     [budgetId]: [category2],
   });
 });
