@@ -17,6 +17,7 @@
   "devDependencies": {
     "@astrojs/mdx": "^5.0.0-beta.9",
     "@astrojs/node": "^10.0.0-beta.6",
+    "@astrojs/vercel": "10.0.0-beta.6",
     "@biomejs/biome": "2.4.5",
     "@iconify-json/tabler": "^1.2.29",
     "@types/cors": "^2.8.19",

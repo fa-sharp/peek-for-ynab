@@ -2,6 +2,7 @@
 
 import mdx from "@astrojs/mdx";
 import node from "@astrojs/node";
+import vercel from "@astrojs/vercel";
 import { defineConfig, envField } from "astro/config";
 import icon from "astro-icon";
 
@@ -22,8 +23,9 @@ export default defineConfig({
   image: {
     responsiveStyles: true,
   },
-  adapter: node({
-    // Use standalone mode for Vercel preview deployments, middleware by default
-    mode: process?.env.BUILD_MODE === "standalone" ? "standalone" : "middleware",
-  }),
+  adapter: !process?.env.VERCEL
+    ? node({
+        mode: "middleware",
+      })
+    : vercel(),
 });
