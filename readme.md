@@ -30,12 +30,13 @@ Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.c
 
 ### Backend / Web
 
-The server and website is created with [Astro](https://astro.build/). Pages and API routes are located in the `web/src/pages/` folder. You can run the development server via:
+The server and website is created with [Astro](https://astro.build/). Pages and API routes are located in the `web/src/pages/` folder. You can run the server via:
 
 ```bash
 cd web
 pnpm install
-pnpm dev
+pnpm build
+pnpm start
 ```
 
 ### Extension
