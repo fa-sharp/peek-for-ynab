@@ -1,17 +1,13 @@
+import { useSetAtom } from "jotai";
 import { useId, useState } from "react";
 import type { Account, CategoryGroupWithCategories } from "ynab";
 
 import { CategoryView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
-import type {
-  AppSettings,
-  CachedBudget,
-  DetailViewState,
-  TxAddInitialState
-} from "~lib/types";
+import { popupStateAtom } from "~lib/state";
+import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
-
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
@@ -26,35 +22,24 @@ import {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const {
-    savedCategories,
-    saveCategory,
-    setPopupState,
-    setTxState,
-    popupState,
-    editingItems,
-    settings
-  } = useStorageContext();
+  const { savedCategories, saveCategory, editingItems, settings } = useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
+
+  const setPopupState = useSetAtom(popupStateAtom);
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (
-    !popupState ||
-    !selectedBudgetData ||
-    !categoryGroupsData ||
-    !savedCategories ||
-    !settings
-  )
+  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
     return null;
 
   return (
     <>
       <div
         className="heading-medium cursor-pointer"
-        onClick={() => setExpanded(!expanded)}>
+        onClick={() => setExpanded(!expanded)}
+      >
         <IconButton
           aria-expanded={expanded}
           aria-controls={controlsId}
@@ -77,9 +62,8 @@ function CategoriesView() {
               editMode={editingItems}
               settings={settings}
               onSaveCategory={(categoryId) => saveCategory(categoryId)}
-              onAddTx={async (txAddState) => {
-                await setTxState(txAddState);
-                setPopupState({ view: "txAdd" });
+              onAddTx={(txState) => {
+                setPopupState({ view: "txAdd", txState });
               }}
               onOpenDetailView={(detailState) =>
                 setPopupState({ view: "detail", detailState })
@@ -113,7 +97,7 @@ export function CategoryGroupView({
   onSaveCategory: (categoryId: string) => void;
   editMode?: boolean;
   settings: AppSettings;
-  onAddTx: (initialState: TxAddInitialState) => void;
+  onAddTx: (initialState: TxAddState) => void;
   onOpenDetailView: (detailState: DetailViewState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -126,7 +110,8 @@ export function CategoryGroupView({
     <li>
       <div
         className="heading-small heading-bordered cursor-pointer"
-        onClick={() => setExpanded(!expanded)}>
+        onClick={() => setExpanded(!expanded)}
+      >
         <IconButton
           aria-controls={controlsId}
           aria-expanded={expanded}

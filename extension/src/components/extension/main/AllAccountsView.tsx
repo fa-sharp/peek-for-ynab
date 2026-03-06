@@ -1,16 +1,12 @@
+import { useSetAtom } from "jotai";
 import { useId, useState } from "react";
 import type { Account } from "ynab";
 
 import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
-import type {
-  AppSettings,
-  CachedBudget,
-  DetailViewState,
-  TxAddInitialState
-} from "~lib/types";
-
+import { popupStateAtom } from "~lib/state";
+import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import {
   AddTransactionIcon,
   CollapseListIcon,
@@ -24,29 +20,23 @@ import {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 export default function AllAccountsView() {
-  const {
-    savedAccounts,
-    saveAccount,
-    setPopupState,
-    setTxState,
-    popupState,
-    editingItems,
-    settings
-  } = useStorageContext();
+  const { savedAccounts, saveAccount, editingItems, settings } = useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
+
+  const setPopupState = useSetAtom(popupStateAtom);
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!popupState || !selectedBudgetData || !accountsData || !savedAccounts || !settings)
-    return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
 
   return (
     <>
       <div
         className={"heading-medium cursor-pointer"}
-        onClick={() => setExpanded(!expanded)}>
+        onClick={() => setExpanded(!expanded)}
+      >
         <IconButton
           aria-controls={controlsId}
           aria-expanded={expanded}
@@ -68,9 +58,8 @@ export default function AllAccountsView() {
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={async (txAddState) => {
-                await setTxState(txAddState);
-                setPopupState({ view: "txAdd" });
+              onAddTx={(txState) => {
+                setPopupState({ view: "txAdd", txState });
               }}
               onOpenDetailView={(detailState) =>
                 setPopupState({ view: "detail", detailState })
@@ -87,9 +76,8 @@ export default function AllAccountsView() {
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={async (txAddState) => {
-                await setTxState(txAddState);
-                setPopupState({ view: "txAdd" });
+              onAddTx={(txState) => {
+                setPopupState({ view: "txAdd", txState });
               }}
               onOpenDetailView={(detailState) =>
                 setPopupState({ view: "detail", detailState })
@@ -123,7 +111,7 @@ function AccountTypeView({
   saveAccount: (accountId: string) => void;
   settings: AppSettings;
   editMode?: boolean;
-  onAddTx: (initialState: TxAddInitialState) => void;
+  onAddTx: (initialState: TxAddState) => void;
   onOpenDetailView: (detailState: DetailViewState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -133,7 +121,8 @@ function AccountTypeView({
     <>
       <div
         className="heading-small heading-bordered cursor-pointer"
-        onClick={() => setExpanded(!expanded)}>
+        onClick={() => setExpanded(!expanded)}
+      >
         <IconButton
           aria-controls={controlsId}
           aria-expanded={expanded}

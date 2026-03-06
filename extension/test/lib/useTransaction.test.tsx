@@ -9,7 +9,7 @@ import "vitest-dom/extend-expect";
 import { browser } from "wxt/browser";
 
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { TxAddInitialState } from "~lib/types";
+import type { TxAddState } from "~lib/types";
 import useTransaction from "~lib/useTransaction";
 
 beforeEach(async () => {
@@ -45,7 +45,7 @@ test("persists form state to extension storage", async () => {
       amount: "123.45",
       accountId: checkingAccount.id,
       flag: "orange",
-    } satisfies TxAddInitialState)
+    } satisfies TxAddState)
   );
   await waitFor(async () =>
     expect(
@@ -54,6 +54,6 @@ test("persists form state to extension storage", async () => {
       amount: "123.45",
       accountId: checkingAccount.id,
       flag: "orange",
-    } satisfies TxAddInitialState)
+    } satisfies TxAddState)
   );
 });

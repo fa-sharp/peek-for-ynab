@@ -1,4 +1,5 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
+import { useAtomValue } from "jotai";
 import { useCallback, useEffect } from "react";
 
 import {
@@ -15,15 +16,12 @@ import {
   SavedCategoriesView,
   TransactionForm,
 } from "~components";
-import {
-  useNotificationsContext,
-  useStorageContext,
-  useYNABContext,
-} from "~lib/context";
+import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import { popupStateAtom } from "~lib/state";
 
 export default function PopupMain() {
-  const { popupState } = useStorageContext();
   const { newVersionAlert } = useNotificationsContext();
+  const popupState = useAtomValue(popupStateAtom);
 
   return (
     <>
@@ -32,10 +30,12 @@ export default function PopupMain() {
       {popupState?.view === "txAdd" && <TransactionForm />}
       {popupState?.view === "main" && <MainView />}
       {popupState?.view === "detail" && !popupState.detailState && <MainView />}
-      {popupState?.view === "detail" &&
-        popupState.detailState?.type === "account" && <AccountDetailView />}
-      {popupState?.view === "detail" &&
-        popupState.detailState?.type === "category" && <CategoryDetailView />}
+      {popupState?.view === "detail" && popupState.detailState?.type === "account" && (
+        <AccountDetailView />
+      )}
+      {popupState?.view === "detail" && popupState.detailState?.type === "category" && (
+        <CategoryDetailView />
+      )}
       {popupState?.view === "move" && <MoveMoney />}
     </>
   );
@@ -101,7 +101,7 @@ const useDragEndCallback = (): OnDragEndResponder => {
       savedAccountsData,
       savedCategoriesData,
       popupState?.budgetId,
-    ]
+    ],
   );
 };
 

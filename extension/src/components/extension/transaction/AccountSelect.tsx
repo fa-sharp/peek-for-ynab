@@ -7,7 +7,7 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
 import type { Account } from "ynab";
@@ -33,9 +33,9 @@ function AccountSelect(
     placeholder,
     required = true,
     disabled,
-    selectAccount
+    selectAccount,
   }: Props,
-  ref: ForwardedRef<HTMLInputElement | null>
+  ref: ForwardedRef<HTMLInputElement | null>,
 ) {
   const { selectedBudgetData } = useYNABContext();
 
@@ -50,7 +50,7 @@ function AccountSelect(
   const [accountList, setAccountList] = useState<Account[]>([]);
   useEffect(
     () => accounts && setAccountList(accounts.filter(getFilter(inputRef.current?.value))),
-    [accounts, getFilter]
+    [accounts, getFilter],
   );
 
   const {
@@ -63,15 +63,15 @@ function AccountSelect(
     setHighlightedIndex,
     reset,
     highlightedIndex,
-    selectedItem
+    selectedItem,
   } = useCombobox<Account | null>({
     items: accountList,
-    selectedItem: currentAccount,
+    selectedItem: currentAccount ?? null,
     itemToString(account) {
       if (!account) return "";
       return `${account.name} (${formatCurrency(
         account.balance,
-        selectedBudgetData?.currencyFormat
+        selectedBudgetData?.currencyFormat,
       )})`;
     },
     onInputValueChange({ inputValue }) {
@@ -81,7 +81,7 @@ function AccountSelect(
       if (selectedItem) {
         selectAccount(selectedItem);
       }
-    }
+    },
   });
 
   return (
@@ -94,7 +94,7 @@ function AccountSelect(
             ref: (node) => {
               inputRef.current = node;
               ref && (ref instanceof Function ? ref(node) : (ref.current = node));
-            }
+            },
           })}
           placeholder={placeholder}
           className={selectedItem ? "item-selected" : ""}
@@ -136,7 +136,7 @@ function AccountSelect(
           ) : (
             (["Budget", "Tracking"] as const)
               .filter((type) =>
-                accountList.find((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
+                accountList.find((a) => (type === "Budget" ? a.on_budget : !a.on_budget)),
               )
               .map((type) => (
                 <Fragment key={type}>
@@ -151,7 +151,7 @@ function AccountSelect(
                         <li
                           className={clsx("select-dropdown-item", {
                             highlighted: highlightedIndex === itemIndex,
-                            selected: selectedItem?.id === account.id
+                            selected: selectedItem?.id === account.id,
                           })}
                           key={account.id}
                           {...getItemProps({ item: account, index: itemIndex })}>
@@ -159,11 +159,11 @@ function AccountSelect(
                           <span
                             className={clsx("currency", {
                               positive: account.balance > 0,
-                              negative: account.balance < 0
+                              negative: account.balance < 0,
                             })}>
                             {formatCurrency(
                               account.balance,
-                              selectedBudgetData?.currencyFormat
+                              selectedBudgetData?.currencyFormat,
                             )}
                           </span>
                           )

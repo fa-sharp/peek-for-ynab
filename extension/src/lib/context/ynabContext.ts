@@ -8,7 +8,7 @@ import {
   fetchAccountsForBudget,
   fetchBudgets,
   fetchCategoryGroupsForBudget,
-  fetchPayeesForBudget
+  fetchPayeesForBudget,
 } from "~lib/api";
 import { useConfetti } from "~lib/hooks";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
@@ -27,7 +27,7 @@ const useYNABProvider = () => {
     popupState,
     setPopupState,
     shownBudgetIds,
-    setShownBudgetIds
+    setShownBudgetIds,
   } = useStorageContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
@@ -43,7 +43,7 @@ const useYNABProvider = () => {
   const {
     data: budgetsData,
     refetch: refreshBudgets,
-    isFetching: isRefreshingBudgets
+    isFetching: isRefreshingBudgets,
   } = useQuery({
     queryKey: ["budgets"],
     staleTime: ONE_DAY_IN_MILLIS * 7,
@@ -54,10 +54,10 @@ const useYNABProvider = () => {
       // If no budgets have been selected by the user, select the most recently modified budget
       if (shownBudgetIds && shownBudgetIds.length === 0 && budgets[0]) {
         setShownBudgetIds([budgets[0].id]);
-        setPopupState({ budgetId: budgets[0].id });
+        setPopupState({ view: "main", budgetId: budgets[0].id });
       }
       return budgets;
-    }
+    },
   });
 
   /** Data from the currently selected budget */
@@ -71,7 +71,7 @@ const useYNABProvider = () => {
     data: categoryGroupsData,
     dataUpdatedAt: categoriesLastUpdated,
     error: categoriesError,
-    refetch: refetchCategoryGroups
+    refetch: refetchCategoryGroups,
   } = useQuery({
     queryKey: ["categoryGroups", { budgetId: popupState?.budgetId }],
     enabled: Boolean(ynabAPI && popupState?.budgetId),
@@ -83,7 +83,7 @@ const useYNABProvider = () => {
         queryClient.getQueryState(queryKey)
       );
     },
-    select: (data) => data?.categoryGroups
+    select: (data) => data?.categoryGroups,
   });
 
   const useGetCategoryGroupsForBudget = (budgetId: string) =>
@@ -98,7 +98,7 @@ const useYNABProvider = () => {
           queryClient.getQueryState(queryKey)
         );
       },
-      select: (data) => data?.categoryGroups
+      select: (data) => data?.categoryGroups,
     });
 
   /** Flattened array of categories (depends on `categoryGroupsData` above) */
@@ -132,7 +132,7 @@ const useYNABProvider = () => {
       const { month } = response.data;
       IS_DEV && console.log("Fetched month data!", month);
       return month;
-    }
+    },
   });
 
   /** Fetch accounts for the selected budget */
@@ -140,7 +140,7 @@ const useYNABProvider = () => {
     data: accountsData,
     dataUpdatedAt: accountsLastUpdated,
     error: accountsError,
-    refetch: refetchAccounts
+    refetch: refetchAccounts,
   } = useQuery({
     queryKey: ["accounts", { budgetId: popupState?.budgetId }],
     enabled: Boolean(ynabAPI && popupState?.budgetId),
@@ -152,7 +152,7 @@ const useYNABProvider = () => {
         queryClient.getQueryState(queryKey)
       );
     },
-    select: (data) => data?.accounts
+    select: (data) => data?.accounts,
   });
 
   const refreshCategoriesAndAccounts = useCallback(
@@ -161,8 +161,8 @@ const useYNABProvider = () => {
         refetchCategoryGroups(),
         refetchAccounts(),
         queryClient.invalidateQueries({
-          queryKey: ["month", { budgetId: popupState?.budgetId }]
-        })
+          queryKey: ["month", { budgetId: popupState?.budgetId }],
+        }),
       ]),
     [queryClient, refetchAccounts, refetchCategoryGroups, popupState?.budgetId]
   );
@@ -176,7 +176,7 @@ const useYNABProvider = () => {
     queryFn: async () => {
       if (!ynabAPI || !popupState?.budgetId) return;
       return await checkUnapprovedTxsForBudget(ynabAPI, popupState.budgetId);
-    }
+    },
   });
 
   /** Fetch payees for the selected budget */
@@ -192,7 +192,7 @@ const useYNABProvider = () => {
         queryClient.getQueryState(queryKey)
       );
     },
-    select: (data) => data?.payees
+    select: (data) => data?.payees,
   });
 
   /** Select data of only saved accounts from `accountsData` */
@@ -217,7 +217,7 @@ const useYNABProvider = () => {
       accountsData,
       categoriesData,
       categoryGroupsData,
-      payeesData
+      payeesData,
     };
   }, [accountsData, categoriesData, categoryGroupsData, payeesData]);
 
@@ -226,7 +226,7 @@ const useYNABProvider = () => {
       enabled: Boolean(ynabAPI && accountId && popupState?.budgetId),
       queryKey: [
         "txs",
-        { budgetId: popupState?.budgetId, accountId, sinceDaysAgo }
+        { budgetId: popupState?.budgetId, accountId, sinceDaysAgo },
       ] as const,
       placeholderData: (prevData, prevQuery) => {
         if (prevQuery?.queryKey[1].accountId === accountId && prevData) return prevData;
@@ -246,7 +246,7 @@ const useYNABProvider = () => {
         );
         IS_DEV && console.log("Fetched account transactions!", txs);
         return txs;
-      }
+      },
     });
 
   const useGetCategoryTxs = (categoryId?: string, sinceDaysAgo?: number) =>
@@ -254,7 +254,7 @@ const useYNABProvider = () => {
       enabled: Boolean(ynabAPI && categoryId && popupState?.budgetId),
       queryKey: [
         "txs",
-        { budgetId: popupState?.budgetId, categoryId, sinceDaysAgo }
+        { budgetId: popupState?.budgetId, categoryId, sinceDaysAgo },
       ] as const,
       placeholderData: (prevData, prevQuery) => {
         if (prevQuery?.queryKey[1].categoryId === categoryId && prevData) return prevData;
@@ -274,7 +274,7 @@ const useYNABProvider = () => {
         );
         IS_DEV && console.log("Fetched category transactions!", txs);
         return txs;
-      }
+      },
     });
 
   const useGetAccountsForBudget = (budgetId: string) =>
@@ -289,7 +289,7 @@ const useYNABProvider = () => {
           queryClient.getQueryState(queryKey)
         );
       },
-      select: (data) => data?.accounts
+      select: (data) => data?.accounts,
     });
 
   const { launchConfetti } = useConfetti();
@@ -302,7 +302,7 @@ const useYNABProvider = () => {
     async (transaction: ynab.NewTransaction) => {
       if (!ynabAPI || !popupState?.budgetId) return;
       const response = await ynabAPI.transactions.createTransaction(popupState.budgetId, {
-        transaction
+        transaction,
       });
       IS_DEV &&
         console.log("Added transaction!", { transaction, apiResponse: response.data });
@@ -322,7 +322,7 @@ const useYNABProvider = () => {
         ) {
           const emojis = [
             ...budgetSettings.confetti.emojis,
-            ...findAllEmoji(transaction.category_name || "")
+            ...findAllEmoji(transaction.category_name || ""),
           ];
           launchConfetti(emojis);
         }
@@ -332,9 +332,9 @@ const useYNABProvider = () => {
               "txs",
               {
                 budgetId: popupState.budgetId,
-                categoryId: transaction.category_id
-              }
-            ]
+                categoryId: transaction.category_id,
+              },
+            ],
           });
         transaction?.account_id &&
           queryClient.invalidateQueries({
@@ -342,9 +342,9 @@ const useYNABProvider = () => {
               "txs",
               {
                 budgetId: popupState.budgetId,
-                accountId: transaction.account_id
-              }
-            ]
+                accountId: transaction.account_id,
+              },
+            ],
           });
         transaction?.transfer_account_id &&
           queryClient.invalidateQueries({
@@ -352,9 +352,9 @@ const useYNABProvider = () => {
               "txs",
               {
                 budgetId: popupState.budgetId,
-                accountId: transaction.transfer_account_id
-              }
-            ]
+                accountId: transaction.transfer_account_id,
+              },
+            ],
           });
       }
     },
@@ -367,7 +367,7 @@ const useYNABProvider = () => {
       budgetSettings?.confetti?.categories,
       budgetSettings?.confetti?.emojis,
       queryClient,
-      launchConfetti
+      launchConfetti,
     ]
   );
 
@@ -379,7 +379,7 @@ const useYNABProvider = () => {
     async ({
       subtractFromCategoryId,
       addToCategoryId,
-      amountInMillis
+      amountInMillis,
     }: {
       subtractFromCategoryId?: string;
       addToCategoryId?: string;
@@ -404,7 +404,7 @@ const useYNABProvider = () => {
               toCategory.id,
               { category: { budgeted: toCategory.budgeted + amountInMillis } }
             )
-          : Promise.resolve("No 'to' category")
+          : Promise.resolve("No 'to' category"),
       ]);
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
       setTimeout(() => refreshCategoriesAndAccounts(), 350);
@@ -461,7 +461,7 @@ const useYNABProvider = () => {
     /** Move money in the current budget */
     moveMoney,
     /** The recently moved category/categories. Can be used to trigger animations/effects. */
-    moved
+    moved,
   };
 };
 

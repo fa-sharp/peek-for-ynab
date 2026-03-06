@@ -4,7 +4,7 @@ import {
   useMenuItem,
   useMenuTrigger
 } from "@react-aria/menu";
-import { type Placement } from "@react-aria/overlays";
+import type { Placement } from "@react-aria/overlays";
 import { type MenuTriggerProps, useMenuTriggerState } from "@react-stately/menu";
 import { type TreeState, useTreeState } from "@react-stately/tree";
 import type { Node } from "@react-types/shared";

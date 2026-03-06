@@ -1,28 +1,22 @@
-import { browser } from "#imports";
+import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
+import { useAtom } from "jotai";
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
-import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
-
+import { browser } from "#imports";
 import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
   DEFAULT_BUDGET_SETTINGS,
-  DEFAULT_POPUP_STATE,
   DEFAULT_SETTINGS,
   REFRESH_SIGNAL_KEY,
   TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY
+  TOKEN_STORAGE_KEY,
 } from "~lib/constants";
-import type {
-  AppSettings,
-  BudgetSettings,
-  PopupState,
-  TokenData,
-  TxAddInitialState
-} from "~lib/types";
+import { popupStateAtom } from "~lib/state";
+import type { AppSettings, BudgetSettings, TokenData } from "~lib/types";
 
 /** Map of budget IDs to string arrays. */
 interface BudgetToStringArrayMap {
@@ -44,28 +38,7 @@ const useStorageProvider = () => {
   );
 
   /** Current state of popup (persisted locally) */
-  const [popupState, _setPopupState, { setRenderValue: _setPopupRender }] =
-    useExtensionStorage<PopupState | undefined>(
-      { key: "popupState", instance: CHROME_LOCAL_STORAGE },
-      (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_POPUP_STATE : data)
-    );
-
-  /** Partial update of popup state */
-  const setPopupState = useCallback(
-    (newState: Partial<PopupState>) => {
-      if (!popupState) return;
-      const newPopupState = { ...popupState, ...newState };
-      _setPopupRender(newPopupState); // ensure popup state change is rendered ASAP
-      return _setPopupState(newPopupState);
-    },
-    [_setPopupRender, _setPopupState, popupState]
-  );
-
-  /** Initial state of the transaction form (persisted locally) */
-  const [txState, setTxState] = useExtensionStorage<TxAddInitialState | undefined>(
-    { key: "txState", instance: CHROME_LOCAL_STORAGE },
-    (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
-  );
+  const [popupState, setPopupState] = useAtom(popupStateAtom);
 
   /** Whether user can edit and re-arrange the pinned categories and accounts */
   const [editingItems, setEditingItems] = useState(false);
@@ -82,7 +55,7 @@ const useStorageProvider = () => {
 
   /** Keep `syncEnabled` setting synced to localStorage, in order to make it synchronous for the subsequent hooks */
   const [syncEnabledLocal, setSyncEnabledLocal] = useLocalStorage<boolean>("sync", {
-    defaultValue: false
+    defaultValue: false,
   });
   useEffect(() => {
     if (syncEnabledInStorage !== undefined && syncEnabledInStorage !== syncEnabledLocal) {
@@ -146,7 +119,7 @@ const useStorageProvider = () => {
   const [
     savedCategories,
     setSavedCategories,
-    { setRenderValue: setSavedCategoriesRender }
+    { setRenderValue: setSavedCategoriesRender },
   ] = useExtensionStorage<BudgetToStringArrayMap | undefined>(
     { key: "cats", instance: storageArea },
     (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
@@ -182,15 +155,15 @@ const useStorageProvider = () => {
       ...savedCategories,
       [popupState.budgetId]: [
         ...(savedCategories?.[popupState.budgetId] || []),
-        categoryIdToSave
-      ]
+        categoryIdToSave,
+      ],
     });
   };
 
   const saveCategoriesForBudget = (budgetId: string, categoryIds: string[]) => {
     const newSavedCategories = {
       ...savedCategories,
-      [budgetId]: categoryIds
+      [budgetId]: categoryIds,
     };
     setSavedCategoriesRender(newSavedCategories);
     setSavedCategories(newSavedCategories);
@@ -203,7 +176,7 @@ const useStorageProvider = () => {
       ...savedCategories,
       [popupState.budgetId]: savedCategories?.[popupState.budgetId]?.filter(
         (categoryId) => categoryId !== categoryIdToRemove
-      )
+      ),
     });
   };
 
@@ -218,15 +191,15 @@ const useStorageProvider = () => {
       ...savedAccounts,
       [popupState.budgetId]: [
         ...(savedAccounts?.[popupState.budgetId] || []),
-        accountIdToSave
-      ]
+        accountIdToSave,
+      ],
     });
   };
 
   const saveAccountsForBudget = (budgetId: string, accountIds: string[]) => {
     const newSavedAccounts = {
       ...savedAccounts,
-      [budgetId]: accountIds
+      [budgetId]: accountIds,
     };
     setSavedAccountsRender(newSavedAccounts);
     setSavedAccounts(newSavedAccounts);
@@ -239,7 +212,7 @@ const useStorageProvider = () => {
       ...savedAccounts,
       [popupState.budgetId]: savedAccounts?.[popupState.budgetId]?.filter(
         (accountId) => accountId !== accountIdToRemove
-      )
+      ),
     });
   };
 
@@ -249,18 +222,12 @@ const useStorageProvider = () => {
     // hide budget
     if (shownBudgetIds.includes(budgetId)) {
       setShownBudgetIds(shownBudgetIds.filter((id) => id !== budgetId));
-      if (popupState?.budgetId === budgetId) setPopupState({ budgetId: "" });
-      // Clean up saved categories and accounts for this budget
-      setSavedCategories({
-        ...savedCategories,
-        [budgetId]: undefined
-      });
-      setSavedAccounts({
-        ...savedAccounts,
-        [budgetId]: undefined
-      });
-      // Clean up budget-specific settings
-      storageArea.remove(`budget-${budgetId}`);
+      if (popupState?.budgetId === budgetId) {
+        setPopupState({
+          view: "main",
+          budgetId: "",
+        });
+      }
     }
     // show budget
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
@@ -283,8 +250,6 @@ const useStorageProvider = () => {
     setTokenRefreshNeeded,
     popupState,
     setPopupState,
-    txState,
-    setTxState,
     editingItems,
     setEditingItems,
     omniboxInput,
@@ -306,7 +271,7 @@ const useStorageProvider = () => {
     setBudgetSettings,
     useBudgetSettings,
     removeAccount,
-    removeAllData
+    removeAllData,
   };
 };
 

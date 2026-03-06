@@ -1,6 +1,6 @@
-import { Browser } from "#imports";
 import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
+import type { Browser } from "#imports";
 import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
@@ -247,8 +247,9 @@ export function getPossibleTransferFieldCombinations(
 /** Check if user has enabled permission to use the URL/address bar */
 export async function checkBrowserBarPermission() {
   const sync = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-  const settings = await (
-    sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE
+  const settings = await (sync
+    ? CHROME_SYNC_STORAGE
+    : CHROME_LOCAL_STORAGE
   ).get<AppSettings>("settings");
   return !!settings?.omnibox;
 }

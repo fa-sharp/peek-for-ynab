@@ -1,350 +1,207 @@
-import {
-  type FormEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { TransactionClearedStatus, TransactionFlagColor } from "ynab";
+import { useAtom } from "jotai";
+import { type SubmitEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import { TransactionClearedStatus, type TransactionFlagColor } from "ynab";
 
-import { IS_PRODUCTION } from "./constants";
 import { useStorageContext, useYNABContext } from "./context";
-import type { CachedPayee, SubTxState, TxAddInitialState } from "./types";
+import {
+  popupStateAtom,
+  type TxStoreAction,
+  txStore,
+  useTxStore,
+  useTxStoreSubTxTotals,
+} from "./state";
 import {
   checkPermissions,
   executeScriptInCurrentTab,
-  getTodaysDateISO,
+  isBudgetToTrackingTransfer,
   parseLocaleNumber,
   stringValueToMillis,
 } from "./utils";
 
-export type TransactionFormState = ReturnType<
-  typeof useTransaction
->["formState"];
-export type TransactionFormHandlers = ReturnType<
-  typeof useTransaction
->["handlers"];
+export type TransactionFormDispatch = ReturnType<typeof useTransaction>["dispatch"];
 
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const {
-    settings,
-    budgetSettings,
-    popupState,
-    txState,
-    setPopupState,
-    setTxState,
-    setOmniboxInput,
-    setBudgetSettings,
-  } = useStorageContext();
+  const { settings, budgetSettings, setOmniboxInput, setBudgetSettings } =
+    useStorageContext();
 
-  // Transaction state
-  const [isTransfer, setIsTransfer] = useState(txState?.isTransfer ?? false);
-  const [date, setDate] = useState(txState?.date || getTodaysDateISO);
-  const [amount, setAmount] = useState(txState?.amount || "");
-  const [cleared, setCleared] = useState(
-    () =>
-      txState?.cleared ??
-      (accountsData?.find((a) => a.id === txState?.accountId)?.type ===
-        "cash" ||
-        !!budgetSettings?.transactions.cleared),
-  );
-  const [amountType, setAmountType] = useState<"Inflow" | "Outflow">(
-    txState?.amountType || "Outflow",
-  );
-  const [payee, setPayee] = useState<CachedPayee | { name: string } | null>(
-    txState?.payee || null,
-  );
-  const [category, setCategory] = useState(() => {
-    if (!txState?.categoryId) return null;
-    return categoriesData?.find((c) => c.id === txState?.categoryId) || null;
-  });
-  const [account, setAccount] = useState(() => {
-    if (txState?.accountId)
-      return accountsData?.find((a) => a.id === txState?.accountId) || null;
-    if (budgetSettings?.transactions.defaultAccountId)
-      return (
-        accountsData?.find(
-          (a) => a.id === budgetSettings.transactions.defaultAccountId,
-        ) || null
-      );
-    return null;
-  });
-  const [memo, setMemo] = useState(txState?.memo || "");
-  const [flag, setFlag] = useState(txState?.flag || "");
-
-  // Split transaction state
-  const [isSplit, setIsSplit] = useState(txState?.isSplit ?? false);
-  const [subTxs, setSubTxs] = useState<Array<SubTxState>>(
-    txState?.subTxs || [
-      { amount: "", amountType: "Outflow", isTransfer: false },
-    ],
-  );
-  const onAddSubTx = useCallback(() => {
-    setSubTxs((prev) => [
-      ...prev,
-      { amount: "", amountType: "Outflow", isTransfer: false },
-    ]);
-  }, []);
-  const onRemoveSubTx = useCallback(() => {
-    setSubTxs((prev) => prev.slice(0, -1));
-  }, []);
-  const totalSubTxsAmount = useMemo(
-    () =>
-      subTxs.reduce(
-        (sum, tx) => sum + stringValueToMillis(tx.amount, tx.amountType),
-        0,
-      ),
-    [subTxs],
-  );
-  const leftOverSubTxsAmount = useMemo(
-    () => stringValueToMillis(amount, amountType) - totalSubTxsAmount,
-    [amount, amountType, totalSubTxsAmount],
-  );
-
-  // Other form state
+  const [popupState, setPopupState] = useAtom(popupStateAtom);
   const [isSaving, setIsSaving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  // Keep form state saved to storage, so we can restore it if user closes & re-opens the popup
-  usePersistFormState({
-    amount,
-    amountType,
-    isTransfer,
-    payee,
-    categoryId: category?.id,
-    accountId: account?.id,
-    memo,
-    flag,
-    isSplit,
-    subTxs,
-    cleared,
-    date,
-    returnTo: txState?.returnTo,
-  });
+  const dispatchTxState = useTxStore((s) => s.dispatch);
+  const resetTxForm = useTxStore((s) => s.reset);
 
   // Try parsing user's current selection as the initial amount
-  useParseAmountFromUserSelection(!!settings?.currentTabAccess, setAmount);
+  useParseAmountFromUserSelection(!!settings?.currentTabAccess, dispatchTxState);
 
   // Reset form state if switching budgets
   const originalBudgetId = useRef(popupState?.budgetId);
   useEffect(() => {
-    if (popupState && popupState.budgetId !== originalBudgetId.current) {
-      setPayee(null);
-      setAccount(null);
-      setCategory(null);
+    if (popupState.budgetId !== originalBudgetId.current) {
+      resetTxForm();
       originalBudgetId.current = popupState.budgetId;
     }
-  }, [popupState]);
+  }, [popupState.budgetId, resetTxForm]);
 
-  /** Whether this is a budget to tracking account transfer. We'll want a category for these transactions. */
-  const isBudgetToTrackingTransfer = useMemo(() => {
-    if (!isTransfer || !payee || !("id" in payee) || !payee.transferId)
-      return false;
-    const transferToAccount = accountsData?.find(
-      (a) => a.id === payee.transferId,
-    );
-    if (!transferToAccount) return false;
-    return !transferToAccount.on_budget && !!account?.on_budget;
-  }, [account?.on_budget, accountsData, isTransfer, payee]);
+  const { leftOverSubTxsAmount } = useTxStoreSubTxTotals();
 
-  const handlers = useMemo(
-    () => ({
-      setDate,
-      setAmount,
-      setAmountType,
-      setPayee,
-      setCategory,
-      setAccount,
-      setFlag,
-      setMemo,
-      setCleared,
-      setSubTxs,
-      setIsTransfer,
-      setIsSplit,
-      onAddSubTx,
-      onRemoveSubTx,
-    }),
-    [onAddSubTx, onRemoveSubTx],
-  );
+  /** Save the transaction to YNAB */
+  const onSaveTransaction: SubmitEventHandler = useCallback(
+    async (event) => {
+      event.preventDefault();
+      dispatchTxState({ type: "setErrorMessage", message: "" });
 
-  const onSaveTransaction: FormEventHandler = async (event) => {
-    event.preventDefault();
-    setErrorMessage("");
-    if (!account) {
-      setErrorMessage("Please select an account!");
-      return;
-    }
-    if (!payee) {
-      setErrorMessage("Please enter a payee!");
-      return;
-    }
-    if (!amount) {
-      setErrorMessage("Please enter a valid amount!");
-      return;
-    }
-    if (isTransfer) {
-      if (!("transferId" in payee)) {
-        setErrorMessage("'To' account is not valid!");
+      const state = txStore.getState();
+      const account = accountsData?.find((a) => a.id === state.accountId);
+      const category = categoriesData?.find((c) => c.id === state.categoryId);
+      const isBudgetToTracking = isBudgetToTrackingTransfer(
+        state.payee,
+        account,
+        accountsData,
+      );
+
+      if (!account) {
+        dispatchTxState({
+          type: "setErrorMessage",
+          message: "Please select an account!",
+        });
         return;
       }
-      if (payee.transferId === account.id) {
-        setErrorMessage("Can't transfer to the same account!");
+      if (!state.payee) {
+        dispatchTxState({ type: "setErrorMessage", message: "Please enter a payee!" });
         return;
       }
-      if (isSplit && !isBudgetToTrackingTransfer) {
-        setErrorMessage("This transfer can't be a split transaction!");
+      if (!state.amount) {
+        dispatchTxState({
+          type: "setErrorMessage",
+          message: "Please enter a valid amount!",
+        });
         return;
       }
-    }
-    if (isSplit) {
+      if (state.isTransfer) {
+        if (!("transferId" in state.payee)) {
+          dispatchTxState({
+            type: "setErrorMessage",
+            message: "'To' account is not valid!",
+          });
+          return;
+        }
+        if (state.payee.transferId === state.accountId) {
+          dispatchTxState({
+            type: "setErrorMessage",
+            message: "Can't transfer to the same account!",
+          });
+          return;
+        }
+        if (state.isSplit && !isBudgetToTrackingTransfer) {
+          dispatchTxState({
+            type: "setErrorMessage",
+            message: "This transfer can't be a split transaction!",
+          });
+          return;
+        }
+      }
+      if (state.isSplit) {
+        if (
+          state.subTxs?.some(
+            (tx) =>
+              tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id,
+          )
+        ) {
+          dispatchTxState({
+            type: "setErrorMessage",
+            message: "Can't transfer to the same account!",
+          });
+          return;
+        }
+        if (leftOverSubTxsAmount !== 0) {
+          dispatchTxState({
+            type: "setErrorMessage",
+            message: "Total of splits doesn't match amount!",
+          });
+          return;
+        }
+      }
       if (
-        subTxs.some(
-          (tx) =>
-            tx.payee &&
-            "id" in tx.payee &&
-            tx.payee.id === account.transfer_payee_id,
-        )
-      ) {
-        setErrorMessage("Can't transfer to the same account!");
-        return;
-      }
-      if (leftOverSubTxsAmount !== 0) {
-        setErrorMessage("Total of splits doesn't match amount!");
-        return;
-      }
-    }
-    if (
-      budgetSettings?.transactions.rememberAccount &&
-      account.id !== budgetSettings.transactions.defaultAccountId
-    )
-      setBudgetSettings(
-        (prev) =>
-          prev && {
-            ...prev,
-            transactions: {
-              ...prev.transactions,
-              defaultAccountId: account.id,
+        budgetSettings?.transactions.rememberAccount &&
+        account.id !== budgetSettings.transactions.defaultAccountId
+      )
+        setBudgetSettings(
+          (prev) =>
+            prev && {
+              ...prev,
+              transactions: {
+                ...prev.transactions,
+                defaultAccountId: account.id,
+              },
             },
-          },
-      );
+        );
 
-    setIsSaving(true);
-    try {
-      await addTransaction({
-        date,
-        amount: stringValueToMillis(amount, amountType),
-        payee_id: "id" in payee ? payee.id : undefined,
-        payee_name: "id" in payee ? undefined : payee.name,
-        account_id: account.id,
-        category_id:
-          (!isTransfer || isBudgetToTrackingTransfer) && !isSplit
-            ? category?.id
+      setIsSaving(true);
+      try {
+        await addTransaction({
+          date: state.date,
+          amount: stringValueToMillis(state.amount, state.amountType ?? "Outflow"),
+          payee_id: "id" in state.payee ? state.payee.id : undefined,
+          payee_name: "id" in state.payee ? undefined : state.payee.name,
+          account_id: account.id,
+          category_id:
+            (!state.isTransfer || isBudgetToTracking) && !state.isSplit
+              ? category?.id
+              : undefined,
+          cleared: state.cleared
+            ? TransactionClearedStatus.Cleared
+            : TransactionClearedStatus.Uncleared,
+          approved: budgetSettings?.transactions.approved,
+          memo: state.memo,
+          flag_color: state.flag ? (state.flag as TransactionFlagColor) : undefined,
+          subtransactions: state.isSplit
+            ? state.subTxs?.map((subTx) => ({
+                amount: stringValueToMillis(subTx.amount, subTx.amountType),
+                category_id: subTx.categoryId,
+                payee_id: subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
+                payee_name:
+                  subTx.payee && "id" in subTx.payee ? undefined : subTx.payee?.name,
+                memo: subTx.memo,
+              }))
             : undefined,
-        cleared: cleared
-          ? TransactionClearedStatus.Cleared
-          : TransactionClearedStatus.Uncleared,
-        approved: budgetSettings?.transactions.approved,
-        memo,
-        flag_color: flag
-          ? (flag as unknown as TransactionFlagColor)
-          : undefined,
-        subtransactions: isSplit
-          ? subTxs.map((subTx) => ({
-              amount: stringValueToMillis(subTx.amount, subTx.amountType),
-              category_id: subTx.categoryId,
-              payee_id:
-                subTx.payee && "id" in subTx.payee ? subTx.payee.id : undefined,
-              payee_name:
-                subTx.payee && "id" in subTx.payee
-                  ? undefined
-                  : subTx.payee?.name,
-              memo: subTx.memo,
-            }))
-          : undefined,
-      });
-      const { returnTo } = txState || {};
-      await setTxState({});
-      setOmniboxInput("");
-      setPopupState(returnTo || { view: "main" });
-      // biome-ignore lint/suspicious/noExplicitAny: not important
-    } catch (err: any) {
-      console.error("Error while saving transaction: ", err);
-      setErrorMessage(
-        "Error adding transaction! " + (err?.error?.detail || ""),
-      );
-    }
-    setIsSaving(false);
-  };
+        });
+
+        setOmniboxInput("");
+        setPopupState(state.returnTo || { view: "main" });
+        // biome-ignore lint/suspicious/noExplicitAny: not important
+      } catch (err: any) {
+        console.error("Error while saving transaction: ", err);
+        dispatchTxState({
+          type: "setErrorMessage",
+          message: "Error adding transaction! " + (err?.error?.detail || ""),
+        });
+      }
+      setIsSaving(false);
+    },
+    [
+      budgetSettings,
+      dispatchTxState,
+      addTransaction,
+      setOmniboxInput,
+      setPopupState,
+      setBudgetSettings,
+      accountsData,
+      categoriesData,
+      leftOverSubTxsAmount,
+    ],
+  );
 
   return {
     isSaving,
     onSaveTransaction,
-    handlers,
-    formState: {
-      date,
-      amount,
-      amountType,
-      payee,
-      category,
-      account,
-      flag,
-      memo,
-      cleared,
-      subTxs,
-      isSplit,
-      isTransfer,
-      errorMessage,
-    },
-    derivedState: {
-      totalSubTxsAmount,
-      leftOverSubTxsAmount,
-      isBudgetToTrackingTransfer,
-    },
+    dispatch: dispatchTxState,
   };
 }
 
-const usePersistFormState = (txState: TxAddInitialState) => {
-  const { setTxState } = useStorageContext();
-  useEffect(() => {
-    setTxState({
-      accountId: txState.accountId,
-      amount: txState.amount,
-      amountType: txState.amountType,
-      categoryId: txState.categoryId,
-      flag: txState.flag,
-      isSplit: txState.isSplit,
-      isTransfer: txState.isTransfer,
-      memo: txState.memo,
-      payee: txState.payee,
-      subTxs: txState.subTxs,
-      cleared: txState.cleared,
-      date: txState.date,
-      returnTo: txState.returnTo,
-    });
-  }, [
-    setTxState,
-    txState.accountId,
-    txState.amount,
-    txState.amountType,
-    txState.categoryId,
-    txState.flag,
-    txState.isSplit,
-    txState.isTransfer,
-    txState.memo,
-    txState.payee,
-    txState.subTxs,
-    txState.cleared,
-    txState.date,
-    txState.returnTo,
-  ]);
-};
-
 const useParseAmountFromUserSelection = (
   enabled: boolean,
-  setAmount: (amount: string) => void,
+  dispatch: (action: TxStoreAction) => void,
 ) => {
   useEffect(() => {
     if (!enabled) return;
@@ -354,12 +211,12 @@ const useParseAmountFromUserSelection = (
         .then((selection) => {
           if (!selection) return;
           const parsedNumber = parseLocaleNumber(selection);
-          if (!isNaN(parsedNumber)) setAmount(parsedNumber.toString());
+          if (!isNaN(parsedNumber))
+            dispatch({ type: "setAmount", amount: parsedNumber.toString() });
         })
         .catch((err) => {
-          !IS_PRODUCTION &&
-            console.error("Error getting user's selection: ", err);
+          console.error("Error getting user's selection: ", err);
         });
     });
-  }, [enabled, setAmount]);
+  }, [enabled, dispatch]);
 };

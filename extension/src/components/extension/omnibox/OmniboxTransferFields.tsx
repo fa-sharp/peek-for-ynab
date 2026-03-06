@@ -1,31 +1,33 @@
 import { RadioButton, RadioButtonGroup } from "~components";
 import type { ParsedTransferQuery, ParsedTransferResults } from "~lib/omnibox";
-import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
+import { useTxStore } from "~lib/state";
+import type { TransactionFormDispatch } from "~lib/useTransaction";
 
 interface Props {
   parsedQuery: ParsedTransferQuery;
   results: ParsedTransferResults;
-  formState: TransactionFormState;
-  handlers: TransactionFormHandlers;
+  dispatch: TransactionFormDispatch;
 }
 
-export default function OmniboxTransferFields({
-  parsedQuery,
-  results,
-  formState,
-  handlers
-}: Props) {
+export default function OmniboxTransferFields({ parsedQuery, results, dispatch }: Props) {
+  const { payee, accountId, categoryId } = useTxStore((state) => ({
+    payee: state.payee,
+    categoryId: state.categoryId,
+    accountId: state.accountId,
+  }));
+
   return (
     <>
       {parsedQuery.fromAccountQuery && (
         <RadioButtonGroup
           label="From:"
           className="flex-row gap-sm flex-wrap"
-          value={formState.account?.id || null}
+          value={accountId || null}
           onChange={(id) =>
-            handlers.setAccount(
-              results.fromAccountResults.find((a) => a.id === id) || null
-            )
+            dispatch({
+              type: "setAccount",
+              accountId: results.fromAccountResults.find((a) => a.id === id)?.id || null,
+            })
           }>
           {results.fromAccountResults.map((account) => (
             <RadioButton key={account.id} value={account.id}>
@@ -38,19 +40,19 @@ export default function OmniboxTransferFields({
         <RadioButtonGroup
           label="To:"
           className="flex-row gap-sm flex-wrap"
-          value={
-            formState.payee && "transferId" in formState.payee
-              ? formState.payee?.transferId || null
-              : null
-          }
+          value={payee && "transferId" in payee ? payee?.transferId || null : null}
           onChange={(id) => {
             const account = results.toAccountResults.find((a) => a.id === id);
-            if (!account || !account.transfer_payee_id) handlers.setPayee(null);
+            if (!account || !account.transfer_payee_id)
+              dispatch({ type: "setPayee", payee: null });
             else
-              handlers.setPayee({
-                id: account.transfer_payee_id,
-                name: account.name,
-                transferId: account.id
+              dispatch({
+                type: "setPayee",
+                payee: {
+                  id: account.transfer_payee_id,
+                  name: account.name,
+                  transferId: account.id,
+                },
               });
           }}>
           {results.toAccountResults.map((account) => (
@@ -64,9 +66,12 @@ export default function OmniboxTransferFields({
         <RadioButtonGroup
           label="Category:"
           className="flex-row gap-sm flex-wrap"
-          value={formState.category?.id || null}
+          value={categoryId || null}
           onChange={(id) =>
-            handlers.setCategory(results.categoryResults.find((c) => c.id === id) || null)
+            dispatch({
+              type: "setCategory",
+              categoryId: results.categoryResults.find((c) => c.id === id)?.id || null,
+            })
           }>
           {results.categoryResults.map((category) => (
             <RadioButton key={category.id} value={category.id}>

@@ -2,7 +2,7 @@ import type {
   Account,
   Category,
   CategoryGroupWithCategories,
-  CurrencyFormat
+  CurrencyFormat,
 } from "ynab";
 
 export interface TokenData {
@@ -97,12 +97,12 @@ export interface DetailViewState {
   id: string;
 }
 
-/** Initial state of the add transaction screen */
-export interface TxAddInitialState {
+/** State of the add transaction form */
+export interface TxAddState {
   amount?: string;
   amountType?: "Inflow" | "Outflow";
-  accountId?: string;
-  categoryId?: string;
+  accountId?: string | null;
+  categoryId?: string | null;
   payee?: CachedPayee | { name: string } | null;
   isTransfer?: boolean;
   memo?: string;
@@ -111,10 +111,13 @@ export interface TxAddInitialState {
   subTxs?: Array<SubTxState>;
   cleared?: boolean;
   date?: string;
-  returnTo?: {
-    view: "main" | "detail";
-    detailState?: DetailViewState;
-  };
+  returnTo?:
+    | { view: "main" }
+    | {
+        view: "detail";
+        detailState: DetailViewState;
+      };
+  errorMessage?: string;
 }
 
 /** Split transaction state  */
@@ -132,8 +135,10 @@ export interface MoveMoneyInitialState {
   amount?: string;
   fromCategoryId?: string;
   toCategoryId?: string;
-  returnTo?: {
-    view: "main" | "detail";
-    detailState?: DetailViewState;
-  };
+  returnTo?:
+    | { view: "main" }
+    | {
+        view: "detail";
+        detailState: DetailViewState;
+      };
 }

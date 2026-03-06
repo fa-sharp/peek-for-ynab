@@ -9,6 +9,12 @@ export const LATEST_VERSION_ALERT_TEXT = "New: Detail views!";
 export const IS_DEV = import.meta.env.DEV && !import.meta.env.VITEST;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
+/** Storage keys for persisted state items */
+export const STORAGE_KEYS = Object.freeze({
+  TxState: "txState",
+  PopupState: "popupState",
+});
+
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";

@@ -1,9 +1,10 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { useSetAtom } from "jotai";
 
 import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
+import { popupStateAtom } from "~lib/state";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
-
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
@@ -13,14 +14,7 @@ import {
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const {
-    removeCategory,
-    settings,
-    editingItems,
-    popupState,
-    setPopupState,
-    setTxState
-  } = useStorageContext();
+  const { removeCategory, settings, editingItems } = useStorageContext();
   const {
     accountsData,
     selectedBudgetData,
@@ -30,8 +24,9 @@ export default function SavedCategoriesView() {
   } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
+  const setPopupState = useSetAtom(popupStateAtom);
+
   if (
-    !popupState ||
     !selectedBudgetData ||
     !savedCategoriesData ||
     !settings ||
@@ -48,7 +43,8 @@ export default function SavedCategoriesView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned categories"
-          className="list mb-lg">
+          className="list mb-lg"
+        >
           {savedCategoriesData.map((category, idx) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
@@ -60,13 +56,15 @@ export default function SavedCategoriesView() {
                 draggableId={category.id}
                 key={category.id}
                 index={idx}
-                isDragDisabled={!editingItems}>
+                isDragDisabled={!editingItems}
+              >
                 {(provided) => (
                   <li
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    style={provided.draggableProps.style}>
+                    style={provided.draggableProps.style}
+                  >
                     <CategoryView
                       categoryData={category}
                       currencyFormat={currencyFormat}
@@ -93,9 +91,10 @@ export default function SavedCategoriesView() {
                                 icon={<AddTransactionIcon />}
                                 label="Add transaction"
                                 onClick={() =>
-                                  setTxState({ categoryId: category.id }).then(() =>
-                                    setPopupState({ view: "txAdd" })
-                                  )
+                                  setPopupState({
+                                    view: "txAdd",
+                                    txState: { categoryId: category.id }
+                                  })
                                 }
                               />
                               <IconButton
@@ -122,22 +121,21 @@ export default function SavedCategoriesView() {
                               label="Add credit card payment"
                               onClick={() =>
                                 ccAccount.transfer_payee_id &&
-                                setTxState({
-                                  isTransfer: true,
-                                  amount:
-                                    category.balance >= 0
-                                      ? millisToStringValue(
-                                          category.balance,
-                                          currencyFormat
-                                        )
-                                      : undefined,
-                                  amountType: "Inflow",
-                                  accountId: ccAccount.id
-                                }).then(() =>
-                                  setPopupState({
-                                    view: "txAdd"
-                                  })
-                                )
+                                setPopupState({
+                                  view: "txAdd",
+                                  txState: {
+                                    isTransfer: true,
+                                    amount:
+                                      category.balance >= 0
+                                        ? millisToStringValue(
+                                            category.balance,
+                                            currencyFormat
+                                          )
+                                        : undefined,
+                                    amountType: "Inflow",
+                                    accountId: ccAccount.id
+                                  }
+                                })
                               }
                             />
                           )}

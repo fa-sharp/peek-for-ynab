@@ -18,7 +18,7 @@ const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
   await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
+    tokenData: JSON.stringify(validToken)
   });
 });
 
@@ -37,7 +37,7 @@ test("Transfer form has expected keyboard tab order", async () => {
     <>
       <TransactionFormMainTransfer
         formState={result.current.transaction.formState}
-        handlers={result.current.transaction.handlers}
+        dispatch={result.current.transaction.handlers}
         memoRef={memoRef}
         budgetMainData={result.current.ynab.budgetMainData!}
         isBudgetToTrackingTransfer={
@@ -72,7 +72,7 @@ test("Proper transfer payee and account state when filling out the form", async 
   render(
     <TransactionFormMainTransfer
       formState={result.current.transaction.formState}
-      handlers={result.current.transaction.handlers}
+      dispatch={result.current.transaction.handlers}
       budgetMainData={result.current.ynab.budgetMainData!}
       isBudgetToTrackingTransfer={
         result.current.transaction.derivedState.isBudgetToTrackingTransfer
@@ -91,7 +91,7 @@ test("Proper transfer payee and account state when filling out the form", async 
   expect(result.current.transaction.formState).toMatchObject({
     payee: { id: checkingAccount.transfer_payee_id, name: checkingAccount.name },
     category: null,
-    account: null,
+    account: null
   });
 
   screen.getByRole("combobox", { name: "Account (From)" }).focus();
@@ -100,6 +100,6 @@ test("Proper transfer payee and account state when filling out the form", async 
   expect(result.current.transaction.formState).toMatchObject({
     payee: { id: checkingAccount.transfer_payee_id, name: checkingAccount.name },
     category: null,
-    account: savingsAccount,
+    account: savingsAccount
   });
 });

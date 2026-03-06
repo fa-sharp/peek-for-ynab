@@ -17,7 +17,7 @@ const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 
 beforeEach(async () => {
   await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
+    tokenData: JSON.stringify(validToken)
   });
 });
 
@@ -36,7 +36,7 @@ test("Form has expected keyboard tab order", async () => {
     <>
       <TransactionFormMain
         formState={result.current.transaction.formState}
-        handlers={result.current.transaction.handlers}
+        dispatch={result.current.transaction.handlers}
         memoRef={memoRef}
         budgetMainData={result.current.ynab.budgetMainData!}
         isSaving={false}
@@ -69,7 +69,7 @@ test("State is successfully updated when filling out the form", async () => {
   render(
     <TransactionFormMain
       formState={result.current.transaction.formState}
-      handlers={result.current.transaction.handlers}
+      dispatch={result.current.transaction.handlers}
       budgetMainData={result.current.ynab.budgetMainData!}
       isSaving={false}
     />,
@@ -83,7 +83,7 @@ test("State is successfully updated when filling out the form", async () => {
 
   expect(result.current.transaction.formState).toMatchObject({
     category: { name: "Inflow: Ready to Assign" },
-    account: null,
+    account: null
   });
 
   screen.getByRole("combobox", { name: "Account" }).focus();
@@ -91,6 +91,6 @@ test("State is successfully updated when filling out the form", async () => {
 
   expect(result.current.transaction.formState).toMatchObject({
     category: { name: "Inflow: Ready to Assign" },
-    account: checkingAccount,
+    account: checkingAccount
   });
 });

@@ -1,10 +1,10 @@
 import { Storage, type StorageAreaName } from "@plasmohq/storage";
-import { type DehydratedState } from "@tanstack/react-query";
+import type { DehydratedState } from "@tanstack/react-query";
 import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Browser, browser } from "#imports";
+import { type Browser, browser } from "#imports";
 import { BACKGROUND_ALARM_NAME } from "~lib/constants";
 import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
 
@@ -79,9 +79,8 @@ function Devtools() {
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        padding: 4,
-      }}
-    >
+        padding: 4
+      }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
       {!tokenData ? (
@@ -120,8 +119,7 @@ function Devtools() {
       )}
       <div>
         <button
-          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}
-        >
+          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
           Clear alarm
         </button>
       </div>
@@ -138,9 +136,8 @@ function Devtools() {
         style={{
           display: "flex",
           paddingBottom: 4,
-          borderBottom: "solid 2px lightgray",
-        }}
-      >
+          borderBottom: "solid 2px lightgray"
+        }}>
         <div style={{ width: 110 }}>
           <b>Key</b>
         </div>
@@ -158,17 +155,15 @@ function Devtools() {
                 style={{
                   display: "flex",
                   paddingBlock: 3,
-                  borderBottom: "solid 1px lightgray",
-                }}
-              >
+                  borderBottom: "solid 1px lightgray"
+                }}>
                 <b
                   style={{
                     width: 110,
                     overflow: "hidden",
                     whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                >
+                    textOverflow: "ellipsis"
+                  }}>
                   {key}
                 </b>
                 <div>

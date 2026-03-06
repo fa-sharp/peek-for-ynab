@@ -2,7 +2,7 @@ import { type Browser, browser, defineBackground } from "#imports";
 import {
   backgroundDataRefresh,
   IS_TOKEN_REFRESHING_KEY,
-  refreshToken,
+  refreshToken
 } from "~lib/backgroundRefresh";
 import {
   BACKGROUND_ALARM_NAME,
@@ -10,7 +10,7 @@ import {
   CHROME_SESSION_STORAGE,
   IS_DEV,
   REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
+  TOKEN_STORAGE
 } from "~lib/constants";
 import {
   checkBrowserBarPermission,
@@ -19,9 +19,9 @@ import {
   getBrowserBarDataForBudget,
   getPossibleTransferFieldCombinations,
   getPossibleTxFieldCombinations,
-  parseTxInput,
+  parseTxInput
 } from "~lib/omnibox";
-import type { PopupState, TxAddInitialState } from "~lib/types";
+import type { PopupState, TxAddState } from "~lib/types";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
@@ -34,7 +34,7 @@ export default defineBackground(() => {
       )
         return;
       await refreshToken();
-    },
+    }
   });
 
   // Setup periodic background refresh
@@ -53,7 +53,7 @@ export default defineBackground(() => {
       IS_DEV && console.log("Setting up new alarm!");
       await browser.alarms.clearAll();
       await browser.alarms.create(BACKGROUND_ALARM_NAME, {
-        periodInMinutes: 15,
+        periodInMinutes: 15
       });
     } else {
       IS_DEV && console.log("Alarm already exists!");
@@ -73,11 +73,11 @@ export default defineBackground(() => {
   browser.omnibox.onInputStarted.addListener(async () => {
     if (!(await checkBrowserBarPermission())) {
       browser.omnibox.setDefaultSuggestion({
-        description: "URL/address bar not enabled in settings!",
+        description: "URL/address bar not enabled in settings!"
       });
     } else {
       browser.omnibox.setDefaultSuggestion({
-        description: OMNIBOX_START_TEXT,
+        description: OMNIBOX_START_TEXT
       });
       const budgetId = (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))
         ?.budgetId;
@@ -87,11 +87,11 @@ export default defineBackground(() => {
   browser.omnibox.onInputCancelled.addListener(async () => {
     if (!(await checkBrowserBarPermission())) {
       browser.omnibox.setDefaultSuggestion({
-        description: "URL/address bar not enabled in settings!",
+        description: "URL/address bar not enabled in settings!"
       });
     } else {
       browser.omnibox.setDefaultSuggestion({
-        description: OMNIBOX_START_TEXT,
+        description: OMNIBOX_START_TEXT
       });
     }
   });
@@ -103,7 +103,7 @@ export default defineBackground(() => {
         ? "add (<dim>amount</dim>) (in <dim>budget</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
         : text.startsWith("transfer")
           ? "transfer (<dim>amount</dim>) (in <dim>budget</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
-          : OMNIBOX_START_TEXT,
+          : OMNIBOX_START_TEXT
     });
     const parsedQuery = parseTxInput(text);
     if (!parsedQuery) return;
@@ -161,11 +161,11 @@ export default defineBackground(() => {
       accountId: tx?.account?.id,
       categoryId: tx?.category?.id,
       memo: parsedQuery.memo?.trim(),
-      isTransfer: parsedQuery.type === "transfer",
-    } satisfies TxAddInitialState);
+      isTransfer: parsedQuery.type === "transfer"
+    } satisfies TxAddState);
     await CHROME_LOCAL_STORAGE.set("popupState", {
       view: "txAdd",
-      budgetId: budgetId,
+      budgetId: budgetId
     } satisfies PopupState);
     browser.action.openPopup();
   });

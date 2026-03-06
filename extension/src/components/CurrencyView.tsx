@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CountUp from "react-countup";
-import { type CurrencyFormat } from "ynab";
+import type { CurrencyFormat } from "ynab";
 
 import { getCurrencyFormatter } from "~lib/utils";
 

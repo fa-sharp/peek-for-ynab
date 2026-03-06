@@ -1,19 +1,20 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { useSetAtom } from "jotai";
 
 import { AccountView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-
+import { popupStateAtom } from "~lib/state";
 import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, setPopupState, popupState, editingItems, settings, setTxState } =
-    useStorageContext();
+  const { removeAccount, editingItems, settings } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
+  const setPopupState = useSetAtom(popupStateAtom);
+
   if (
-    !popupState ||
     !savedAccountsData ||
     !selectedBudgetData ||
     !settings ||
@@ -28,19 +29,22 @@ export default function SavedAccountsView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned accounts"
-          className="list mb-lg">
+          className="list mb-lg"
+        >
           {savedAccountsData.map((account, idx) => (
             <Draggable
               draggableId={account.id}
               key={account.id}
               index={idx}
-              isDragDisabled={!editingItems}>
+              isDragDisabled={!editingItems}
+            >
               {(provided) => (
                 <li
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  style={provided.draggableProps.style}>
+                  style={provided.draggableProps.style}
+                >
                   <AccountView
                     key={account.id}
                     account={account}
@@ -65,9 +69,10 @@ export default function SavedAccountsView() {
                           icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
-                            setTxState({ accountId: account.id }).then(() =>
-                              setPopupState({ view: "txAdd" })
-                            )
+                            setPopupState({
+                              view: "txAdd",
+                              txState: { accountId: account.id }
+                            })
                           }
                         />
                         <IconButton

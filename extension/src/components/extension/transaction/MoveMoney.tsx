@@ -1,17 +1,18 @@
-import { type FormEventHandler, useCallback, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { type SubmitEventHandler, useCallback, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
 import type { MonthDetail } from "ynab";
 
 import { CategorySelect, CurrencyView, IconButton } from "~components";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useYNABContext } from "~lib/context";
+import { popupStateAtom } from "~lib/state";
 import type { BudgetMainData, CachedBudget, PopupState } from "~lib/types";
 import { millisToStringValue, stringValueToMillis } from "~lib/utils";
 
 /** Form that lets user move money to/from category, or between categories */
 export default function MoveMoneyWrapper() {
-  const { selectedBudgetData, budgetMainData, monthData, moveMoney } =
-    useYNABContext();
-  const { popupState, setPopupState } = useStorageContext();
+  const { selectedBudgetData, budgetMainData, monthData, moveMoney } = useYNABContext();
+  const [popupState, setPopupState] = useAtom(popupStateAtom);
 
   return (
     <section>
@@ -19,8 +20,8 @@ export default function MoveMoneyWrapper() {
         <div role="heading">Move money</div>
       </div>
       <div className="mt-lg mb-lg">
-        ⚠️ Money moves made here will not show up in the &ldquo;Recent
-        Moves&rdquo; section in YNAB.
+        ⚠️ Money moves made here will not show up in the &ldquo;Recent Moves&rdquo; section
+        in YNAB.
       </div>
       {!budgetMainData || !selectedBudgetData || !popupState ? (
         <div>Loading...</div>
@@ -32,10 +33,7 @@ export default function MoveMoneyWrapper() {
           moveMoney={moveMoney}
           popupState={popupState}
           resetPopupState={() => {
-            setPopupState({
-              ...(popupState?.moveMoneyState?.returnTo || { view: "main" }),
-              moveMoneyState: undefined,
-            });
+            setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" });
           }}
         />
       )}
@@ -96,7 +94,7 @@ export function MoveMoneyInner({
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const onMoveMoney: FormEventHandler = async (event) => {
+  const onMoveMoney: SubmitEventHandler = async (event) => {
     event.preventDefault();
     setErrorMessage("");
     if (!fromCategory && !toCategory) {
@@ -174,8 +172,7 @@ export function MoveMoneyInner({
                   selectedBudgetData?.currencyFormat,
                 ),
               );
-            }}
-          >
+            }}>
             <CurrencyView
               colorsEnabled
               milliUnits={monthData.to_be_budgeted}
@@ -197,8 +194,7 @@ export function MoveMoneyInner({
                   selectedBudgetData?.currencyFormat,
                 ),
               );
-            }}
-          >
+            }}>
             <CurrencyView
               colorsEnabled
               milliUnits={fromCategory.balance}
@@ -231,13 +227,12 @@ export function MoveMoneyInner({
           }
         }}
       />
-      {[
-        fromCategory?.category_group_name,
-        toCategory?.category_group_name,
-      ].includes("Credit Card Payments") && (
+      {[fromCategory?.category_group_name, toCategory?.category_group_name].includes(
+        "Credit Card Payments",
+      ) && (
         <div>
-          ⚠️ You are moving money to/from a Credit Card Payment category! Did you
-          mean to make a payment instead?
+          ⚠️ You are moving money to/from a Credit Card Payment category! Did you mean to
+          make a payment instead?
         </div>
       )}
       <div className="text-error">{errorMessage}</div>
@@ -246,16 +241,14 @@ export function MoveMoneyInner({
           ref={saveButtonRef}
           type="submit"
           className="button rounded accent mt-lg flex-1"
-          disabled={isSaving}
-        >
+          disabled={isSaving}>
           {isSaving ? "Moving..." : "Move"}
         </button>
         <button
           type="button"
           className="button gray rounded mt-lg flex-1"
           onClick={() => resetPopupState()}
-          disabled={isSaving}
-        >
+          disabled={isSaving}>
           Cancel
         </button>
       </div>
