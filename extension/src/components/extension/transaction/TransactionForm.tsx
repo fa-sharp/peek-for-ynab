@@ -22,7 +22,7 @@ import TransactionFormSplit from "./TransactionFormSplit";
 /** Form that lets the user add a transaction. */
 export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
-  const { settings } = useStorageContext();
+  const { settings, budgetSettings } = useStorageContext();
 
   return (
     <section>
@@ -36,6 +36,7 @@ export default function TransactionFormWrapper() {
           budgetMainData={budgetMainData}
           selectedBudgetData={selectedBudgetData}
           settings={settings}
+          budgetSettings={budgetSettings}
         />
       )}
     </section>
@@ -86,13 +87,13 @@ export function TransactionFormInner({
   const setPopupState = useSetAtom(popupStateAtom);
   const resetPopupState = useCallback(
     () => setPopupState({ view: "main" }),
-    [setPopupState],
+    [setPopupState]
   );
   const setMemo = useCallback(
     (memo: SetStateAction<string>) => {
       dispatch({ type: "setMemo", memo });
     },
-    [dispatch],
+    [dispatch]
   );
   const memoRef = useRef<HTMLInputElement>(null);
 
@@ -142,6 +143,7 @@ export function TransactionFormInner({
           {...{
             dispatch,
             budgetMainData,
+            budgetSettings,
             memoRef,
             isSaving,
           }}

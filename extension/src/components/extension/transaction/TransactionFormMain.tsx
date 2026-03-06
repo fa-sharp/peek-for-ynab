@@ -47,7 +47,7 @@ export default function TransactionFormMain({
         else memoRef?.current?.focus();
       }
     },
-    [dispatch, category, account, memoRef],
+    [dispatch, category, account, memoRef]
   );
   const selectCategory = useCallback(
     (selectedCategory: Category | null) => {
@@ -57,7 +57,7 @@ export default function TransactionFormMain({
         else memoRef?.current?.focus();
       }
     },
-    [dispatch, account, memoRef],
+    [dispatch, account, memoRef]
   );
   const selectAccount = useCallback(
     (selectedAccount: Account | null) => {
@@ -68,18 +68,25 @@ export default function TransactionFormMain({
           dispatch({ type: "setCleared", cleared: true });
       }
     },
-    [dispatch, memoRef],
+    [dispatch, memoRef]
   );
 
   // Select default account if not selected
   useEffect(() => {
     if (!accountId && budgetSettings?.transactions.defaultAccountId) {
       const defaultAccount = budgetMainData.accountsData.find(
-        (a) => a.id === budgetSettings.transactions.defaultAccountId,
+        (a) => a.id === budgetSettings.transactions.defaultAccountId
       );
-      if (defaultAccount) selectAccount(defaultAccount);
+      if (defaultAccount) {
+        dispatch({ type: "setAccount", accountId: defaultAccount.id });
+      }
     }
-  }, [accountId, budgetMainData.accountsData, budgetSettings, selectAccount]);
+  }, [
+    accountId,
+    budgetMainData.accountsData,
+    budgetSettings?.transactions.defaultAccountId,
+    dispatch,
+  ]);
 
   return (
     <>
