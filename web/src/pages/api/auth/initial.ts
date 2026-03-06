@@ -2,6 +2,7 @@
 Initial OAuth token exchange endpoint.
 */
 
+import { zodJsonParse } from "@lib/validation";
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
 
@@ -11,7 +12,7 @@ export const prerender = false;
 
 const inputSchema = z.string().pipe(
   z.preprocess(
-    (text) => JSON.parse(text),
+    zodJsonParse,
     z.object({
       code: z.string().min(10),
       redirectUri: z.url(),
@@ -37,17 +38,17 @@ export const POST: APIRoute = async (req) => {
     const tokenResponse = await fetch(tokenUrl, { method: "POST" });
     if (!tokenResponse.ok)
       throw {
-        message: "Error getting OAuth token from YNAB",
+        message: "Error exchanging initial OAuth token from YNAB",
         status: tokenResponse.status,
         errorData: await tokenResponse.json(),
       };
     const data = await tokenResponse.json();
-
     const tokenData = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
       expires: (data.created_at + data.expires_in) * 1000,
     };
+
     return Response.json(tokenData);
   } catch (err) {
     req.locals.log.warn({ err }, "Error during initial OAuth token retrieval");

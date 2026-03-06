@@ -2,6 +2,7 @@
 Refresh OAuth token endpoint.
 */
 
+import { zodJsonParse } from "@lib/validation";
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
 
@@ -11,7 +12,7 @@ export const prerender = false;
 
 const inputSchema = z.string().pipe(
   z.preprocess(
-    (text) => JSON.parse(text),
+    zodJsonParse,
     z.object({
       refreshToken: z.string().min(10),
     })
@@ -40,12 +41,12 @@ export const POST: APIRoute = async (req) => {
         errorData: await tokenResponse.json(),
       };
     const data = await tokenResponse.json();
-
     const tokenData = {
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
       expires: (data.created_at + data.expires_in) * 1000,
     };
+
     return Response.json(tokenData);
   } catch (err) {
     req.locals.log.warn({ err }, "Error during OAuth token refresh");
