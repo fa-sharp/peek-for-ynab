@@ -1,5 +1,4 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
-import { useAtomValue } from "jotai";
 import { useCallback, useEffect } from "react";
 
 import {
@@ -17,11 +16,11 @@ import {
   TransactionForm,
 } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { useGetPopupState } from "~lib/state";
 
 export default function PopupMain() {
   const { newVersionAlert } = useNotificationsContext();
-  const popupState = useAtomValue(popupStateAtom);
+  const popupState = useGetPopupState();
 
   return (
     <>
@@ -101,7 +100,7 @@ const useDragEndCallback = (): OnDragEndResponder => {
       savedAccountsData,
       savedCategoriesData,
       popupState?.budgetId,
-    ],
+    ]
   );
 };
 

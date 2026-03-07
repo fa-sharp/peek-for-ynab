@@ -1,5 +1,4 @@
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
-import { useAtom } from "jotai";
 import { createProvider } from "puro";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
@@ -15,7 +14,7 @@ import {
   TOKEN_STORAGE,
   TOKEN_STORAGE_KEY,
 } from "~lib/constants";
-import { popupStateAtom } from "~lib/state";
+import { usePopupState } from "~lib/state";
 import type { AppSettings, BudgetSettings, TokenData } from "~lib/types";
 
 /** Map of budget IDs to string arrays. */
@@ -38,7 +37,7 @@ const useStorageProvider = () => {
   );
 
   /** Current state of popup (persisted locally) */
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
 
   /** Whether user can edit and re-arrange the pinned categories and accounts */
   const [editingItems, setEditingItems] = useState(false);

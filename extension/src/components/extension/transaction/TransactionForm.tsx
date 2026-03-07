@@ -1,4 +1,3 @@
-import { useSetAtom } from "jotai";
 import { type SetStateAction, useCallback, useEffect, useRef } from "react";
 import { CircleC } from "tabler-icons-react";
 import { TransactionFlagColor } from "ynab";
@@ -6,7 +5,7 @@ import { TransactionFlagColor } from "ynab";
 import { AmountField, IconButton, MemoField } from "~components";
 import { CheckIcon as Check } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom, useTxStore } from "~lib/state";
+import { useSetPopupState, useTxStore } from "~lib/state";
 import type {
   AppSettings,
   BudgetMainData,
@@ -86,7 +85,7 @@ export function TransactionFormInner({
     returnTo: s.returnTo,
   }));
 
-  const setPopupState = useSetAtom(popupStateAtom);
+  const setPopupState = useSetPopupState();
   const onCancel = useCallback(
     () => setPopupState(returnTo ?? { view: "main" }),
     [setPopupState, returnTo]

@@ -1,4 +1,3 @@
-import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import { ArrowBack, ExternalLink } from "tabler-icons-react";
 import { AccountType } from "ynab";
@@ -11,7 +10,7 @@ import {
 } from "~components/icons/ActionIcons";
 import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { usePopupState, useSetPopupState } from "~lib/state";
 import type { TxAddState } from "~lib/types";
 import { millisToStringValue } from "~lib/utils";
 
@@ -26,8 +25,7 @@ const AccountTxsView = () => {
   const { settings, budgetSettings } = useStorageContext();
   const { accountsData, categoriesData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
-
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
 
   const account = useMemo(
     () => accountsData?.find((a) => a.id === popupState?.detailState?.id),
@@ -257,7 +255,7 @@ export default AccountTxsView;
 
 const AccountActivityView = ({ accountId }: { accountId: string }) => {
   const { useGetAccountTxs, selectedBudgetData, addedTransaction } = useYNABContext();
-  const setPopupState = useSetAtom(popupStateAtom);
+  const setPopupState = useSetPopupState();
 
   const [sinceDaysAgo, setSinceDaysAgo] = useState(15);
   const { data: accountTxs, isFetching: isFetchingTxs } = useGetAccountTxs(

@@ -1,18 +1,17 @@
-import { useAtom } from "jotai";
 import { type SubmitEventHandler, useCallback, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
 import type { MonthDetail } from "ynab";
 
 import { CategorySelect, CurrencyView, IconButton } from "~components";
 import { useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { usePopupState } from "~lib/state";
 import type { BudgetMainData, CachedBudget, PopupState } from "~lib/types";
 import { millisToStringValue, stringValueToMillis } from "~lib/utils";
 
 /** Form that lets user move money to/from category, or between categories */
 export default function MoveMoneyWrapper() {
   const { selectedBudgetData, budgetMainData, monthData, moveMoney } = useYNABContext();
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
 
   return (
     <section>
@@ -67,7 +66,7 @@ export function MoveMoneyInner({
     if (!popupState.moveMoneyState?.fromCategoryId) return null;
     return (
       budgetMainData.categoriesData.find(
-        (c) => c.id === popupState?.moveMoneyState?.fromCategoryId,
+        (c) => c.id === popupState?.moveMoneyState?.fromCategoryId
       ) || null
     );
   });
@@ -75,7 +74,7 @@ export function MoveMoneyInner({
     if (!popupState.moveMoneyState?.toCategoryId) return null;
     return (
       budgetMainData.categoriesData.find(
-        (c) => c.id === popupState.moveMoneyState?.toCategoryId,
+        (c) => c.id === popupState.moveMoneyState?.toCategoryId
       ) || null
     );
   });
@@ -169,8 +168,8 @@ export function MoveMoneyInner({
               setAmount(
                 millisToStringValue(
                   monthData.to_be_budgeted,
-                  selectedBudgetData?.currencyFormat,
-                ),
+                  selectedBudgetData?.currencyFormat
+                )
               );
             }}>
             <CurrencyView
@@ -191,8 +190,8 @@ export function MoveMoneyInner({
               setAmount(
                 millisToStringValue(
                   fromCategory.balance,
-                  selectedBudgetData?.currencyFormat,
-                ),
+                  selectedBudgetData?.currencyFormat
+                )
               );
             }}>
             <CurrencyView
@@ -228,7 +227,7 @@ export function MoveMoneyInner({
         }}
       />
       {[fromCategory?.category_group_name, toCategory?.category_group_name].includes(
-        "Credit Card Payments",
+        "Credit Card Payments"
       ) && (
         <div>
           ⚠️ You are moving money to/from a Credit Card Payment category! Did you mean to

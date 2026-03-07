@@ -1,17 +1,16 @@
-import { useAtom } from "jotai";
 import { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, TransactionView } from "~components";
 import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { usePopupState } from "~lib/state";
 
 const CategoryTxsView = () => {
   const { useGetCategoryTxs, categoriesData, selectedBudgetData, addedTransaction } =
     useYNABContext();
   const { settings } = useStorageContext();
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
 
   const category = useMemo(
     () => categoriesData?.find((c) => c.id === popupState?.detailState?.id),
@@ -81,13 +80,12 @@ const CategoryTxsView = () => {
                   view: "detail",
                   detailState: {
                     type: "category",
-                    id: category.id
-                  }
-                }
-              }
+                    id: category.id,
+                  },
+                },
+              },
             })
-          }
-        >
+          }>
           <AddTransactionIcon /> Transaction
         </button>
         <button
@@ -101,13 +99,12 @@ const CategoryTxsView = () => {
                   view: "detail",
                   detailState: {
                     type: "category",
-                    id: category.id
-                  }
-                }
-              }
+                    id: category.id,
+                  },
+                },
+              },
             })
-          }
-        >
+          }>
           <AddTransferIcon /> Move Money
         </button>
       </div>

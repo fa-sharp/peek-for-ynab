@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 import { DEFAULT_POPUP_STATE, STORAGE_KEYS } from "~lib/constants";
@@ -36,9 +36,8 @@ export const popupStateAtom = atom(
             view: "main",
           };
         case "txAdd":
-          // Update transaction form before switching to page
           if (newState.txState) {
-            txStore.getState().replace(newState.txState);
+            txStore.getState().replace(newState.txState); // update transaction form before switching to page
           }
           return {
             budgetId,
@@ -60,6 +59,13 @@ export const popupStateAtom = atom(
     });
   }
 );
+
+/** React hook for accessing and updating the popup state */
+export const usePopupState = () => useAtom(popupStateAtom);
+/** React hook for getting the popup state */
+export const useGetPopupState = () => useAtomValue(popupStateAtom);
+/** React hook for updating the popup state */
+export const useSetPopupState = () => useSetAtom(popupStateAtom);
 
 /** Possible popup states */
 type OpenPopupView =

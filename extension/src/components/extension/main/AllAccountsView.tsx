@@ -1,11 +1,10 @@
-import { useSetAtom } from "jotai";
 import { useId, useState } from "react";
 import type { Account } from "ynab";
 
 import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
-import { popupStateAtom } from "~lib/state";
+import { useSetPopupState } from "~lib/state";
 import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import {
   AddTransactionIcon,
@@ -15,7 +14,7 @@ import {
   ExpandListIcon,
   ExpandListIconBold,
   PinItemIcon,
-  PinnedItemIcon
+  PinnedItemIcon,
 } from "../../icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
@@ -24,7 +23,7 @@ export default function AllAccountsView() {
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
-  const setPopupState = useSetAtom(popupStateAtom);
+  const setPopupState = useSetPopupState();
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
@@ -35,8 +34,7 @@ export default function AllAccountsView() {
     <>
       <div
         className={"heading-medium cursor-pointer"}
-        onClick={() => setExpanded(!expanded)}
-      >
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-controls={controlsId}
           aria-expanded={expanded}
@@ -101,7 +99,7 @@ function AccountTypeView({
   settings,
   editMode,
   onAddTx,
-  onOpenDetailView
+  onOpenDetailView,
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -121,8 +119,7 @@ function AccountTypeView({
     <>
       <div
         className="heading-small heading-bordered cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
+        onClick={() => setExpanded(!expanded)}>
         <IconButton
           aria-controls={controlsId}
           aria-expanded={expanded}

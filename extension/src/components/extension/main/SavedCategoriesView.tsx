@@ -1,15 +1,14 @@
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { useSetAtom } from "jotai";
 
 import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { useSetPopupState } from "~lib/state";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
   DetailIcon,
-  PinnedItemIcon
+  PinnedItemIcon,
 } from "../../icons/ActionIcons";
 
 /** View of user's saved categories with balances */
@@ -20,11 +19,10 @@ export default function SavedCategoriesView() {
     selectedBudgetData,
     savedCategoriesData,
     addedTransaction,
-    moved
+    moved,
   } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
-
-  const setPopupState = useSetAtom(popupStateAtom);
+  const setPopupState = useSetPopupState();
 
   if (
     !selectedBudgetData ||
@@ -43,8 +41,7 @@ export default function SavedCategoriesView() {
           {...provided.droppableProps}
           ref={provided.innerRef}
           aria-label="Pinned categories"
-          className="list mb-lg"
-        >
+          className="list mb-lg">
           {savedCategoriesData.map((category, idx) => {
             /** The corresponding credit card account, if this is a CCP category */
             const ccAccount =
@@ -56,15 +53,13 @@ export default function SavedCategoriesView() {
                 draggableId={category.id}
                 key={category.id}
                 index={idx}
-                isDragDisabled={!editingItems}
-              >
+                isDragDisabled={!editingItems}>
                 {(provided) => (
                   <li
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    style={provided.draggableProps.style}
-                  >
+                    style={provided.draggableProps.style}>
                     <CategoryView
                       categoryData={category}
                       currencyFormat={currencyFormat}
@@ -93,7 +88,7 @@ export default function SavedCategoriesView() {
                                 onClick={() =>
                                   setPopupState({
                                     view: "txAdd",
-                                    txState: { categoryId: category.id }
+                                    txState: { categoryId: category.id },
                                   })
                                 }
                               />
@@ -107,8 +102,8 @@ export default function SavedCategoriesView() {
                                     view: "detail",
                                     detailState: {
                                       type: "category",
-                                      id: category.id
-                                    }
+                                      id: category.id,
+                                    },
                                   })
                                 }
                               />
@@ -133,8 +128,8 @@ export default function SavedCategoriesView() {
                                           )
                                         : undefined,
                                     amountType: "Inflow",
-                                    accountId: ccAccount.id
-                                  }
+                                    accountId: ccAccount.id,
+                                  },
                                 })
                               }
                             />

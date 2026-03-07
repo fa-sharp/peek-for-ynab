@@ -1,6 +1,5 @@
 import { Item } from "@react-stately/collections";
 import { useIsFetching } from "@tanstack/react-query";
-import { useAtom } from "jotai";
 import { type Key, useCallback, useMemo } from "react";
 import {
   AlertTriangle,
@@ -20,7 +19,7 @@ import {
 import { browser } from "#imports";
 import { BudgetSelect, IconButton, Menu } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-import { popupStateAtom } from "~lib/state";
+import { usePopupState } from "~lib/state";
 
 /** Whether data is considered fresh for display, based on `lastUpdated` time (<4 minutes old) */
 const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
@@ -40,12 +39,12 @@ export default function PopupNav() {
     isRefreshingBudgets,
   } = useYNABContext();
 
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
   const globalIsFetching = useIsFetching();
 
   const shownBudgetsData = useMemo(
     () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds],
+    [budgetsData, shownBudgetIds]
   );
 
   const openBudget = useCallback(() => {
@@ -56,7 +55,7 @@ export default function PopupNav() {
     window.open(
       browser.runtime.getURL("/popup.html"),
       "peekWindow",
-      "width=320,height=500",
+      "width=320,height=500"
     );
     window.close();
   }, []);
@@ -92,7 +91,7 @@ export default function PopupNav() {
           break;
       }
     },
-    [editingItems, openPopupWindow, setEditingItems, setPopupState],
+    [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
@@ -111,7 +110,7 @@ export default function PopupNav() {
                 : `Status: Last updated ${new Date(
                     categoriesLastUpdated < accountsLastUpdated
                       ? categoriesLastUpdated
-                      : accountsLastUpdated,
+                      : accountsLastUpdated
                   ).toLocaleString()}`
         }
         icon={

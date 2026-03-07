@@ -1,12 +1,11 @@
-import { useAtom } from "jotai";
 import { type SubmitEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { TransactionClearedStatus, type TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "./context";
 import {
-  popupStateAtom,
   type TxStoreAction,
   txStore,
+  usePopupState,
   useTxStore,
   useTxStoreSubTxTotals,
 } from "./state";
@@ -26,7 +25,7 @@ export default function useTransaction() {
   const { settings, budgetSettings, setOmniboxInput, setBudgetSettings } =
     useStorageContext();
 
-  const [popupState, setPopupState] = useAtom(popupStateAtom);
+  const [popupState, setPopupState] = usePopupState();
   const [isSaving, setIsSaving] = useState(false);
   const dispatchTxState = useTxStore((s) => s.dispatch);
   const resetTxForm = useTxStore((s) => s.reset);
@@ -57,7 +56,7 @@ export default function useTransaction() {
       const isBudgetToTracking = isBudgetToTrackingTransfer(
         state.payee,
         account,
-        accountsData,
+        accountsData
       );
 
       if (!account) {
@@ -105,7 +104,7 @@ export default function useTransaction() {
         if (
           state.subTxs?.some(
             (tx) =>
-              tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id,
+              tx.payee && "id" in tx.payee && tx.payee.id === account.transfer_payee_id
           )
         ) {
           dispatchTxState({
@@ -134,7 +133,7 @@ export default function useTransaction() {
                 ...prev.transactions,
                 defaultAccountId: account.id,
               },
-            },
+            }
         );
 
       setIsSaving(true);
@@ -189,7 +188,7 @@ export default function useTransaction() {
       accountsData,
       categoriesData,
       leftOverSubTxsAmount,
-    ],
+    ]
   );
 
   return {
@@ -201,7 +200,7 @@ export default function useTransaction() {
 
 const useParseAmountFromUserSelection = (
   enabled: boolean,
-  dispatch: (action: TxStoreAction) => void,
+  dispatch: (action: TxStoreAction) => void
 ) => {
   useEffect(() => {
     if (!enabled) return;

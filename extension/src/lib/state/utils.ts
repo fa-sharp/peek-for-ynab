@@ -5,10 +5,7 @@ import { createJSONStorage as createJSONStorageZustand } from "zustand/middlewar
 
 import { storage } from "#imports";
 
-/**
- * Create a Chrome storage adapter for Jotai, that handles persisting/syncing a Jotai
- * atom with the given storage area.
- */
+/** Create a Chrome storage adapter for Jotai, that handles persisting/syncing a Jotai atom. */
 export const createJotaiChromeStorage = <T>(area: "local" | "sync") =>
   createJSONStorageJotai<T>(() => ({
     getItem: async (key) => storage.getItem(`${area}:${key}`),
@@ -17,6 +14,7 @@ export const createJotaiChromeStorage = <T>(area: "local" | "sync") =>
     subscribe: (key, callback) => storage.watch(`${area}:${key}`, callback),
   }));
 
+/** Create a Chrome storage adapter for a Zustand store */
 export const createZustandChromeStorage = <T>(area: "local" | "sync") =>
   createJSONStorageZustand<T>(() => ({
     getItem: async (key) => storage.getItem(`${area}:${key}`),
@@ -24,11 +22,10 @@ export const createZustandChromeStorage = <T>(area: "local" | "sync") =>
     removeItem: (key) => storage.removeItem(`${area}:${key}`),
   }));
 
-type StoreWithPersist<S> = Mutate<StoreApi<S>, [["zustand/persist", unknown]]>;
-
-export const useChromeStorageEvents = <S>(
-  store: StoreWithPersist<S>,
-  area: "local" | "sync",
+/** Subscribe to Chrome storage events for a Zustand store, rehydrating on change. */
+export const useZustandChromeStorageEvents = <S>(
+  store: Mutate<StoreApi<S>, [["zustand/persist", unknown]]>,
+  area: "local" | "sync"
 ) => {
   useEffect(() => {
     const storageEventCallback = () => {
@@ -37,7 +34,7 @@ export const useChromeStorageEvents = <S>(
 
     const unwatch = storage.watch(
       `${area}:${store.persist.getOptions().name}`,
-      storageEventCallback,
+      storageEventCallback
     );
     return () => {
       unwatch();

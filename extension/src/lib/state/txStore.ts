@@ -8,7 +8,7 @@ import type { TxAddState } from "~lib/types";
 import { stringValueToMillis } from "~lib/utils";
 import type { TxStoreAction } from "./txStoreAction";
 import { DEFAULT_SUB_TX, DEFAULT_TX_STATE } from "./txStoreDefaults";
-import { createZustandChromeStorage, useChromeStorageEvents } from "./utils";
+import { createZustandChromeStorage, useZustandChromeStorageEvents } from "./utils";
 
 /** The type of the transaction form Zustand store */
 export type TxStore = ExtractState<typeof txStore>;
@@ -38,7 +38,7 @@ export const txStore = createStore<TxAddState & TxStoreActions>()(
 /** Subscribe and use the transaction form Zustand store in a React component */
 export const useTxStore = <U>(selector: (state: TxAddState & TxStoreActions) => U) => {
   const store = useStore(txStore, useShallow(selector));
-  useChromeStorageEvents(txStore, "local");
+  useZustandChromeStorageEvents(txStore, "local");
 
   return store;
 };
