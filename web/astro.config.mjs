@@ -28,4 +28,20 @@ export default defineConfig({
         mode: "middleware",
       })
     : vercel(),
+
+  // Allow cross-origin requests from Chrome extensions in development
+  security: {
+    allowedDomains:
+      process.env.NODE_ENV === "development"
+        ? [{ protocol: "chrome-extension" }]
+        : undefined,
+  },
+  vite: {
+    server: {
+      cors: {
+        //@ts-expect-error first parameter of callback has wrong type
+        origin: (origin, cb) => cb(null, !!origin?.startsWith("chrome-extension://")),
+      },
+    },
+  },
 });

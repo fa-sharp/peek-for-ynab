@@ -35,8 +35,7 @@ The server and website is created with [Astro](https://astro.build/). Pages and 
 ```bash
 cd web
 pnpm install
-pnpm build
-pnpm start
+pnpm dev
 ```
 
 ### Extension
