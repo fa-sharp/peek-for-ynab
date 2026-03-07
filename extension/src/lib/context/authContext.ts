@@ -6,23 +6,20 @@ import { useContext, useEffect } from "react";
 import * as ynab from "ynab";
 
 import { browser } from "#imports";
+import { sendMessage } from "~lib/messaging";
 import type { TokenData } from "~lib/types";
-import { IS_PRODUCTION } from "../constants";
+import { IS_DEV } from "../constants";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
-  const { tokenData, setTokenRefreshNeeded, setTokenData, removeAllData } =
-    useStorageContext();
+  const { tokenData, setTokenData, removeAllData } = useStorageContext();
 
   const queryClient = useQueryClient();
 
-  /** Whether the token is expired (or expires in less than 5 minutes). Will be `false` if token does not exist */
-  const tokenExpired = tokenData ? tokenData.expires < Date.now() + 5 * 60 * 1000 : false;
-
-  /** If token is expired (or about to expire in less than 5 minutes) refresh the token */
+  /** If token is expired, send signal to refresh the token */
   useEffect(() => {
-    if (tokenData && tokenExpired) setTokenRefreshNeeded(true);
-  }, [setTokenRefreshNeeded, tokenData, tokenExpired]);
+    if (tokenData?.isExpired) sendMessage("tokenRefreshNeeded");
+  }, [tokenData?.isExpired]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
   const login = (tokenData: TokenData) => {
@@ -30,7 +27,7 @@ const useAuthProvider = () => {
     api.user
       .getUser()
       .then(({ data }) => {
-        if (!IS_PRODUCTION) console.log("Successfully logged in user: ", data.user.id);
+        if (IS_DEV) console.log("Successfully logged in user: ", data.user.id);
         setTokenData(tokenData);
       })
       .catch((err) => console.error("Login failed: ", err));
@@ -94,8 +91,11 @@ const useAuthProvider = () => {
                 return res.json();
               })
               .then((newTokenData) => {
-                if (!IS_PRODUCTION) console.log("Got a new token!");
-                setTokenData(newTokenData);
+                if (IS_DEV) console.log("Got a new token!");
+                return setTokenData(newTokenData);
+              })
+              .then(() => {
+                if (IS_DEV) console.log("Saved new token!");
               })
               .catch((err) => {
                 console.error("OAuth login failed: ", err);
@@ -121,12 +121,12 @@ const useAuthProvider = () => {
     login,
     loginWithOAuth,
     logout,
-    /** Whether authentication/token data is loading */
-    authLoading: tokenData === undefined,
-    /** Whether token data is present. Check `authLoading` first */
-    loggedIn: tokenData != null,
+    /** Whether token data is present. */
+    loggedIn: !!tokenData,
     /** Whether token is expired and needs to be refreshed. */
-    tokenExpired,
+    tokenExpired: !!tokenData?.isExpired,
+    /** Whether token is currently being refreshed. */
+    tokenRefreshing: !!tokenData?.isRefreshing,
   };
 };
 

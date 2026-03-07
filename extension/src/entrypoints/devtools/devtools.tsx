@@ -7,11 +7,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { type Browser, browser } from "#imports";
 import { BACKGROUND_ALARM_NAME } from "~lib/constants";
 import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
+import { sendMessage } from "~lib/messaging";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
-  const { tokenData, setTokenData, tokenRefreshNeeded, setTokenRefreshNeeded } =
-    useStorageContext();
+  const { tokenData, setTokenData } = useStorageContext();
 
   const [area, setArea] = useState<StorageAreaName>("local");
   const [data, setData] = useState<Record<string, string>>({});
@@ -79,7 +79,7 @@ function Devtools() {
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        padding: 4
+        padding: 4,
       }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
@@ -97,8 +97,10 @@ function Devtools() {
             Token expires: {tokenData && new Date(tokenData.expires).toLocaleString()}
           </div>
           <div>
-            {!tokenRefreshNeeded ? (
-              <button onClick={() => setTokenRefreshNeeded(true)}>Force refresh</button>
+            {!tokenData.isRefreshing ? (
+              <button onClick={() => sendMessage("tokenRefreshNeeded")}>
+                Force refresh
+              </button>
             ) : (
               <button disabled>Refreshing...</button>
             )}
@@ -136,7 +138,7 @@ function Devtools() {
         style={{
           display: "flex",
           paddingBottom: 4,
-          borderBottom: "solid 2px lightgray"
+          borderBottom: "solid 2px lightgray",
         }}>
         <div style={{ width: 110 }}>
           <b>Key</b>
@@ -155,14 +157,14 @@ function Devtools() {
                 style={{
                   display: "flex",
                   paddingBlock: 3,
-                  borderBottom: "solid 1px lightgray"
+                  borderBottom: "solid 1px lightgray",
                 }}>
                 <b
                   style={{
                     width: 110,
                     overflow: "hidden",
                     whiteSpace: "nowrap",
-                    textOverflow: "ellipsis"
+                    textOverflow: "ellipsis",
                   }}>
                   {key}
                 </b>

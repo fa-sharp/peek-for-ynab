@@ -11,10 +11,7 @@ import type {
 import { txStore } from "./txStore";
 import { createJotaiChromeStorage } from "./utils";
 
-/**
- * Internal Jotai atom that holds the popup state (e.g. current view, budget ID), and
- * persists/syncs to local Chrome storage
- */
+/** Internal persisted Jotai atom that holds the popup state (e.g. current view, budget ID) */
 const POPUP_STATE_ATOM = atomWithStorage<PopupState>(
   STORAGE_KEYS.PopupState,
   DEFAULT_POPUP_STATE,

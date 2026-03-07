@@ -6,7 +6,7 @@ import {
   AppProvider,
   useAuthContext,
   useStorageContext,
-  useYNABContext
+  useYNABContext,
 } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 import { checkPermissions, removePermissions, requestPermissions } from "~lib/utils";
@@ -18,9 +18,9 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { popupState, settings, syncEnabled, changeSetting } = useStorageContext();
+  const { settings, syncEnabled, changeSetting } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
-  const { authLoading, loginWithOAuth, loggedIn, logout } = useAuthContext();
+  const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   useSetColorTheme();
 
@@ -29,18 +29,17 @@ export function OptionsView() {
   const {
     enabled: notificationEnabled,
     request: requestNotificationPermission,
-    remove: removeNotificationPermission
+    remove: removeNotificationPermission,
   } = useNotificationPermission();
 
-  // check if auth and storage are hydrated to avoid flashes
-  if (authLoading || !settings || !popupState) return null;
+  if (!settings) return null;
 
   return (
     <section
       style={{
         padding: "0 16px 16px",
         maxWidth: "700px",
-        width: "max-content"
+        width: "max-content",
       }}>
       {!loggedIn ? (
         <>

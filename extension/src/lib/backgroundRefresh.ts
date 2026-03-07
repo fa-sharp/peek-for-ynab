@@ -8,13 +8,9 @@ import {
 } from "~lib/api";
 import {
   CHROME_LOCAL_STORAGE,
-  CHROME_SESSION_STORAGE,
   CHROME_SYNC_STORAGE,
   IS_DEV,
   ONE_DAY_IN_MILLIS,
-  REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY,
 } from "~lib/constants";
 import {
   type CurrentAlerts,
@@ -25,27 +21,29 @@ import {
 import { createQueryClient } from "~lib/queryClient";
 import type { BudgetSettings, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
+import { getJotaiStore, tokenAtom, tokenRefreshingAtom } from "./state";
 
-export const IS_TOKEN_REFRESHING_KEY = "isRefreshing";
-
+/** Refreshes the token, then persists and returns the new token data.
+ * Returns null if no current token exists or if refresh fails */
 export async function refreshToken(): Promise<TokenData | null> {
-  await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, true);
+  const jotaiStore = getJotaiStore();
 
-  // check if token exists
-  const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
+  // signal that token is refreshing
+  await jotaiStore.set(tokenRefreshingAtom, true);
+
+  // check if current token exists
+  const tokenData = await jotaiStore.get(tokenAtom);
   if (!tokenData) {
     console.error("Not refreshing - no existing token data found");
-    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
-    await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, false);
+    await jotaiStore.set(tokenRefreshingAtom, false);
     return null;
   }
 
-  // refresh token
+  // perform token refresh
   let newTokenData: TokenData | null = null;
   const refreshUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
   refreshUrl.pathname = "/api/auth/refresh";
   IS_DEV && console.log("Refreshing token!");
-
   try {
     const res = await fetch(refreshUrl, {
       method: "POST",
@@ -53,46 +51,48 @@ export async function refreshToken(): Promise<TokenData | null> {
       body: JSON.stringify({ refreshToken: tokenData.refreshToken }),
     });
     if (!res.ok) {
-      if (res.status === 401) await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
+      if (res.status === 401) await jotaiStore.set(tokenAtom, null); // clear token if status is unauthorized
       throw {
         message: "Error from API while refreshing token",
         status: res.status,
         error: await res.text(),
       };
     }
-    newTokenData = await res.json();
+    newTokenData = (await res.json()) as TokenData;
     IS_DEV && console.log("Got a new token!");
-    await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, newTokenData);
+    await jotaiStore.set(tokenAtom, newTokenData);
   } catch (err) {
     console.error("Failed to refresh token:", err);
   }
 
-  // signal that refresh is complete
-  try {
-    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
-    await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, false);
-  } catch (err) {
-    console.error("Failed to signal refresh completion:", err);
-  }
+  // signal that token refresh is complete
+  await jotaiStore.set(tokenRefreshingAtom, false);
 
   return newTokenData;
 }
 
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
+  const jotaiStore = getJotaiStore();
+
   // Check for existing token. If it's expired, refresh the token
-  let tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
+  let tokenData = await jotaiStore.get(tokenAtom);
   if (!tokenData) {
     IS_DEV && console.log("Background refresh: no existing token data found");
     return;
   }
-  if (tokenData.expires < Date.now() + 60 * 1000) {
+  if (tokenData.isExpired) {
     IS_DEV && console.log("Background refresh: Refreshing token...");
-    tokenData = await refreshToken();
-    if (!tokenData) {
+    const newTokenData = await refreshToken();
+    if (!newTokenData) {
       console.error("Background refresh: couldn't get new token");
       return;
     }
+    tokenData = {
+      ...newTokenData,
+      isRefreshing: false,
+      isExpired: false,
+    };
   }
 
   const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");

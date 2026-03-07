@@ -1,16 +1,7 @@
 import { type Browser, browser, defineBackground } from "#imports";
-import {
-  backgroundDataRefresh,
-  IS_TOKEN_REFRESHING_KEY,
-  refreshToken,
-} from "~lib/backgroundRefresh";
-import {
-  BACKGROUND_ALARM_NAME,
-  CHROME_SESSION_STORAGE,
-  IS_DEV,
-  REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
-} from "~lib/constants";
+import { backgroundDataRefresh, refreshToken } from "~lib/backgroundRefresh";
+import { BACKGROUND_ALARM_NAME, IS_DEV } from "~lib/constants";
+import { onMessage } from "~lib/messaging";
 import {
   checkBrowserBarPermission,
   createBrowserBarSuggestions,
@@ -20,20 +11,16 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput,
 } from "~lib/omnibox";
-import { getJotaiStore, popupStateAtom, txStore } from "~lib/state";
+import { getJotaiStore, popupStateAtom, tokenRefreshingAtom, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
   // Listen for token refresh signal
-  TOKEN_STORAGE.watch({
-    [REFRESH_SIGNAL_KEY]: async (c) => {
-      if (
-        c.newValue !== true ||
-        (await CHROME_SESSION_STORAGE.get<boolean>(IS_TOKEN_REFRESHING_KEY))
-      )
-        return;
+  onMessage("tokenRefreshNeeded", async () => {
+    const isAlreadyRefreshing = await getJotaiStore().get(tokenRefreshingAtom);
+    if (!isAlreadyRefreshing) {
       await refreshToken();
-    },
+    }
   });
 
   // Setup periodic background refresh

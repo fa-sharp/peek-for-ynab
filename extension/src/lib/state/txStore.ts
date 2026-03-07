@@ -1,4 +1,3 @@
-// store.ts
 import { createStore, type ExtractState, type StateCreator, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";

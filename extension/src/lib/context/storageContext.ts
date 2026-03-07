@@ -1,7 +1,6 @@
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
 import { createProvider } from "puro";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { flushSync } from "react-dom";
 import useLocalStorage from "use-local-storage-state";
 
 import { browser } from "#imports";
@@ -10,12 +9,9 @@ import {
   CHROME_SYNC_STORAGE,
   DEFAULT_BUDGET_SETTINGS,
   DEFAULT_SETTINGS,
-  REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY,
 } from "~lib/constants";
-import { usePopupState } from "~lib/state";
-import type { AppSettings, BudgetSettings, TokenData } from "~lib/types";
+import { usePopupState, useTokenData } from "~lib/state";
+import type { AppSettings, BudgetSettings } from "~lib/types";
 
 /** Map of budget IDs to string arrays. */
 interface BudgetToStringArrayMap {
@@ -24,17 +20,7 @@ interface BudgetToStringArrayMap {
 
 const useStorageProvider = () => {
   /** The token used to authenticate the YNAB user. Stored locally. */
-  const [tokenData, setTokenData, { remove: removeToken }] = useExtensionStorage<
-    TokenData | null | undefined
-  >({ key: TOKEN_STORAGE_KEY, instance: TOKEN_STORAGE }, (data, isHydrated) =>
-    !isHydrated ? undefined : !data ? null : data
-  );
-
-  /** Whether the token needs refreshing. Setting this to `true` will trigger a background job to refresh token. */
-  const [tokenRefreshNeeded, setTokenRefreshNeeded] = useExtensionStorage<boolean>(
-    { key: REFRESH_SIGNAL_KEY, instance: TOKEN_STORAGE },
-    false
-  );
+  const [tokenData, setTokenData] = useTokenData();
 
   /** Current state of popup (persisted locally) */
   const [popupState, setPopupState] = usePopupState();
@@ -232,12 +218,9 @@ const useStorageProvider = () => {
     else setShownBudgetIds([...shownBudgetIds, budgetId]);
   };
 
-  /** Clears all values, removes all saved data from browser storage */
+  /** Clears all values, removes all locally saved data from browser storage */
   const removeAllData = async () => {
-    flushSync(() => {
-      // Ensure token is removed first so we don't refetch API data
-      removeToken();
-    });
+    await setTokenData(null);
     await browser.storage.local.clear();
     localStorage.clear();
   };
@@ -245,8 +228,6 @@ const useStorageProvider = () => {
   return {
     tokenData,
     setTokenData,
-    tokenRefreshNeeded,
-    setTokenRefreshNeeded,
     popupState,
     setPopupState,
     editingItems,

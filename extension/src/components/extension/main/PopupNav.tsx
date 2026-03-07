@@ -26,9 +26,8 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { tokenExpired } = useAuthContext();
-  const { settings, tokenRefreshNeeded, shownBudgetIds, editingItems, setEditingItems } =
-    useStorageContext();
+  const { tokenExpired, tokenRefreshing } = useAuthContext();
+  const { settings, shownBudgetIds, editingItems, setEditingItems } = useStorageContext();
   const {
     budgetsData,
     accountsLastUpdated,
@@ -94,8 +93,8 @@ export default function PopupNav() {
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
-  if (tokenRefreshNeeded) return <div>Loading...</div>;
-  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>;
+  if (tokenRefreshing) return <div>Loading...</div>;
+  if (tokenExpired && !tokenRefreshing) return <div>Authentication error!</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
   if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 
@@ -105,7 +104,7 @@ export default function PopupNav() {
         label={
           categoriesError || accountsError
             ? "Error getting data from YNAB! Click to retry"
-            : !tokenRefreshNeeded && tokenExpired
+            : tokenExpired && !tokenRefreshing
               ? "Authentication error"
               : globalIsFetching
                 ? "Status: Refreshing data..."
@@ -120,7 +119,7 @@ export default function PopupNav() {
             <Refresh aria-hidden />
           ) : categoriesError || accountsError ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : !tokenRefreshNeeded && tokenExpired ? (
+          ) : tokenExpired && !tokenRefreshing ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates authentication error
           ) : !popupState?.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&

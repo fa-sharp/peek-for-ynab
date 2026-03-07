@@ -11,21 +11,20 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 
 /** Storage keys for persisted state items */
 export const STORAGE_KEYS = Object.freeze({
-  TxState: "txState",
   PopupState: "popupState",
+  TxState: "txState",
+  Token: "tokenData",
+  TokenRefreshing: "tokenRefreshing",
 });
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
-export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
 export const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 
 export const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
 export const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
 export const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
-export const TOKEN_STORAGE = new Storage({ area: "local" });
 
 export const DEFAULT_POPUP_STATE: PopupState = {
   view: "main",

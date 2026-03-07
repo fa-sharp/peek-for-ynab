@@ -6,7 +6,7 @@ import { createJSONStorage as createJSONStorageZustand } from "zustand/middlewar
 import { storage } from "#imports";
 
 /** Create a Chrome storage adapter for Jotai, that handles persisting/syncing a Jotai atom. */
-export const createJotaiChromeStorage = <T>(area: "local" | "sync") =>
+export const createJotaiChromeStorage = <T>(area: "local" | "sync" | "session") =>
   createJSONStorageJotai<T>(() => ({
     getItem: async (key) => storage.getItem(`${area}:${key}`),
     setItem: (key, value) => storage.setItem(`${area}:${key}`, value),
