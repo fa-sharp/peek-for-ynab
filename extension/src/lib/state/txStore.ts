@@ -22,7 +22,7 @@ interface TxStoreActions {
 const txStoreInit: StateCreator<TxAddState & TxStoreActions> = (set, get, store) => ({
   ...DEFAULT_TX_STATE,
   dispatch: (action) => set((state) => txStateReducer(state, action)),
-  replace: (txState) => set({ ...txState, ...txStoreInit(set, get, store) }, true),
+  replace: (txState) => set({ ...txStoreInit(set, get, store), ...txState }, true),
   reset: () => set(txStoreInit(set, get, store), true),
 });
 

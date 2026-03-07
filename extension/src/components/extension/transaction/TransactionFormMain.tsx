@@ -71,15 +71,13 @@ export default function TransactionFormMain({
     [dispatch, memoRef]
   );
 
-  // Select default account if not selected
+  // Select default account if no account is selected
   useEffect(() => {
-    if (!accountId && budgetSettings?.transactions.defaultAccountId) {
+    if (accountId === undefined && budgetSettings?.transactions.defaultAccountId) {
       const defaultAccount = budgetMainData.accountsData.find(
         (a) => a.id === budgetSettings.transactions.defaultAccountId
       );
-      if (defaultAccount) {
-        dispatch({ type: "setAccount", accountId: defaultAccount.id });
-      }
+      if (defaultAccount) dispatch({ type: "setAccount", accountId: defaultAccount.id });
     }
   }, [
     accountId,

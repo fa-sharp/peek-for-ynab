@@ -70,6 +70,7 @@ export function TransactionFormInner({
     memo,
     errorMessage,
     dispatch,
+    returnTo,
   } = useTxStore((s) => ({
     amount: s.amount,
     amountType: s.amountType,
@@ -82,12 +83,13 @@ export function TransactionFormInner({
     flag: s.flag,
     errorMessage: s.errorMessage,
     dispatch: s.dispatch,
+    returnTo: s.returnTo,
   }));
 
   const setPopupState = useSetAtom(popupStateAtom);
-  const resetPopupState = useCallback(
-    () => setPopupState({ view: "main" }),
-    [setPopupState]
+  const onCancel = useCallback(
+    () => setPopupState(returnTo ?? { view: "main" }),
+    [setPopupState, returnTo]
   );
   const setMemo = useCallback(
     (memo: SetStateAction<string>) => {
@@ -97,15 +99,14 @@ export function TransactionFormInner({
   );
   const memoRef = useRef<HTMLInputElement>(null);
 
-  // Set default cleared state based on account type and budget settings
+  // Set cash accounts as cleared by default, otherwise use budget settings
   useEffect(() => {
-    if (cleared === undefined) {
-      const defaultCleared =
-        budgetMainData.accountsData?.find((a) => a.id === accountId)?.type === "cash" ||
-        !!budgetSettings?.transactions.cleared;
-      dispatch({ type: "setCleared", cleared: defaultCleared });
+    if (budgetMainData.accountsData?.find((a) => a.id === accountId)?.type === "cash") {
+      dispatch({ type: "setCleared", cleared: true });
+    } else if (budgetSettings?.transactions.cleared) {
+      dispatch({ type: "setCleared", cleared: budgetSettings.transactions.cleared });
     }
-  }, [cleared, accountId, budgetMainData, budgetSettings, dispatch]);
+  }, [accountId, budgetMainData, budgetSettings?.transactions.cleared, dispatch]);
 
   if (!budgetMainData) return <div>Loading...</div>;
 
@@ -228,7 +229,7 @@ export function TransactionFormInner({
         <button
           type="button"
           className="button gray rounded flex-1"
-          onClick={resetPopupState}
+          onClick={onCancel}
           disabled={isSaving}>
           Cancel
         </button>
