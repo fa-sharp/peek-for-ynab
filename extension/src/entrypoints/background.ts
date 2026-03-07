@@ -2,15 +2,14 @@ import { type Browser, browser, defineBackground } from "#imports";
 import {
   backgroundDataRefresh,
   IS_TOKEN_REFRESHING_KEY,
-  refreshToken
+  refreshToken,
 } from "~lib/backgroundRefresh";
 import {
   BACKGROUND_ALARM_NAME,
-  CHROME_LOCAL_STORAGE,
   CHROME_SESSION_STORAGE,
   IS_DEV,
   REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE
+  TOKEN_STORAGE,
 } from "~lib/constants";
 import {
   checkBrowserBarPermission,
@@ -19,9 +18,9 @@ import {
   getBrowserBarDataForBudget,
   getPossibleTransferFieldCombinations,
   getPossibleTxFieldCombinations,
-  parseTxInput
+  parseTxInput,
 } from "~lib/omnibox";
-import type { PopupState, TxAddState } from "~lib/types";
+import { getJotaiStore, popupStateAtom, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
@@ -34,7 +33,7 @@ export default defineBackground(() => {
       )
         return;
       await refreshToken();
-    }
+    },
   });
 
   // Setup periodic background refresh
@@ -53,7 +52,7 @@ export default defineBackground(() => {
       IS_DEV && console.log("Setting up new alarm!");
       await browser.alarms.clearAll();
       await browser.alarms.create(BACKGROUND_ALARM_NAME, {
-        periodInMinutes: 15
+        periodInMinutes: 15,
       });
     } else {
       IS_DEV && console.log("Alarm already exists!");
@@ -73,25 +72,24 @@ export default defineBackground(() => {
   browser.omnibox.onInputStarted.addListener(async () => {
     if (!(await checkBrowserBarPermission())) {
       browser.omnibox.setDefaultSuggestion({
-        description: "URL/address bar not enabled in settings!"
+        description: "URL/address bar not enabled in settings!",
       });
     } else {
       browser.omnibox.setDefaultSuggestion({
-        description: OMNIBOX_START_TEXT
+        description: OMNIBOX_START_TEXT,
       });
-      const budgetId = (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))
-        ?.budgetId;
+      const budgetId = (await getJotaiStore().get(popupStateAtom))?.budgetId;
       if (budgetId) getBrowserBarDataForBudget(budgetId);
     }
   });
   browser.omnibox.onInputCancelled.addListener(async () => {
     if (!(await checkBrowserBarPermission())) {
       browser.omnibox.setDefaultSuggestion({
-        description: "URL/address bar not enabled in settings!"
+        description: "URL/address bar not enabled in settings!",
       });
     } else {
       browser.omnibox.setDefaultSuggestion({
-        description: OMNIBOX_START_TEXT
+        description: OMNIBOX_START_TEXT,
       });
     }
   });
@@ -103,7 +101,7 @@ export default defineBackground(() => {
         ? "add (<dim>amount</dim>) (in <dim>budget</dim>) (at <dim>payee</dim>) (for <dim>category</dim>) (on <dim>account</dim>) (memo <dim>memo</dim>)"
         : text.startsWith("transfer")
           ? "transfer (<dim>amount</dim>) (in <dim>budget</dim>) (from|to <dim>account</dim>) (from|to <dim>account</dim>) (for <dim>category</dim>) (memo <dim>memo</dim>)"
-          : OMNIBOX_START_TEXT
+          : OMNIBOX_START_TEXT,
     });
     const parsedQuery = parseTxInput(text);
     if (!parsedQuery) return;
@@ -112,7 +110,7 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
+      : (await getJotaiStore().get(popupStateAtom))?.budgetId;
     if (!budgetId) {
       browser.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
       return;
@@ -144,29 +142,29 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
+      : (await getJotaiStore().get(popupStateAtom))?.budgetId;
     if (!budgetId) return;
 
     const data = await getBrowserBarDataForBudget(budgetId);
-    const [tx] =
+    const [fields] =
       parsedQuery.type === "tx"
         ? getPossibleTxFieldCombinations(parsedQuery, data)
         : getPossibleTransferFieldCombinations(parsedQuery, data);
-    IS_DEV && console.log("Received tx fields from omnibox:", tx);
+    IS_DEV && console.log("Received tx from omnibox:", { parsedQuery, fields });
 
-    await CHROME_LOCAL_STORAGE.set("txState", {
-      amount: parsedQuery.amount,
+    await txStore.setState({
+      amount: parsedQuery.amount ?? "",
       amountType: "amountType" in parsedQuery ? parsedQuery.amountType : "Outflow",
-      payee: tx?.payee,
-      accountId: tx?.account?.id,
-      categoryId: tx?.category?.id,
-      memo: parsedQuery.memo?.trim(),
-      isTransfer: parsedQuery.type === "transfer"
-    } satisfies TxAddState);
-    await CHROME_LOCAL_STORAGE.set("popupState", {
+      payee: fields?.payee ?? null,
+      accountId: fields?.account?.id ?? null,
+      categoryId: fields?.category?.id ?? null,
+      memo: parsedQuery.memo?.trim() ?? null,
+      isTransfer: parsedQuery.type === "transfer",
+    });
+    await getJotaiStore().set(popupStateAtom, {
       view: "txAdd",
-      budgetId: budgetId
-    } satisfies PopupState);
+      budgetId: budgetId,
+    });
     browser.action.openPopup();
   });
 });

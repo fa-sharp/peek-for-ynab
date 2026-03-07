@@ -11,13 +11,13 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { settings, popupState } = useStorageContext();
+  const { settings } = useStorageContext();
   const { loggedIn, authLoading } = useAuthContext();
 
   useSetColorTheme();
 
   // check if auth and storage are hydrated to avoid flashes
-  if (authLoading || !settings || !popupState) return null;
+  if (authLoading || !settings) return null;
 
   return (
     <div
@@ -25,7 +25,7 @@ export function PopupView() {
         padding: "1em",
         minWidth: "260px",
         maxWidth: "360px",
-        minHeight: "50px"
+        minHeight: "50px",
       }}>
       {!loggedIn ? <PopupLogin /> : <PopupMain />}
     </div>

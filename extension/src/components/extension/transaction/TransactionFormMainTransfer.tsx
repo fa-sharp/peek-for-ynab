@@ -41,21 +41,21 @@ export default function TransactionFormMainTransfer({
   const firstAccount = useMemo(() => {
     return payee && "transferId" in payee
       ? budgetMainData.accountsData?.find(
-          (a) => a.id === (payee as { transferId: string }).transferId,
+          (a) => a.id === (payee as { transferId: string }).transferId
         ) || null
       : null;
   }, [payee, budgetMainData.accountsData]);
   const secondAccount = useMemo(
     () => budgetMainData.accountsData.find((a) => a.id === accountId),
-    [budgetMainData.accountsData, accountId],
+    [budgetMainData.accountsData, accountId]
   );
   const isBudgetToTracking = useMemo(() => {
-    if (!firstAccount) return false;
-    return firstAccount.on_budget && !!secondAccount?.on_budget;
-  }, [firstAccount, secondAccount?.on_budget]);
+    if (!firstAccount || !secondAccount) return false;
+    return secondAccount.on_budget && !firstAccount.on_budget;
+  }, [firstAccount, secondAccount]);
   const category = useMemo(
     () => budgetMainData.categoriesData.find((c) => c.id === categoryId),
-    [budgetMainData.categoriesData, categoryId],
+    [budgetMainData.categoriesData, categoryId]
   );
 
   const selectFirstAccount = useCallback(
@@ -79,7 +79,7 @@ export default function TransactionFormMainTransfer({
         else memoRef?.current?.focus();
       }
     },
-    [secondAccount, category, dispatch, memoRef],
+    [secondAccount, category, dispatch, memoRef]
   );
   const selectSecondAccount = useCallback(
     (account: Account | null) => {
@@ -92,14 +92,14 @@ export default function TransactionFormMainTransfer({
         if (account.type === "cash") dispatch({ type: "setCleared", cleared: true });
       }
     },
-    [memoRef, dispatch],
+    [memoRef, dispatch]
   );
   const selectCategory = useCallback(
     (category: Category | null) => {
       dispatch({ type: "setCategory", categoryId: category?.id || null });
       if (category) memoRef?.current?.focus();
     },
-    [memoRef, dispatch],
+    [memoRef, dispatch]
   );
 
   return (

@@ -25,8 +25,8 @@ const POPUP_STATE_ATOM = atomWithStorage<PopupState>(
 /** Jotai atom for getting and updating the popup state / view */
 export const popupStateAtom = atom(
   (get) => get(POPUP_STATE_ATOM),
-  (_get, set, newState: OpenPopupView) => {
-    set(POPUP_STATE_ATOM, async (prev) => {
+  async (_get, set, newState: OpenPopupView) => {
+    await set(POPUP_STATE_ATOM, async (prev) => {
       const budgetId = (await prev).budgetId;
       switch (newState.view) {
         case "main":
@@ -40,7 +40,7 @@ export const popupStateAtom = atom(
             txStore.getState().replace(newState.txState); // update transaction form before switching to page
           }
           return {
-            budgetId,
+            budgetId: newState.budgetId ?? budgetId,
             view: "txAdd",
           };
         case "detail":
@@ -76,6 +76,7 @@ type OpenPopupView =
   | {
       view: "txAdd";
       txState?: TxAddState;
+      budgetId?: string;
     }
   | {
       view: "detail";

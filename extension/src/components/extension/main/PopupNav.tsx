@@ -94,6 +94,8 @@ export default function PopupNav() {
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
+  if (tokenRefreshNeeded) return <div>Loading...</div>;
+  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
   if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
 

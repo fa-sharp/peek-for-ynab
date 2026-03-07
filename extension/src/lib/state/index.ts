@@ -1,3 +1,5 @@
+import { getDefaultStore as getJotaiStore } from "jotai";
+
 import {
   popupStateAtom,
   useGetPopupState,
@@ -8,6 +10,7 @@ import { type TxStore, txStore, useTxStore, useTxStoreSubTxTotals } from "./txSt
 import type { TxStoreAction } from "./txStoreAction";
 
 export {
+  getJotaiStore,
   popupStateAtom,
   usePopupState,
   useGetPopupState,
