@@ -38,7 +38,7 @@ export default function useTransaction() {
   useParseAmountFromUserSelection(!!settings.currentTabAccess, dispatchTxState);
 
   // Reset form state if switching budgets
-  const originalBudgetId = useRef(popupState?.budgetId);
+  const originalBudgetId = useRef(popupState.budgetId);
   useEffect(() => {
     if (popupState.budgetId !== originalBudgetId.current) {
       resetTxForm();

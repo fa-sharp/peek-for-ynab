@@ -15,7 +15,7 @@ export const shouldSyncStorage = storage.defineItem<boolean>(
   }
 );
 
-export const useShouldSyncSettings = () => {
+export const useShouldSyncQuery = () => {
   return useQuery({
     queryKey: [STORAGE_KEYS.ShouldSyncSettings],
     queryFn: shouldSyncStorage.getValue,

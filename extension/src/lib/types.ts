@@ -5,6 +5,7 @@ import type {
   CurrencyFormat,
 } from "ynab";
 
+/** Persisted token data */
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -21,7 +22,10 @@ export interface PopupState {
   moveMoneyState?: MoveMoneyInitialState;
 }
 
+/** Global settings */
 export interface AppSettings {
+  /** List of budget IDs to show */
+  budgets: string[];
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */

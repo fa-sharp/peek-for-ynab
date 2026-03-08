@@ -29,6 +29,9 @@ import { shouldSyncStorage, tokenDataStorage, tokenRefreshingStorage } from "./s
  * Returns null if no current token exists or if refresh fails
  */
 export async function refreshToken(refreshToken: string): Promise<TokenData | null> {
+  // double-check we're not already refreshing before proceeding
+  if (await tokenRefreshingStorage.getValue()) return null;
+
   // signal that token is refreshing
   await tokenRefreshingStorage.setValue(true);
 

@@ -14,10 +14,9 @@ export default function Omnibox() {
     omniboxInput,
     setOmniboxInput,
     editingItems,
-    saveAccount,
-    saveCategory,
-    savedAccounts,
-    savedCategories,
+    pinnedItems,
+    toggleAccount,
+    toggleCategory,
     setPopupState,
   } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
@@ -69,10 +68,10 @@ export default function Omnibox() {
               setOmniboxInput("");
             },
             editingItems,
-            savedAccounts: savedAccounts?.[selectedBudgetData.id],
-            savedCategories: savedCategories?.[selectedBudgetData.id],
+            savedAccounts: pinnedItems?.accounts,
+            savedCategories: pinnedItems?.categories,
             onPinItem: (type, id) =>
-              type === "account" ? saveAccount(id) : saveCategory(id),
+              type === "account" ? toggleAccount(id) : toggleCategory(id),
           }}
         />
       ) : parsedQuery ? (

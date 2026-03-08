@@ -33,17 +33,21 @@ export default function PopupMain() {
       {popupState.view === "detail" && popupState.detailState?.type === "category" && (
         <CategoryDetailView />
       )}
-      {popupState?.view === "move" && <MoveMoney />}
+      {popupState.view === "move" && <MoveMoney />}
     </>
   );
 }
 
 const MainView = () => {
-  const { omniboxInput } = useStorageContext();
+  const { pinnedItems, setEditingItems, omniboxInput } = useStorageContext();
   const { categoriesData, accountsData } = useYNABContext();
   const onDragEnd = useDragEndCallback();
 
-  useActivateEditModeIfNoPinnedItems();
+  // Activate edit mode if there are no pinned categories or accounts yet
+  useEffect(() => {
+    if (pinnedItems && !pinnedItems.categories.length && !pinnedItems.accounts.length)
+      setEditingItems(true);
+  }, [pinnedItems, setEditingItems]);
 
   if (!categoriesData || !accountsData) return null;
 
@@ -65,13 +69,12 @@ const MainView = () => {
 
 /** Callback when dragging and dropping pinned categories and accounts */
 const useDragEndCallback = (): OnDragEndResponder => {
-  const { popupState, saveCategoriesForBudget, saveAccountsForBudget } =
-    useStorageContext();
+  const { popupState, setAccounts, setCategories } = useStorageContext();
   const { savedAccountsData, savedCategoriesData } = useYNABContext();
 
   return useCallback(
     (result) => {
-      if (!result.destination || !popupState?.budgetId) return;
+      if (!result.destination || !popupState.budgetId) return;
       if (
         result.source.droppableId === "savedCategories" &&
         result.destination.droppableId === "savedCategories"
@@ -80,7 +83,7 @@ const useDragEndCallback = (): OnDragEndResponder => {
         const savedCategoryIds = savedCategoriesData.map((c) => c.id);
         const [categoryId] = savedCategoryIds.splice(result.source.index, 1);
         savedCategoryIds.splice(result.destination.index, 0, categoryId);
-        saveCategoriesForBudget(popupState.budgetId, savedCategoryIds);
+        setCategories(savedCategoryIds);
       } else if (
         result.source.droppableId === "savedAccounts" &&
         result.destination.droppableId === "savedAccounts"
@@ -89,32 +92,15 @@ const useDragEndCallback = (): OnDragEndResponder => {
         const savedAccountIds = savedAccountsData.map((a) => a.id);
         const [accountId] = savedAccountIds.splice(result.source.index, 1);
         savedAccountIds.splice(result.destination.index, 0, accountId);
-        saveAccountsForBudget(popupState.budgetId, savedAccountIds);
+        setAccounts(savedAccountIds);
       }
     },
     [
-      saveAccountsForBudget,
-      saveCategoriesForBudget,
+      setAccounts,
+      setCategories,
       savedAccountsData,
       savedCategoriesData,
-      popupState?.budgetId,
+      popupState.budgetId,
     ]
   );
-};
-
-/** Activate edit mode if there are no pinned categories or accounts yet */
-const useActivateEditModeIfNoPinnedItems = () => {
-  const { popupState, setEditingItems, savedCategories, savedAccounts } =
-    useStorageContext();
-
-  useEffect(() => {
-    if (
-      popupState &&
-      savedCategories &&
-      savedAccounts &&
-      !savedCategories[popupState.budgetId]?.length &&
-      !savedAccounts[popupState.budgetId]?.length
-    )
-      setEditingItems(true);
-  }, [popupState, savedAccounts, savedCategories, setEditingItems]);
 };

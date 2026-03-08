@@ -12,6 +12,8 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 /** Storage keys for persisted state items */
 export const STORAGE_KEYS = Object.freeze({
   AppSettings: "settings",
+  BudgetSettings: (budgetId: string) => `budget-${budgetId}`,
+  PinnedItems: (budgetId: string) => `budget-${budgetId}:pinned`,
   PopupState: "popupState",
   ShouldSyncSettings: "sync",
   TxState: "txState",
@@ -35,6 +37,7 @@ export const DEFAULT_POPUP_STATE: PopupState = {
 };
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
+  budgets: [],
   currentTabAccess: false,
   theme: "auto",
   animations: true,

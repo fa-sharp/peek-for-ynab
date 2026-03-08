@@ -9,7 +9,7 @@ export const tokenDataStorage = storage.defineItem<TokenData | null>(
     fallback: null,
     version: 2,
     migrations: {
-      2: safeMigrateJsonString(null),
+      2: safeMigrateJsonString<TokenData | null>(null),
     },
   }
 );

@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { use, useCallback } from "react";
 
 import { storage } from "#imports";
 import { DEFAULT_POPUP_STATE, STORAGE_KEYS } from "~lib/constants";
@@ -17,17 +18,32 @@ export const popupStateStorage = storage.defineItem<PopupState>(
     fallback: DEFAULT_POPUP_STATE,
     version: 2,
     migrations: {
-      2: safeMigrateJsonString(DEFAULT_POPUP_STATE),
+      2: safeMigrateJsonString<PopupState>(DEFAULT_POPUP_STATE),
     },
   }
 );
 
+const usePopupStateQuery = () =>
+  useQuery({
+    queryKey: [STORAGE_KEYS.PopupState],
+    queryFn: popupStateStorage.getValue,
+    staleTime: Infinity,
+  });
+
 export const usePopupState = () => {
-  const [popupState, _setPopupState] = useChromeStorage(popupStateStorage);
+  // `React.use` allows us to fetch the initial popup state on render
+  const popupStateQuery = usePopupStateQuery();
+  const initialPopupState = use(popupStateQuery.promise);
+
+  // We can now render with immediate access to the initial popup state
+  const [popupState, _setPopupState] = useChromeStorage(
+    popupStateStorage,
+    initialPopupState
+  );
 
   const setPopupState = useCallback(
     (newState: OpenPopupView) => {
-      const currentBudgetId = popupState?.budgetId ?? "";
+      const currentBudgetId = popupState.budgetId ?? "";
       switch (newState.view) {
         case "main":
           txStore.getState().reset(); // reset transaction form

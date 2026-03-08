@@ -1,3 +1,4 @@
+import { pinnedItemsStorage, usePinnedItems } from "./budgetPinned";
 import { popupStateStorage, usePopupState } from "./popupState";
 import { appSettingsStorage, useAppSettings } from "./settings";
 import { shouldSyncStorage } from "./sync";
@@ -7,9 +8,11 @@ import type { TxStoreAction } from "./txStoreAction";
 
 export {
   useAppSettings,
+  usePinnedItems,
   usePopupState,
   useTokenData,
   appSettingsStorage,
+  pinnedItemsStorage,
   popupStateStorage,
   shouldSyncStorage,
   tokenDataStorage,

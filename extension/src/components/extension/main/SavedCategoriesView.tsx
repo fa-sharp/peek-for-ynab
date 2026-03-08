@@ -12,7 +12,7 @@ import {
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const { removeCategory, settings, editingItems } = useStorageContext();
+  const { toggleCategory, settings, editingItems } = useStorageContext();
   const {
     accountsData,
     selectedBudgetData,
@@ -65,7 +65,7 @@ export default function SavedCategoriesView() {
                         !editingItems ? null : (
                           <IconButton
                             label="Unpin"
-                            onClick={() => removeCategory(category.id)}
+                            onClick={() => toggleCategory(category.id)}
                             icon={<PinnedItemIcon />}
                           />
                         )

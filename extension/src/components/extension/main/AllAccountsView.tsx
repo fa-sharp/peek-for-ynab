@@ -18,7 +18,7 @@ import {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 export default function AllAccountsView() {
-  const { savedAccounts, saveAccount, editingItems, settings, setPopupState } =
+  const { pinnedItems, toggleAccount, editingItems, settings, setPopupState } =
     useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
@@ -26,7 +26,7 @@ export default function AllAccountsView() {
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!selectedBudgetData || !accountsData || !savedAccounts) return null;
+  if (!selectedBudgetData || !accountsData || !pinnedItems) return null;
 
   return (
     <>
@@ -49,8 +49,8 @@ export default function AllAccountsView() {
               accountType="Budget"
               accountsData={accountsData.filter((a) => a.on_budget)}
               accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-              savedAccounts={savedAccounts[selectedBudgetData.id]}
-              saveAccount={saveAccount}
+              savedAccounts={pinnedItems.accounts}
+              saveAccount={toggleAccount}
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
@@ -67,8 +67,8 @@ export default function AllAccountsView() {
               accountType="Tracking"
               accountsData={accountsData.filter((a) => !a.on_budget)}
               accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-              savedAccounts={savedAccounts[selectedBudgetData.id]}
-              saveAccount={saveAccount}
+              savedAccounts={pinnedItems.accounts}
+              saveAccount={toggleAccount}
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}

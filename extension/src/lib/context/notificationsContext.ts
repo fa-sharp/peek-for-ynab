@@ -1,19 +1,17 @@
+import { useStorage } from "@plasmohq/storage/hook";
 import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
-
-import { useStorage } from "@plasmohq/storage/hook";
 
 import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
-  LATEST_VERSION_ALERT_NUM
+  LATEST_VERSION_ALERT_NUM,
 } from "~lib/constants";
 import {
   type CurrentAlerts,
   getBudgetAlerts,
-  updateIconAndTooltip
+  updateIconAndTooltip,
 } from "~lib/notifications";
-
 import { useStorageContext } from "./storageContext";
 import { useYNABContext } from "./ynabContext";
 
@@ -36,7 +34,7 @@ const useNotificationsProvider = () => {
   useEffect(() => {
     if (
       !currentAlertsHydrated ||
-      !popupState?.budgetId ||
+      !popupState.budgetId ||
       !budgetSettings ||
       !accountsData ||
       !categoriesData ||
@@ -46,11 +44,11 @@ const useNotificationsProvider = () => {
     const budgetAlerts = getBudgetAlerts(budgetSettings.notifications, {
       accounts: accountsData,
       categories: categoriesData,
-      unapprovedTxs
+      unapprovedTxs,
     });
     setCurrentAlerts((prev) => ({
       ...prev,
-      [popupState.budgetId]: budgetAlerts || undefined
+      [popupState.budgetId]: budgetAlerts || undefined,
     }));
   }, [
     accountsData,
@@ -58,8 +56,8 @@ const useNotificationsProvider = () => {
     categoriesData,
     currentAlertsHydrated,
     unapprovedTxs,
-    popupState?.budgetId,
-    setCurrentAlerts
+    popupState.budgetId,
+    setCurrentAlerts,
   ]);
 
   // Update tooltip with latest notifications
@@ -74,7 +72,7 @@ const useNotificationsProvider = () => {
     /** Whether there's an alert for a new version/update */
     newVersionAlert:
       !!latestVersionAlert && latestVersionAlert !== LATEST_VERSION_ALERT_NUM,
-    resetVersionAlert: () => setLatestVersionAlert(LATEST_VERSION_ALERT_NUM)
+    resetVersionAlert: () => setLatestVersionAlert(LATEST_VERSION_ALERT_NUM),
   };
 };
 

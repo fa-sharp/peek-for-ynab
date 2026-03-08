@@ -1,13 +1,16 @@
 import { type SetStateAction, useEffect, useState } from "react";
 import type { Mutate, StoreApi } from "zustand";
-import { createJSONStorage as createJSONStorageZustand } from "zustand/middleware";
+import { createJSONStorage } from "zustand/middleware";
 
 import { storage, type WxtStorageItem } from "#imports";
 
 /** Hook to subscribe, read, and write to Chrome storage items */
-export const useChromeStorage = <T>(item: WxtStorageItem<T, {}>, initialValue?: T) => {
+export const useChromeStorage = <T, I extends T | undefined>(
+  item: WxtStorageItem<T, {}>,
+  initialValue?: I
+) => {
   // Displayed value
-  const [renderedValue, setRenderedValue] = useState(initialValue);
+  const [renderedValue, setRenderedValue] = useState<T | undefined>(initialValue);
 
   // Initial load
   useEffect(() => {
@@ -39,21 +42,24 @@ export const useChromeStorage = <T>(item: WxtStorageItem<T, {}>, initialValue?: 
     }
   };
 
-  return [renderedValue, setValue] as const;
+  return [renderedValue, setValue] as [I, typeof setValue];
 };
 
 /** Safely migrate a stored JSON string value (from old storage library) to an object. */
-export const safeMigrateJsonString = (fallback: unknown) => (oldValue: unknown) => {
-  try {
-    return JSON.parse(oldValue as string);
-  } catch {
-    return fallback;
-  }
-};
+export const safeMigrateJsonString =
+  <F>(fallback: F) =>
+  (oldValue: unknown) => {
+    if (oldValue === undefined) return fallback;
+    try {
+      return JSON.parse(oldValue as string) as F;
+    } catch {
+      return fallback;
+    }
+  };
 
 /** Create a Chrome storage adapter for a Zustand store */
 export const createZustandChromeStorage = <T>(area: "local" | "sync") =>
-  createJSONStorageZustand<T>(() => ({
+  createJSONStorage<T>(() => ({
     getItem: async (key) => storage.getItem(`${area}:${key}`),
     setItem: (key, value) => storage.setItem(`${area}:${key}`, value),
     removeItem: (key) => storage.removeItem(`${area}:${key}`),

@@ -7,7 +7,7 @@ import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/Acti
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, editingItems, settings, setPopupState } = useStorageContext();
+  const { toggleAccount, editingItems, settings, setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
   if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
@@ -46,7 +46,7 @@ export default function SavedAccountsView() {
                       !editingItems ? null : (
                         <IconButton
                           label="Unpin"
-                          onClick={() => removeAccount(account.id)}
+                          onClick={() => toggleAccount(account.id)}
                           icon={<PinnedItemIcon />}
                         />
                       )

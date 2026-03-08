@@ -20,7 +20,7 @@ import {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const { savedCategories, saveCategory, editingItems, settings, setPopupState } =
+  const { pinnedItems, toggleCategory, editingItems, settings, setPopupState } =
     useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
@@ -28,7 +28,7 @@ function CategoriesView() {
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
+  if (!selectedBudgetData || !categoryGroupsData || !pinnedItems) return null;
 
   return (
     <>
@@ -53,10 +53,10 @@ function CategoriesView() {
               categoryAlerts={currentAlerts?.[selectedBudgetData.id]?.cats}
               budgetData={selectedBudgetData}
               accountsData={accountsData}
-              savedCategories={savedCategories[selectedBudgetData.id]}
+              savedCategories={pinnedItems.categories}
               editMode={editingItems}
               settings={settings}
-              onSaveCategory={(categoryId) => saveCategory(categoryId)}
+              onSaveCategory={toggleCategory}
               onAddTx={(txState) => {
                 setPopupState({ view: "txAdd", txState });
               }}

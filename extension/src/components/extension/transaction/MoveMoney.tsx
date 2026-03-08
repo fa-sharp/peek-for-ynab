@@ -32,7 +32,7 @@ export default function MoveMoneyWrapper() {
           moveMoney={moveMoney}
           popupState={popupState}
           resetPopupState={() => {
-            setPopupState(popupState?.moveMoneyState?.returnTo || { view: "main" });
+            setPopupState(popupState.moveMoneyState?.returnTo || { view: "main" });
           }}
         />
       )}
@@ -66,7 +66,7 @@ export function MoveMoneyInner({
     if (!popupState.moveMoneyState?.fromCategoryId) return null;
     return (
       budgetMainData.categoriesData.find(
-        (c) => c.id === popupState?.moveMoneyState?.fromCategoryId
+        (c) => c.id === popupState.moveMoneyState?.fromCategoryId
       ) || null
     );
   });

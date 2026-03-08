@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { clear } from "idb-keyval";
+import { clear as idbClear } from "idb-keyval";
 import { customAlphabet, urlAlphabet } from "nanoid";
 import { createProvider } from "puro";
 import { useContext, useEffect } from "react";
@@ -12,8 +12,7 @@ import { IS_DEV } from "../constants";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
-  const { token, removeAllData } = useStorageContext();
-
+  const { token } = useStorageContext();
   const queryClient = useQueryClient();
 
   /** If token is expired, send signal to refresh the token */
@@ -41,7 +40,7 @@ const useAuthProvider = () => {
 
       // Clear API cache and local storage to avoid any leakage of data
       queryClient.removeQueries();
-      clear();
+      idbClear();
       localStorage.clear();
 
       const authorizeUrl = new URL("https://app.ynab.com/oauth/authorize");
@@ -111,10 +110,12 @@ const useAuthProvider = () => {
       );
     });
 
-  /** Clears all data, including the user's token */
+  /** Clears all local data, including the user's token */
   const logout = async () => {
-    await removeAllData();
-    await clear();
+    await token.setTokenData(null);
+    await browser.storage.local.clear();
+    await idbClear();
+    localStorage.clear();
     queryClient.removeQueries();
   };
 

@@ -26,7 +26,7 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
   const { tokenExpired, tokenRefreshing } = useAuthContext();
-  const { popupState, setPopupState, shownBudgetIds, editingItems, setEditingItems } =
+  const { popupState, setPopupState, settings, editingItems, setEditingItems } =
     useStorageContext();
   const {
     budgetsData,
@@ -41,13 +41,13 @@ export default function PopupNav() {
   const globalIsFetching = useIsFetching();
 
   const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds]
+    () => budgetsData?.filter((b) => settings.budgets.includes(b.id)),
+    [budgetsData, settings.budgets]
   );
 
   const openBudget = useCallback(() => {
-    window.open(`https://app.ynab.com/${popupState?.budgetId}/budget`, "_blank");
-  }, [popupState?.budgetId]);
+    window.open(`https://app.ynab.com/${popupState.budgetId}/budget`, "_blank");
+  }, [popupState.budgetId]);
 
   const openPopupWindow = useCallback(() => {
     window.open(
@@ -120,7 +120,7 @@ export default function PopupNav() {
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
           ) : tokenExpired && !tokenRefreshing ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates authentication error
-          ) : !popupState?.budgetId ||
+          ) : !popupState.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (
             <Check aria-hidden color="var(--success)" />
@@ -131,7 +131,7 @@ export default function PopupNav() {
         onClick={() => refreshCategoriesAndAccounts()}
         disabled={
           Boolean(globalIsFetching) ||
-          !popupState?.budgetId ||
+          !popupState.budgetId ||
           (!categoriesError &&
             !accountsError &&
             isDataFreshForDisplay(categoriesLastUpdated) &&
