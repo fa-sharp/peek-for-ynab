@@ -11,9 +11,6 @@ importers:
       '@hello-pangea/dnd':
         specifier: ^18.0.1
         version: 18.0.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@plasmohq/storage':
-        specifier: ^1.15.0
-        version: 1.15.0(react@19.2.4)
       '@react-aria/button':
         specifier: ^3.14.4
         version: 3.14.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -860,14 +857,6 @@ packages:
 
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
-
-  '@plasmohq/storage@1.15.0':
-    resolution: {integrity: sha512-zBZ2NyVyvZlql2XHsjkZDL0+bqF6lir9RygeTnkYGF253M8DZttuSvjpsmpK6OWYmRXjhEqJeubd3+Zq9kuZ0w==}
-    peerDependencies:
-      react: ^16.8.6 || ^17 || ^18 || ^19.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
 
   '@pnpm/config.env-replace@1.1.0':
     resolution: {integrity: sha512-htyl8TWnKL7K/ESFa1oW2UB5lVDxuF5DpM7tBi6Hu2LNL3mWkIzNLG6N4zoCUP1lCKNxWy/3iu8mS8MvToGd6w==}
@@ -2725,10 +2714,6 @@ packages:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
 
-  pify@6.1.0:
-    resolution: {integrity: sha512-KocF8ve28eFjjuBKKGvzOBGzG8ew2OqOOSxTTZhirkzH7h3BI1vyzqlR0qbfcDBve1Yzo3FVlWUAtCRrbVN8Fw==}
-    engines: {node: '>=14.16'}
-
   pino-abstract-transport@2.0.0:
     resolution: {integrity: sha512-F63x5tizV6WCh4R6RHyi2Ml+M70DNRXt/+HANowMflpgGFMAym/VKm6G7ZOQRjqN7XbGxK1Lg9t6ZrtzOaivMw==}
 
@@ -4184,12 +4169,6 @@ snapshots:
       outvariant: 1.4.3
 
   '@open-draft/until@2.1.0': {}
-
-  '@plasmohq/storage@1.15.0(react@19.2.4)':
-    dependencies:
-      pify: 6.1.0
-    optionalDependencies:
-      react: 19.2.4
 
   '@pnpm/config.env-replace@1.1.0': {}
 
@@ -6158,8 +6137,6 @@ snapshots:
 
   pify@4.0.1:
     optional: true
-
-  pify@6.1.0: {}
 
   pino-abstract-transport@2.0.0:
     dependencies:

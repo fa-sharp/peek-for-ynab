@@ -6,13 +6,7 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
 } from "~lib/api";
-import {
-  CHROME_LOCAL_STORAGE,
-  CHROME_SYNC_STORAGE,
-  FIVE_MINUTES_IN_MILLIS,
-  IS_DEV,
-  ONE_DAY_IN_MILLIS,
-} from "~lib/constants";
+import { FIVE_MINUTES_IN_MILLIS, IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
@@ -20,19 +14,23 @@ import {
   updateIconAndTooltip,
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
-import type { BudgetSettings, TokenData } from "~lib/types";
+import type { TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
-import { shouldSyncStorage, tokenDataStorage, tokenRefreshingStorage } from "./state";
+import {
+  appSettingsStorage,
+  budgetSettingsStorage,
+  currentAlertsStorage,
+  shouldSyncStorage,
+  tokenDataStorage,
+  tokenRefreshingStorage,
+} from "./state";
 
 /**
  * Refreshes the token, then persists and returns the new token data.
  * Returns null if no current token exists or if refresh fails
  */
 export async function refreshToken(refreshToken: string): Promise<TokenData | null> {
-  // double-check we're not already refreshing before proceeding
-  if (await tokenRefreshingStorage.getValue()) return null;
-
-  // signal that token is refreshing
+  // signal that token refresh is in progress
   await tokenRefreshingStorage.setValue(true);
 
   // perform token refresh
@@ -86,9 +84,9 @@ export async function backgroundDataRefresh() {
   }
 
   const syncEnabled = await shouldSyncStorage.getValue();
-  const storage = syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE;
-  const shownBudgetIds = await storage.get<string[]>("budgets");
-  if (!shownBudgetIds) return;
+  const storageArea = syncEnabled ? "sync" : "local";
+  const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
+  if (!budgetIds || budgetIds.length === 0) return;
 
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);
@@ -102,14 +100,14 @@ export async function backgroundDataRefresh() {
   });
 
   const alerts: CurrentAlerts = {};
-  const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
+  const oldAlerts = await currentAlertsStorage.getValue();
   const notificationsEnabled = await checkPermissions(["notifications"]);
 
   // Fetch new data for each budget and update alerts
   // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
   // See https://github.com/TanStack/query/issues/8075
-  for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
-    const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
+  for (const budget of budgetsData.filter(({ id }) => budgetIds.includes(id))) {
+    const budgetSettings = await budgetSettingsStorage(budget.id, storageArea).getValue();
     if (!budgetSettings) continue;
 
     let unapprovedTxs: TransactionDetail[] | undefined;
@@ -194,5 +192,5 @@ export async function backgroundDataRefresh() {
   }
 
   updateIconAndTooltip(alerts, budgetsData);
-  await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
+  await currentAlertsStorage.setValue(alerts);
 }

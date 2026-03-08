@@ -1,14 +1,14 @@
-import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage-state";
 
 import {
-  CHROME_LOCAL_STORAGE,
-  CHROME_SYNC_STORAGE,
-  DEFAULT_BUDGET_SETTINGS,
-} from "~lib/constants";
-import { useAppSettings, usePinnedItems, usePopupState, useTokenData } from "~lib/state";
-import type { AppSettings, BudgetSettings } from "~lib/types";
+  useAppSettings,
+  useBudgetSettings,
+  usePinnedItems,
+  usePopupState,
+  useTokenData,
+} from "~lib/state";
+import type { AppSettings } from "~lib/types";
 
 export const useStorageProvider = () => {
   // UNPERSISTED STATE
@@ -33,10 +33,15 @@ export const useStorageProvider = () => {
   const { pinnedItems, toggleCategory, toggleAccount, setCategories, setAccounts } =
     usePinnedItems(popupState.budgetId, sync);
 
-  const storageArea = useMemo(
-    () => (sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
-    [sync]
+  /** Budget-specific settings for the current budget. Is synced if the user chooses. */
+  const [budgetSettings, setBudgetSettings] = useBudgetSettings(
+    popupState.budgetId,
+    sync
   );
+
+  /** Get budget settings for a given budget ID, with the current sync option applied. */
+  const useBudgetSettingsWithSync = (budgetId: string) =>
+    useBudgetSettings(budgetId, sync);
 
   /** Keep the global theme setting synced to localStorage. This helps avoid the 'flash' on load.
    *  See also `public/scripts/theme.js` */
@@ -48,27 +53,6 @@ export const useStorageProvider = () => {
     if (settings?.theme && themeLocalSetting !== settings.theme)
       setThemeLocalSetting(settings.theme);
   }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
-
-  /** Budget-specific settings for the current budget. Is synced if the user chooses. */
-  const [budgetSettings, setBudgetSettings] = useExtensionStorage<
-    BudgetSettings | undefined
-  >(
-    { key: `budget-${popupState.budgetId}`, instance: storageArea },
-    (data, isHydrated) =>
-      !isHydrated || !popupState.budgetId
-        ? undefined
-        : !data
-          ? DEFAULT_BUDGET_SETTINGS
-          : data
-  );
-
-  /** Get settings for a specific budget */
-  const useBudgetSettings = (budgetId: string) =>
-    useExtensionStorage<BudgetSettings | undefined>(
-      { key: `budget-${budgetId}`, instance: storageArea },
-      (data, isHydrated) =>
-        !isHydrated ? undefined : !data ? DEFAULT_BUDGET_SETTINGS : data
-    );
 
   // Wait for essential state to be loaded from Chrome storage to avoid flashes (should only take a few ms)
   if (!tokenState || !settings) return null;
@@ -92,12 +76,12 @@ export const useStorageProvider = () => {
     setAccounts,
     budgetSettings,
     setBudgetSettings,
-    useBudgetSettings,
+    useBudgetSettings: useBudgetSettingsWithSync,
   };
 };
 
 export const StorageContext =
-  //@ts-expect-error Provider will not actually render a null value
+  //@ts-expect-error Context should not return null due to early return in Provider
   createContext<NonNullable<ReturnType<typeof useStorageProvider>>>(null);
 
 /** Hook for storing and retrieving data from browser storage */

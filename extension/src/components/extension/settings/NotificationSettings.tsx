@@ -5,7 +5,6 @@ import { Dialog, IconButton, Tooltip } from "~components";
 import { CollapseListIcon, ExpandListIcon } from "~components/icons/ActionIcons";
 import { useStorageContext } from "~lib/context";
 import type { BudgetSettings, CachedBudget } from "~lib/types";
-
 import ReconcileAlertSettings from "./ReconcileAlertSettings";
 
 export default function NotificationSettings({ budget }: { budget: CachedBudget }) {
@@ -18,13 +17,10 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
     key: K,
     value: BudgetSettings["notifications"][K]
   ) =>
-    setBudgetSettings((prev) => {
-      if (!prev) return undefined;
-      return {
-        ...prev,
-        notifications: { ...prev.notifications, [key]: value }
-      };
-    });
+    setBudgetSettings((prev) => ({
+      ...prev,
+      notifications: { ...prev.notifications, [key]: value },
+    }));
 
   return (
     <>

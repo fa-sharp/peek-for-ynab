@@ -1,11 +1,11 @@
+import type { SetStateAction } from "react";
 import { createStore, type ExtractState, type StateCreator, useStore } from "zustand";
 import { persist } from "zustand/middleware";
 import { useShallow } from "zustand/react/shallow";
 
 import { STORAGE_KEYS } from "~lib/constants";
-import type { TxAddState } from "~lib/types";
+import type { CachedPayee, SubTxState, TxAddState } from "~lib/types";
 import { stringValueToMillis } from "~lib/utils";
-import type { TxStoreAction } from "./txStoreAction";
 import { DEFAULT_SUB_TX, DEFAULT_TX_STATE } from "./txStoreDefaults";
 import { createZustandChromeStorage, useZustandChromeStorageEvents } from "./utils";
 
@@ -106,3 +106,62 @@ const txStateReducer = (prev: TxAddState, action: TxStoreAction): Partial<TxAddS
       return { errorMessage: action.message };
   }
 };
+
+/** All actions that can be dispatched to update the transaction form store. */
+export type TxStoreAction =
+  | {
+      type: "setAmount";
+      amount?: string;
+    }
+  | {
+      type: "setAmountType";
+      amountType: "Inflow" | "Outflow";
+    }
+  | {
+      type: "setDate";
+      date: string;
+    }
+  | {
+      type: "setAccount";
+      accountId: string | null;
+    }
+  | {
+      type: "setCategory";
+      categoryId: string | null;
+    }
+  | {
+      type: "setPayee";
+      payee: CachedPayee | { name: string } | null;
+    }
+  | {
+      type: "setMemo";
+      memo: SetStateAction<string>;
+    }
+  | {
+      type: "setFlag";
+      flag: string;
+    }
+  | {
+      type: "setIsTransfer";
+      isTransfer: boolean;
+    }
+  | {
+      type: "setIsSplit";
+      isSplit: boolean;
+    }
+  | {
+      type: "addSubTx";
+    }
+  | {
+      type: "removeSubTx";
+    }
+  | {
+      type: "editSubTx";
+      idx: number;
+      update: (tx: SubTxState) => SubTxState;
+    }
+  | {
+      type: "setCleared";
+      cleared: boolean;
+    }
+  | { type: "setErrorMessage"; message?: string };

@@ -1,4 +1,3 @@
-import { Storage, type StorageAreaName } from "@plasmohq/storage";
 import type { DehydratedState } from "@tanstack/react-query";
 import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
@@ -14,7 +13,7 @@ import { sendMessage } from "~lib/messaging";
 function Devtools() {
   const { token } = useStorageContext();
 
-  const [area, setArea] = useState<StorageAreaName>("local");
+  const [area, setArea] = useState<"local" | "sync">("local");
   const [data, setData] = useState<Record<string, unknown>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
@@ -50,12 +49,11 @@ function Devtools() {
       });
     };
 
-    const storage = new Storage({ area });
-    storage.getAll().then(setData);
-    storage.primaryClient.onChanged.addListener(storageListener);
+    browser.storage[area].get().then(setData);
+    browser.storage[area].onChanged.addListener(storageListener);
 
     return () => {
-      storage.primaryClient.onChanged.removeListener(storageListener);
+      browser.storage[area].onChanged.removeListener(storageListener);
     };
   }, [area]);
 
@@ -130,7 +128,9 @@ function Devtools() {
       <h3>Browser Storage</h3>
       <div>
         Storage Area:{" "}
-        <select value={area} onChange={(e) => setArea(e.target.value as StorageAreaName)}>
+        <select
+          value={area}
+          onChange={(e) => setArea(e.target.value as "local" | "sync")}>
           <option>local</option>
           <option>sync</option>
         </select>

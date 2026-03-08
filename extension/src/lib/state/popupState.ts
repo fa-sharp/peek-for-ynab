@@ -23,19 +23,16 @@ export const popupStateStorage = storage.defineItem<PopupState>(
   }
 );
 
-const usePopupStateQuery = () =>
-  useQuery({
+export const usePopupState = () => {
+  // `React.use` allows us to fetch the initial popup state on render
+  const popupStateQuery = useQuery({
     queryKey: [STORAGE_KEYS.PopupState],
     queryFn: popupStateStorage.getValue,
     staleTime: Infinity,
   });
-
-export const usePopupState = () => {
-  // `React.use` allows us to fetch the initial popup state on render
-  const popupStateQuery = usePopupStateQuery();
   const initialPopupState = use(popupStateQuery.promise);
 
-  // We can now render with immediate access to the initial popup state
+  // We can now render with synchronous access to the initial popup state
   const [popupState, _setPopupState] = useChromeStorage(
     popupStateStorage,
     initialPopupState
