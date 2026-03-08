@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { createQueryClient } from "~lib/queryClient";
 import { AuthProvider, useAuthContext } from "./authContext";
 import { NotificationsProvider, useNotificationsContext } from "./notificationsContext";
-import { StorageProvider, useStorageContext } from "./storageContext";
+import { useStorageContext } from "./storageContext";
+import StorageProvider from "./storageProvider";
 import { useYNABContext, YNABProvider } from "./ynabContext";
 
 const queryClient = createQueryClient({ staleTime: 30 * 1000 }); // data is assumed fresh for 30 seconds

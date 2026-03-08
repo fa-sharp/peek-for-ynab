@@ -16,7 +16,7 @@ interface BudgetToStringArrayMap {
   [budgetId: string]: string[] | undefined;
 }
 
-const useStorageProvider = () => {
+export const useStorageProvider = () => {
   // Unpersisted state
   /** Whether user can edit and re-arrange the pinned categories and accounts */
   const [editingItems, setEditingItems] = useState(false);
@@ -224,17 +224,9 @@ const useStorageProvider = () => {
   };
 };
 
-const StorageContext =
-  //@ts-expect-error will not render if state is not loaded
+export const StorageContext =
+  //@ts-expect-error Provider will not actually render a null value
   createContext<NonNullable<ReturnType<typeof useStorageProvider>>>(null);
 
 /** Hook for storing and retrieving data from browser storage */
 export const useStorageContext = () => useContext(StorageContext);
-
-export const StorageProvider = ({ children }: { children: React.ReactNode }) => {
-  const value = useStorageProvider();
-
-  if (!value) return null;
-
-  return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>;
-};
