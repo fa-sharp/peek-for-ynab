@@ -10,7 +10,6 @@ import {
 } from "~components/icons/ActionIcons";
 import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { usePopupState, useSetPopupState } from "~lib/state";
 import type { TxAddState } from "~lib/types";
 import { millisToStringValue } from "~lib/utils";
 
@@ -22,30 +21,26 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 });
 
 const AccountTxsView = () => {
-  const { settings, budgetSettings } = useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState } = useStorageContext();
   const { accountsData, categoriesData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
-  const [popupState, setPopupState] = usePopupState();
 
   const account = useMemo(
-    () => accountsData?.find((a) => a.id === popupState?.detailState?.id),
-    [accountsData, popupState?.detailState?.id]
+    () => accountsData?.find((a) => a.id === popupState.detailState?.id),
+    [accountsData, popupState.detailState?.id]
   );
 
   const hasReconcileAlert = useMemo(
     () =>
-      account &&
-      popupState?.budgetId &&
-      currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.reconcile,
-    [account, currentAlerts, popupState?.budgetId]
+      account && currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.reconcile,
+    [account, currentAlerts, popupState.budgetId]
   );
 
   const hasImportError = useMemo(
     () =>
       account &&
-      popupState?.budgetId &&
       currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.importError,
-    [account, currentAlerts, popupState?.budgetId]
+    [account, currentAlerts, popupState.budgetId]
   );
 
   /** The corresponding CCP categoroy, if this is a credit card account */
@@ -76,10 +71,10 @@ const AccountTxsView = () => {
     () =>
       account &&
       window.open(
-        `https://app.ynab.com/${popupState?.budgetId}/accounts/${account.id}`,
+        `https://app.ynab.com/${popupState.budgetId}/accounts/${account.id}`,
         "_blank"
       ),
-    [account, popupState?.budgetId]
+    [account, popupState.budgetId]
   );
 
   if (!account || !selectedBudgetData) return <div>Loading...</div>;
@@ -254,8 +249,8 @@ const AccountTxsView = () => {
 export default AccountTxsView;
 
 const AccountActivityView = ({ accountId }: { accountId: string }) => {
+  const { setPopupState } = useStorageContext();
   const { useGetAccountTxs, selectedBudgetData, addedTransaction } = useYNABContext();
-  const setPopupState = useSetPopupState();
 
   const [sinceDaysAgo, setSinceDaysAgo] = useState(15);
   const { data: accountTxs, isFetching: isFetchingTxs } = useGetAccountTxs(

@@ -6,15 +6,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type Browser, browser } from "#imports";
 import { BACKGROUND_ALARM_NAME } from "~lib/constants";
-import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
+import { AppProvider } from "~lib/context";
+import { useStorageContext } from "~lib/context/storageContext";
 import { sendMessage } from "~lib/messaging";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
-  const { tokenData, setTokenData } = useStorageContext();
+  const { token } = useStorageContext();
 
   const [area, setArea] = useState<StorageAreaName>("local");
-  const [data, setData] = useState<Record<string, string>>({});
+  const [data, setData] = useState<Record<string, unknown>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
   const [backgroundAlarm, setBackgroundAlarm] = useState<Browser.alarms.Alarm | null>(
@@ -83,28 +84,29 @@ function Devtools() {
       }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
-      {!tokenData ? (
+      {!token.tokenData ? (
         <div>No token data</div>
       ) : (
         <>
           <div>
-            Access token: <SensitiveString data={tokenData.accessToken} />
+            Access token: <SensitiveString data={token.tokenData.accessToken} />
           </div>
           <div>
-            Refresh token: <SensitiveString data={tokenData.refreshToken} />
+            Refresh token: <SensitiveString data={token.tokenData.refreshToken} />
           </div>
+          <div>Token expires: {new Date(token.tokenData.expires).toLocaleString()}</div>
           <div>
-            Token expires: {tokenData && new Date(tokenData.expires).toLocaleString()}
-          </div>
-          <div>
-            {!tokenData.isRefreshing ? (
-              <button onClick={() => sendMessage("tokenRefreshNeeded")}>
+            {!token.isRefreshing ? (
+              <button
+                onClick={() =>
+                  sendMessage("tokenRefreshNeeded", token.tokenData!.refreshToken)
+                }>
                 Force refresh
               </button>
             ) : (
               <button disabled>Refreshing...</button>
             )}
-            <button onClick={() => setTokenData(null)}>Clear token</button>
+            <button onClick={() => token.setTokenData(null)}>Clear token</button>
           </div>
         </>
       )}
@@ -149,35 +151,37 @@ function Devtools() {
       </div>
       {Object.entries(data)
         .sort(([key1], [key2]) => key1.localeCompare(key2))
-        .map(
-          ([key, value]) =>
-            key !== "tokenData" && (
-              <div
-                key={key}
-                style={{
-                  display: "flex",
-                  paddingBlock: 3,
-                  borderBottom: "solid 1px lightgray",
-                }}>
-                <b
-                  style={{
-                    width: 110,
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}>
-                  {key}
-                </b>
-                <div>
-                  {value === undefined || typeof JSON.parse(value) !== "object" ? (
-                    value
-                  ) : (
-                    <FormattedJSON value={JSON.parse(value)} />
-                  )}
-                </div>
-              </div>
-            )
-        )}
+        .filter(([key]) => key !== "tokenData")
+        .map(([key, value]) => (
+          <div
+            key={key}
+            style={{
+              display: "flex",
+              paddingBlock: 3,
+              borderBottom: "solid 1px lightgray",
+            }}>
+            <b
+              style={{
+                width: 110,
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}>
+              {key}
+            </b>
+            <div>
+              {value == undefined ? (
+                value
+              ) : typeof value === "object" ? (
+                <FormattedJSON value={value} />
+              ) : typeof value === "string" ? (
+                <FormattedJSON value={JSON.parse(value)} />
+              ) : (
+                value.toString()
+              )}
+            </div>
+          </div>
+        ))}
       <h3>API Cache</h3>
       <div>
         <button onClick={loadCache}>Refresh</button>
@@ -190,9 +194,9 @@ function Devtools() {
 
 function DevtoolsWrapper() {
   return (
-    <StorageProvider>
+    <AppProvider>
       <Devtools />
-    </StorageProvider>
+    </AppProvider>
   );
 }
 

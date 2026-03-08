@@ -1,6 +1,5 @@
 import { useStorage as useExtensionStorage } from "@plasmohq/storage/hook";
-import { createProvider } from "puro";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import useLocalStorage from "use-local-storage-state";
 
 import { browser } from "#imports";
@@ -8,9 +7,8 @@ import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
   DEFAULT_BUDGET_SETTINGS,
-  DEFAULT_SETTINGS,
 } from "~lib/constants";
-import { usePopupState, useTokenData } from "~lib/state";
+import { useAppSettings, usePopupState, useTokenData } from "~lib/state";
 import type { AppSettings, BudgetSettings } from "~lib/types";
 
 /** Map of budget IDs to string arrays. */
@@ -19,51 +17,32 @@ interface BudgetToStringArrayMap {
 }
 
 const useStorageProvider = () => {
-  /** The token used to authenticate the YNAB user. Stored locally. */
-  const [tokenData, setTokenData] = useTokenData();
-
-  /** Current state of popup (persisted locally) */
-  const [popupState, setPopupState] = usePopupState();
-
+  // Unpersisted state
   /** Whether user can edit and re-arrange the pinned categories and accounts */
   const [editingItems, setEditingItems] = useState(false);
-
   /** Omnibox input state */
   const [omniboxInput, setOmniboxInput] = useState("");
 
-  /** Whether syncing of settings is enabled (persisted in extension storage) */
-  const [syncEnabledInStorage, setSyncEnabledInStorage] = useExtensionStorage<
-    boolean | undefined
-  >({ key: "sync", instance: CHROME_LOCAL_STORAGE }, (val, isHydrated) =>
-    !isHydrated ? undefined : !val ? false : val
-  );
+  // Persisted state
+  /** The token used to authenticate the YNAB user. Persisted locally. */
+  const tokenState = useTokenData();
 
-  /** Keep `syncEnabled` setting synced to localStorage, in order to make it synchronous for the subsequent hooks */
-  const [syncEnabledLocal, setSyncEnabledLocal] = useLocalStorage<boolean>("sync", {
-    defaultValue: false,
-  });
-  useEffect(() => {
-    if (syncEnabledInStorage !== undefined && syncEnabledInStorage !== syncEnabledLocal) {
-      setSyncEnabledLocal(syncEnabledInStorage);
-      location.reload(); // need to refresh the page, since the Storage hooks won't automatically update
-    }
-  }, [setSyncEnabledLocal, syncEnabledInStorage, syncEnabledLocal]);
+  /** Current state of popup. Persisted locally. */
+  const [popupState, setPopupState] = usePopupState();
+
+  /** Global settings, including whether user has chosen to sync settings to their profile. */
+  const { sync, settings, changeSetting } = useAppSettings();
 
   const storageArea = useMemo(
-    () => (syncEnabledLocal ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
-    [syncEnabledLocal]
-  );
-
-  /** Extension settings. Is synced if the user chooses. */
-  const [settings, setSettings] = useExtensionStorage<AppSettings | undefined>(
-    { key: "settings", instance: storageArea },
-    (data, isHydrated) => (!isHydrated ? undefined : !data ? DEFAULT_SETTINGS : data)
+    () => (sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE),
+    [sync]
   );
 
   /** Keep theme setting synced to localStorage. This helps avoid the 'flash' - see also `public/scripts/theme.js` */
-  const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<
-    "light" | "dark" | "auto"
-  >("theme", { defaultValue: "auto" });
+  const [themeLocalSetting, setThemeLocalSetting] = useLocalStorage<AppSettings["theme"]>(
+    "theme",
+    { defaultValue: "auto" }
+  );
   useEffect(() => {
     if (settings?.theme && themeLocalSetting !== settings.theme)
       setThemeLocalSetting(settings.theme);
@@ -116,18 +95,6 @@ const useStorageProvider = () => {
       { key: "accounts", instance: storageArea },
       (data, isHydrated) => (!isHydrated ? undefined : !data ? {} : data)
     );
-
-  const changeSetting = <K extends keyof AppSettings | "sync">(
-    key: K,
-    newValue: K extends keyof AppSettings ? AppSettings[K] : boolean
-  ) => {
-    if (key === "sync" && typeof newValue === "boolean")
-      setSyncEnabledInStorage(newValue);
-    else
-      setSettings((prevSettings) =>
-        prevSettings ? { ...prevSettings, [key]: newValue } : prevSettings
-      );
-  };
 
   /** Save/pin a category for the currently selected budget */
   const saveCategory = (categoryIdToSave: string) => {
@@ -220,22 +187,24 @@ const useStorageProvider = () => {
 
   /** Clears all values, removes all locally saved data from browser storage */
   const removeAllData = async () => {
-    await setTokenData(null);
+    await tokenState?.setTokenData(null);
     await browser.storage.local.clear();
     localStorage.clear();
   };
 
+  // Wait for essential state to be loaded from Chrome storage (should only take a few ms)
+  if (!tokenState || !popupState || !settings) return null;
+
   return {
-    tokenData,
-    setTokenData,
+    token: tokenState,
     popupState,
     setPopupState,
     editingItems,
     setEditingItems,
     omniboxInput,
     setOmniboxInput,
+    settingsSynced: sync,
     settings,
-    syncEnabled: syncEnabledInStorage,
     changeSetting,
     shownBudgetIds,
     setShownBudgetIds,
@@ -255,8 +224,17 @@ const useStorageProvider = () => {
   };
 };
 
-const { BaseContext, Provider } = createProvider(useStorageProvider);
+const StorageContext =
+  //@ts-expect-error will not render if state is not loaded
+  createContext<NonNullable<ReturnType<typeof useStorageProvider>>>(null);
 
 /** Hook for storing and retrieving data from browser storage */
-export const useStorageContext = () => useContext(BaseContext);
-export const StorageProvider = Provider;
+export const useStorageContext = () => useContext(StorageContext);
+
+export const StorageProvider = ({ children }: { children: React.ReactNode }) => {
+  const value = useStorageProvider();
+
+  if (!value) return null;
+
+  return <StorageContext.Provider value={value}>{children}</StorageContext.Provider>;
+};

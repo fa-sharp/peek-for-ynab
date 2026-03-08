@@ -14,13 +14,11 @@ import { useConfetti } from "~lib/hooks";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
 import { findAllEmoji, getNDaysAgoISO } from "../utils";
-import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
 const useYNABProvider = () => {
-  const { tokenExpired } = useAuthContext();
   const {
-    tokenData,
+    token,
     budgetSettings,
     savedAccounts,
     savedCategories,
@@ -35,9 +33,10 @@ const useYNABProvider = () => {
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
-    if (tokenData && !tokenExpired) setYnabAPI(new ynab.API(tokenData.accessToken));
+    if (token.tokenData?.accessToken && !token.isExpired)
+      setYnabAPI(new ynab.API(token.tokenData.accessToken));
     else setYnabAPI(null);
-  }, [tokenData, tokenExpired]);
+  }, [token.tokenData?.accessToken, token.isExpired]);
 
   /** Fetch and cache user's budgets. */
   const {

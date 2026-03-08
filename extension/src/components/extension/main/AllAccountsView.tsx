@@ -4,7 +4,6 @@ import type { Account } from "ynab";
 import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
-import { useSetPopupState } from "~lib/state";
 import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import {
   AddTransactionIcon,
@@ -19,16 +18,15 @@ import {
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 export default function AllAccountsView() {
-  const { savedAccounts, saveAccount, editingItems, settings } = useStorageContext();
+  const { savedAccounts, saveAccount, editingItems, settings, setPopupState } =
+    useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
-
-  const setPopupState = useSetPopupState();
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!selectedBudgetData || !accountsData || !savedAccounts || !settings) return null;
+  if (!selectedBudgetData || !accountsData || !savedAccounts) return null;
 
   return (
     <>

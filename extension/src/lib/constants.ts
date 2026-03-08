@@ -11,13 +11,16 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 
 /** Storage keys for persisted state items */
 export const STORAGE_KEYS = Object.freeze({
+  AppSettings: "settings",
   PopupState: "popupState",
+  ShouldSyncSettings: "sync",
   TxState: "txState",
   Token: "tokenData",
   TokenRefreshing: "tokenRefreshing",
 });
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+export const FIVE_MINUTES_IN_MILLIS = 1000 * 60 * 5;
 
 export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const BACKGROUND_ALARM_NAME = "backgroundRefresh";

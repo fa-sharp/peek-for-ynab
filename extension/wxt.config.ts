@@ -11,14 +11,13 @@ export default defineConfig({
     vite: {
       babel: {
         plugins: ["babel-plugin-react-compiler"],
-        presets: ["jotai-babel/preset"]
-      }
-    }
+      },
+    },
   },
   vite: () => ({
     envPrefix: "PUBLIC_",
     build: {
-      commonjsOptions: { transformMixedEsModules: true } // needed for packages that use `require()`
+      commonjsOptions: { transformMixedEsModules: true }, // needed for packages that use `require()`
     },
     plugins: [
       {
@@ -26,20 +25,20 @@ export default defineConfig({
         apply: "serve",
         transformIndexHtml: (html) => ({
           html,
-          tags: [{ tag: "script", attrs: { src: "http://localhost:8097" } }]
-        })
-      }
-    ]
+          tags: [{ tag: "script", attrs: { src: "http://localhost:8097" } }], // allow react devtools in development
+        }),
+      },
+    ],
   }),
   alias: {
     "~components": "src/components",
     "~lib": "src/lib",
-    "~test": "test"
+    "~test": "test",
   },
   autoIcons: { baseIconPath: "assets/icon512.png" },
   webExt: {
     chromiumArgs: [`--user-data-dir=${resolve(".wxt/chrome-data")}`],
-    keepProfileChanges: true
+    keepProfileChanges: true,
   },
   modules: ["@wxt-dev/auto-icons", "@wxt-dev/module-react"],
   manifest: ({ mode }) => ({
@@ -50,28 +49,28 @@ export default defineConfig({
     optional_permissions: ["scripting", "activeTab", "notifications"],
     host_permissions: ["https://api.ynab.com/*"],
     omnibox: {
-      keyword: "peek"
+      keyword: "peek",
     },
     commands: {
       _execute_action: {
         suggested_key: {
-          default: "Alt+Shift+Y"
+          default: "Alt+Shift+Y",
         },
-        description: "Open the extension popup"
-      }
+        description: "Open the extension popup",
+      },
     },
     browser_specific_settings: {
       gecko: {
         id: "{e734411e-6aae-4590-ab10-65e7a226b311}",
-        strict_min_version: "109.0"
-      }
+        strict_min_version: "109.0",
+      },
     },
     content_security_policy: {
       extension_pages:
         // allow React devtools in development
         mode === "development"
           ? "script-src 'self' 'wasm-unsafe-eval' http://localhost:3000 http://localhost:8097"
-          : undefined
-    }
-  })
+          : undefined,
+    },
+  }),
 });

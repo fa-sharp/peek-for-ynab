@@ -2,23 +2,18 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 import { AccountView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { useSetPopupState } from "~lib/state";
 import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, editingItems, settings } = useStorageContext();
+  const { removeAccount, editingItems, settings, setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
-  const setPopupState = useSetPopupState();
 
-  if (
-    !savedAccountsData ||
-    !selectedBudgetData ||
-    !settings ||
-    savedAccountsData.length === 0
-  )
+  if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
     return null;
+
+  const { id: budgetId, currencyFormat } = selectedBudgetData;
 
   return (
     <Droppable droppableId="savedAccounts" isDropDisabled={!editingItems}>
@@ -43,8 +38,8 @@ export default function SavedAccountsView() {
                   <AccountView
                     key={account.id}
                     account={account}
-                    alerts={currentAlerts?.[selectedBudgetData.id]?.accounts[account.id]}
-                    currencyFormat={selectedBudgetData?.currencyFormat}
+                    alerts={currentAlerts?.[budgetId]?.accounts[account.id]}
+                    currencyFormat={currencyFormat}
                     settings={settings}
                     addedTransaction={addedTransaction}
                     actionElementsLeft={

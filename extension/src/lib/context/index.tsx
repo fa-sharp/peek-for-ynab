@@ -1,10 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { DevTools } from "jotai-devtools";
-import jotaiDevtoolsCss from "jotai-devtools/styles.css?inline";
 import type { ReactNode } from "react";
 
-import { IS_DEV } from "~lib/constants";
 import { createQueryClient } from "~lib/queryClient";
 import { AuthProvider, useAuthContext } from "./authContext";
 import { NotificationsProvider, useNotificationsContext } from "./notificationsContext";
@@ -15,33 +12,22 @@ const queryClient = createQueryClient({ staleTime: 30 * 1000 }); // data is assu
 
 /** Provides auth, storage, and data contexts to the containing components */
 const AppProvider = ({ children }: { children: ReactNode }) => (
-  <>
-    <JotaiDevTools />
+  <QueryClientProvider client={queryClient}>
     <StorageProvider>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
-        <AuthProvider>
-          <YNABProvider>
-            <NotificationsProvider>{children}</NotificationsProvider>
-          </YNABProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+      <AuthProvider>
+        <YNABProvider>
+          <NotificationsProvider>{children}</NotificationsProvider>
+        </YNABProvider>
+      </AuthProvider>
     </StorageProvider>
-  </>
+  </QueryClientProvider>
 );
-
-const JotaiDevTools = () =>
-  IS_DEV ? (
-    <>
-      <style>{jotaiDevtoolsCss}</style>
-      <DevTools />
-    </>
-  ) : null;
 
 export {
   AppProvider,
   useAuthContext,
   useYNABContext,
   useNotificationsContext,
-  useStorageContext
+  useStorageContext,
 };

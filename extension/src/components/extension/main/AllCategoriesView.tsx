@@ -4,7 +4,6 @@ import type { Account, CategoryGroupWithCategories } from "ynab";
 import { CategoryView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
-import { useSetPopupState } from "~lib/state";
 import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 import {
@@ -21,17 +20,15 @@ import {
 
 /** View of all categories in a budget, grouped by category groups */
 function CategoriesView() {
-  const { savedCategories, saveCategory, editingItems, settings } = useStorageContext();
+  const { savedCategories, saveCategory, editingItems, settings, setPopupState } =
+    useStorageContext();
   const { selectedBudgetData, accountsData, categoryGroupsData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
-
-  const setPopupState = useSetPopupState();
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!selectedBudgetData || !categoryGroupsData || !savedCategories || !settings)
-    return null;
+  if (!selectedBudgetData || !categoryGroupsData || !savedCategories) return null;
 
   return (
     <>

@@ -2,13 +2,7 @@ import { type SubmitEventHandler, useCallback, useEffect, useRef, useState } fro
 import { TransactionClearedStatus, type TransactionFlagColor } from "ynab";
 
 import { useStorageContext, useYNABContext } from "./context";
-import {
-  type TxStoreAction,
-  txStore,
-  usePopupState,
-  useTxStore,
-  useTxStoreSubTxTotals,
-} from "./state";
+import { type TxStoreAction, txStore, useTxStore, useTxStoreSubTxTotals } from "./state";
 import {
   checkPermissions,
   executeScriptInCurrentTab,
@@ -22,16 +16,26 @@ export type TransactionFormDispatch = ReturnType<typeof useTransaction>["dispatc
 /** Utility hook for transaction form logic */
 export default function useTransaction() {
   const { accountsData, categoriesData, addTransaction } = useYNABContext();
-  const { settings, budgetSettings, setOmniboxInput, setBudgetSettings } =
-    useStorageContext();
+  const {
+    popupState,
+    setPopupState,
+    settings,
+    budgetSettings,
+    setOmniboxInput,
+    setBudgetSettings,
+  } = useStorageContext();
 
-  const [popupState, setPopupState] = usePopupState();
-  const [isSaving, setIsSaving] = useState(false);
   const dispatchTxState = useTxStore((s) => s.dispatch);
   const resetTxForm = useTxStore((s) => s.reset);
+  const returnTo = useTxStore((s) => s.returnTo);
+
+  /** Cancel adding transaction and return to previous page */
+  const onCancelTransaction = useCallback(() => {
+    setPopupState(returnTo ?? { view: "main" });
+  }, [setPopupState, returnTo]);
 
   // Try parsing user's current selection as the initial amount
-  useParseAmountFromUserSelection(!!settings?.currentTabAccess, dispatchTxState);
+  useParseAmountFromUserSelection(!!settings.currentTabAccess, dispatchTxState);
 
   // Reset form state if switching budgets
   const originalBudgetId = useRef(popupState?.budgetId);
@@ -42,6 +46,7 @@ export default function useTransaction() {
     }
   }, [popupState.budgetId, resetTxForm]);
 
+  const [isSaving, setIsSaving] = useState(false);
   const { leftOverSubTxsAmount } = useTxStoreSubTxTotals();
 
   /** Save the transaction to YNAB */
@@ -192,9 +197,10 @@ export default function useTransaction() {
   );
 
   return {
-    isSaving,
-    onSaveTransaction,
     dispatch: dispatchTxState,
+    onCancelTransaction,
+    onSaveTransaction,
+    isSaving,
   };
 }
 

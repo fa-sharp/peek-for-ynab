@@ -16,23 +16,21 @@ import {
   TransactionForm,
 } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { useGetPopupState } from "~lib/state";
 
 export default function PopupMain() {
+  const { popupState } = useStorageContext();
   const { newVersionAlert } = useNotificationsContext();
-  const popupState = useGetPopupState();
 
   return (
     <>
       {newVersionAlert && <NewVersionAlert />}
       <PopupNav />
-      {popupState?.view === "txAdd" && <TransactionForm />}
-      {popupState?.view === "main" && <MainView />}
-      {popupState?.view === "detail" && !popupState.detailState && <MainView />}
-      {popupState?.view === "detail" && popupState.detailState?.type === "account" && (
+      {popupState.view === "txAdd" && <TransactionForm />}
+      {popupState.view === "main" && <MainView />}
+      {popupState.view === "detail" && popupState.detailState?.type === "account" && (
         <AccountDetailView />
       )}
-      {popupState?.view === "detail" && popupState.detailState?.type === "category" && (
+      {popupState.view === "detail" && popupState.detailState?.type === "category" && (
         <CategoryDetailView />
       )}
       {popupState?.view === "move" && <MoveMoney />}

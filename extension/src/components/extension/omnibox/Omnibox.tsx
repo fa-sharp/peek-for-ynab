@@ -2,7 +2,6 @@ import { useMemo } from "react";
 
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
-import { useSetPopupState } from "~lib/state";
 import useTransaction from "~lib/useTransaction";
 import { searchWithinString } from "~lib/utils";
 import OmniboxFiltered from "./OmniboxFiltered";
@@ -19,11 +18,11 @@ export default function Omnibox() {
     saveCategory,
     savedAccounts,
     savedCategories,
+    setPopupState,
   } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
   const { selectedBudgetData, budgetMainData } = useYNABContext();
   const { dispatch, onSaveTransaction, isSaving } = useTransaction();
-  const setPopupState = useSetPopupState();
 
   /** Parsed search terms for each transaction field */
   const parsedQuery = useMemo(() => {
@@ -45,7 +44,7 @@ export default function Omnibox() {
     };
   }, [budgetMainData, parsedQuery, omniboxInput]);
 
-  if (!selectedBudgetData || !budgetMainData || !settings) return null;
+  if (!selectedBudgetData || !budgetMainData) return null;
 
   return (
     <form className="flex-col mb-md" onSubmit={onSaveTransaction}>

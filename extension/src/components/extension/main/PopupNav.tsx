@@ -19,7 +19,6 @@ import {
 import { browser } from "#imports";
 import { BudgetSelect, IconButton, Menu } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
-import { usePopupState } from "~lib/state";
 
 /** Whether data is considered fresh for display, based on `lastUpdated` time (<4 minutes old) */
 const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > Date.now();
@@ -27,7 +26,8 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
   const { tokenExpired, tokenRefreshing } = useAuthContext();
-  const { settings, shownBudgetIds, editingItems, setEditingItems } = useStorageContext();
+  const { popupState, setPopupState, shownBudgetIds, editingItems, setEditingItems } =
+    useStorageContext();
   const {
     budgetsData,
     accountsLastUpdated,
@@ -38,7 +38,6 @@ export default function PopupNav() {
     isRefreshingBudgets,
   } = useYNABContext();
 
-  const [popupState, setPopupState] = usePopupState();
   const globalIsFetching = useIsFetching();
 
   const shownBudgetsData = useMemo(
@@ -96,7 +95,7 @@ export default function PopupNav() {
   if (tokenRefreshing) return <div>Loading...</div>;
   if (tokenExpired && !tokenRefreshing) return <div>Authentication error!</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
-  if (!shownBudgetsData || !settings) return null; // storage not hydrated yet
+  if (!shownBudgetsData) return null; // No budgets to show
 
   return (
     <nav className="flex-row justify-between mb-md">

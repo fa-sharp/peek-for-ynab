@@ -5,7 +5,7 @@ import { TransactionFlagColor } from "ynab";
 import { AmountField, IconButton, MemoField } from "~components";
 import { CheckIcon as Check } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { useSetPopupState, useTxStore } from "~lib/state";
+import { useTxStore } from "~lib/state";
 import type {
   AppSettings,
   BudgetMainData,
@@ -55,7 +55,7 @@ export function TransactionFormInner({
   selectedBudgetData,
   settings,
 }: Props) {
-  const { onSaveTransaction, isSaving } = useTransaction();
+  const { onSaveTransaction, isSaving, onCancelTransaction } = useTransaction();
 
   const {
     amount,
@@ -69,7 +69,6 @@ export function TransactionFormInner({
     memo,
     errorMessage,
     dispatch,
-    returnTo,
   } = useTxStore((s) => ({
     amount: s.amount,
     amountType: s.amountType,
@@ -82,14 +81,8 @@ export function TransactionFormInner({
     flag: s.flag,
     errorMessage: s.errorMessage,
     dispatch: s.dispatch,
-    returnTo: s.returnTo,
   }));
 
-  const setPopupState = useSetPopupState();
-  const onCancel = useCallback(
-    () => setPopupState(returnTo ?? { view: "main" }),
-    [setPopupState, returnTo]
-  );
   const setMemo = useCallback(
     (memo: SetStateAction<string>) => {
       dispatch({ type: "setMemo", memo });
@@ -228,7 +221,7 @@ export function TransactionFormInner({
         <button
           type="button"
           className="button gray rounded flex-1"
-          onClick={onCancel}
+          onClick={onCancelTransaction}
           disabled={isSaving}>
           Cancel
         </button>

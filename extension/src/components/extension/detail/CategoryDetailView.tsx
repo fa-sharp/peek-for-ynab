@@ -4,19 +4,19 @@ import { ArrowBack } from "tabler-icons-react";
 import { CurrencyView, IconButton, TransactionView } from "~components";
 import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import { usePopupState } from "~lib/state";
+import { useAppSettings } from "~lib/state";
 
 const CategoryTxsView = () => {
+  const { popupState, setPopupState } = useStorageContext();
   const { useGetCategoryTxs, categoriesData, selectedBudgetData, addedTransaction } =
     useYNABContext();
-  const { settings } = useStorageContext();
-  const [popupState, setPopupState] = usePopupState();
+  const { settings } = useAppSettings();
 
   const category = useMemo(
-    () => categoriesData?.find((c) => c.id === popupState?.detailState?.id),
-    [categoriesData, popupState?.detailState?.id]
+    () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
+    [categoriesData, popupState.detailState?.id]
   );
-  const { data: categoryTxs } = useGetCategoryTxs(popupState?.detailState?.id, 30);
+  const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 

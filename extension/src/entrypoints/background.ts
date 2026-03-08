@@ -11,15 +11,15 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput,
 } from "~lib/omnibox";
-import { getJotaiStore, popupStateAtom, tokenRefreshingAtom, txStore } from "~lib/state";
+import { popupStateStorage, tokenRefreshingStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
   // Listen for token refresh signal
-  onMessage("tokenRefreshNeeded", async () => {
-    const isAlreadyRefreshing = await getJotaiStore().get(tokenRefreshingAtom);
+  onMessage("tokenRefreshNeeded", async (msg) => {
+    const isAlreadyRefreshing = await tokenRefreshingStorage.getValue();
     if (!isAlreadyRefreshing) {
-      await refreshToken();
+      await refreshToken(msg.data);
     }
   });
 
@@ -65,7 +65,7 @@ export default defineBackground(() => {
       browser.omnibox.setDefaultSuggestion({
         description: OMNIBOX_START_TEXT,
       });
-      const budgetId = (await getJotaiStore().get(popupStateAtom))?.budgetId;
+      const budgetId = (await popupStateStorage.getValue())?.budgetId;
       if (budgetId) getBrowserBarDataForBudget(budgetId);
     }
   });
@@ -97,7 +97,7 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await getJotaiStore().get(popupStateAtom))?.budgetId;
+      : (await popupStateStorage.getValue())?.budgetId;
     if (!budgetId) {
       browser.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
       return;
@@ -129,7 +129,7 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await getJotaiStore().get(popupStateAtom))?.budgetId;
+      : (await popupStateStorage.getValue())?.budgetId;
     if (!budgetId) return;
 
     const data = await getBrowserBarDataForBudget(budgetId);
@@ -148,9 +148,9 @@ export default defineBackground(() => {
       memo: parsedQuery.memo?.trim() ?? null,
       isTransfer: parsedQuery.type === "transfer",
     });
-    await getJotaiStore().set(popupStateAtom, {
+    await popupStateStorage.setValue({
       view: "txAdd",
-      budgetId: budgetId,
+      budgetId,
     });
     browser.action.openPopup();
   });

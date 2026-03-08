@@ -9,6 +9,7 @@ import {
 import {
   CHROME_LOCAL_STORAGE,
   CHROME_SYNC_STORAGE,
+  FIVE_MINUTES_IN_MILLIS,
   IS_DEV,
   ONE_DAY_IN_MILLIS,
 } from "~lib/constants";
@@ -21,23 +22,15 @@ import {
 import { createQueryClient } from "~lib/queryClient";
 import type { BudgetSettings, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
-import { getJotaiStore, tokenAtom, tokenRefreshingAtom } from "./state";
+import { shouldSyncStorage, tokenDataStorage, tokenRefreshingStorage } from "./state";
 
-/** Refreshes the token, then persists and returns the new token data.
- * Returns null if no current token exists or if refresh fails */
-export async function refreshToken(): Promise<TokenData | null> {
-  const jotaiStore = getJotaiStore();
-
+/**
+ * Refreshes the token, then persists and returns the new token data.
+ * Returns null if no current token exists or if refresh fails
+ */
+export async function refreshToken(refreshToken: string): Promise<TokenData | null> {
   // signal that token is refreshing
-  await jotaiStore.set(tokenRefreshingAtom, true);
-
-  // check if current token exists
-  const tokenData = await jotaiStore.get(tokenAtom);
-  if (!tokenData) {
-    console.error("Not refreshing - no existing token data found");
-    await jotaiStore.set(tokenRefreshingAtom, false);
-    return null;
-  }
+  await tokenRefreshingStorage.setValue(true);
 
   // perform token refresh
   let newTokenData: TokenData | null = null;
@@ -48,10 +41,10 @@ export async function refreshToken(): Promise<TokenData | null> {
     const res = await fetch(refreshUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: tokenData.refreshToken }),
+      body: JSON.stringify({ refreshToken }),
     });
     if (!res.ok) {
-      if (res.status === 401) await jotaiStore.set(tokenAtom, null); // clear token if status is unauthorized
+      if (res.status === 401) await tokenDataStorage.setValue(null); // clear token if status is unauthorized
       throw {
         message: "Error from API while refreshing token",
         status: res.status,
@@ -60,42 +53,36 @@ export async function refreshToken(): Promise<TokenData | null> {
     }
     newTokenData = (await res.json()) as TokenData;
     IS_DEV && console.log("Got a new token!");
-    await jotaiStore.set(tokenAtom, newTokenData);
+    await tokenDataStorage.setValue(newTokenData);
   } catch (err) {
     console.error("Failed to refresh token:", err);
   }
 
   // signal that token refresh is complete
-  await jotaiStore.set(tokenRefreshingAtom, false);
+  await tokenRefreshingStorage.setValue(false);
 
   return newTokenData;
 }
 
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
-  const jotaiStore = getJotaiStore();
 
   // Check for existing token. If it's expired, refresh the token
-  let tokenData = await jotaiStore.get(tokenAtom);
+  let tokenData = await tokenDataStorage.getValue();
   if (!tokenData) {
     IS_DEV && console.log("Background refresh: no existing token data found");
     return;
   }
-  if (tokenData.isExpired) {
+  if (tokenData.expires < Date.now() + FIVE_MINUTES_IN_MILLIS) {
     IS_DEV && console.log("Background refresh: Refreshing token...");
-    const newTokenData = await refreshToken();
-    if (!newTokenData) {
+    tokenData = await refreshToken(tokenData.refreshToken);
+    if (!tokenData) {
       console.error("Background refresh: couldn't get new token");
       return;
     }
-    tokenData = {
-      ...newTokenData,
-      isRefreshing: false,
-      isExpired: false,
-    };
   }
 
-  const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
+  const syncEnabled = await shouldSyncStorage.getValue();
   const storage = syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE;
   const shownBudgetIds = await storage.get<string[]>("budgets");
   if (!shownBudgetIds) return;

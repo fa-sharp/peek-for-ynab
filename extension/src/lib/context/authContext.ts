@@ -12,14 +12,15 @@ import { IS_DEV } from "../constants";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
-  const { tokenData, setTokenData, removeAllData } = useStorageContext();
+  const { token, removeAllData } = useStorageContext();
 
   const queryClient = useQueryClient();
 
   /** If token is expired, send signal to refresh the token */
   useEffect(() => {
-    if (tokenData?.isExpired) sendMessage("tokenRefreshNeeded");
-  }, [tokenData?.isExpired]);
+    if (token.isExpired && token.tokenData?.refreshToken)
+      sendMessage("tokenRefreshNeeded", token.tokenData.refreshToken);
+  }, [token.isExpired, token.tokenData?.refreshToken]);
 
   /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
   const login = (tokenData: TokenData) => {
@@ -28,7 +29,7 @@ const useAuthProvider = () => {
       .getUser()
       .then(({ data }) => {
         if (IS_DEV) console.log("Successfully logged in user: ", data.user.id);
-        setTokenData(tokenData);
+        token.setTokenData(tokenData);
       })
       .catch((err) => console.error("Login failed: ", err));
   };
@@ -92,14 +93,14 @@ const useAuthProvider = () => {
               })
               .then((newTokenData) => {
                 if (IS_DEV) console.log("Got a new token!");
-                return setTokenData(newTokenData);
+                return token.setTokenData(newTokenData);
               })
               .then(() => {
                 if (IS_DEV) console.log("Saved new token!");
               })
               .catch((err) => {
                 console.error("OAuth login failed: ", err);
-                setTokenData(null);
+                token.setTokenData(null);
               })
               .finally(resolve);
           } catch (err) {
@@ -122,11 +123,11 @@ const useAuthProvider = () => {
     loginWithOAuth,
     logout,
     /** Whether token data is present. */
-    loggedIn: !!tokenData,
+    loggedIn: !!token.tokenData,
     /** Whether token is expired and needs to be refreshed. */
-    tokenExpired: !!tokenData?.isExpired,
+    tokenExpired: !!token.isExpired,
     /** Whether token is currently being refreshed. */
-    tokenRefreshing: !!tokenData?.isRefreshing,
+    tokenRefreshing: !!token.isRefreshing,
   };
 };
 

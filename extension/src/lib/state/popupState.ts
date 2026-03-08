@@ -1,6 +1,6 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { useCallback } from "react";
 
+import { storage } from "#imports";
 import { DEFAULT_POPUP_STATE, STORAGE_KEYS } from "~lib/constants";
 import type {
   DetailViewState,
@@ -9,60 +9,63 @@ import type {
   TxAddState,
 } from "~lib/types";
 import { txStore } from "./txStore";
-import { createJotaiChromeStorage } from "./utils";
+import { safeMigrateJsonString, useChromeStorage } from "./utils";
 
-/** Internal persisted Jotai atom that holds the popup state (e.g. current view, budget ID) */
-const POPUP_STATE_ATOM = atomWithStorage<PopupState>(
-  STORAGE_KEYS.PopupState,
-  DEFAULT_POPUP_STATE,
-  createJotaiChromeStorage("local"),
-  { getOnInit: true }
+export const popupStateStorage = storage.defineItem<PopupState>(
+  `local:${STORAGE_KEYS.PopupState}`,
+  {
+    fallback: DEFAULT_POPUP_STATE,
+    version: 2,
+    migrations: {
+      2: safeMigrateJsonString(DEFAULT_POPUP_STATE),
+    },
+  }
 );
 
-/** Jotai atom for getting and updating the popup state / view */
-export const popupStateAtom = atom(
-  (get) => get(POPUP_STATE_ATOM),
-  async (_get, set, newState: OpenPopupView) => {
-    await set(POPUP_STATE_ATOM, async (prev) => {
-      const budgetId = (await prev).budgetId;
+export const usePopupState = () => {
+  const [popupState, _setPopupState] = useChromeStorage(popupStateStorage);
+
+  const setPopupState = useCallback(
+    (newState: OpenPopupView) => {
+      const currentBudgetId = popupState?.budgetId ?? "";
       switch (newState.view) {
         case "main":
           txStore.getState().reset(); // reset transaction form
-          return {
-            budgetId: newState.budgetId ?? budgetId,
+          _setPopupState({
+            budgetId: newState.budgetId ?? currentBudgetId,
             view: "main",
-          };
+          });
+          break;
         case "txAdd":
           if (newState.txState) {
             txStore.getState().replace(newState.txState); // update transaction form before switching to page
           }
-          return {
-            budgetId: newState.budgetId ?? budgetId,
+          _setPopupState({
+            budgetId: newState.budgetId ?? currentBudgetId,
             view: "txAdd",
-          };
+          });
+          break;
         case "detail":
-          return {
-            budgetId,
+          _setPopupState({
+            budgetId: currentBudgetId,
             view: "detail",
             detailState: newState.detailState,
-          };
+          });
+          break;
         case "move":
-          return {
-            budgetId,
+          _setPopupState({
+            budgetId: currentBudgetId,
             view: "move",
             moveMoneyState: newState.moveMoneyState,
-          };
+          });
+          break;
       }
-    });
-  }
-);
+    },
+    [_setPopupState, popupState]
+  );
 
-/** React hook for accessing and updating the popup state */
-export const usePopupState = () => useAtom(popupStateAtom);
-/** React hook for getting the popup state */
-export const useGetPopupState = () => useAtomValue(popupStateAtom);
-/** React hook for updating the popup state */
-export const useSetPopupState = () => useSetAtom(popupStateAtom);
+  return [popupState, setPopupState] as const;
+};
 
 /** Possible popup states */
 type OpenPopupView =

@@ -2,7 +2,6 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import { useSetPopupState } from "~lib/state";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 import {
   AddCCPaymentIcon,
@@ -21,18 +20,13 @@ export default function SavedCategoriesView() {
     addedTransaction,
     moved,
   } = useYNABContext();
+  const { setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
-  const setPopupState = useSetPopupState();
 
-  if (
-    !selectedBudgetData ||
-    !savedCategoriesData ||
-    !settings ||
-    savedCategoriesData.length === 0
-  )
+  if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
     return null;
 
-  const { currencyFormat } = selectedBudgetData;
+  const { id: budgetId, currencyFormat } = selectedBudgetData;
 
   return (
     <Droppable droppableId="savedCategories" isDropDisabled={!editingItems}>
@@ -63,7 +57,7 @@ export default function SavedCategoriesView() {
                     <CategoryView
                       categoryData={category}
                       currencyFormat={currencyFormat}
-                      alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
+                      alerts={currentAlerts?.[budgetId]?.cats[category.id]}
                       settings={settings}
                       addedTransaction={addedTransaction}
                       moved={moved}
