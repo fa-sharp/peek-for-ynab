@@ -15,11 +15,19 @@ import { popupStateStorage, tokenRefreshingStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
+  // Track last token refresh attempt to prevent duplicate refreshes
+  let lastRefreshAttempt = 0;
+  const REFRESH_THROTTLE_MS = 3000;
+
   // Listen for token refresh signal
   onMessage("tokenRefreshNeeded", async (msg) => {
     const isAlreadyRefreshing = await tokenRefreshingStorage.getValue();
-    if (!isAlreadyRefreshing) {
+    const timeSinceLastRefresh = msg.timestamp - lastRefreshAttempt;
+    if (!isAlreadyRefreshing && timeSinceLastRefresh > REFRESH_THROTTLE_MS) {
+      lastRefreshAttempt = msg.timestamp;
       await refreshToken(msg.data);
+    } else {
+      IS_DEV && console.log("Skipping token refresh: already in progress or too soon");
     }
   });
 
