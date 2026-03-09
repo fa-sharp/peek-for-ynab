@@ -20,7 +20,9 @@ const inputSchema = z.string().pipe(
 );
 
 export const POST: APIRoute = async (req) => {
-  const { data, error } = inputSchema.safeParse(await req.request.text());
+  const { data, error } = inputSchema.safeParse(
+    (await req.request.text()) || req.url.searchParams.toString()
+  );
   if (error) return Response.json({ message: "Invalid!" }, { status: 400 });
   const { refreshToken } = data;
 
