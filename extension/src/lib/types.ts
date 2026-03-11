@@ -25,7 +25,7 @@ export interface PopupState {
 /** Global settings */
 export interface AppSettings {
   /** List of budget IDs to show */
-  budgets: string[];
+  budgets?: string[];
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */

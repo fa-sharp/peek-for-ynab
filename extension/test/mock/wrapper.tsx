@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { AuthProvider } from "~lib/context/authContext";
 import { NotificationsProvider } from "~lib/context/notificationsContext";
-import { StorageProvider } from "~lib/context/storageContext";
+import StorageProvider from "~lib/context/storageProvider";
 import { YNABProvider } from "~lib/context/ynabContext";
 
 export const createTestAppWrapper = () => {
@@ -11,20 +11,21 @@ export const createTestAppWrapper = () => {
     defaultOptions: {
       queries: {
         retry: false,
+        experimental_prefetchInRender: true,
       },
     },
   });
   return function wrapper({ children }: { children: ReactNode }) {
     return (
-      <StorageProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <StorageProvider>
           <AuthProvider>
             <YNABProvider>
               <NotificationsProvider>{children}</NotificationsProvider>
             </YNABProvider>
           </AuthProvider>
-        </QueryClientProvider>
-      </StorageProvider>
+        </StorageProvider>
+      </QueryClientProvider>
     );
   };
 };
