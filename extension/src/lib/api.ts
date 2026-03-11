@@ -3,16 +3,36 @@ import {
   type api,
   type CategoryGroupWithCategories,
   GetTransactionsTypeEnum,
-  type Payee
+  type Payee,
 } from "ynab";
 
 import { IS_DEV } from "./constants";
 import type { CachedPayee } from "./types";
 
+/** Fetch the current access token from the server, along with a new auth token if token was refreshed */
+export async function fetchAccessToken(
+  authToken: string
+): Promise<
+  | { data: { accessToken: string; authToken?: string }; error: null }
+  | { data: never; error: string }
+> {
+  const res = await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token`, {
+    method: "POST",
+    headers: { Authorization: authToken },
+  });
+  if (res.ok) {
+    const data = await res.json();
+    return { data, error: null };
+  } else {
+    const message = await res.text();
+    return { error: message } as { data: never; error: string };
+  }
+}
+
 /** Fetch budgets from the YNAB API */
 export async function fetchBudgets(ynabAPI: api) {
   const {
-    data: { budgets }
+    data: { budgets },
   } = await ynabAPI.plans.getPlans();
   // Sort budgets by last modified
   budgets.sort((a, b) =>
@@ -26,7 +46,7 @@ export async function fetchBudgets(ynabAPI: api) {
   return budgets.map((budgetSummary) => ({
     id: budgetSummary.id,
     name: budgetSummary.name,
-    currencyFormat: budgetSummary.currency_format || undefined
+    currencyFormat: budgetSummary.currency_format || undefined,
   }));
 }
 
@@ -71,7 +91,7 @@ export async function fetchCategoryGroupsForBudget(
     console.log("Fetched categories!", {
       categoryGroups,
       usingDeltaRequest,
-      serverKnowledge: response.data.server_knowledge
+      serverKnowledge: response.data.server_knowledge,
     });
   return { categoryGroups, serverKnowledge: response.data.server_knowledge };
 }
@@ -149,7 +169,7 @@ export async function fetchAccountsForBudget(
     console.log("Fetched accounts!", {
       accounts,
       usingDeltaRequest,
-      serverKnowledge: response.data.server_knowledge
+      serverKnowledge: response.data.server_knowledge,
     });
   return { accounts, serverKnowledge: response.data.server_knowledge };
 }
@@ -205,7 +225,7 @@ export async function fetchPayeesForBudget(
     console.log("Fetched payees!", {
       payees,
       usingDeltaRequest,
-      serverKnowledge: response.data.server_knowledge
+      serverKnowledge: response.data.server_knowledge,
     });
   return { payees, serverKnowledge: response.data.server_knowledge };
 }
@@ -235,7 +255,7 @@ export function formatPayee(payee: Payee): CachedPayee {
   return {
     id: payee.id,
     name: payee.name,
-    ...(payee.transfer_account_id && { transferId: payee.transfer_account_id })
+    ...(payee.transfer_account_id && { transferId: payee.transfer_account_id }),
   };
 }
 
@@ -253,7 +273,7 @@ function findSortedIndex<T>(array: T[], value: T, compare: (x: T, y: T) => numbe
 /** Check for new unapproved transactions in this budget  */
 export async function checkUnapprovedTxsForBudget(ynabAPI: api, budgetId: string) {
   const {
-    data: { transactions }
+    data: { transactions },
   } = await ynabAPI.transactions.getTransactions(
     budgetId,
     getNDaysAgoISO(14), // fetch unapproved transactions from up to 2 weeks ago

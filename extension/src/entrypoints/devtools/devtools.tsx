@@ -4,14 +4,14 @@ import JSONFormatter from "json-formatter-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type Browser, browser } from "#imports";
-import { BACKGROUND_ALARM_NAME } from "~lib/constants";
-import { AppProvider } from "~lib/context";
+import { BACKGROUND_ALARM_NAME, STORAGE_KEYS } from "~lib/constants";
+import { AppProvider, useAuthContext } from "~lib/context";
 import { useStorageContext } from "~lib/context/storageContext";
-import { sendMessage } from "~lib/messaging";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
-  const { token } = useStorageContext();
+  const { authToken } = useStorageContext();
+  const { accessToken } = useAuthContext();
 
   const [area, setArea] = useState<"local" | "sync">("local");
   const [data, setData] = useState<Record<string, unknown>>({});
@@ -82,30 +82,18 @@ function Devtools() {
       }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
-      {!token.tokenData ? (
+      {!authToken ? (
         <div>No token data</div>
       ) : (
         <>
           <div>
-            Access token: <SensitiveString data={token.tokenData.accessToken} />
+            Auth token: <SensitiveString data={authToken} />
           </div>
-          <div>
-            Refresh token: <SensitiveString data={token.tokenData.refreshToken} />
-          </div>
-          <div>Token expires: {new Date(token.tokenData.expires).toLocaleString()}</div>
-          <div>
-            {!token.isRefreshing ? (
-              <button
-                onClick={() =>
-                  sendMessage("tokenRefreshNeeded", token.tokenData!.refreshToken)
-                }>
-                Force refresh
-              </button>
-            ) : (
-              <button disabled>Refreshing...</button>
-            )}
-            <button onClick={() => token.setTokenData(null)}>Clear token</button>
-          </div>
+          {accessToken && (
+            <div>
+              Access token: <SensitiveString data={accessToken} />
+            </div>
+          )}
         </>
       )}
       <h3>Browser Permissions</h3>
@@ -151,7 +139,7 @@ function Devtools() {
       </div>
       {Object.entries(data)
         .sort(([key1], [key2]) => key1.localeCompare(key2))
-        .filter(([key]) => key !== "tokenData")
+        .filter(([key]) => key !== STORAGE_KEYS.AuthToken)
         .map(([key, value]) => (
           <div
             key={key}

@@ -1,7 +1,6 @@
 import { type Browser, browser, defineBackground } from "#imports";
-import { backgroundDataRefresh, refreshToken } from "~lib/backgroundRefresh";
+import { backgroundDataRefresh } from "~lib/backgroundRefresh";
 import { BACKGROUND_ALARM_NAME, IS_DEV } from "~lib/constants";
-import { onMessage } from "~lib/messaging";
 import {
   checkBrowserBarPermission,
   createBrowserBarSuggestions,
@@ -11,26 +10,10 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput,
 } from "~lib/omnibox";
-import { popupStateStorage, tokenRefreshingStorage, txStore } from "~lib/state";
+import { popupStateStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
-  // Track last token refresh attempt to prevent duplicate refreshes
-  let lastRefreshAttempt = 0;
-  const REFRESH_THROTTLE_MS = 3000;
-
-  // Listen for token refresh signal
-  onMessage("tokenRefreshNeeded", async (msg) => {
-    const isAlreadyRefreshing = await tokenRefreshingStorage.getValue();
-    const timeSinceLastRefresh = msg.timestamp - lastRefreshAttempt;
-    if (!isAlreadyRefreshing && timeSinceLastRefresh > REFRESH_THROTTLE_MS) {
-      lastRefreshAttempt = msg.timestamp;
-      await refreshToken(msg.data);
-    } else {
-      IS_DEV && console.log("Skipping token refresh: already in progress or too soon");
-    }
-  });
-
   // Setup periodic background refresh
   browser.alarms.onAlarm.addListener(async (alarm: Browser.alarms.Alarm) => {
     if (alarm.name === BACKGROUND_ALARM_NAME) {

@@ -6,7 +6,7 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
 } from "~lib/api";
-import { FIVE_MINUTES_IN_MILLIS, IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
@@ -14,73 +14,34 @@ import {
   updateIconAndTooltip,
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
-import type { TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
+import { fetchAccessToken } from "./api";
 import {
   appSettingsStorage,
+  authTokenStorage,
   budgetSettingsStorage,
   currentAlertsStorage,
   shouldSyncStorage,
-  tokenDataStorage,
-  tokenRefreshingStorage,
 } from "./state";
-
-/**
- * Refreshes the token, then persists and returns the new token data.
- * Returns null if no current token exists or if refresh fails
- */
-export async function refreshToken(refreshToken: string): Promise<TokenData | null> {
-  // signal that token refresh is in progress
-  await tokenRefreshingStorage.setValue(true);
-
-  // perform token refresh
-  let newTokenData: TokenData | null = null;
-  const refreshUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
-  refreshUrl.pathname = "/api/auth/refresh";
-  IS_DEV && console.log("Refreshing token!");
-  try {
-    const res = await fetch(refreshUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    });
-    if (!res.ok) {
-      if (res.status === 401) await tokenDataStorage.setValue(null); // clear token if status is unauthorized
-      throw {
-        message: "Error from API while refreshing token",
-        status: res.status,
-        error: await res.text(),
-      };
-    }
-    newTokenData = (await res.json()) as TokenData;
-    IS_DEV && console.log("Got a new token!");
-    await tokenDataStorage.setValue(newTokenData);
-  } catch (err) {
-    console.error("Failed to refresh token:", err);
-  }
-
-  // signal that token refresh is complete
-  await tokenRefreshingStorage.setValue(false);
-
-  return newTokenData;
-}
 
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
 
-  // Check for existing token. If it's expired, refresh the token
-  let tokenData = await tokenDataStorage.getValue();
-  if (!tokenData) {
-    IS_DEV && console.log("Background refresh: no existing token data found");
+  // Check if logged in
+  const authToken = await authTokenStorage.getValue();
+  if (!authToken) {
+    IS_DEV && console.log("Background refresh: no auth token found");
     return;
   }
-  if (tokenData.expires < Date.now() + FIVE_MINUTES_IN_MILLIS) {
-    IS_DEV && console.log("Background refresh: Refreshing token...");
-    tokenData = await refreshToken(tokenData.refreshToken);
-    if (!tokenData) {
-      console.error("Background refresh: couldn't get new token");
-      return;
-    }
+
+  // Fetch the current access token, and store the new authToken if available
+  const { data: tokenData, error: tokenError } = await fetchAccessToken(authToken);
+  if (tokenError) {
+    console.error("Background refresh: couldn't get access token", tokenError);
+    return;
+  }
+  if (tokenData.authToken) {
+    await authTokenStorage.setValue(tokenData.authToken);
   }
 
   const syncEnabled = await shouldSyncStorage.getValue();

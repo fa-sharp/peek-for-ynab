@@ -4,6 +4,7 @@ import { createProvider } from "puro";
 import { useCallback, useContext } from "react";
 
 import { browser } from "#imports";
+import { fetchAccessToken } from "~lib/api";
 import { FIVE_MINUTES_IN_MILLIS } from "~lib/constants";
 import { useStorageContext } from "./storageContext";
 
@@ -19,20 +20,15 @@ const useAuthProvider = () => {
     staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
     queryFn: async () => {
       if (!authToken) return null;
-      const res = await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token`, {
-        method: "POST",
-        headers: { Authorization: authToken },
-      });
-      if (res.ok) {
-        const data: { accessToken: string; authToken?: string } = await res.json();
-        if (data.authToken) await setAuthToken(data.authToken); // Set the new auth token if returned
-        return data.accessToken;
-      } else {
-        const message = await res.text();
-        console.error(`Failed to get access token. Status ${res.status}: ${message}`);
+      const { data, error } = await fetchAccessToken(authToken);
+      if (error) {
+        console.error(`Failed to get access token, logging out: ${error}`);
         await setAuthToken(null);
         return null;
       }
+      // Store the new auth token if returned
+      if (data.authToken) await setAuthToken(data.authToken);
+      return data.accessToken;
     },
   });
 
