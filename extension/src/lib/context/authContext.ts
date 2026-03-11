@@ -1,134 +1,94 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clear as idbClear } from "idb-keyval";
-import { customAlphabet, urlAlphabet } from "nanoid";
 import { createProvider } from "puro";
-import { useContext, useEffect } from "react";
-import * as ynab from "ynab";
+import { useCallback, useContext } from "react";
 
 import { browser } from "#imports";
-import { sendMessage } from "~lib/messaging";
-import type { TokenData } from "~lib/types";
-import { IS_DEV } from "../constants";
+import { FIVE_MINUTES_IN_MILLIS } from "~lib/constants";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
-  const { token } = useStorageContext();
+  const { authToken, setAuthToken } = useStorageContext();
   const queryClient = useQueryClient();
 
-  /** If token is expired, send signal to refresh the token */
-  useEffect(() => {
-    if (token.isExpired && token.tokenData?.refreshToken)
-      sendMessage("tokenRefreshNeeded", token.tokenData.refreshToken);
-  }, [token.isExpired, token.tokenData?.refreshToken]);
-
-  /** Authenticate the YNAB user with their API token (tests the token by making an API request) */
-  const login = (tokenData: TokenData) => {
-    const api = new ynab.API(tokenData.accessToken);
-    api.user
-      .getUser()
-      .then(({ data }) => {
-        if (IS_DEV) console.log("Successfully logged in user: ", data.user.id);
-        token.setTokenData(tokenData);
-      })
-      .catch((err) => console.error("Login failed: ", err));
-  };
+  /** Fetch current access token from the server */
+  const { data: accessToken, status: accessTokenStatus } = useQuery({
+    queryKey: ["accessToken"],
+    enabled: !!authToken,
+    retry: false,
+    staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
+    queryFn: async () => {
+      if (!authToken) return null;
+      const res = await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token`, {
+        method: "POST",
+        headers: { Authorization: authToken },
+      });
+      if (res.ok) {
+        const data: { accessToken: string; authToken?: string } = await res.json();
+        if (data.authToken) await setAuthToken(data.authToken); // Set the new auth token if returned
+        return data.accessToken;
+      } else {
+        const message = await res.text();
+        console.error(`Failed to get access token. Status ${res.status}: ${message}`);
+        await setAuthToken(null);
+        return null;
+      }
+    },
+  });
 
   /** Authenticate the YNAB user through OAuth */
-  const loginWithOAuth = () =>
-    new Promise<void>((resolve, reject) => {
-      if (!import.meta.env.PUBLIC_YNAB_CLIENT_ID) return reject("No Client ID found!");
+  const loginWithOAuth = useCallback(async () => {
+    // Clear API cache to avoid any leakage of data
+    queryClient.removeQueries();
+    await idbClear();
 
-      // Clear API cache and local storage to avoid any leakage of data
-      queryClient.removeQueries();
-      idbClear();
-      localStorage.clear();
+    // Create the authorize URL and add the extension's unique redirect URL
+    const authorizeUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
+    authorizeUrl.pathname = "/api/auth/v2/login";
+    authorizeUrl.searchParams.append("redirect_uri", browser.identity.getRedirectURL());
 
-      const authorizeUrl = new URL("https://app.ynab.com/oauth/authorize");
-      const authorizeState = customAlphabet(urlAlphabet, 15)();
-      authorizeUrl.search = new URLSearchParams({
-        client_id: import.meta.env.PUBLIC_YNAB_CLIENT_ID,
-        redirect_uri: browser?.identity?.getRedirectURL(),
-        response_type: "code",
-        state: authorizeState,
-      }).toString();
+    // initiate OAuth flow
+    try {
+      const responseUrl = await browser.identity.launchWebAuthFlow({
+        interactive: true,
+        url: authorizeUrl.toString(),
+      });
+      if (!responseUrl) throw new Error("No response URL received");
+      const url = new URL(responseUrl);
+      const authToken = url.searchParams.get("auth_token");
+      if (!authToken) throw new Error("No auth token received");
 
-      // if no chrome API available, assume we're testing/developing in a regular web browser context
-      if (!browser || !browser.identity) {
-        window.location.href = authorizeUrl.toString();
-        resolve();
-      }
+      await setAuthToken(authToken);
+    } catch (error) {
+      console.error("OAuth login failed:", error);
+    }
+  }, [queryClient, setAuthToken]);
 
-      // initiate OAuth flow through chrome API
-      browser.identity.launchWebAuthFlow(
-        {
-          interactive: true,
-          url: authorizeUrl.toString(),
-        },
-        (response) => {
-          try {
-            if (!response) throw new Error("No response URL!");
-            const responseURL = new URL(response);
-            const oauthCode = responseURL.searchParams.get("code");
-            const returnedState = responseURL.searchParams.get("state");
-            if (!oauthCode) throw new Error("No OAuth code found!");
-            if (returnedState !== authorizeState)
-              throw new Error("State param doesn't match!");
+  /** Clears all local data, and revokes the token */
+  const logout = useCallback(async () => {
+    if (!authToken) return;
 
-            const initialTokenUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
-            initialTokenUrl.pathname = "/api/auth/initial";
-
-            fetch(initialTokenUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                code: oauthCode,
-                redirectUri: browser.identity.getRedirectURL(),
-              }),
-            })
-              .then((res) => {
-                if (!res.ok)
-                  throw new Error(`Error getting initial token! Status: ${res.status}`);
-                return res.json();
-              })
-              .then((newTokenData) => {
-                if (IS_DEV) console.log("Got a new token!");
-                return token.setTokenData(newTokenData);
-              })
-              .then(() => {
-                if (IS_DEV) console.log("Saved new token!");
-              })
-              .catch((err) => {
-                console.error("OAuth login failed: ", err);
-                token.setTokenData(null);
-              })
-              .finally(resolve);
-          } catch (err) {
-            console.error("OAuth login failed: ", err);
-            resolve();
-          }
-        }
-      );
+    fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
+      method: "POST",
+      headers: { Authorization: authToken },
     });
 
-  /** Clears all local data, including the user's token */
-  const logout = async () => {
-    await token.setTokenData(null);
-    await browser.storage.local.clear();
-    await idbClear();
-    localStorage.clear();
+    await setAuthToken(null);
     queryClient.removeQueries();
-  };
+    queryClient.clear();
+
+    await idbClear();
+    await browser.storage.local.clear();
+    localStorage.clear();
+  }, [authToken, setAuthToken, queryClient]);
 
   return {
-    login,
     loginWithOAuth,
     logout,
-    /** Whether token data is present. */
-    loggedIn: !!token.tokenData,
-    /** Whether token is expired and needs to be refreshed. */
-    tokenExpired: !!token.isExpired,
-    /** Whether token is currently being refreshed. */
-    tokenRefreshing: !!token.isRefreshing,
+    /** Whether the user is logged in (i.e. `authToken` is present) */
+    loggedIn: !!authToken,
+    accessToken,
+    accessTokenStatus,
   };
 };
 

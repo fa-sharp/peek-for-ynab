@@ -25,7 +25,7 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { tokenExpired, tokenRefreshing } = useAuthContext();
+  const { accessTokenStatus } = useAuthContext();
   const { popupState, setPopupState, settings, editingItems, setEditingItems } =
     useStorageContext();
   const {
@@ -92,8 +92,8 @@ export default function PopupNav() {
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
-  if (tokenRefreshing) return <div>Loading...</div>;
-  if (tokenExpired && !tokenRefreshing) return <div>Authentication error!</div>;
+  if (accessTokenStatus === "pending") return <div>Loading...</div>;
+  if (accessTokenStatus === "error") return <div>Authentication error!</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
   if (!shownBudgetsData) return null; // No budgets to show
 
@@ -103,23 +103,19 @@ export default function PopupNav() {
         label={
           categoriesError || accountsError
             ? "Error getting data from YNAB! Click to retry"
-            : tokenExpired && !tokenRefreshing
-              ? "Authentication error"
-              : globalIsFetching
-                ? "Status: Refreshing data..."
-                : `Status: Last updated ${new Date(
-                    categoriesLastUpdated < accountsLastUpdated
-                      ? categoriesLastUpdated
-                      : accountsLastUpdated
-                  ).toLocaleString()}`
+            : globalIsFetching
+              ? "Status: Refreshing data..."
+              : `Status: Last updated ${new Date(
+                  categoriesLastUpdated < accountsLastUpdated
+                    ? categoriesLastUpdated
+                    : accountsLastUpdated
+                ).toLocaleString()}`
         }
         icon={
           globalIsFetching ? (
             <Refresh aria-hidden />
           ) : categoriesError || accountsError ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : tokenExpired && !tokenRefreshing ? (
-            <AlertTriangle aria-hidden color="var(--stale)" /> // indicates authentication error
           ) : !popupState.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (

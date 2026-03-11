@@ -10,6 +10,7 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 /** Storage keys for persisted state items */
 export const STORAGE_KEYS = Object.freeze({
   AppSettings: "settings",
+  AuthToken: "authToken",
   BudgetSettings: (budgetId: string) => `budget-${budgetId}`,
   CurrentAlerts: "currentAlerts",
   PinnedItems: (budgetId: string) => `budget-${budgetId}:pinned`,

@@ -5,7 +5,10 @@ import type {
   CurrencyFormat,
 } from "ynab";
 
-/** Persisted token data */
+/**
+ * Persisted token data
+ * @deprecated old auth system, not used anymore
+ */
 export interface TokenData {
   accessToken: string;
   refreshToken: string;

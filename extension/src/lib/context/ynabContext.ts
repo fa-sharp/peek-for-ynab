@@ -10,15 +10,15 @@ import {
   fetchCategoryGroupsForBudget,
   fetchPayeesForBudget,
 } from "~lib/api";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
 import { useConfetti } from "~lib/hooks";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "../constants";
-import { findAllEmoji, getNDaysAgoISO } from "../utils";
+import { findAllEmoji, getNDaysAgoISO } from "~lib/utils";
+import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
 const useYNABProvider = () => {
   const {
-    token,
     settings,
     budgetSettings,
     pinnedItems,
@@ -26,16 +26,16 @@ const useYNABProvider = () => {
     popupState,
     setPopupState,
   } = useStorageContext();
+  const { accessToken } = useAuthContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
   const queryClient = useQueryClient();
 
   /** Initialize ynabAPI object if authenticated */
   useEffect(() => {
-    if (token.tokenData?.accessToken && !token.isExpired)
-      setYnabAPI(new ynab.API(token.tokenData.accessToken));
+    if (accessToken) setYnabAPI(new ynab.API(accessToken));
     else setYnabAPI(null);
-  }, [token.tokenData?.accessToken, token.isExpired]);
+  }, [accessToken]);
 
   /** Fetch and cache user's budgets. */
   const {

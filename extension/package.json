@@ -44,7 +44,6 @@
     "idb-keyval": "^6.2.2",
     "js-confetti": "^0.13.1",
     "json-formatter-js": "^2.5.23",
-    "nanoid": "^5.1.6",
     "puro": "^0.8.4",
     "react": "^19.2.4",
     "react-countup": "^6.5.3",

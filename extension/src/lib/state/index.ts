@@ -1,4 +1,5 @@
 import { currentAlertsStorage, useCurrentAlerts, useVersionAlert } from "./alerts";
+import { authTokenStorage } from "./authToken";
 import { usePinnedItems } from "./budgetPinned";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
@@ -17,6 +18,7 @@ export {
   useTokenData,
   useVersionAlert,
   appSettingsStorage,
+  authTokenStorage,
   budgetSettingsStorage,
   currentAlertsStorage,
   popupStateStorage,

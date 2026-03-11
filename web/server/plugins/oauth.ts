@@ -74,7 +74,7 @@ const oauthPlugin: FastifyPluginAsyncTypebox<{
       expires: token.expires_at.getTime(),
     });
     const finalRedirectUrl = new URL(redirectUri);
-    finalRedirectUrl.searchParams.set("authToken", encryptedToken);
+    finalRedirectUrl.searchParams.set("auth_token", encryptedToken);
 
     return reply.redirect(finalRedirectUrl.toString());
   });
