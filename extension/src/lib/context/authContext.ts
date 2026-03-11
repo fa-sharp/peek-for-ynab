@@ -6,6 +6,7 @@ import { useCallback, useContext } from "react";
 import { browser } from "#imports";
 import { fetchAccessToken } from "~lib/api";
 import { FIVE_MINUTES_IN_MILLIS } from "~lib/constants";
+import { tokenPersister } from "~lib/queryClient";
 import { useStorageContext } from "./storageContext";
 
 const useAuthProvider = () => {
@@ -16,8 +17,8 @@ const useAuthProvider = () => {
   const { data: accessToken, status: accessTokenStatus } = useQuery({
     queryKey: ["accessToken"],
     enabled: !!authToken,
-    retry: false,
     staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
+    persister: tokenPersister.persisterFn,
     queryFn: async () => {
       if (!authToken) return null;
       const { data, error } = await fetchAccessToken(authToken);
@@ -64,17 +65,15 @@ const useAuthProvider = () => {
   const logout = useCallback(async () => {
     if (!authToken) return;
 
+    // Revoke OAuth token
     fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
       method: "POST",
       headers: { Authorization: authToken },
     });
-
-    await setAuthToken(null);
-    queryClient.removeQueries();
-    queryClient.clear();
-
-    await idbClear();
-    await browser.storage.local.clear();
+    await idbClear(); // Clear persisted API cache
+    await setAuthToken(null); // Clear encrypted token
+    queryClient.clear(); // Clear in-memory cache
+    await browser.storage.local.clear(); // Clear browser local storage
     localStorage.clear();
   }, [authToken, setAuthToken, queryClient]);
 
@@ -90,6 +89,6 @@ const useAuthProvider = () => {
 
 const { BaseContext, Provider } = createProvider(useAuthProvider);
 
-/** Hook to authenticate the YNAB user. Manages the access and refresh tokens. */
+/** Hook to authenticate the YNAB user. Manages the encrypted authToken and accessToken. */
 export const useAuthContext = () => useContext(BaseContext);
 export const AuthProvider = Provider;

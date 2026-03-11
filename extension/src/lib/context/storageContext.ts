@@ -21,8 +21,8 @@ export const useStorageProvider = () => {
 
   // PERSISTED STATE
 
-  /** @deprecated The token used to authenticate the YNAB user. Persisted locally. */
-  const tokenState = useTokenData();
+  /** @deprecated The old token, will clear itself on upgrade */
+  const _tokenState = useTokenData();
 
   /** The encrypted token that contains the sensitive OAuth tokens to access the YNAB API */
   const [authToken, setAuthToken] = useAuthToken();
@@ -59,12 +59,11 @@ export const useStorageProvider = () => {
   }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
 
   // Wait for essential state to be loaded from Chrome storage to avoid flashes (should only take a few ms)
-  if (!tokenState || authToken === undefined || !settings) return null;
+  if (authToken === undefined || !settings) return null;
 
   return {
     authToken,
     setAuthToken,
-    token: tokenState,
     popupState,
     setPopupState,
     editingItems,

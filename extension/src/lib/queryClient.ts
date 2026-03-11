@@ -5,7 +5,8 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-import { ONE_DAY_IN_MILLIS } from "./constants";
+import { storage } from "#imports";
+import { FIVE_MINUTES_IN_MILLIS, ONE_DAY_IN_MILLIS } from "./constants";
 
 export function createQueryClient(options?: { staleTime?: number }) {
   return new QueryClient({
@@ -28,6 +29,7 @@ const CACHED_QUERY_KEYS = new Set([
   "import",
 ]);
 
+/** Persist queries to IndexedDB using idb-keyval */
 const queryPersister = experimental_createQueryPersister<PersistedQuery>({
   prefix: "ynab",
   filters: {
@@ -43,4 +45,17 @@ const queryPersister = experimental_createQueryPersister<PersistedQuery>({
   serialize: (query) => query,
   deserialize: (query) => query,
   buster: "v2",
+});
+
+/** Persist access token to browser session storage (in-memory only) */
+export const tokenPersister = experimental_createQueryPersister<PersistedQuery>({
+  prefix: "ynab",
+  maxAge: FIVE_MINUTES_IN_MILLIS, // must be refreshed after 5 minutes
+  storage: {
+    getItem: (key) => storage.getItem(`session:${key}`),
+    setItem: (key, val) => storage.setItem(`session:${key}`, val),
+    removeItem: (key) => storage.removeItem(`session:${key}`),
+  },
+  serialize: (query) => query,
+  deserialize: (query) => query,
 });
