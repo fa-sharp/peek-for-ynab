@@ -77,8 +77,6 @@ export async function createServer() {
     autoHooksPattern: /^[_.]?hooks(?:\.js|\.ts)$/i,
   });
 
-  app.log.info(app.printRoutes({ includeHooks: true }));
-
   // Shutdown handler
   for (const signal of ["SIGINT", "SIGTERM"]) {
     process.on(signal, async () => {
