@@ -48,15 +48,17 @@ const useYNABProvider = () => {
     enabled: Boolean(ynabAPI),
     queryFn: async (): Promise<CachedBudget[] | undefined> => {
       if (!ynabAPI) return;
-      const budgets = await fetchBudgets(ynabAPI);
-      // If no budgets have been selected by the user, select the most recently modified budget
-      if (settings.budgets.length === 0 && budgets[0]) {
-        await toggleShowBudget(budgets[0].id);
-        setPopupState({ view: "main", budgetId: budgets[0].id });
-      }
-      return budgets;
+      return await fetchBudgets(ynabAPI);
     },
   });
+
+  // If no budgets have been selected by the user, select the most recently modified budget
+  useEffect(() => {
+    if (!settings.budgets && budgetsData?.[0]) {
+      toggleShowBudget(budgetsData[0].id);
+      setPopupState({ view: "main", budgetId: budgetsData[0].id });
+    }
+  }, [settings.budgets, budgetsData, toggleShowBudget, setPopupState]);
 
   /** Data from the currently selected budget */
   const selectedBudgetData = useMemo(

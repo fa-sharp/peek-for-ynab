@@ -34,7 +34,6 @@ export const DEFAULT_POPUP_STATE: PopupState = {
 };
 
 export const DEFAULT_SETTINGS = Object.freeze<AppSettings>({
-  budgets: [],
   currentTabAccess: false,
   theme: "auto",
   animations: true,

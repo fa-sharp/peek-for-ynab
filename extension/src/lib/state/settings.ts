@@ -52,7 +52,9 @@ export const useAppSettings = () => {
     async (budgetId: string) => {
       if (!settings) return;
 
-      if (!settings.budgets.includes(budgetId)) {
+      if (!settings.budgets) {
+        return changeSetting("budgets", [budgetId]);
+      } else if (!settings.budgets.includes(budgetId)) {
         return changeSetting("budgets", [...settings.budgets, budgetId]);
       } else {
         return changeSetting(

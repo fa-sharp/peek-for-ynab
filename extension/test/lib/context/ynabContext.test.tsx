@@ -1,18 +1,21 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import type { RequestHandler } from "msw";
 import { expect, test } from "vitest";
 
-import { browser } from "#imports";
-import { useStorageContext, useYNABContext } from "~lib/context";
+import { useYNABContext } from "~lib/context";
+import { popupStateStorage, tokenDataStorage } from "~lib/state";
+import { pinnedItemsStorage } from "~lib/state/budgetPinned";
 import { mockServer } from "~test/mock/msw";
 import { savedAccounts, savedCategories, validToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets } from "~test/mock/ynabApiData";
 
 test("No data fetched if token is missing", async () => {
-  const { result } = renderHook(useYNABContext, {
-    wrapper: createTestAppWrapper(),
-  });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, {
+      wrapper: createTestAppWrapper(),
+    })
+  );
   await waitFor(() => expect(result.current.budgetsData).toBeFalsy());
   expect(result.current.categoryGroupsData).toBeFalsy();
   expect(result.current.accountsData).toBeFalsy();
@@ -23,35 +26,33 @@ test("No data fetched if token is missing", async () => {
 });
 
 test("Data fetched with valid token, and first budget auto-selected", async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
-
-  const { result } = renderHook(
-    () => ({
-      ynab: useYNABContext(),
-      storage: useStorageContext(),
-    }),
-    {
+  await tokenDataStorage.setValue(validToken);
+  const { result } = await act(() =>
+    renderHook(useYNABContext, {
       wrapper: createTestAppWrapper(),
-    }
+    })
   );
 
-  await waitFor(() => expect(result.current.ynab.budgetsData).toBeTruthy());
-  expect(result.current.ynab.budgetsData).toHaveLength(2);
+  await waitFor(() => expect(result.current.budgetsData).toBeTruthy());
+  expect(result.current.budgetsData).toHaveLength(2);
   expect(
-    result.current.storage.popupState?.budgetId,
+    await popupStateStorage.getValue(),
     "first budget is auto-selected"
-  ).toBe(budgets[0].id);
+  ).toMatchObject({
+    budgetId: budgets[0].id,
+  });
 });
 
 test("Saved categories data loaded properly", async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-    cats: JSON.stringify(savedCategories),
+  await tokenDataStorage.setValue(validToken);
+  await pinnedItemsStorage(budgets[0].id, "local").setValue({
+    categories: savedCategories,
+    accounts: [],
   });
 
-  const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.savedCategoriesData).toBeTruthy());
 
   expect(result.current.savedCategoriesData).toHaveLength(2);
@@ -64,12 +65,15 @@ test("Saved categories data loaded properly", async () => {
 });
 
 test("Saved accounts data loaded properly", async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-    accounts: JSON.stringify(savedAccounts),
+  await tokenDataStorage.setValue(validToken);
+  await pinnedItemsStorage(budgets[0].id, "local").setValue({
+    categories: [],
+    accounts: savedAccounts,
   });
 
-  const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.savedAccountsData).toBeTruthy());
 
   expect(result.current.savedAccountsData).toHaveLength(1);
@@ -82,11 +86,11 @@ test("Saved accounts data loaded properly", async () => {
 });
 
 test("Payee data loaded with transfer IDs included", async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await tokenDataStorage.setValue(validToken);
 
-  const { result } = renderHook(useYNABContext, { wrapper: createTestAppWrapper() });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.payeesData).toBeTruthy());
 
   const checkingTransferPayee = result.current.payeesData?.find(
