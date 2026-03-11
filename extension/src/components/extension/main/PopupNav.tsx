@@ -41,7 +41,7 @@ export default function PopupNav() {
   const globalIsFetching = useIsFetching();
 
   const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => settings.budgets.includes(b.id)),
+    () => budgetsData?.filter((b) => settings.budgets?.includes(b.id)),
     [budgetsData, settings.budgets]
   );
 

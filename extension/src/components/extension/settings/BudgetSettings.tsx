@@ -22,7 +22,7 @@ export default function BudgetSettings({ budget }: { budget: CachedBudget }) {
 
   // hide budget settings if budget has been hidden by user
   useEffect(() => {
-    if (!settings.budgets.includes(budget.id)) setShowSettings(false);
+    if (!settings.budgets?.includes(budget.id)) setShowSettings(false);
   }, [budget.id, settings.budgets]);
 
   return (
