@@ -68,7 +68,11 @@ const oauthPlugin: FastifyPluginAsyncTypebox<{
       return reply.status(400).send({ message: "Missing final redirect URL" });
     }
 
-    const encryptedToken = app.crypto.encryptTokenData(token);
+    const encryptedToken = app.crypto.encryptTokenData({
+      accessToken: token.access_token,
+      refreshToken: token.refresh_token,
+      expires: token.expires_at.getTime(),
+    });
     const finalRedirectUrl = new URL(redirectUri);
     finalRedirectUrl.searchParams.set("authToken", encryptedToken);
 

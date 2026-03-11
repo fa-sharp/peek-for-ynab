@@ -1,7 +1,8 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
-import type { Token } from "@fastify/oauth2";
 import type { FastifyPluginAsync } from "fastify";
 import fastifyPlugin from "fastify-plugin";
+
+import type { TokenData } from "../types";
 
 /**
  * Sets up the service for encrypting and decrypting token data
@@ -25,7 +26,7 @@ export class CryptoService {
     this.key = key;
   }
 
-  encryptTokenData(data: Token) {
+  encryptTokenData(data: TokenData) {
     const iv = randomBytes(IV_LENGTH);
     const cipher = createCipheriv(ALGORITHM, this.key, iv);
 
@@ -36,7 +37,7 @@ export class CryptoService {
     return [authTag.toString(TO_ENCODING), iv.toString(TO_ENCODING), encrypted].join(".");
   }
 
-  decryptTokenData(encrypted: string): Token {
+  decryptTokenData(encrypted: string): TokenData {
     const [authTagStr, ivStr, dataStr] = encrypted.split(".", 3);
     const authTag = Buffer.from(authTagStr, TO_ENCODING);
     const iv = Buffer.from(ivStr, TO_ENCODING);

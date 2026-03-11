@@ -1,9 +1,17 @@
-import type { OAuth2Namespace, Token } from "@fastify/oauth2";
+import type { OAuth2Namespace } from "@fastify/oauth2";
 import type { Static } from "typebox";
 
 import type { CryptoService } from "./plugins/crypto";
 
-// Augment the types on the server instance
+/** The encrypted token data */
+export interface TokenData {
+  accessToken: string;
+  refreshToken: string;
+  /** The access token expiration in Unix milliseconds */
+  expires: number;
+}
+
+// Augment the types on the server and request
 declare module "fastify" {
   interface FastifyInstance {
     /** Parsed config / environment variables */
@@ -15,6 +23,10 @@ declare module "fastify" {
   }
 
   interface FastifyRequest {
-    token: Token | null;
+    /** The decrypted token */
+    token: TokenData | null;
   }
 }
+
+  
+  ;

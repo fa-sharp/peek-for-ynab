@@ -1,27 +1,22 @@
-# Astro Starter Kit: Minimal
+# Peek for YNAB: Backend server and website
 
+To run locally:
 ```sh
-pnpm create astro@latest -- --template minimal
+pnpm install
+pnpm build
+pnpm start
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## Project Structure
 
 ```text
-/
-├── public/
-├── src/
+├── server/ - Fastify server with OAuth handling and API
+├── src/ - Astro static website 
 │   └── pages/
-│       └── index.astro
 └── package.json
 ```
 
 Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
 
 Any static assets, like images, can be placed in the `public/` directory.
 
