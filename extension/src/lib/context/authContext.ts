@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { clear as idbClear } from "idb-keyval";
 import { createProvider } from "puro";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 
 import { browser } from "#imports";
 import { fetchAccessToken } from "~lib/api";
@@ -14,7 +14,7 @@ const useAuthProvider = () => {
   const queryClient = useQueryClient();
 
   /** Fetch current access token from the server */
-  const { data: accessToken, status: accessTokenStatus } = useQuery({
+  const { data: tokenData, status: tokenStatus } = useQuery({
     queryKey: ["accessToken"],
     enabled: !!authToken,
     staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
@@ -22,16 +22,16 @@ const useAuthProvider = () => {
     queryFn: async () => {
       if (!authToken) return null;
       const { data, error } = await fetchAccessToken(authToken);
-      if (error) {
-        console.error(`Failed to get access token, logging out: ${error}`);
-        await setAuthToken(null);
-        return null;
-      }
-      // Store the new auth token if returned
-      if (data.authToken) await setAuthToken(data.authToken);
-      return data.accessToken;
+      if (!data) throw new Error(`Failed to get access token: ${error}`);
+      return data;
     },
   });
+  // Update authToken if received
+  useEffect(() => {
+    if (tokenStatus === "error") setAuthToken(null);
+    else if (tokenStatus === "success" && tokenData?.authToken)
+      setAuthToken(tokenData.authToken);
+  }, [tokenStatus, setAuthToken, tokenData?.authToken]);
 
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = useCallback(async () => {
@@ -82,8 +82,8 @@ const useAuthProvider = () => {
     logout,
     /** Whether the user is logged in (i.e. `authToken` is present) */
     loggedIn: !!authToken,
-    accessToken,
-    accessTokenStatus,
+    accessToken: tokenData?.accessToken,
+    accessTokenStatus: tokenStatus,
   };
 };
 

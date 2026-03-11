@@ -13,7 +13,7 @@ import {
   getBudgetAlerts,
   updateIconAndTooltip,
 } from "~lib/notifications";
-import { createQueryClient } from "~lib/queryClient";
+import { createQueryClient, tokenPersister } from "~lib/queryClient";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
 import { fetchAccessToken } from "./api";
 import {
@@ -27,20 +27,29 @@ import {
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
 
-  // Check if logged in
-  const authToken = await authTokenStorage.getValue();
-  if (!authToken) {
-    IS_DEV && console.log("Background refresh: no auth token found");
-    return;
-  }
+  // Create a query client with a longer default stale time to prevent too many refetches
+  const queryClient = createQueryClient({
+    staleTime: 10 * 60 * 1000,
+  });
+  // Restore query cache
+  await tokenPersister.restoreQueries(queryClient);
 
   // Fetch the current access token, and store the new authToken if available
-  const { data: tokenData, error: tokenError } = await fetchAccessToken(authToken);
-  if (tokenError) {
-    console.error("Background refresh: couldn't get access token", tokenError);
+  const tokenData = await queryClient.fetchQuery({
+    queryKey: ["accessToken"],
+    persister: tokenPersister.persisterFn,
+    queryFn: async () => {
+      const authToken = await authTokenStorage.getValue();
+      if (!authToken) return null;
+      const { data, error } = await fetchAccessToken(authToken);
+      if (!data) throw new Error(`Failed to get access token: ${error}`);
+      return data;
+    },
+  });
+  if (!tokenData) {
+    IS_DEV && console.log("Background refresh: no token");
     return;
-  }
-  if (tokenData.authToken) {
+  } else if (tokenData.authToken) {
     await authTokenStorage.setValue(tokenData.authToken);
   }
 
@@ -51,9 +60,6 @@ export async function backgroundDataRefresh() {
 
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);
-  const queryClient = createQueryClient({
-    staleTime: 10 * 60 * 1000, // to prevent too many refetches, data is assumed fresh for 10 minutes
-  });
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
     staleTime: ONE_DAY_IN_MILLIS * 7,

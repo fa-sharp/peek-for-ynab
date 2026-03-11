@@ -10,22 +10,17 @@ import { IS_DEV } from "./constants";
 import type { CachedPayee } from "./types";
 
 /** Fetch the current access token from the server, along with a new auth token if token was refreshed */
-export async function fetchAccessToken(
-  authToken: string
-): Promise<
-  | { data: { accessToken: string; authToken?: string }; error: null }
-  | { data: never; error: string }
-> {
+export async function fetchAccessToken(authToken: string) {
   const res = await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token`, {
     method: "POST",
     headers: { Authorization: authToken },
   });
   if (res.ok) {
-    const data = await res.json();
-    return { data, error: null };
+    const data: { accessToken: string; authToken?: string } = await res.json();
+    return { data, error: undefined };
   } else {
-    const message = await res.text();
-    return { error: message } as { data: never; error: string };
+    const message = `${res.status} ${await res.text()}`;
+    return { error: message };
   }
 }
 
