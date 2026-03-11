@@ -30,7 +30,9 @@ export default defineConfig({
     : vercel(),
 
   // Allow cross-origin requests from Chrome extensions in development
+  // TODO: remove everything below after auth migration
   security: {
+    checkOrigin: false,
     allowedDomains:
       process.env.NODE_ENV === "development"
         ? [{ protocol: "chrome-extension" }]

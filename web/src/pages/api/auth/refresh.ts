@@ -1,8 +1,7 @@
 /*
-Refresh OAuth token endpoint.
+TODO remove legacy flow: Refresh OAuth token endpoint.
 */
 
-import { zodJsonParse } from "@lib/validation";
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
 
@@ -10,19 +9,12 @@ import { YNAB_CLIENT_ID, YNAB_SECRET, YNAB_TOKEN_URL } from "astro:env/server";
 
 export const prerender = false;
 
-const inputSchema = z.string().pipe(
-  z.preprocess(
-    zodJsonParse,
-    z.object({
-      refreshToken: z.string().min(10),
-    })
-  )
-);
+const inputSchema = z.object({
+  refreshToken: z.string().min(10),
+});
 
 export const POST: APIRoute = async (req) => {
-  const { data, error } = inputSchema.safeParse(
-    (await req.request.text()) || req.url.searchParams.toString()
-  );
+  const { data, error } = inputSchema.safeParse(Object.fromEntries(req.url.searchParams));
   if (error) return Response.json({ message: "Invalid!" }, { status: 400 });
   const { refreshToken } = data;
 

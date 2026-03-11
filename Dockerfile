@@ -45,4 +45,4 @@ COPY --from=installer /app/web/package.json ./package.json
 
 ENV NODE_ENV=production
 ENV HOST="0.0.0.0"
-CMD ["server/index.js"]
+CMD ["server/index.ts"]

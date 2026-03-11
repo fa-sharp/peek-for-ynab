@@ -1,4 +1,3 @@
-//@ts-check
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
@@ -6,13 +5,13 @@ import { createServer } from "../server/server.js";
 
 describe("server", () => {
   it("should start and stop", async () => {
-    const app = createServer();
+    const app = await createServer();
     await app.ready();
     await app.close();
   });
 
   it("should serve all pages", async () => {
-    const app = createServer();
+    const app = await createServer();
     await app.ready();
     for (const url of ["/", "/help", "/releases", "/privacy"]) {
       const response = await app.inject({ url });
@@ -23,7 +22,7 @@ describe("server", () => {
   });
 
   it("should serve API requests", async () => {
-    const app = createServer();
+    const app = await createServer();
     await app.ready();
     for (const url of ["/api/auth/initial", "/api/auth/refresh"]) {
       const response = await app.inject({
