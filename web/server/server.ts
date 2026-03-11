@@ -8,6 +8,7 @@ import { isApiRequest } from "./lib.ts";
 import astroPlugin from "./plugins/astro.ts";
 import corsPlugin from "./plugins/cors.ts";
 import cryptoPlugin from "./plugins/crypto.ts";
+import helmetPlugin from "./plugins/helmet.ts";
 import oauthPlugin from "./plugins/oauth.ts";
 
 /** Environment variables */
@@ -56,6 +57,9 @@ export async function createServer() {
   app.register(cryptoPlugin, {
     key: Buffer.from(app.config.TOKEN_KEY, "hex"),
   });
+
+  // Security headers
+  app.register(helmetPlugin);
 
   // CORS middleware for API requests
   app.register(corsPlugin, {
