@@ -5,13 +5,13 @@ import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { Omnibox } from "~components";
-import { tokenDataStorage } from "~lib/state";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts, category_groups } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 const eatingOutCategory = category_groups[3].categories[1];

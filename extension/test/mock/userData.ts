@@ -1,12 +1,4 @@
-import { randomUUID } from "crypto";
-
-import type { TokenData } from "~lib/types";
-
-export const validToken: TokenData = {
-  accessToken: randomUUID(),
-  refreshToken: randomUUID(),
-  expires: Date.now() + 60 * 60 * 1000,
-};
+export const mockAuthToken = "fake-encrypted-auth-token";
 
 export const savedCategories = [
   "de6859dd-20ef-49db-85ce-762a58bb92b6", // Groceries

@@ -3,10 +3,10 @@ import type { RequestHandler } from "msw";
 import { expect, test } from "vitest";
 
 import { useYNABContext } from "~lib/context";
-import { popupStateStorage, tokenDataStorage } from "~lib/state";
+import { authTokenStorage, popupStateStorage } from "~lib/state";
 import { pinnedItemsStorage } from "~lib/state/budgetPinned";
 import { mockServer } from "~test/mock/msw";
-import { savedAccounts, savedCategories, validToken } from "~test/mock/userData";
+import { mockAuthToken, savedAccounts, savedCategories } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets } from "~test/mock/ynabApiData";
 
@@ -26,7 +26,7 @@ test("No data fetched if token is missing", async () => {
 });
 
 test("Data fetched with valid token, and first budget auto-selected", async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
   const { result } = await act(() =>
     renderHook(useYNABContext, {
       wrapper: createTestAppWrapper(),
@@ -44,7 +44,7 @@ test("Data fetched with valid token, and first budget auto-selected", async () =
 });
 
 test("Saved categories data loaded properly", async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
   await pinnedItemsStorage(budgets[0].id, "local").setValue({
     categories: savedCategories,
     accounts: [],
@@ -65,7 +65,7 @@ test("Saved categories data loaded properly", async () => {
 });
 
 test("Saved accounts data loaded properly", async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
   await pinnedItemsStorage(budgets[0].id, "local").setValue({
     categories: [],
     accounts: savedAccounts,
@@ -86,7 +86,7 @@ test("Saved accounts data loaded properly", async () => {
 });
 
 test("Payee data loaded with transfer IDs included", async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
 
   const { result } = await act(() =>
     renderHook(useYNABContext, { wrapper: createTestAppWrapper() })

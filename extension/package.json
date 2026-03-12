@@ -15,7 +15,7 @@
     "build:firefox:zip": "wxt zip -b firefox",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "biome lint src/",
+    "lint": "biome lint src/ test/",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

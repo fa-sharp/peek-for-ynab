@@ -4,12 +4,12 @@ import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { AllCategoriesView } from "~components";
-import { tokenDataStorage } from "~lib/state";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 
 beforeEach(async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Can expand and collapse all category groups", async () => {

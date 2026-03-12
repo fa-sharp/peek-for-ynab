@@ -5,9 +5,9 @@ import "vitest-dom/extend-expect";
 import OmniboxTransaction from "~components/extension/omnibox/OmniboxTransaction";
 import { useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
-import { tokenDataStorage, txStore } from "~lib/state";
+import { authTokenStorage, txStore } from "~lib/state";
 import useTransaction from "~lib/useTransaction";
-import { validToken } from "~test/mock/userData";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts, category_groups, payees } from "~test/mock/ynabApiData";
 
@@ -16,7 +16,7 @@ const groceriesCategory = category_groups[3].categories[0];
 const amexAccount = accounts[3];
 
 beforeEach(async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 // FIXME doesn't work right now, probably related to https://github.com/testing-library/react-testing-library/pull/1214

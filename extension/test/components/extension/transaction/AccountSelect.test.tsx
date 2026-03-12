@@ -6,8 +6,8 @@ import "vitest-dom/extend-expect";
 
 import { AccountSelect } from "~components";
 import { useYNABContext } from "~lib/context";
-import { tokenDataStorage } from "~lib/state";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts } from "~test/mock/ynabApiData";
 
@@ -15,7 +15,7 @@ const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Mouse behavior works as expected", async () => {

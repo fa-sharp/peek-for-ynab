@@ -6,13 +6,13 @@ import "vitest-dom/extend-expect";
 import { PopupNav } from "~components";
 import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
-import { appSettingsStorage, popupStateStorage, tokenDataStorage } from "~lib/state";
-import { validToken } from "~test/mock/userData";
+import { appSettingsStorage, authTokenStorage, popupStateStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
-  await tokenDataStorage.setValue(validToken);
+  await authTokenStorage.setValue(mockAuthToken);
   await appSettingsStorage("local").setValue({
     ...DEFAULT_SETTINGS,
     budgets: [budgets[0].id, budgets[1].id],

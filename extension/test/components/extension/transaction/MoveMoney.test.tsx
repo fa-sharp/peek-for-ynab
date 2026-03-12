@@ -4,8 +4,9 @@ import "vitest-dom/extend-expect";
 
 import { browser } from "#imports";
 import { MoveMoney } from "~components";
+import { authTokenStorage } from "~lib/state";
 import type { PopupState } from "~lib/types";
-import { validToken } from "~test/mock/userData";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets, category_groups } from "~test/mock/ynabApiData";
 
@@ -14,9 +15,7 @@ const shoppingCategory = category_groups
   .categories.find((c) => c.name.includes("Shopping"))!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Sets initial 'to' category as expected", async () => {

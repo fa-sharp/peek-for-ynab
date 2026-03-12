@@ -4,10 +4,10 @@ import { beforeEach, expect, test } from "vitest";
 import type { Category } from "ynab";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { CategorySelect } from "~components";
 import { useYNABContext } from "~lib/context";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { category_groups } from "~test/mock/ynabApiData";
 
@@ -19,9 +19,7 @@ const shoppingCategory = category_groups
   .categories.find((c) => c.name.includes("Shopping"))!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Mouse behavior works as expected", async () => {
