@@ -52,11 +52,12 @@ const useYNABProvider = () => {
     },
   });
 
-  // If no budgets have been selected by the user, select the most recently modified budget
+  // If no budgets have been selected by the user, auto-select the most recently modified budget
   useEffect(() => {
     if (!settings.budgets && budgetsData?.[0]) {
-      toggleShowBudget(budgetsData[0].id);
-      setPopupState({ view: "main", budgetId: budgetsData[0].id });
+      toggleShowBudget(budgetsData[0].id).then(() =>
+        setPopupState({ view: "main", budgetId: budgetsData[0].id })
+      );
     }
   }, [settings.budgets, budgetsData, toggleShowBudget, setPopupState]);
 

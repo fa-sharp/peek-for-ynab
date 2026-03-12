@@ -346,7 +346,7 @@ export async function getBrowserBarBudgets() {
       queryKey: ["budgets"],
       queryFn: () => [],
     })
-  ).filter((b) => settings.budgets.includes(b.id));
+  ).filter((b) => settings.budgets?.includes(b.id));
   browserBarCache.budgets = budgets;
   return budgets;
 }

@@ -1,4 +1,4 @@
-import { type SetStateAction, useEffect, useState } from "react";
+import { type SetStateAction, useCallback, useEffect, useState } from "react";
 import type { Mutate, StoreApi } from "zustand";
 import { createJSONStorage } from "zustand/middleware";
 
@@ -31,16 +31,19 @@ export const useChromeStorage = <T, I extends T | undefined>(
   }, [item]);
 
   /** Set the value of the storage item, updating the displayed value optimistically */
-  const setValue = async (value: SetStateAction<T>) => {
-    if (typeof value === "function") {
-      const newValue = (value as (prev: T) => T)(await item.getValue());
-      setRenderedValue(newValue);
-      await item.setValue(newValue);
-    } else {
-      setRenderedValue(value);
-      return item.setValue(value);
-    }
-  };
+  const setValue = useCallback(
+    async (value: SetStateAction<T>) => {
+      if (typeof value === "function") {
+        const newValue = (value as (prev: T) => T)(await item.getValue());
+        setRenderedValue(newValue);
+        await item.setValue(newValue);
+      } else {
+        setRenderedValue(value);
+        return item.setValue(value);
+      }
+    },
+    [item]
+  );
 
   return [renderedValue, setValue] as [I, typeof setValue];
 };
