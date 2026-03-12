@@ -44,7 +44,7 @@ export default defineConfig({
   manifest: ({ mode }) => ({
     key: process.env.CRX_PUBLIC_KEY,
     name: "Peek for YNAB",
-    homepage_url: "https://peek-for-ynab-v2.fly.dev",
+    homepage_url: "https://peekforynab.com",
     permissions: ["identity", "alarms", "storage"],
     optional_permissions: ["scripting", "activeTab", "notifications"],
     host_permissions: ["https://api.ynab.com/*"],

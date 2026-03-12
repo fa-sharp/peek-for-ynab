@@ -28,7 +28,7 @@ jobs:
 
       - name: Package into zip artifact
         env:
-          PUBLIC_MAIN_URL: https://peek-for-ynab-v2.fly.dev
+          PUBLIC_MAIN_URL: https://peekforynab.com
           PUBLIC_YNAB_CLIENT_ID: MXlSSQTLehZOIlzmsasuCpoGb9wvnxH5lmZBwxbPFnY
         run: pnpm run build:zip
 
