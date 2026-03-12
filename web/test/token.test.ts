@@ -47,8 +47,8 @@ describe("API: /token routes", () => {
     await app.ready();
 
     const currentAuthToken = app.crypto.encryptTokenData({
-      accessToken: "access",
-      refreshToken: "refresh",
+      accessToken: "current-access",
+      refreshToken: "current-refresh",
       expires: Date.now() + 10 * 60 * 1000, // active for 10 minutes
     });
 
@@ -61,7 +61,7 @@ describe("API: /token routes", () => {
     });
     assert.equal(response.statusCode, 200);
     const { accessToken, authToken } = await response.json();
-    assert.equal(accessToken, "access");
+    assert.equal(accessToken, "current-access");
     assert.equal(authToken, undefined);
 
     await app.close();
