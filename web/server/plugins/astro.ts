@@ -1,14 +1,13 @@
 import fastifyStatic from "@fastify/static";
-import type { FastifyPluginAsync } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 
 import { isApiRequest } from "../lib.ts";
 
 /** Serves the Astro website */
-const astroPlugin: FastifyPluginAsync<{
+export default fastifyPlugin<{
   rootStaticPath: string;
   ssrHandler: (...args: unknown[]) => void | Promise<void>;
-}> = async (app, opts) => {
+}>(async (app, opts) => {
   // Serve Astro static files
   app.register(fastifyStatic, {
     root: opts.rootStaticPath,
@@ -39,6 +38,4 @@ const astroPlugin: FastifyPluginAsync<{
       : undefined;
     opts.ssrHandler(req.raw, res.raw, nextWithCleanup, locals);
   });
-};
-
-export default fastifyPlugin(astroPlugin);
+});

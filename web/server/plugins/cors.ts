@@ -1,16 +1,10 @@
 import cors from "cors";
-import type { FastifyPluginCallback } from "fastify";
 import fastifyPlugin from "fastify-plugin";
 
 import { isApiRequest } from "../lib.ts";
 
-/**
- * Add CORS middleware to all API requests.
- */
-const corsPlugin: FastifyPluginCallback<{ allowedOrigins?: string[] }> = async (
-  app,
-  opts
-) => {
+/** Add CORS middleware to all API requests. */
+export default fastifyPlugin<{ allowedOrigins?: string[] }>(async (app, opts) => {
   const corsMiddleware = cors({
     origin: !opts.allowedOrigins
       ? "*"
@@ -26,6 +20,4 @@ const corsPlugin: FastifyPluginCallback<{ allowedOrigins?: string[] }> = async (
       next();
     }
   });
-};
-
-export default fastifyPlugin(corsPlugin);
+});

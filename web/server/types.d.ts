@@ -3,14 +3,6 @@ import type { Static } from "typebox";
 
 import type { CryptoService } from "./plugins/crypto";
 
-/** The encrypted token data */
-export interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-  /** The access token expiration in Unix milliseconds */
-  expires: number;
-}
-
 // Augment the types on the server and request
 declare module "fastify" {
   interface FastifyInstance {
@@ -28,5 +20,10 @@ declare module "fastify" {
   }
 }
 
-  
-  ;
+/** The encrypted token data */
+export interface TokenData {
+  accessToken: string;
+  refreshToken: string;
+  /** The access token expiration in Unix milliseconds */
+  expires: number;
+}

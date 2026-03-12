@@ -1,17 +1,15 @@
 import fastifyOauth from "@fastify/oauth2";
-import type { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import fastifyPlugin from "fastify-plugin";
 import { Type as T } from "typebox";
 
-/**
- * Sets up the OAuth login and callback routes
- */
-const oauthPlugin: FastifyPluginAsyncTypebox<{
+/** Sets up the OAuth login and callback routes */
+export default fastifyPlugin<{
   prefix: string;
   clientId: string;
   clientSecret: string;
   baseUrl: string;
-}> = async (app, opts) => {
+}>(async (app, opts) => {
   app.register(fastifyOauth, {
     name: "oauth",
     callbackUri: (req) => `${req.protocol}://${req.host}${opts.prefix}/callback`,
@@ -32,7 +30,7 @@ const oauthPlugin: FastifyPluginAsyncTypebox<{
 
   const REDIRECT_COOKIE_NAME = "peek-oauth-redirect";
 
-  app.route({
+  app.withTypeProvider<TypeBoxTypeProvider>().route({
     method: "GET",
     url: `${opts.prefix}/login`,
     schema: {
@@ -68,6 +66,7 @@ const oauthPlugin: FastifyPluginAsyncTypebox<{
       return reply.status(400).send({ message: "Missing final redirect URL" });
     }
 
+    // Encrypt the access and refresh tokens into an opaque token string and add it to the redirect URL
     const encryptedToken = app.crypto.encryptTokenData({
       accessToken: token.access_token,
       refreshToken: token.refresh_token,
@@ -78,6 +77,4 @@ const oauthPlugin: FastifyPluginAsyncTypebox<{
 
     return reply.redirect(finalRedirectUrl.toString());
   });
-};
-
-export default fastifyPlugin(oauthPlugin);
+});

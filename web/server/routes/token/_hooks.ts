@@ -1,8 +1,6 @@
 import type { FastifyInstance } from "fastify";
 
-/**
- * Hook for decrypting the token from the Authorization header
- */
+/** Hook for decrypting the tokens from the Authorization header */
 export default async function (app: FastifyInstance) {
   app.decorateRequest("token", null);
 
