@@ -36,7 +36,12 @@ export class CryptoService {
   }
 
   decryptTokenData(encrypted: string): TokenData {
-    const [authTagStr, ivStr, dataStr] = encrypted.split(".", 3);
+    const parts = encrypted.split(".", 3) as [string, string, string];
+    if (parts.length !== 3) {
+      throw new Error("Invalid format");
+    }
+
+    const [authTagStr, ivStr, dataStr] = parts;
     const authTag = Buffer.from(authTagStr, TO_ENCODING);
     const iv = Buffer.from(ivStr, TO_ENCODING);
     const decipher = createDecipheriv(ALGORITHM, this.#key, iv);

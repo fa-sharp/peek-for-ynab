@@ -25,6 +25,7 @@ export default async function tokenRoutes(app: FastifyInstance) {
           refreshToken: token.refresh_token,
           expires: token.expires_at.getTime(),
         });
+
         return {
           accessToken: token.access_token,
           authToken,
