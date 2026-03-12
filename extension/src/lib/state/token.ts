@@ -7,7 +7,7 @@ import { useChromeStorage } from "./utils";
 
 /** @deprecated old token storage */
 export const tokenDataStorage = storage.defineItem<TokenData | null>(
-  `local:${STORAGE_KEYS.Token}`,
+  `local:${STORAGE_KEYS.OldToken}`,
   { fallback: null }
 );
 

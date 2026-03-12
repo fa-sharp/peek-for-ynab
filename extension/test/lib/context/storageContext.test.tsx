@@ -3,9 +3,9 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect, test } from "vitest";
 
 import { browser } from "#imports";
-import { DEFAULT_SETTINGS } from "~lib/constants";
+import { DEFAULT_SETTINGS, STORAGE_KEYS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
-import { appSettingsStorage } from "~lib/state";
+import { appSettingsStorage, tokenDataStorage } from "~lib/state";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 
 test("Can render storage hook successfully, with default settings", async () => {
@@ -109,4 +109,23 @@ test("Can remove saved category", async () => {
       categories: [category2],
     }
   );
+});
+
+// TODO: remove after auth migration
+test("Automatically clears old token", async () => {
+  await tokenDataStorage.setValue({
+    accessToken: "access",
+    refreshToken: "refresh",
+    expires: Date.now() + 60 * 60 * 1000,
+  });
+
+  await act(() =>
+    renderHook(useStorageContext, {
+      wrapper: createTestAppWrapper(),
+    })
+  );
+
+  expect(await browser.storage.local.get(STORAGE_KEYS.OldToken)).toMatchObject({
+    [STORAGE_KEYS.OldToken]: undefined,
+  });
 });

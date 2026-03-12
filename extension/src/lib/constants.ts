@@ -17,7 +17,8 @@ export const STORAGE_KEYS = Object.freeze({
   PopupState: "popupState",
   ShouldSyncSettings: "sync",
   TxState: "txState",
-  Token: "tokenData",
+  /** @deprecated */
+  OldToken: "tokenData",
   TokenRefreshing: "tokenRefreshing",
   VersionAlert: "versionAlert",
 });
