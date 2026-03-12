@@ -1,4 +1,4 @@
-app = "peek-for-ynab-v2"
+app = "peek-for-ynab"
 primary_region = "ewr"
 
 [build]
