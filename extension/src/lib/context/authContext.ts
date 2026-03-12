@@ -15,7 +15,7 @@ const useAuthProvider = () => {
 
   /** Fetch current access token from the server */
   const { data: tokenData, status: tokenStatus } = useQuery({
-    queryKey: ["accessToken"],
+    queryKey: ["auth"],
     enabled: !!authToken,
     staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
     persister: tokenPersister.persisterFn,
@@ -72,8 +72,9 @@ const useAuthProvider = () => {
     });
     await idbClear(); // Clear persisted API cache
     await setAuthToken(null); // Clear encrypted token
-    queryClient.clear(); // Clear in-memory cache
-    await browser.storage.local.clear(); // Clear browser local storage
+    await browser.storage.session.clear(); // Clear browser storage
+    await browser.storage.local.clear();
+    queryClient.clear(); // Clear in-memory API cache
     localStorage.clear();
   }, [authToken, setAuthToken, queryClient]);
 

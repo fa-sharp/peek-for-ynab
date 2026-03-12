@@ -21,7 +21,6 @@ export function createQueryClient(options?: { staleTime?: number }) {
   });
 }
 
-const CACHE_PREFIX = "ynab";
 const CACHED_QUERY_KEYS = new Set([
   "budgets",
   "payees",
@@ -32,7 +31,7 @@ const CACHED_QUERY_KEYS = new Set([
 
 /** Persist queries to IndexedDB using idb-keyval */
 const queryPersister = experimental_createQueryPersister<PersistedQuery>({
-  prefix: CACHE_PREFIX,
+  prefix: "ynab",
   filters: {
     predicate: ({ queryKey }) =>
       typeof queryKey[0] === "string" && CACHED_QUERY_KEYS.has(queryKey[0]),
@@ -50,7 +49,7 @@ const queryPersister = experimental_createQueryPersister<PersistedQuery>({
 
 /** Persist access token to browser session storage (in-memory only) */
 export const tokenPersister = experimental_createQueryPersister<PersistedQuery>({
-  prefix: CACHE_PREFIX,
+  prefix: "token",
   maxAge: FIVE_MINUTES_IN_MILLIS, // access token should be valid for 5 minutes
   storage: {
     getItem: (key) => storage.getItem(`session:${key}`),

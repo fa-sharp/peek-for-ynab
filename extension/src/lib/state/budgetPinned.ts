@@ -22,17 +22,19 @@ export function pinnedItemsStorage(budgetId: string, area: "local" | "sync") {
     `${area}:${STORAGE_KEYS.PinnedItems(budgetId)}`,
     {
       fallback: { categories: [], accounts: [] },
-      init: async () => {
-        // on key creation, migrate from old storage of pinned items
-        const oldCatsStr = await storage.getItem<string>(`${area}:cats`);
-        const oldAcctStr = await storage.getItem<string>(`${area}:accounts`);
-        const oldCats = safeMigrateJsonString<BudgetToIdsMap>({})(oldCatsStr);
-        const oldAccts = safeMigrateJsonString<BudgetToIdsMap>({})(oldAcctStr);
-        return {
-          categories: oldCats?.[budgetId] ?? [],
-          accounts: oldAccts?.[budgetId] ?? [],
-        };
-      },
+      init: !budgetId
+        ? undefined
+        : async () => {
+            // on key creation, migrate from old storage of pinned items
+            const oldCatsStr = await storage.getItem<string>(`${area}:cats`);
+            const oldAcctStr = await storage.getItem<string>(`${area}:accounts`);
+            const oldCats = safeMigrateJsonString<BudgetToIdsMap>({})(oldCatsStr);
+            const oldAccts = safeMigrateJsonString<BudgetToIdsMap>({})(oldAcctStr);
+            return {
+              categories: oldCats?.[budgetId] ?? [],
+              accounts: oldAccts?.[budgetId] ?? [],
+            };
+          },
     }
   );
 }

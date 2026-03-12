@@ -36,7 +36,7 @@ export async function backgroundDataRefresh() {
 
   // Fetch the current access token, and store the new authToken if available
   const tokenData = await queryClient.fetchQuery({
-    queryKey: ["accessToken"],
+    queryKey: ["auth"],
     persister: tokenPersister.persisterFn,
     queryFn: async () => {
       const authToken = await authTokenStorage.getValue();
