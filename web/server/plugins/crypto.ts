@@ -4,8 +4,8 @@ import fastifyPlugin from "fastify-plugin";
 import type { TokenData } from "../types";
 
 /** Sets up the service for encrypting and decrypting token data */
-export default fastifyPlugin<{ key: Buffer }>(async (app, opts) => {
-  const cryptoService = new CryptoService(opts.key);
+export default fastifyPlugin<{ keys: Buffer[] }>(async (app, opts) => {
+  const cryptoService = new CryptoService(opts.keys);
   app.decorate("crypto", cryptoService);
 });
 
@@ -16,16 +16,22 @@ const FROM_ENCODING = "utf8";
 const TO_ENCODING = "base64url";
 
 export class CryptoService {
-  #key: Buffer;
+  #keys: Buffer[];
 
-  constructor(key: Buffer) {
-    if (key.byteLength !== KEY_LENGTH) throw new Error(`Key must be ${KEY_LENGTH} bytes`);
-    this.#key = key;
+  constructor(keys: Buffer[]) {
+    if (keys.length === 0) {
+      throw new Error("Must provide at least one key");
+    }
+    for (const key of keys) {
+      if (key.byteLength !== KEY_LENGTH)
+        throw new Error(`Key must be ${KEY_LENGTH} bytes`);
+    }
+    this.#keys = keys;
   }
 
   encryptTokenData(data: TokenData) {
     const iv = randomBytes(IV_LENGTH);
-    const cipher = createCipheriv(ALGORITHM, this.#key, iv);
+    const cipher = createCipheriv(ALGORITHM, this.#keys[0], iv);
 
     const encrypted =
       cipher.update(JSON.stringify(data), FROM_ENCODING, TO_ENCODING) +
@@ -44,13 +50,23 @@ export class CryptoService {
     const [authTagStr, ivStr, dataStr] = parts;
     const authTag = Buffer.from(authTagStr, TO_ENCODING);
     const iv = Buffer.from(ivStr, TO_ENCODING);
-    const decipher = createDecipheriv(ALGORITHM, this.#key, iv);
-    decipher.setAuthTag(authTag);
 
-    const decrypted =
-      decipher.update(dataStr, TO_ENCODING, FROM_ENCODING) +
-      decipher.final(FROM_ENCODING);
+    let decryptionError;
+    for (const key of this.#keys) {
+      try {
+        const decipher = createDecipheriv(ALGORITHM, key, iv);
+        decipher.setAuthTag(authTag);
 
-    return JSON.parse(decrypted);
+        const decrypted =
+          decipher.update(dataStr, TO_ENCODING, FROM_ENCODING) +
+          decipher.final(FROM_ENCODING);
+
+        return JSON.parse(decrypted);
+      } catch (e) {
+        decryptionError = e;
+        continue;
+      }
+    }
+    throw decryptionError;
   }
 }

@@ -55,7 +55,7 @@ export async function createServer() {
 
   // Token encryption
   app.register(cryptoPlugin, {
-    key: Buffer.from(app.config.TOKEN_KEY, "hex"),
+    keys: [Buffer.from(app.config.TOKEN_KEY, "hex")],
   });
 
   // Security headers
