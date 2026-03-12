@@ -66,6 +66,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
               required={false}
               placeholder="Select a default account (optional)"
               accounts={accounts}
+              currencyFormat={budget.currencyFormat}
               currentAccount={
                 accounts?.find((a) => a.id === settings?.transactions.defaultAccountId) ||
                 null

@@ -1,4 +1,4 @@
-import { renderHook, screen, waitFor } from "@testing-library/react";
+import { act, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
@@ -17,19 +17,21 @@ test("Can record credit card payment via CCP category", async () => {
   const user = userEvent.setup();
   const Wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(
-    () => ({
-      ynab: useYNABContext(),
-      storage: useStorageContext(),
-    }),
-    {
-      wrapper: ({ children }) => (
-        <Wrapper>
-          <PopupView />
-          {children}
-        </Wrapper>
-      ),
-    }
+  const { result } = await act(() =>
+    renderHook(
+      () => ({
+        ynab: useYNABContext(),
+        storage: useStorageContext(),
+      }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <PopupView />
+            {children}
+          </Wrapper>
+        ),
+      }
+    )
   );
   await waitFor(() => expect(result.current.ynab.categoriesData).toBeTruthy());
 

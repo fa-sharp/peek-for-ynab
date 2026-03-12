@@ -108,6 +108,7 @@ export default function TransactionFormMain({
         ref={accountRef}
         currentAccount={account}
         accounts={budgetMainData.accountsData}
+        currencyFormat={budgetMainData.currencyFormat}
         selectAccount={selectAccount}
         disabled={isSaving}
       />

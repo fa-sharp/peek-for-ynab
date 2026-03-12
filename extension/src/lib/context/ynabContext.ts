@@ -216,8 +216,9 @@ const useYNABProvider = () => {
       categoriesData,
       categoryGroupsData,
       payeesData,
+      currencyFormat: selectedBudgetData?.currencyFormat,
     };
-  }, [accountsData, categoriesData, categoryGroupsData, payeesData]);
+  }, [accountsData, categoriesData, categoryGroupsData, payeesData, selectedBudgetData]);
 
   const useGetAccountTxs = (accountId?: string, sinceDaysAgo?: number) =>
     useQuery({

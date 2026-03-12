@@ -1,11 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { MoveMoney } from "~components";
-import { authTokenStorage } from "~lib/state";
-import type { PopupState } from "~lib/types";
+import { authTokenStorage, popupStateStorage } from "~lib/state";
 import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets, category_groups } from "~test/mock/ynabApiData";
@@ -19,19 +17,15 @@ beforeEach(async () => {
 });
 
 test("Sets initial 'to' category as expected", async () => {
-  await browser.storage.local.set({
-    popupState: JSON.stringify({
-      view: "move",
-      budgetId: budgets[0].id,
-      moveMoneyState: {
-        toCategoryId: shoppingCategory.id,
-      },
-    } satisfies PopupState),
+  await popupStateStorage.setValue({
+    view: "move",
+    budgetId: budgets[0].id,
+    moveMoneyState: {
+      toCategoryId: shoppingCategory.id,
+    },
   });
 
-  const wrapper = createTestAppWrapper();
-
-  render(<MoveMoney />, { wrapper });
+  await act(async () => render(<MoveMoney />, { wrapper: createTestAppWrapper() }));
   await waitFor(() => screen.getByDisplayValue(shoppingCategory.name, { exact: false }));
   const toCategoryField = screen.getByLabelText<HTMLInputElement>("To", {
     selector: "input",
@@ -40,17 +34,14 @@ test("Sets initial 'to' category as expected", async () => {
 });
 
 test("Sets initial 'from' category as expected", async () => {
-  await browser.storage.local.set({
-    popupState: JSON.stringify({
-      view: "move",
-      budgetId: budgets[0].id,
-      moveMoneyState: {
-        fromCategoryId: shoppingCategory.id,
-      },
-    } satisfies PopupState),
+  await popupStateStorage.setValue({
+    view: "move",
+    budgetId: budgets[0].id,
+    moveMoneyState: {
+      fromCategoryId: shoppingCategory.id,
+    },
   });
-  const wrapper = createTestAppWrapper();
-  render(<MoveMoney />, { wrapper });
+  await act(async () => render(<MoveMoney />, { wrapper: createTestAppWrapper() }));
   await waitFor(() => screen.getByDisplayValue(shoppingCategory.name, { exact: false }));
   const fromCategoryField = screen.getByLabelText<HTMLInputElement>("From", {
     selector: "input",
@@ -59,19 +50,15 @@ test("Sets initial 'from' category as expected", async () => {
 });
 
 test("Shows Ready to Assign when category field is blank", async () => {
-  await browser.storage.local.set({
-    popupState: JSON.stringify({
-      view: "move",
-      budgetId: budgets[0].id,
-      moveMoneyState: {
-        toCategoryId: shoppingCategory.id,
-      },
-    } satisfies PopupState),
+  await popupStateStorage.setValue({
+    view: "move",
+    budgetId: budgets[0].id,
+    moveMoneyState: {
+      toCategoryId: shoppingCategory.id,
+    },
   });
 
-  const wrapper = createTestAppWrapper();
-
-  render(<MoveMoney />, { wrapper });
+  await act(async () => render(<MoveMoney />, { wrapper: createTestAppWrapper() }));
   await waitFor(() => screen.getByDisplayValue(shoppingCategory.name, { exact: false }));
   expect(screen.queryByText("Ready to Assign", { exact: false })).toBeTruthy();
 });

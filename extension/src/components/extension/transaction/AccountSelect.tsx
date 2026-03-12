@@ -10,14 +10,14 @@ import {
   useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Account } from "ynab";
+import type { Account, CurrencyFormat } from "ynab";
 
-import { useYNABContext } from "~lib/context";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   currentAccount?: Account | null;
   accounts?: Account[];
+  currencyFormat?: CurrencyFormat;
   selectAccount: (account: Account | null) => void;
   label?: string;
   placeholder?: string;
@@ -29,16 +29,15 @@ function AccountSelect(
   {
     currentAccount,
     accounts,
+    currencyFormat,
     label,
     placeholder,
     required = true,
     disabled,
     selectAccount,
   }: Props,
-  ref: ForwardedRef<HTMLInputElement | null>,
+  ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const { selectedBudgetData } = useYNABContext();
-
   const getFilter = useCallback((inputValue?: string) => {
     return (account: Account) =>
       !inputValue || searchWithinString(account.name, inputValue);
@@ -50,7 +49,7 @@ function AccountSelect(
   const [accountList, setAccountList] = useState<Account[]>([]);
   useEffect(
     () => accounts && setAccountList(accounts.filter(getFilter(inputRef.current?.value))),
-    [accounts, getFilter],
+    [accounts, getFilter]
   );
 
   const {
@@ -69,10 +68,7 @@ function AccountSelect(
     selectedItem: currentAccount ?? null,
     itemToString(account) {
       if (!account) return "";
-      return `${account.name} (${formatCurrency(
-        account.balance,
-        selectedBudgetData?.currencyFormat,
-      )})`;
+      return `${account.name} (${formatCurrency(account.balance, currencyFormat)})`;
     },
     onInputValueChange({ inputValue }) {
       setAccountList(accounts?.filter(getFilter(inputValue)) || []);
@@ -136,7 +132,7 @@ function AccountSelect(
           ) : (
             (["Budget", "Tracking"] as const)
               .filter((type) =>
-                accountList.find((a) => (type === "Budget" ? a.on_budget : !a.on_budget)),
+                accountList.find((a) => (type === "Budget" ? a.on_budget : !a.on_budget))
               )
               .map((type) => (
                 <Fragment key={type}>
@@ -161,10 +157,7 @@ function AccountSelect(
                               positive: account.balance > 0,
                               negative: account.balance < 0,
                             })}>
-                            {formatCurrency(
-                              account.balance,
-                              selectedBudgetData?.currencyFormat,
-                            )}
+                            {formatCurrency(account.balance, currencyFormat)}
                           </span>
                           )
                         </li>

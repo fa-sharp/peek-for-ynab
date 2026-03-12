@@ -10,12 +10,21 @@ beforeAll(() => mockServer.listen({ onUnhandledRequest: "error" }));
 afterEach(async () => {
   mockServer.resetHandlers();
   fakeBrowser.reset();
-  await browser.storage.local.clear();
   cleanup();
 });
 afterAll(() => {
   mockServer.close();
   mockServer.dispose();
+});
+
+// FIXME ignore act warning for now: https://github.com/testing-library/react-testing-library/pull/1214
+const consoleError = console.error;
+console.error = vi.fn().mockImplementation((...args) => {
+  const ignoredMessage =
+    "The current testing environment is not configured to support act(...)";
+  if (args[0] !== ignoredMessage) {
+    consoleError(...args);
+  }
 });
 
 // Browser extension API mocks

@@ -82,6 +82,7 @@ export interface BudgetMainData {
   categoriesData: Category[];
   categoryGroupsData: CategoryGroupWithCategories[];
   payeesData: CachedPayee[];
+  currencyFormat?: CurrencyFormat;
 }
 
 /** Budget data cached by the app */

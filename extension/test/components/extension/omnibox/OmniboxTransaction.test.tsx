@@ -19,7 +19,6 @@ beforeEach(async () => {
   await authTokenStorage.setValue(mockAuthToken);
 });
 
-// FIXME doesn't work right now, probably related to https://github.com/testing-library/react-testing-library/pull/1214
 test("updates the form state for each field", async () => {
   const wrapper = createTestAppWrapper();
   const { result: ynab } = await act(() =>
