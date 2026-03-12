@@ -75,11 +75,11 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Build Astro site
+        run: pnpm run build
+
       - name: Check types
         run: pnpm run typecheck
-
-      - name: Build
-        run: pnpm run build
 
       - name: Generate token key for tests
         id: generate-token-key
