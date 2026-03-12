@@ -1,8 +1,13 @@
 # Peek for YNAB: Backend server and website
 
-To run locally:
+To preview the Astro website locally, run:
 ```sh
-pnpm install
+pnpm dev
+```
+
+To run the server locally, set up the environment variables in `.env` and then run:
+
+```sh
 pnpm build
 pnpm start
 ```
@@ -20,7 +25,7 @@ Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page
 
 Any static assets, like images, can be placed in the `public/` directory.
 
-## 🧞 Commands
+## Astro Commands
 
 All commands are run from the root of the project, from a terminal:
 
