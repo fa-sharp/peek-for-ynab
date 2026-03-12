@@ -1,7 +1,8 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+import { Ajv, type ValidateFunction } from "ajv";
 import fastifyPlugin from "fastify-plugin";
 
-import type { TokenData } from "../types";
+import { type TokenData, TokenDataSchema } from "../lib.ts";
 
 /** Sets up the service for encrypting and decrypting token data */
 export default fastifyPlugin<{ keys: Buffer[] }>(async (app, opts) => {
@@ -17,6 +18,7 @@ const TO_ENCODING = "base64url";
 
 export class CryptoService {
   #keys: Buffer[];
+  #validate: ValidateFunction<TokenData>;
 
   constructor(keys: Buffer[]) {
     if (keys.length === 0) {
@@ -27,9 +29,14 @@ export class CryptoService {
         throw new Error(`Key must be ${KEY_LENGTH} bytes`);
     }
     this.#keys = keys;
+    this.#validate = new Ajv().compile(TokenDataSchema);
   }
 
   encryptTokenData(data: TokenData) {
+    if (!this.#validate(data)) {
+      throw new Error("Invalid token data");
+    }
+
     const iv = randomBytes(IV_LENGTH);
     const cipher = createCipheriv(ALGORITHM, this.#keys[0], iv);
 
@@ -61,7 +68,11 @@ export class CryptoService {
           decipher.update(dataStr, TO_ENCODING, FROM_ENCODING) +
           decipher.final(FROM_ENCODING);
 
-        return JSON.parse(decrypted);
+        const decryptedData = JSON.parse(decrypted);
+        if (!this.#validate(decryptedData)) {
+          throw new Error("Invalid token data");
+        }
+        return decryptedData;
       } catch (e) {
         decryptionError = e;
         continue;

@@ -2,13 +2,12 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { describe, it } from "node:test";
 
+import type { TokenData } from "../server/lib.ts";
 import { CryptoService } from "../server/plugins/crypto.ts";
-import type { TokenData } from "../server/types";
 
 describe("crypto", () => {
   it("should encrypt and decrypt data", () => {
-    const key = randomBytes(32);
-    const crypto = new CryptoService([key]);
+    const crypto = new CryptoService([randomBytes(32)]);
 
     const token: TokenData = {
       accessToken: "access",
@@ -44,18 +43,29 @@ describe("crypto", () => {
   });
 
   it("should reject decryption with invalid key", () => {
-    const invalidKey = randomBytes(32);
-    const invalidCrypto = new CryptoService([invalidKey]);
+    const invalidCrypto = new CryptoService([randomBytes(32)]);
     const encryptedWithInvalidKey = invalidCrypto.encryptTokenData({
       accessToken: "access",
       refreshToken: "refresh",
       expires: Date.now(),
     });
 
-    const newKey = randomBytes(32);
-    const newCrypto = new CryptoService([newKey]);
+    const newCrypto = new CryptoService([randomBytes(32)]);
     assert.throws(() => {
       newCrypto.decryptTokenData(encryptedWithInvalidKey);
     }, /unable to authenticate/);
+  });
+
+  it("should reject encryption of invalid token data", () => {
+    const crypto = new CryptoService([randomBytes(32)]);
+    const invalidToken: TokenData = {
+      accessToken: "access",
+      refreshToken: "refresh",
+      expires: 2.44,
+    };
+
+    assert.throws(() => {
+      crypto.encryptTokenData(invalidToken);
+    }, /Invalid token data/);
   });
 });

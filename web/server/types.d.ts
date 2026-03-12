@@ -19,11 +19,3 @@ declare module "fastify" {
     token: TokenData | null;
   }
 }
-
-/** The encrypted token data */
-export interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-  /** The access token expiration in Unix milliseconds */
-  expires: number;
-}
