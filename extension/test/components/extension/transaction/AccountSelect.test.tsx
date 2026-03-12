@@ -1,12 +1,12 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 import type { Account } from "ynab";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { AccountSelect } from "~components";
 import { useYNABContext } from "~lib/context";
+import { tokenDataStorage } from "~lib/state";
 import { validToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts } from "~test/mock/ynabApiData";
@@ -15,15 +15,13 @@ const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await tokenDataStorage.setValue(validToken);
 });
 
 test("Mouse behavior works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -58,7 +56,7 @@ test("Mouse behavior works as expected", async () => {
 test("Keyboard behavior works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -96,7 +94,7 @@ test("Keyboard behavior works as expected", async () => {
 test("Filtering works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -119,7 +117,7 @@ test("Filtering works as expected", async () => {
 test("Clear button works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();

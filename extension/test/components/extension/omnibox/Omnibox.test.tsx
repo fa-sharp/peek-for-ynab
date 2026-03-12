@@ -1,28 +1,24 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { Omnibox } from "~components";
+import { tokenDataStorage } from "~lib/state";
 import { validToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts, category_groups } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await tokenDataStorage.setValue(validToken);
 });
 
 const eatingOutCategory = category_groups[3].categories[1];
 const amexAccount = accounts[3];
 
 test("Can filter categories and accounts", async () => {
-  const wrapper = createTestAppWrapper();
-
-  render(<Omnibox />, { wrapper });
+  await act(async () => render(<Omnibox />, { wrapper: createTestAppWrapper() }));
   await waitFor(() => screen.getByRole("textbox"));
 
   const user = userEvent.setup();

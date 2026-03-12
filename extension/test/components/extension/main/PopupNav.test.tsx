@@ -1,32 +1,37 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { PopupNav } from "~components";
+import { DEFAULT_SETTINGS } from "~lib/constants";
 import { useStorageContext } from "~lib/context";
+import { appSettingsStorage, popupStateStorage, tokenDataStorage } from "~lib/state";
 import { validToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { budgets } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-    budgets: JSON.stringify([budgets[0].id, budgets[1].id]),
-    popupState: JSON.stringify({ view: "main", budgetId: budgets[0].id }),
+  await tokenDataStorage.setValue(validToken);
+  await appSettingsStorage("local").setValue({
+    ...DEFAULT_SETTINGS,
+    budgets: [budgets[0].id, budgets[1].id],
+  });
+  await popupStateStorage.setValue({
+    view: "main",
+    budgetId: budgets[0].id,
   });
 });
 
 test("Correct budget is selected", async () => {
   const wrapper = createTestAppWrapper();
-  render(<PopupNav />, { wrapper });
+  await act(async () => render(<PopupNav />, { wrapper }));
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 });
 
 test("Can be navigated with keyboard", async () => {
   const wrapper = createTestAppWrapper();
-  render(<PopupNav />, { wrapper });
+  await act(async () => render(<PopupNav />, { wrapper }));
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
@@ -55,7 +60,7 @@ test("Can be navigated with keyboard", async () => {
 
 test("Selecting a menu item closes the menu", async () => {
   const wrapper = createTestAppWrapper();
-  render(<PopupNav />, { wrapper });
+  await act(async () => render(<PopupNav />, { wrapper }));
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
@@ -72,14 +77,16 @@ test("Selecting a menu item closes the menu", async () => {
 
 test("Menu buttons change the popup state as expected", async () => {
   const Wrapper = createTestAppWrapper();
-  const { result } = renderHook(useStorageContext, {
-    wrapper: ({ children }) => (
-      <Wrapper>
-        <PopupNav />
-        {children}
-      </Wrapper>
-    ),
-  });
+  const { result } = await act(async () =>
+    renderHook(useStorageContext, {
+      wrapper: ({ children }) => (
+        <Wrapper>
+          <PopupNav />
+          {children}
+        </Wrapper>
+      ),
+    })
+  );
   await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
 
   const user = userEvent.setup();

@@ -61,7 +61,7 @@ export default function OmniboxTransaction({
       payee: s.payee,
       memo: s.memo,
       errorMessage: s.errorMessage,
-    }),
+    })
   );
 
   const defaultAccount = useMemo(() => {
@@ -84,7 +84,9 @@ export default function OmniboxTransaction({
   const initialAmount = useRef(amount);
   const canSubmitImmediately = !!amount && !!payee && !!accountId;
 
-  useEffect(() => dispatch({ type: "setDate", date: getTodaysDateISO() }), [dispatch]);
+  useEffect(() => {
+    dispatch({ type: "setDate", date: getTodaysDateISO() });
+  }, [dispatch]);
   useEffect(() => {
     if (!parsedQuery || !results) return;
     dispatch({ type: "setAmount", amount: parsedQuery.amount || initialAmount.current });
@@ -95,7 +97,7 @@ export default function OmniboxTransaction({
       dispatch({ type: "setPayee", payee: results.payeeResults[0] || null });
       dispatch({
         type: "setCategory",
-        categoryId: results.categoryResults[0].id || null,
+        categoryId: results.categoryResults[0]?.id || null,
       });
       dispatch({
         type: "setAccount",
@@ -161,7 +163,7 @@ export default function OmniboxTransaction({
             <CurrencyView
               milliUnits={stringValueToMillis(
                 amount,
-                parsedQuery.type === "tx" ? (amountType ?? "Outflow") : "Inflow",
+                parsedQuery.type === "tx" ? (amountType ?? "Outflow") : "Inflow"
               )}
               currencyFormat={budget.currencyFormat}
             />

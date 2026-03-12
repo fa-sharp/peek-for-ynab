@@ -40,41 +40,40 @@ export const usePopupState = () => {
 
   const setPopupState = useCallback(
     (newState: OpenPopupView) => {
-      const currentBudgetId = popupState.budgetId ?? "";
       switch (newState.view) {
         case "main":
           txStore.getState().reset(); // reset transaction form
-          _setPopupState({
-            budgetId: newState.budgetId ?? currentBudgetId,
+          _setPopupState((prev) => ({
+            budgetId: newState.budgetId ?? prev.budgetId,
             view: "main",
-          });
+          }));
           break;
         case "txAdd":
           if (newState.txState) {
             txStore.getState().replace(newState.txState); // update transaction form before switching to page
           }
-          _setPopupState({
-            budgetId: newState.budgetId ?? currentBudgetId,
+          _setPopupState((prev) => ({
+            budgetId: newState.budgetId ?? prev.budgetId,
             view: "txAdd",
-          });
+          }));
           break;
         case "detail":
-          _setPopupState({
-            budgetId: currentBudgetId,
+          _setPopupState((prev) => ({
+            budgetId: prev.budgetId,
             view: "detail",
             detailState: newState.detailState,
-          });
+          }));
           break;
         case "move":
-          _setPopupState({
-            budgetId: currentBudgetId,
+          _setPopupState((prev) => ({
+            budgetId: prev.budgetId,
             view: "move",
             moveMoneyState: newState.moveMoneyState,
-          });
+          }));
           break;
       }
     },
-    [_setPopupState, popupState]
+    [_setPopupState]
   );
 
   return [popupState, setPopupState] as const;
