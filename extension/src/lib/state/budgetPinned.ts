@@ -12,8 +12,8 @@ interface PinnedItemsStorage {
   accounts: string[];
 }
 
-/** Old shape of the pinned items storage: map of budget IDs to arrays of account/category IDs */
-interface BudgetToIdsMap {
+/** TODO remove: Old shape of the pinned items storage: map of budget IDs to arrays of account/category IDs */
+interface OldBudgetToIdsMap {
   [budgetId: string]: string[] | undefined;
 }
 
@@ -28,8 +28,8 @@ export function pinnedItemsStorage(budgetId: string, area: "local" | "sync") {
             // on key creation, migrate from old storage of pinned items
             const oldCatsStr = await storage.getItem<string>(`${area}:cats`);
             const oldAcctStr = await storage.getItem<string>(`${area}:accounts`);
-            const oldCats = safeMigrateJsonString<BudgetToIdsMap>({})(oldCatsStr);
-            const oldAccts = safeMigrateJsonString<BudgetToIdsMap>({})(oldAcctStr);
+            const oldCats = safeMigrateJsonString<OldBudgetToIdsMap>({})(oldCatsStr);
+            const oldAccts = safeMigrateJsonString<OldBudgetToIdsMap>({})(oldAcctStr);
             return {
               categories: oldCats?.[budgetId] ?? [],
               accounts: oldAccts?.[budgetId] ?? [],
