@@ -1,37 +1,16 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { clear as idbClear } from "idb-keyval";
 import { createProvider } from "puro";
-import { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext } from "react";
 
 import { browser } from "#imports";
-import { fetchAccessToken } from "~lib/api";
-import { FIVE_MINUTES_IN_MILLIS } from "~lib/constants";
-import { tokenPersister } from "~lib/queryClient";
-import { useStorageContext } from "./storageContext";
+import { useAuth } from "~lib/state";
 
 const useAuthProvider = () => {
-  const { authToken, setAuthToken } = useStorageContext();
   const queryClient = useQueryClient();
 
-  /** Fetch current access token from the server */
-  const { data: tokenData, status: tokenStatus } = useQuery({
-    queryKey: ["auth"],
-    enabled: !!authToken,
-    staleTime: FIVE_MINUTES_IN_MILLIS, // access token should be valid for at least 5 minutes
-    persister: tokenPersister.persisterFn,
-    queryFn: async () => {
-      if (!authToken) return null;
-      const { data, error } = await fetchAccessToken(authToken);
-      if (!data) throw new Error(`Failed to get access token: ${error}`);
-      return data;
-    },
-  });
-  // Update authToken if received
-  useEffect(() => {
-    if (tokenStatus === "error") setAuthToken(null);
-    else if (tokenStatus === "success" && tokenData?.authToken)
-      setAuthToken(tokenData.authToken);
-  }, [tokenStatus, setAuthToken, tokenData?.authToken]);
+  /** The encrypted token that contains the sensitive OAuth tokens to access the YNAB API */
+  const { error: authError, authToken, clearToken, fetchToken, accessToken } = useAuth();
 
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = useCallback(async () => {
@@ -55,11 +34,11 @@ const useAuthProvider = () => {
       const authToken = url.searchParams.get("auth_token");
       if (!authToken) throw new Error("No auth token received");
 
-      await setAuthToken(authToken);
+      await fetchToken(authToken);
     } catch (error) {
       console.error("OAuth login failed:", error);
     }
-  }, [queryClient, setAuthToken]);
+  }, [queryClient, fetchToken]);
 
   /** Clears all local data, and revokes the token */
   const logout = useCallback(async () => {
@@ -70,21 +49,23 @@ const useAuthProvider = () => {
       method: "POST",
       headers: { Authorization: authToken },
     });
-    await idbClear(); // Clear persisted API cache
-    await setAuthToken(null); // Clear encrypted token
-    await browser.storage.session.clear(); // Clear browser storage
+    // Clear encrypted token
+    await clearToken();
+    // Clear API cache
+    await idbClear();
+    queryClient.removeQueries();
+    // Clear all local storage
     await browser.storage.local.clear();
-    queryClient.clear(); // Clear in-memory API cache
+    await browser.storage.session.clear();
     localStorage.clear();
-  }, [authToken, setAuthToken, queryClient]);
+  }, [authToken, clearToken, queryClient]);
 
   return {
     loginWithOAuth,
     logout,
-    /** Whether the user is logged in (i.e. `authToken` is present) */
     loggedIn: !!authToken,
-    accessToken: tokenData?.accessToken,
-    accessTokenStatus: tokenStatus,
+    accessToken,
+    authError,
   };
 };
 

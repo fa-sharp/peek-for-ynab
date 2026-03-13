@@ -13,10 +13,11 @@ import {
   getBudgetAlerts,
   updateIconAndTooltip,
 } from "~lib/notifications";
-import { createQueryClient, tokenPersister } from "~lib/queryClient";
+import { createQueryClient } from "~lib/queryClient";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
 import { fetchAccessToken } from "./api";
 import {
+  accessTokenStorage,
   appSettingsStorage,
   authTokenStorage,
   budgetSettingsStorage,
@@ -27,36 +28,37 @@ import {
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
 
-  // Create a query client with a longer default stale time to prevent too many refetches
-  const queryClient = createQueryClient({
-    staleTime: 10 * 60 * 1000,
-  });
-  // Restore query cache
-  await tokenPersister.restoreQueries(queryClient);
-
-  // Fetch the current access token, and store the new authToken if available
-  const tokenData = await queryClient.fetchQuery({
-    queryKey: ["auth"],
-    persister: tokenPersister.persisterFn,
-    queryFn: async () => {
-      const authToken = await authTokenStorage.getValue();
-      if (!authToken) return null;
-      const { data, error } = await fetchAccessToken(authToken);
-      if (!data) throw new Error(`Failed to get access token: ${error}`);
-      return data;
-    },
-  });
-  if (!tokenData) {
+  // Fetch and store the access token, and the new authToken if available
+  const authToken = await authTokenStorage.getValue();
+  if (!authToken) {
     IS_DEV && console.log("Background refresh: no token");
     return;
-  } else if (tokenData.authToken) {
-    await authTokenStorage.setValue(tokenData.authToken);
   }
+  const { data: tokenData, error: tokenError } = await fetchAccessToken(authToken);
+  if (tokenError) {
+    console.warn("Background refresh: error retrieving token:", tokenError);
+    if (tokenError.status === 401) {
+      await authTokenStorage.setValue(null);
+      await accessTokenStorage.setValue(null);
+    }
+    return;
+  }
+  await accessTokenStorage.setValue({
+    value: tokenData.accessToken,
+    lastChecked: Date.now(),
+  });
+  if (tokenData.authToken) await authTokenStorage.setValue(tokenData.authToken);
 
+  // Get the configured budgets in the relevant storage area
   const syncEnabled = await shouldSyncStorage.getValue();
   const storageArea = syncEnabled ? "sync" : "local";
   const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
   if (!budgetIds || budgetIds.length === 0) return;
+
+  // Create a query client with a longer default stale time to prevent too many refetches
+  const queryClient = createQueryClient({
+    staleTime: 10 * 60 * 1000,
+  });
 
   IS_DEV && console.log("Background refresh: updating alerts...");
   const ynabAPI = new api(tokenData.accessToken);

@@ -1,6 +1,6 @@
 import { currentAlertsStorage, useCurrentAlerts, useVersionAlert } from "./alerts";
-import { authTokenStorage } from "./authToken";
-import { usePinnedItems } from "./budgetPinned";
+import { accessTokenStorage, authTokenStorage, useAuth } from "./auth";
+import { pinnedItemsStorage, usePinnedItems } from "./budgetPinned";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
 import { appSettingsStorage, useAppSettings } from "./settings";
@@ -10,6 +10,7 @@ import type { TxStoreAction } from "./txStore";
 import { type TxStore, txStore, useTxStore, useTxStoreSubTxTotals } from "./txStore";
 
 export {
+  useAuth,
   useAppSettings,
   useBudgetSettings,
   useCurrentAlerts,
@@ -17,10 +18,12 @@ export {
   usePopupState,
   useTokenData,
   useVersionAlert,
-  appSettingsStorage,
+  accessTokenStorage,
   authTokenStorage,
+  appSettingsStorage,
   budgetSettingsStorage,
   currentAlertsStorage,
+  pinnedItemsStorage,
   popupStateStorage,
   shouldSyncStorage,
   tokenDataStorage,

@@ -8,7 +8,6 @@ import {
   usePopupState,
   useTokenData,
 } from "~lib/state";
-import { useAuthToken } from "~lib/state/authToken";
 import type { AppSettings } from "~lib/types";
 
 export const useStorageProvider = () => {
@@ -23,9 +22,6 @@ export const useStorageProvider = () => {
 
   /** @deprecated The old token, will clear itself on upgrade */
   const _tokenState = useTokenData();
-
-  /** The encrypted token that contains the sensitive OAuth tokens to access the YNAB API */
-  const [authToken, setAuthToken] = useAuthToken();
 
   /** Current popup view state. Persisted locally. */
   const [popupState, setPopupState] = usePopupState();
@@ -59,11 +55,9 @@ export const useStorageProvider = () => {
   }, [settings?.theme, themeLocalSetting, setThemeLocalSetting]);
 
   // Wait for essential state to be loaded from Chrome storage to avoid flashes (should only take a few ms)
-  if (authToken === undefined || !settings) return null;
+  if (!settings) return null;
 
   return {
-    authToken,
-    setAuthToken,
     popupState,
     setPopupState,
     editingItems,

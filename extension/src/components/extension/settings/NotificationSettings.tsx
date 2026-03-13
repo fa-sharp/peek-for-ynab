@@ -17,10 +17,13 @@ export default function NotificationSettings({ budget }: { budget: CachedBudget 
     key: K,
     value: BudgetSettings["notifications"][K]
   ) =>
-    setBudgetSettings((prev) => ({
-      ...prev,
-      notifications: { ...prev.notifications, [key]: value },
-    }));
+    setBudgetSettings((prev) => {
+      if (!prev) return;
+      return {
+        ...prev,
+        notifications: { ...prev.notifications, [key]: value },
+      };
+    });
 
   return (
     <>

@@ -5,8 +5,7 @@ import {
 } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-import { browser, storage } from "#imports";
-import { FIVE_MINUTES_IN_MILLIS, ONE_DAY_IN_MILLIS } from "./constants";
+import { ONE_DAY_IN_MILLIS } from "./constants";
 
 export function createQueryClient(options?: { staleTime?: number }) {
   return new QueryClient({
@@ -45,21 +44,4 @@ const queryPersister = experimental_createQueryPersister<PersistedQuery>({
   serialize: (query) => query,
   deserialize: (query) => query,
   buster: "v2",
-});
-
-/** Persist access token to browser session storage (in-memory only) */
-export const tokenPersister = experimental_createQueryPersister<PersistedQuery>({
-  prefix: "token",
-  maxAge: FIVE_MINUTES_IN_MILLIS, // access token should be valid for 5 minutes
-  storage: {
-    getItem: (key) => storage.getItem(`session:${key}`),
-    setItem: (key, val) => storage.setItem(`session:${key}`, val),
-    removeItem: (key) => storage.removeItem(`session:${key}`),
-    entries: async () => {
-      const entries = await browser.storage.session.get();
-      return Object.entries(entries) as [string, PersistedQuery][];
-    },
-  },
-  serialize: (query) => query,
-  deserialize: (query) => query,
 });

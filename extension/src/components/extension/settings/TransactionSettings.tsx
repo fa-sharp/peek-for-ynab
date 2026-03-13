@@ -15,10 +15,13 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
     key: K,
     value: BudgetSettings["transactions"][K]
   ) =>
-    setSettings((prev) => ({
-      ...prev,
-      transactions: { ...prev.transactions, [key]: value },
-    }));
+    setSettings((prev) => {
+      if (!prev) return;
+      return {
+        ...prev,
+        transactions: { ...prev.transactions, [key]: value },
+      };
+    });
 
   return (
     <>

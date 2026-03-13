@@ -26,20 +26,19 @@ export const useChromeStorage = <T, I extends T | undefined>(
     });
     return () => {
       unwatch();
-      // setRenderedValue(initialValue); // not sure if this is needed
     };
   }, [item]);
 
   /** Set the value of the storage item, updating the displayed value optimistically */
   const setValue = useCallback(
-    async (value: SetStateAction<T>) => {
+    async (value: SetStateAction<I>) => {
+      //@ts-expect-error generic type `I` should work here
+      setRenderedValue(value);
       if (typeof value === "function") {
         const newValue = (value as (prev: T) => T)(await item.getValue());
-        setRenderedValue(newValue);
-        await item.setValue(newValue);
+        return item.setValue(newValue);
       } else {
-        setRenderedValue(value);
-        return item.setValue(value);
+        return value !== undefined ? item.setValue(value) : item.removeValue();
       }
     },
     [item]

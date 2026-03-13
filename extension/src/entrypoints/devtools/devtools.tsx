@@ -6,12 +6,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { type Browser, browser } from "#imports";
 import { BACKGROUND_ALARM_NAME, STORAGE_KEYS } from "~lib/constants";
 import { AppProvider, useAuthContext } from "~lib/context";
-import { useStorageContext } from "~lib/context/storageContext";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
-  const { authToken } = useStorageContext();
-  const { accessToken } = useAuthContext();
+  const { accessToken, loggedIn } = useAuthContext();
 
   const [area, setArea] = useState<"local" | "sync">("local");
   const [data, setData] = useState<Record<string, unknown>>({});
@@ -82,12 +80,12 @@ function Devtools() {
       }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
-      {!authToken ? (
+      {!loggedIn ? (
         <div>No token data</div>
       ) : (
         <>
           <div>
-            Auth token: <SensitiveString data={authToken} />
+            Auth token: <b>Stored</b>
           </div>
           {accessToken && (
             <div>

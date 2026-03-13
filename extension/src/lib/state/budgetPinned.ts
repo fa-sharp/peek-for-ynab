@@ -69,13 +69,13 @@ export const usePinnedItems = (budgetId: string, sync: boolean) => {
 
   const setCategories = useCallback(
     async (categories: string[]) => {
-      return setPinnedItems((prev) => ({ ...prev, categories }));
+      return setPinnedItems((prev) => (prev ? { ...prev, categories } : prev));
     },
     [setPinnedItems]
   );
   const setAccounts = useCallback(
     async (accounts: string[]) => {
-      return setPinnedItems((prev) => ({ ...prev, accounts }));
+      return setPinnedItems((prev) => (prev ? { ...prev, accounts } : prev));
     },
     [setPinnedItems]
   );

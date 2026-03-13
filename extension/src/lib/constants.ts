@@ -10,6 +10,7 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 /** Storage keys for persisted state items */
 export const STORAGE_KEYS = Object.freeze({
   AppSettings: "settings",
+  AccessToken: "accessToken",
   AuthToken: "authToken",
   BudgetSettings: (budgetId: string) => `budget-${budgetId}`,
   CurrentAlerts: "currentAlerts",
@@ -19,15 +20,12 @@ export const STORAGE_KEYS = Object.freeze({
   TxState: "txState",
   /** @deprecated TODO remove after auth migration */
   OldToken: "tokenData",
-  /** @deprecated TODO remove after auth migration */
-  TokenRefreshing: "tokenRefreshing",
   VersionAlert: "versionAlert",
 });
 
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
-export const FIVE_MINUTES_IN_MILLIS = 1000 * 60 * 5;
+export const ONE_MINUTE_IN_MILLIS = 1000 * 60;
 
-export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
 export const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 
 export const DEFAULT_POPUP_STATE: PopupState = {

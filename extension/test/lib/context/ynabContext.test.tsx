@@ -3,8 +3,7 @@ import type { RequestHandler } from "msw";
 import { expect, test } from "vitest";
 
 import { useYNABContext } from "~lib/context";
-import { authTokenStorage, popupStateStorage } from "~lib/state";
-import { pinnedItemsStorage } from "~lib/state/budgetPinned";
+import { authTokenStorage, pinnedItemsStorage, popupStateStorage } from "~lib/state";
 import { mockServer } from "~test/mock/msw";
 import { mockAuthToken, savedAccounts, savedCategories } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";

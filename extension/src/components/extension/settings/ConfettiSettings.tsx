@@ -38,13 +38,16 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
     key: K,
     value: NonNullable<BudgetSettings["confetti"]>[K]
   ) =>
-    setSettings((prev) => ({
-      ...prev,
-      confetti: {
-        ...(prev.confetti || DEFAULT_BUDGET_SETTINGS.confetti!),
-        [key]: value,
-      },
-    }));
+    setSettings((prev) => {
+      if (!prev) return;
+      return {
+        ...prev,
+        confetti: {
+          ...(prev.confetti || DEFAULT_BUDGET_SETTINGS.confetti!),
+          [key]: value,
+        },
+      };
+    });
 
   const onAddEmoji: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();

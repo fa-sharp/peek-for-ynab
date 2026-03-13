@@ -19,8 +19,12 @@ export async function fetchAccessToken(authToken: string) {
     const data: { accessToken: string; authToken?: string } = await res.json();
     return { data, error: undefined };
   } else {
-    const message = `${res.status} ${await res.text()}`;
-    return { error: message };
+    return {
+      error: {
+        status: res.status,
+        message: await res.text(),
+      },
+    };
   }
 }
 

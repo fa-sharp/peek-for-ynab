@@ -42,7 +42,7 @@ export const useAppSettings = () => {
         await syncQuery.refetch();
         return;
       } else {
-        return setSettings((prev) => ({ ...prev, [key]: newValue }));
+        return setSettings((prev) => (prev ? { ...prev, [key]: newValue } : prev));
       }
     },
     [syncQuery, setSettings]
