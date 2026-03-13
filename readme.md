@@ -16,9 +16,10 @@ A browser extension for YNAB that lets users see their category and account bala
     - `styles/` Extension CSS / Sass styles
   - `test/` Unit tests with Vitest
 - `web/` Website and server using Astro and Fastify
-  - `server/` Fastify server (serves Astro as middleware)
+  - `server/` Fastify server (OAuth flow, API routes, and Astro static files)
+    - `routes/` API routes
   - `src/`
-    - `pages/` All website pages and routes (Astro)
+    - `pages/` All website pages (Astro)
 
 ## Building and running locally
 
@@ -30,7 +31,7 @@ Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.c
 
 ### Backend / Web
 
-The server and website is created with [Astro](https://astro.build/). Pages and API routes are located in the `web/src/pages/` folder. You can run the server via:
+The server and website is created with [Fastify](https://fastify.dev) and [Astro](https://astro.build/). The server is located in the `/web/server` folder, and the web pages are located in the `web/src/pages` folder. You can run the server via:
 
 ```bash
 cd web
