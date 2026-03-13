@@ -1,38 +1,52 @@
-import { type SetStateAction, useCallback, useEffect, useState } from "react";
+import { type SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import type { Mutate, StoreApi } from "zustand";
 import { createJSONStorage } from "zustand/middleware";
 
-import { storage, type WxtStorageItem } from "#imports";
+import { type StorageItemKey, storage, type WxtStorageItem } from "#imports";
 
 /** Hook to subscribe, read, and write to Chrome storage items */
 export const useChromeStorage = <T, I extends T | undefined>(
   item: WxtStorageItem<T, {}>,
-  initialValue?: I
+  opts?: {
+    /** Initial displayed value. If set, the rendered value
+     * will not have an initial type of `undefined` on loading. */
+    initialValue?: I;
+    /** Additional items of the same type that should be kept in cache,
+     * to prevent rendering flashes when switching between the items. Make sure this
+     * is a stable value (e.g. wrapped in `useMemo` if defined within React) */
+    cacheItems?: WxtStorageItem<T, {}>[];
+  }
 ) => {
   // Displayed value
-  const [renderedValue, setRenderedValue] = useState<T | undefined>(initialValue);
+  const [renderedValue, setRenderedValue] = useState<T | undefined>(opts?.initialValue);
+
+  // Items retrieved from storage on load and cached to avoid flashes
+  const cache = useRef<Record<StorageItemKey, T>>({});
+  useEffect(() => {
+    if (!opts?.cacheItems) return;
+    Promise.all(
+      opts?.cacheItems.map(async (item) => [item.key, await item.getValue()] as const)
+    ).then((entries) => {
+      cache.current = Object.fromEntries(entries);
+    });
+  }, [opts?.cacheItems]);
 
   // Initial load
   useEffect(() => {
-    item.getValue().then((value) => {
-      setRenderedValue(value);
-    });
+    if (cache.current[item.key]) setRenderedValue(cache.current[item.key]);
+    item.getValue().then(setRenderedValue);
   }, [item]);
 
   // Subscribe to changes
   useEffect(() => {
-    const unwatch = item.watch((value) => {
-      setRenderedValue(value);
-    });
-    return () => {
-      unwatch();
-    };
+    const unwatch = item.watch(setRenderedValue);
+    return () => unwatch();
   }, [item]);
 
   /** Set the value of the storage item, updating the displayed value optimistically */
   const setValue = useCallback(
-    async (value: SetStateAction<I>) => {
-      //@ts-expect-error generic type `I` should work here
+    async (value: SetStateAction<I extends T ? T : T | undefined>) => {
+      //@ts-expect-error forcing the custom generic typing here
       setRenderedValue(value);
       if (typeof value === "function") {
         const newValue = (value as (prev: T) => T)(await item.getValue());
@@ -44,7 +58,7 @@ export const useChromeStorage = <T, I extends T | undefined>(
     [item]
   );
 
-  return [renderedValue, setValue] as [I, typeof setValue];
+  return [renderedValue, setValue] as [I extends T ? T : T | undefined, typeof setValue];
 };
 
 /** Safely migrate a stored JSON string value (from old storage library) to an object. */

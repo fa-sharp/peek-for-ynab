@@ -33,10 +33,9 @@ export const usePopupState = () => {
   const initialPopupState = use(popupStateQuery.promise);
 
   // We can now render with synchronous access to the initial popup state
-  const [popupState, _setPopupState] = useChromeStorage(
-    popupStateStorage,
-    initialPopupState
-  );
+  const [popupState, _setPopupState] = useChromeStorage(popupStateStorage, {
+    initialValue: initialPopupState,
+  });
 
   const setPopupState = useCallback(
     (newState: OpenPopupView) => {

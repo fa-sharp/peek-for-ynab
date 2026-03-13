@@ -33,7 +33,9 @@ export const useAuth = () => {
   });
   const initialAuthToken = use(authTokenQuery.promise);
 
-  const [authToken, setAuthToken] = useChromeStorage(authTokenStorage, initialAuthToken);
+  const [authToken, setAuthToken] = useChromeStorage(authTokenStorage, {
+    initialValue: initialAuthToken,
+  });
   const [accessToken, setAccessToken] = useChromeStorage(accessTokenStorage);
   const [error, setError] = useState("");
 

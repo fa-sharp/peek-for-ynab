@@ -92,7 +92,7 @@ export default function PopupNav() {
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
-  if (!accessToken && authError) return <div>⚠️ Authentication error: {authError}</div>;
+  if (!accessToken && authError) return <div>Authentication error: {authError}</div>;
   if (!accessToken) return <div>Loading...</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
   if (!shownBudgetsData) return null; // No budgets to show
