@@ -31,7 +31,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => (
 export {
   AppProvider,
   useAuthContext,
-  useYNABContext,
   useNotificationsContext,
   useStorageContext,
+  useYNABContext,
 };

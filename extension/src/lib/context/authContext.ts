@@ -8,7 +8,7 @@ import { useAuth } from "~lib/state";
 export const useAuthProvider = () => {
   const queryClient = useQueryClient();
 
-  /** The encrypted token that contains the sensitive OAuth tokens to access the YNAB API */
+  /** Get auth state */
   const { error: authError, authToken, clearToken, fetchToken, accessToken } = useAuth();
 
   /** Authenticate the YNAB user through OAuth */

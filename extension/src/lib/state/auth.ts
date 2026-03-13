@@ -61,7 +61,6 @@ export const useAuth = () => {
           }
           setError(error.message);
         } else {
-          setError("");
           await setAccessToken({ value: data.accessToken, lastChecked: Date.now() });
           await setAuthToken(data.authToken ? data.authToken : authToken);
         }
@@ -79,10 +78,15 @@ export const useAuth = () => {
   }, [authToken, accessToken, accessTokenIsStale, fetchToken]);
 
   return {
+    /** Error that ocurred during auth flow */
     error,
+    /** Fetch and save the access token in memory */
     fetchToken,
+    /** The current auth token */
     authToken,
+    /** The current access token */
     accessToken: accessToken?.value && !accessTokenIsStale ? accessToken.value : null,
+    /** Clear the access token and auth token (e.g. on logout) */
     clearToken,
   };
 };
