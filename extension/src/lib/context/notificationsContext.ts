@@ -1,5 +1,4 @@
-import { createProvider } from "puro";
-import { useContext, useEffect } from "react";
+import { createContext, useContext, useEffect } from "react";
 
 import { LATEST_VERSION_ALERT_NUM } from "~lib/constants";
 import { getBudgetAlerts, updateIconAndTooltip } from "~lib/notifications";
@@ -7,7 +6,7 @@ import { useCurrentAlerts, useVersionAlert } from "~lib/state";
 import { useStorageContext } from "./storageContext";
 import { useYNABContext } from "./ynabContext";
 
-const useNotificationsProvider = () => {
+export const useNotificationsProvider = () => {
   const { budgetSettings, popupState } = useStorageContext();
   const { accountsData, budgetsData, categoriesData, unapprovedTxs } = useYNABContext();
 
@@ -61,8 +60,9 @@ const useNotificationsProvider = () => {
   };
 };
 
-const { BaseContext, Provider } = createProvider(useNotificationsProvider);
+export const NotificationsContext =
+  //@ts-expect-error Context should not be null if wrapped in provider
+  createContext<ReturnType<typeof useNotificationsProvider>>(null);
 
-/** Hook for retrieving current alerts and notifications */
-export const useNotificationsContext = () => useContext(BaseContext);
-export const NotificationsProvider = Provider;
+/** Hook for alerts and notifications */
+export const useNotificationsContext = () => useContext(NotificationsContext);

@@ -1,12 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { clear as idbClear } from "idb-keyval";
-import { createProvider } from "puro";
-import { useCallback, useContext } from "react";
+import { createContext, useCallback, useContext } from "react";
 
 import { browser } from "#imports";
 import { useAuth } from "~lib/state";
 
-const useAuthProvider = () => {
+export const useAuthProvider = () => {
   const queryClient = useQueryClient();
 
   /** The encrypted token that contains the sensitive OAuth tokens to access the YNAB API */
@@ -69,8 +68,9 @@ const useAuthProvider = () => {
   };
 };
 
-const { BaseContext, Provider } = createProvider(useAuthProvider);
+export const AuthContext =
+  //@ts-expect-error Context should not be null if wrapped in provider
+  createContext<ReturnType<typeof useAuthProvider>>(null);
 
-/** Hook to authenticate the YNAB user. Manages the encrypted authToken and accessToken. */
-export const useAuthContext = () => useContext(BaseContext);
-export const AuthProvider = Provider;
+/** Hook to get authentication status and access token */
+export const useAuthContext = () => useContext(AuthContext);

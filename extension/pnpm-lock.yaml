@@ -83,9 +83,6 @@ importers:
       json-formatter-js:
         specifier: ^2.5.23
         version: 2.5.23
-      puro:
-        specifier: ^0.8.4
-        version: 0.8.4(react@19.2.4)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -2773,12 +2770,6 @@ packages:
   pupa@3.3.0:
     resolution: {integrity: sha512-LjgDO2zPtoXP2wJpDjZrGdojii1uqO0cnwKoIoUzkfS98HDmbeiGmYiXo3lXeFlq2xvne1QFQhwYXSUCLKtEuA==}
     engines: {node: '>=12.20'}
-
-  puro@0.8.4:
-    resolution: {integrity: sha512-NeUTk5V9uqwyY22oyNutaUmQxrYG8251o9g7kiNA8shNA/0MZ4M2AbIuTzjK2WrWwNvt/TudtuLpRcxpCxE/7A==}
-    hasBin: true
-    peerDependencies:
-      react: '>=17 || >=18'
 
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
@@ -6219,10 +6210,6 @@ snapshots:
   pupa@3.3.0:
     dependencies:
       escape-goat: 4.0.0
-
-  puro@0.8.4(react@19.2.4):
-    dependencies:
-      react: 19.2.4
 
   quansync@0.2.11: {}
 

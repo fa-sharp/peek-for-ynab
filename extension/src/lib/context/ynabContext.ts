@@ -1,6 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createProvider } from "puro";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import * as ynab from "ynab";
 
 import {
@@ -17,7 +23,7 @@ import { findAllEmoji, getNDaysAgoISO } from "~lib/utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
-const useYNABProvider = () => {
+export const useYNABProvider = () => {
   const {
     settings,
     budgetSettings,
@@ -464,8 +470,9 @@ const useYNABProvider = () => {
   };
 };
 
-const { BaseContext, Provider } = createProvider(useYNABProvider);
+export const YNABContext =
+  //@ts-expect-error Context should not be null if wrapped in provider
+  createContext<ReturnType<typeof useYNABProvider>>(null);
 
 /** Hook that provides user's budget data from YNAB */
-export const useYNABContext = () => useContext(BaseContext);
-export const YNABProvider = Provider;
+export const useYNABContext = () => useContext(YNABContext);

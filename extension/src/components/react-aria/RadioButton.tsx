@@ -3,29 +3,26 @@ import {
   type AriaRadioGroupProps,
   type AriaRadioProps,
   useRadio,
-  useRadioGroup
+  useRadioGroup,
 } from "@react-aria/radio";
 import { mergeProps } from "@react-aria/utils";
 import { VisuallyHidden } from "@react-aria/visually-hidden";
 import {
   type RadioGroupProps,
   type RadioGroupState,
-  useRadioGroupState
+  useRadioGroupState,
 } from "@react-stately/radio";
 import { clsx } from "clsx";
-import { createProvider } from "puro";
-import { useContext, useRef } from "react";
-
-const { BaseContext: RadioButtonContext, Provider: RadioButtonProvider } = createProvider(
-  ({ state }: { state: RadioGroupState }) => {
-    return { state };
-  }
-);
+import { createContext, useContext, useRef } from "react";
 
 interface RadioButtonGroupProps extends RadioGroupProps, AriaRadioGroupProps {
   children: React.ReactNode;
   className?: string;
 }
+
+const useRadioButtonProvider = (props: { state: RadioGroupState }) => props;
+//@ts-expect-error Context should not be null if wrapped in provider
+const RadioButtonContext = createContext<ReturnType<typeof useRadioButtonProvider>>(null);
 
 export function RadioButtonGroup({
   children,
@@ -36,7 +33,7 @@ export function RadioButtonGroup({
   const { radioGroupProps, labelProps, descriptionProps } = useRadioGroup(
     {
       ...props,
-      orientation: "horizontal"
+      orientation: "horizontal",
     },
     state
   );
@@ -44,7 +41,9 @@ export function RadioButtonGroup({
   return (
     <div {...radioGroupProps} className={className}>
       <span {...labelProps}>{props.label}</span>
-      <RadioButtonProvider state={state}>{children}</RadioButtonProvider>
+      <RadioButtonContext.Provider value={{ state }}>
+        {children}
+      </RadioButtonContext.Provider>
       {props.description && (
         <div {...descriptionProps} style={{ fontSize: ".9em" }}>
           {props.description}
@@ -66,7 +65,7 @@ export function RadioButton(props: AriaRadioProps) {
       className={clsx("button small rounded hide-overflow max-w-32", {
         accent: isSelected,
         gray: !isSelected,
-        focus: isFocusVisible
+        focus: isFocusVisible,
       })}>
       <VisuallyHidden>
         <input {...mergeProps(inputProps, focusProps)} ref={ref} />
