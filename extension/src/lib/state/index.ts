@@ -1,35 +1,39 @@
 import { currentAlertsStorage, useCurrentAlerts, useVersionAlert } from "./alerts";
-import { accessTokenStorage, authTokenStorage, useAuth } from "./auth";
+import { AuthManager, authTokenStorage, useAuth } from "./auth";
 import { pinnedItemsStorage, usePinnedItems } from "./budgetPinned";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
-import { appSettingsStorage, useAppSettings } from "./settings";
-import { shouldSyncStorage } from "./sync";
+import { appSettingsStorage, shouldSyncStorage, useAppSettings } from "./settings";
 import { tokenDataStorage, useTokenData } from "./token";
-import type { TxStoreAction } from "./txStore";
-import { type TxStore, txStore, useTxStore, useTxStoreSubTxTotals } from "./txStore";
+import {
+  type TxStore,
+  type TxStoreAction,
+  txStore,
+  useTxStore,
+  useTxStoreSubTxTotals,
+} from "./txStore";
 
 export {
-  useAuth,
-  useAppSettings,
-  useBudgetSettings,
-  useCurrentAlerts,
-  usePinnedItems,
-  usePopupState,
-  useTokenData,
-  useVersionAlert,
-  accessTokenStorage,
-  authTokenStorage,
+  AuthManager,
   appSettingsStorage,
+  authTokenStorage,
   budgetSettingsStorage,
   currentAlertsStorage,
   pinnedItemsStorage,
   popupStateStorage,
   shouldSyncStorage,
-  tokenDataStorage,
-  txStore,
-  useTxStore,
-  useTxStoreSubTxTotals,
   type TxStore,
   type TxStoreAction,
+  tokenDataStorage,
+  txStore,
+  useAppSettings,
+  useAuth,
+  useBudgetSettings,
+  useCurrentAlerts,
+  usePinnedItems,
+  usePopupState,
+  useTokenData,
+  useTxStore,
+  useTxStoreSubTxTotals,
+  useVersionAlert,
 };

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { storage } from "#imports";
 import { STORAGE_KEYS } from "~lib/constants";
-import { appSettingsStorage } from "./settings";
+import type { AppSettings } from "~lib/types";
 import { safeMigrateJsonString, useChromeStorage } from "./utils";
 
 /** Shape of the pinned items storage for each budget */
@@ -15,7 +15,7 @@ interface PinnedItemsStorage {
 
 const DEFAULT_PINNED_ITEMS: PinnedItemsStorage = { categories: [], accounts: [] };
 
-/** TODO remove: Old shape of the pinned items storage: map of budget IDs to arrays of account/category IDs */
+/** Old shape of the pinned items storage: map of budget IDs to arrays of account/category IDs */
 interface OldBudgetToIdsMap {
   [budgetId: string]: string[] | undefined;
 }
@@ -42,15 +42,18 @@ export function pinnedItemsStorage(budgetId: string, area: "local" | "sync") {
   );
 }
 
-export const usePinnedItems = (budgetId: string, sync: boolean) => {
+export const usePinnedItems = (
+  budgetId: string,
+  sync: boolean,
+  settings?: AppSettings
+) => {
   const pinnedItemsStore = useMemo(
     () => pinnedItemsStorage(budgetId, sync ? "sync" : "local"),
     [sync, budgetId]
   );
-  // If user has selected multiple budgets, cache pinned items from all of them
+  // If user has selected multiple budgets, cache the pinned items from all of them
   // to prevent rendering flashes when switching budgets
-  const [settings] = useChromeStorage(appSettingsStorage(sync ? "sync" : "local"));
-  const cacheItems = useMemo(
+  const cachedPinnedItems = useMemo(
     () =>
       settings?.budgets && settings.budgets.length > 1
         ? settings?.budgets?.map((budgetId) =>
@@ -61,7 +64,7 @@ export const usePinnedItems = (budgetId: string, sync: boolean) => {
   );
   const [pinnedItems, setPinnedItems] = useChromeStorage(pinnedItemsStore, {
     initialValue: DEFAULT_PINNED_ITEMS,
-    cacheItems,
+    cacheItems: cachedPinnedItems,
   });
 
   const toggleCategory = useCallback(

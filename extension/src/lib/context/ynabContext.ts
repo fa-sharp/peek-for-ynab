@@ -18,6 +18,7 @@ import {
 } from "~lib/api";
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
 import { useConfetti } from "~lib/hooks";
+import { queryPersister } from "~lib/queryClient";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
 import { findAllEmoji, getNDaysAgoISO } from "~lib/utils";
 import { useAuthContext } from "./authContext";
@@ -35,13 +36,22 @@ export const useYNABProvider = () => {
   const { accessToken } = useAuthContext();
 
   const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
-  const queryClient = useQueryClient();
 
-  /** Initialize ynabAPI object if authenticated */
+  // Initialize ynabAPI object if authenticated
   useEffect(() => {
     if (accessToken) setYnabAPI(new ynab.API(accessToken));
     else setYnabAPI(null);
   }, [accessToken]);
+
+  const queryClient = useQueryClient();
+
+  // If showing multiple budgets, restore all category and account query cache to avoid rendering flashes
+  useEffect(() => {
+    if (settings.budgets && settings.budgets.length > 1) {
+      queryPersister.restoreQueries(queryClient, { queryKey: ["categoryGroups"] });
+      queryPersister.restoreQueries(queryClient, { queryKey: ["accounts"] });
+    }
+  }, [queryClient, settings.budgets]);
 
   /** Fetch and cache user's budgets. */
   const {

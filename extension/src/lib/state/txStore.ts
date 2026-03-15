@@ -5,12 +5,30 @@ import { useShallow } from "zustand/react/shallow";
 
 import { STORAGE_KEYS } from "~lib/constants";
 import type { CachedPayee, SubTxState, TxAddState } from "~lib/types";
-import { stringValueToMillis } from "~lib/utils";
-import { DEFAULT_SUB_TX, DEFAULT_TX_STATE } from "./txStoreDefaults";
+import { getTodaysDateISO, stringValueToMillis } from "~lib/utils";
 import { createZustandChromeStorage, useZustandChromeStorageEvents } from "./utils";
 
 /** The type of the transaction form Zustand store */
 export type TxStore = ExtractState<typeof txStore>;
+
+/** Initial default state for a sub/split transaction */
+const DEFAULT_SUB_TX: SubTxState = {
+  amount: "",
+  amountType: "Outflow",
+  isTransfer: false,
+};
+
+/** Initial default state for transaction form */
+const DEFAULT_TX_STATE: TxAddState = {
+  amount: "",
+  amountType: "Outflow",
+  isTransfer: false,
+  cleared: false,
+  isSplit: false,
+  subTxs: [DEFAULT_SUB_TX],
+  date: getTodaysDateISO(),
+  returnTo: { view: "main" },
+};
 
 interface TxStoreActions {
   dispatch: (action: TxStoreAction) => void;

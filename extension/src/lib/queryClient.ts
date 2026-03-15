@@ -1,9 +1,9 @@
-import { QueryClient } from "@tanstack/react-query";
 import {
   experimental_createQueryPersister,
   type PersistedQuery,
-} from "@tanstack/react-query-persist-client";
-import { del, get, set } from "idb-keyval";
+} from "@tanstack/query-persist-client-core";
+import { QueryClient } from "@tanstack/react-query";
+import { del, entries, get, set } from "idb-keyval";
 
 import { ONE_DAY_IN_MILLIS } from "./constants";
 
@@ -29,7 +29,7 @@ const CACHED_QUERY_KEYS = new Set([
 ]);
 
 /** Persist queries to IndexedDB using idb-keyval */
-const queryPersister = experimental_createQueryPersister<PersistedQuery>({
+export const queryPersister = experimental_createQueryPersister<PersistedQuery>({
   prefix: "ynab",
   filters: {
     predicate: ({ queryKey }) =>
@@ -40,6 +40,7 @@ const queryPersister = experimental_createQueryPersister<PersistedQuery>({
     getItem: (key) => get(key),
     setItem: (key, val) => set(key, val),
     removeItem: (key) => del(key),
+    entries: () => entries(),
   },
   serialize: (query) => query,
   deserialize: (query) => query,

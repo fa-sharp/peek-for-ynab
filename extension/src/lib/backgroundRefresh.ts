@@ -15,9 +15,8 @@ import {
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
-import { fetchAccessToken } from "./api";
 import {
-  accessTokenStorage,
+  AuthManager,
   appSettingsStorage,
   authTokenStorage,
   budgetSettingsStorage,
@@ -28,26 +27,17 @@ import {
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
 
-  // Fetch and store the access token, and the new authToken if available
+  // Get the access token
   const authToken = await authTokenStorage.getValue();
   if (!authToken) {
-    IS_DEV && console.log("Background refresh: no token");
+    IS_DEV && console.log("Background refresh: no auth token");
     return;
   }
-  const { data: tokenData, error: tokenError } = await fetchAccessToken(authToken);
-  if (tokenError) {
-    console.warn("Background refresh: error retrieving token:", tokenError);
-    if (tokenError.status === 401) {
-      await authTokenStorage.setValue(null);
-      await accessTokenStorage.setValue(null);
-    }
+  const tokenResponse = await AuthManager.fetchToken(authToken);
+  if (!tokenResponse.success) {
+    console.warn("Background refresh: failed to get access token:", tokenResponse.error);
     return;
   }
-  await accessTokenStorage.setValue({
-    value: tokenData.accessToken,
-    lastChecked: Date.now(),
-  });
-  if (tokenData.authToken) await authTokenStorage.setValue(tokenData.authToken);
 
   // Get the configured budgets in the relevant storage area
   const syncEnabled = await shouldSyncStorage.getValue();
@@ -61,7 +51,7 @@ export async function backgroundDataRefresh() {
   });
 
   IS_DEV && console.log("Background refresh: updating alerts...");
-  const ynabAPI = new api(tokenData.accessToken);
+  const ynabAPI = new api(tokenResponse.accessToken);
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
     staleTime: ONE_DAY_IN_MILLIS * 7,

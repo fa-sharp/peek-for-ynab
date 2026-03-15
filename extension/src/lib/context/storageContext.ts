@@ -31,7 +31,7 @@ export const useStorageProvider = () => {
 
   /** Pinned categories and accounts for the current budget */
   const { pinnedItems, toggleCategory, toggleAccount, setCategories, setAccounts } =
-    usePinnedItems(popupState.budgetId, sync);
+    usePinnedItems(popupState.budgetId, sync, settings);
 
   /** Budget-specific settings for the current budget. Is synced if the user chooses. */
   const [budgetSettings, setBudgetSettings] = useBudgetSettings(

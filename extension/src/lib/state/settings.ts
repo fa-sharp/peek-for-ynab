@@ -1,9 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { use, useCallback, useMemo } from "react";
 
 import { storage } from "#imports";
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from "~lib/constants";
 import type { AppSettings } from "~lib/types";
-import { shouldSyncStorage, useShouldSyncQuery } from "./sync";
 import { safeMigrateJsonString, useChromeStorage } from "./utils";
 
 export function appSettingsStorage(area: "local" | "sync") {
@@ -21,9 +21,24 @@ export function appSettingsStorage(area: "local" | "sync") {
   });
 }
 
+export const shouldSyncStorage = storage.defineItem<boolean>(
+  `local:${STORAGE_KEYS.ShouldSyncSettings}`,
+  {
+    fallback: false,
+    version: 2,
+    migrations: {
+      2: safeMigrateJsonString(false),
+    },
+  }
+);
+
 export const useAppSettings = () => {
-  // `React.use` allows us to fetch the sync setting on render
-  const syncQuery = useShouldSyncQuery();
+  // Fetch the sync setting on render to avoid loading state
+  const syncQuery = useQuery({
+    queryKey: [STORAGE_KEYS.ShouldSyncSettings],
+    queryFn: shouldSyncStorage.getValue,
+    staleTime: Infinity,
+  });
   const shouldSync = use(syncQuery.promise);
 
   const settingsStore = useMemo(

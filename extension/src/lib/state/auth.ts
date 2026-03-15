@@ -13,19 +13,57 @@ export const authTokenStorage = storage.defineItem<string | null>(
 );
 
 /** Unencrypted access token held in memory */
-export const accessTokenStorage = storage.defineItem<{
+const accessTokenStorage = storage.defineItem<{
   value: string;
   lastChecked: number;
 } | null>(`session:${STORAGE_KEYS.AccessToken}`, {
   fallback: null,
 });
 
-/** Access token should be valid for 5 minutes */
+/** Access token is valid for at least 5 minutes */
 const TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 5;
 
-/** Hook to get and manage the auth state */
+/** Auth utilities */
+export class AuthManager {
+  /**
+   * Fetch the unencrypted access token from the server, and save it in memory. Will
+   * clear the tokens from storage if an unauthorized error is received from the server.
+   */
+  static async fetchToken(authToken: string) {
+    try {
+      const { data, error } = await fetchAccessToken(authToken);
+      if (error) {
+        if (error.status === 401) {
+          console.warn("token endpoint returned unauthorized status, logging out...");
+          await this.clearToken();
+        }
+        return { success: false, error: error.message } as const;
+      } else {
+        await accessTokenStorage.setValue({
+          value: data.accessToken,
+          lastChecked: Date.now(),
+        });
+        await authTokenStorage.setValue(data.authToken ? data.authToken : authToken);
+        return { success: true, accessToken: data.accessToken } as const;
+      }
+    } catch (err: unknown) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Unknown error",
+      } as const;
+    }
+  }
+
+  /** Clear tokens from storage */
+  static async clearToken() {
+    await authTokenStorage.setValue(null);
+    await accessTokenStorage.setValue(null);
+  }
+}
+
+/** React hook to get and manage the auth state */
 export const useAuth = () => {
-  // fetch auth token on render to eliminate loading state
+  // get auth token on render to eliminate loading state
   const authTokenQuery = useQuery({
     queryKey: [STORAGE_KEYS.AuthToken],
     queryFn: authTokenStorage.getValue,
@@ -33,44 +71,25 @@ export const useAuth = () => {
   });
   const initialAuthToken = use(authTokenQuery.promise);
 
-  const [authToken, setAuthToken] = useChromeStorage(authTokenStorage, {
+  const [authToken] = useChromeStorage(authTokenStorage, {
     initialValue: initialAuthToken,
   });
-  const [accessToken, setAccessToken] = useChromeStorage(accessTokenStorage);
+  const [accessToken] = useChromeStorage(accessTokenStorage);
   const [error, setError] = useState("");
 
   const accessTokenIsStale =
     !!accessToken && accessToken.lastChecked + TOKEN_STALE_TIME < Date.now();
 
-  const clearToken = useCallback(async () => {
-    await setAuthToken(null);
-    await setAccessToken(null);
-  }, [setAccessToken, setAuthToken]);
+  const fetchToken = useCallback(async (authToken: string) => {
+    setError("");
+    const { success, error } = await AuthManager.fetchToken(authToken);
+    if (!success) {
+      console.warn("failed to get access token:", error);
+      setError(error);
+    }
+  }, []);
 
-  /** Fetch the unencrypted access token from the server, and save it in memory */
-  const fetchToken = useCallback(
-    async (authToken: string) => {
-      setError("");
-      try {
-        const { data, error } = await fetchAccessToken(authToken);
-        if (error) {
-          console.warn("failed to get access token:", error.message);
-          if (error.status === 401) {
-            console.warn("status is unauthorized, logging out...");
-            await clearToken();
-          }
-          setError(error.message);
-        } else {
-          await setAccessToken({ value: data.accessToken, lastChecked: Date.now() });
-          await setAuthToken(data.authToken ? data.authToken : authToken);
-        }
-      } catch (err: unknown) {
-        console.warn("failed to get access token:", err);
-        setError(err instanceof Error ? err.message : "Unknown error");
-      }
-    },
-    [setAuthToken, setAccessToken, clearToken]
-  );
+  const clearToken = useCallback(() => AuthManager.clearToken(), []);
 
   // If auth token is present, fetch access token if it's not in memory and/or is stale
   useEffect(() => {
