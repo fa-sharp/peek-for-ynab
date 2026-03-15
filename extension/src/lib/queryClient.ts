@@ -40,7 +40,7 @@ export const queryPersister = experimental_createQueryPersister<PersistedQuery>(
     getItem: (key) => get(key),
     setItem: (key, val) => set(key, val),
     removeItem: (key) => del(key),
-    entries: () => entries(),
+    entries: entries,
   },
   serialize: (query) => query,
   deserialize: (query) => query,
