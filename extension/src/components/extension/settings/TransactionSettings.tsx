@@ -16,10 +16,10 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
     value: BudgetSettings["transactions"][K]
   ) =>
     setSettings((prev) => {
-      if (!prev) return undefined;
+      if (!prev) return;
       return {
         ...prev,
-        transactions: { ...prev.transactions, [key]: value }
+        transactions: { ...prev.transactions, [key]: value },
       };
     });
 
@@ -69,6 +69,7 @@ export default function TransactionSettings({ budget }: { budget: CachedBudget }
               required={false}
               placeholder="Select a default account (optional)"
               accounts={accounts}
+              currencyFormat={budget.currencyFormat}
               currentAccount={
                 accounts?.find((a) => a.id === settings?.transactions.defaultAccountId) ||
                 null

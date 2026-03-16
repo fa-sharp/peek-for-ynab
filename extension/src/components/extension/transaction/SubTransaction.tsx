@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { Plus } from "tabler-icons-react";
 
 import type { BudgetMainData, SubTxState } from "~lib/types";
-
 import { AccountSelect, AmountField, CategorySelect, PayeeSelect } from "../..";
 
 interface Props {
@@ -22,7 +21,7 @@ export default function SubTransaction({
   allowTransfer = true,
   autoFocus = false,
   disabled = false,
-  budgetMainData
+  budgetMainData,
 }: Props) {
   const [showPayee, setShowPayee] = useState(!!txState.payee);
   const [showMemo, setShowMemo] = useState(!!txState.memo);
@@ -71,6 +70,7 @@ export default function SubTransaction({
             }
             label={txState.amountType === "Outflow" ? "Payee (To)" : "Payee (From)"}
             accounts={budgetMainData.accountsData}
+            currencyFormat={budgetMainData.currencyFormat}
             selectAccount={(account) => {
               if (!account || !account.transfer_payee_id) {
                 setField("payee", null);
@@ -79,7 +79,7 @@ export default function SubTransaction({
                 setField("payee", {
                   id: account.transfer_payee_id,
                   name: account.name,
-                  transferId: account.id
+                  transferId: account.id,
                 });
                 if (account.on_budget) {
                   setShowCategory(false);

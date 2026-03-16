@@ -1,4 +1,4 @@
-import { type ForwardedRef, type SetStateAction, forwardRef } from "react";
+import { type ForwardedRef, forwardRef, type SetStateAction } from "react";
 import { WorldWww } from "tabler-icons-react";
 
 import IconButton from "~components/IconButton";
@@ -6,15 +6,15 @@ import type { AppSettings } from "~lib/types";
 import { executeScriptInCurrentTab, requestPermissions } from "~lib/utils";
 
 type Props = {
-  memo: string;
-  setMemo: (memo: SetStateAction<string>) => void;
   disabled?: boolean;
+  memo?: string;
+  setMemo: (memo: SetStateAction<string>) => void;
   settings?: AppSettings;
 };
 
 const MemoField = (
-  { memo, setMemo, disabled, settings }: Props,
-  ref: ForwardedRef<HTMLInputElement>
+  { memo = "", setMemo, disabled, settings }: Props,
+  ref: ForwardedRef<HTMLInputElement>,
 ) => {
   const onCopyURLIntoMemo = async () => {
     if (!(await requestPermissions(["activeTab", "scripting"]))) return;

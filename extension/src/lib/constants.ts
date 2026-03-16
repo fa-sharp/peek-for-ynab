@@ -1,5 +1,3 @@
-import { Storage } from "@plasmohq/storage";
-
 import type { AppSettings, BudgetSettings, PopupState } from "./types";
 
 /** Update these 2 variables to alert the user for a major new update/version */
@@ -9,17 +7,26 @@ export const LATEST_VERSION_ALERT_TEXT = "New: Detail views!";
 export const IS_DEV = import.meta.env.DEV && !import.meta.env.VITEST;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
+/** Storage keys for persisted state items */
+export const STORAGE_KEYS = Object.freeze({
+  AppSettings: "settings",
+  AccessToken: "accessToken",
+  AuthToken: "authToken",
+  BudgetSettings: (budgetId: string) => `budget-${budgetId}`,
+  CurrentAlerts: "currentAlerts",
+  PinnedItems: (budgetId: string) => `budget-${budgetId}:pinned`,
+  PopupState: "popupState",
+  ShouldSyncSettings: "sync",
+  TxState: "txState",
+  /** @deprecated TODO remove after auth migration */
+  OldToken: "tokenData",
+  VersionAlert: "versionAlert",
+});
+
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+export const ONE_MINUTE_IN_MILLIS = 1000 * 60;
 
-export const OAUTH_BASE_URL = "https://app.ynab.com/oauth/token";
-export const TOKEN_STORAGE_KEY = "tokenData";
-export const REFRESH_SIGNAL_KEY = "tokenRefreshing";
 export const BACKGROUND_ALARM_NAME = "backgroundRefresh";
-
-export const CHROME_LOCAL_STORAGE = new Storage({ area: "local" });
-export const CHROME_SYNC_STORAGE = new Storage({ area: "sync" });
-export const CHROME_SESSION_STORAGE = new Storage({ area: "session" });
-export const TOKEN_STORAGE = new Storage({ area: "local" });
 
 export const DEFAULT_POPUP_STATE: PopupState = {
   view: "main",

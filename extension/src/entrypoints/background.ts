@@ -1,17 +1,6 @@
 import { type Browser, browser, defineBackground } from "#imports";
-import {
-  backgroundDataRefresh,
-  IS_TOKEN_REFRESHING_KEY,
-  refreshToken,
-} from "~lib/backgroundRefresh";
-import {
-  BACKGROUND_ALARM_NAME,
-  CHROME_LOCAL_STORAGE,
-  CHROME_SESSION_STORAGE,
-  IS_DEV,
-  REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
-} from "~lib/constants";
+import { backgroundDataRefresh } from "~lib/backgroundRefresh";
+import { BACKGROUND_ALARM_NAME, IS_DEV } from "~lib/constants";
 import {
   checkBrowserBarPermission,
   createBrowserBarSuggestions,
@@ -21,22 +10,10 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput,
 } from "~lib/omnibox";
-import type { PopupState, TxAddInitialState } from "~lib/types";
+import { popupStateStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
-  // Listen for token refresh signal
-  TOKEN_STORAGE.watch({
-    [REFRESH_SIGNAL_KEY]: async (c) => {
-      if (
-        c.newValue !== true ||
-        (await CHROME_SESSION_STORAGE.get<boolean>(IS_TOKEN_REFRESHING_KEY))
-      )
-        return;
-      await refreshToken();
-    },
-  });
-
   // Setup periodic background refresh
   browser.alarms.onAlarm.addListener(async (alarm: Browser.alarms.Alarm) => {
     if (alarm.name === BACKGROUND_ALARM_NAME) {
@@ -79,8 +56,7 @@ export default defineBackground(() => {
       browser.omnibox.setDefaultSuggestion({
         description: OMNIBOX_START_TEXT,
       });
-      const budgetId = (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))
-        ?.budgetId;
+      const budgetId = (await popupStateStorage.getValue())?.budgetId;
       if (budgetId) getBrowserBarDataForBudget(budgetId);
     }
   });
@@ -112,7 +88,7 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
+      : (await popupStateStorage.getValue())?.budgetId;
     if (!budgetId) {
       browser.omnibox.setDefaultSuggestion({ description: "Budget not found!" });
       return;
@@ -144,29 +120,29 @@ export default defineBackground(() => {
     const budgetId = parsedQuery.budgetQuery
       ? budgets.find((b) => searchWithinString(b.name, parsedQuery.budgetQuery!.trim()))
           ?.id
-      : (await CHROME_LOCAL_STORAGE.get<PopupState>("popupState"))?.budgetId;
+      : (await popupStateStorage.getValue())?.budgetId;
     if (!budgetId) return;
 
     const data = await getBrowserBarDataForBudget(budgetId);
-    const [tx] =
+    const [fields] =
       parsedQuery.type === "tx"
         ? getPossibleTxFieldCombinations(parsedQuery, data)
         : getPossibleTransferFieldCombinations(parsedQuery, data);
-    IS_DEV && console.log("Received tx fields from omnibox:", tx);
+    IS_DEV && console.log("Received tx from omnibox:", { parsedQuery, fields });
 
-    await CHROME_LOCAL_STORAGE.set("txState", {
-      amount: parsedQuery.amount,
+    await txStore.setState({
+      amount: parsedQuery.amount ?? "",
       amountType: "amountType" in parsedQuery ? parsedQuery.amountType : "Outflow",
-      payee: tx?.payee,
-      accountId: tx?.account?.id,
-      categoryId: tx?.category?.id,
-      memo: parsedQuery.memo?.trim(),
+      payee: fields?.payee ?? null,
+      accountId: fields?.account?.id ?? null,
+      categoryId: fields?.category?.id ?? null,
+      memo: parsedQuery.memo?.trim() ?? null,
       isTransfer: parsedQuery.type === "transfer",
-    } satisfies TxAddInitialState);
-    await CHROME_LOCAL_STORAGE.set("popupState", {
+    });
+    await popupStateStorage.setValue({
       view: "txAdd",
-      budgetId: budgetId,
-    } satisfies PopupState);
+      budgetId,
+    });
     browser.action.openPopup();
   });
 });

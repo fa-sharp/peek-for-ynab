@@ -13,7 +13,7 @@ import type {
   AppSettings,
   BudgetMainData,
   CachedBudget,
-  TxAddInitialState
+  TxAddState
 } from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
@@ -23,7 +23,7 @@ interface Props {
   budgetMainData: BudgetMainData;
   settings: AppSettings;
   currentAlerts?: CurrentAlerts;
-  openTxForm: (txState: TxAddInitialState) => void;
+  openTxForm: (txState: TxAddState) => void;
   savedCategories?: string[];
   savedAccounts?: string[];
   editingItems?: boolean;

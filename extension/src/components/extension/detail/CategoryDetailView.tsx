@@ -1,20 +1,22 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, TransactionView } from "~components";
 import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
+import { useAppSettings } from "~lib/state";
 
 const CategoryTxsView = () => {
+  const { popupState, setPopupState } = useStorageContext();
   const { useGetCategoryTxs, categoriesData, selectedBudgetData, addedTransaction } =
     useYNABContext();
-  const { settings, popupState, setPopupState, setTxState } = useStorageContext();
+  const { settings } = useAppSettings();
 
   const category = useMemo(
-    () => categoriesData?.find((c) => c.id === popupState?.detailState?.id),
-    [categoriesData, popupState?.detailState?.id]
+    () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
+    [categoriesData, popupState.detailState?.id]
   );
-  const { data: categoryTxs } = useGetCategoryTxs(popupState?.detailState?.id, 30);
+  const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
@@ -25,7 +27,7 @@ const CategoryTxsView = () => {
         <IconButton
           icon={<ArrowBack aria-hidden />}
           label="Back to main view"
-          onClick={() => setPopupState({ view: "main", detailState: undefined })}
+          onClick={() => setPopupState({ view: "main" })}
         />
       </div>
       <ul className="list mb-lg" aria-label="Category details">
@@ -70,16 +72,19 @@ const CategoryTxsView = () => {
         <button
           className="button rounded accent flex-row gap-sm"
           onClick={() =>
-            setTxState({
-              categoryId: category.id,
-              returnTo: {
-                view: "detail",
-                detailState: {
-                  type: "category",
-                  id: category.id
-                }
-              }
-            }).then(() => setPopupState({ view: "txAdd" }))
+            setPopupState({
+              view: "txAdd",
+              txState: {
+                categoryId: category.id,
+                returnTo: {
+                  view: "detail",
+                  detailState: {
+                    type: "category",
+                    id: category.id,
+                  },
+                },
+              },
+            })
           }>
           <AddTransactionIcon /> Transaction
         </button>
@@ -94,10 +99,10 @@ const CategoryTxsView = () => {
                   view: "detail",
                   detailState: {
                     type: "category",
-                    id: category.id
-                  }
-                }
-              }
+                    id: category.id,
+                  },
+                },
+              },
             })
           }>
           <AddTransferIcon /> Move Money

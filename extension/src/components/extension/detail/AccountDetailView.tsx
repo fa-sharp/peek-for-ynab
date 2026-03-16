@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ArrowBack, ExternalLink } from "tabler-icons-react";
 import { AccountType } from "ynab";
 
@@ -6,45 +6,41 @@ import { CurrencyView, IconButton, IconSpan, TransactionView } from "~components
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
-  AddTransferIcon
+  AddTransferIcon,
 } from "~components/icons/ActionIcons";
 import { ImportErrorIcon, ReconcileAlertIcon } from "~components/icons/AlertIcons";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-import type { TxAddInitialState } from "~lib/types";
+import type { TxAddState } from "~lib/types";
 import { millisToStringValue } from "~lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "short",
   day: "numeric",
   year: "numeric",
-  timeZone: "UTC"
+  timeZone: "UTC",
 });
 
 const AccountTxsView = () => {
-  const { settings, budgetSettings, setTxState, popupState, setPopupState } =
-    useStorageContext();
+  const { settings, budgetSettings, popupState, setPopupState } = useStorageContext();
   const { accountsData, categoriesData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   const account = useMemo(
-    () => accountsData?.find((a) => a.id === popupState?.detailState?.id),
-    [accountsData, popupState?.detailState?.id]
+    () => accountsData?.find((a) => a.id === popupState.detailState?.id),
+    [accountsData, popupState.detailState?.id]
   );
 
   const hasReconcileAlert = useMemo(
     () =>
-      account &&
-      popupState?.budgetId &&
-      currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.reconcile,
-    [account, currentAlerts, popupState?.budgetId]
+      account && currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.reconcile,
+    [account, currentAlerts, popupState.budgetId]
   );
 
   const hasImportError = useMemo(
     () =>
       account &&
-      popupState?.budgetId &&
       currentAlerts?.[popupState.budgetId]?.accounts?.[account.id]?.importError,
-    [account, currentAlerts, popupState?.budgetId]
+    [account, currentAlerts, popupState.budgetId]
   );
 
   /** The corresponding CCP categoroy, if this is a credit card account */
@@ -58,14 +54,14 @@ const AccountTxsView = () => {
   );
 
   /** The state to return to after entering a transaction */
-  const returnTo = useMemo<TxAddInitialState["returnTo"]>(
+  const returnTo = useMemo<TxAddState["returnTo"]>(
     () =>
       account && {
         view: "detail",
         detailState: {
           type: "account",
-          id: account.id
-        }
+          id: account.id,
+        },
       },
     [account]
   );
@@ -75,10 +71,10 @@ const AccountTxsView = () => {
     () =>
       account &&
       window.open(
-        `https://app.ynab.com/${popupState?.budgetId}/accounts/${account.id}`,
+        `https://app.ynab.com/${popupState.budgetId}/accounts/${account.id}`,
         "_blank"
       ),
-    [account, popupState?.budgetId]
+    [account, popupState.budgetId]
   );
 
   if (!account || !selectedBudgetData) return <div>Loading...</div>;
@@ -97,7 +93,7 @@ const AccountTxsView = () => {
         <IconButton
           icon={<ArrowBack aria-hidden />}
           label="Back to main view"
-          onClick={() => setPopupState({ view: "main", detailState: undefined })}
+          onClick={() => setPopupState({ view: "main" })}
         />
       </div>
       <ul className="list mb-lg" aria-label="Account details">
@@ -171,10 +167,13 @@ const AccountTxsView = () => {
         <button
           className="button rounded accent flex-row gap-sm"
           onClick={() =>
-            setTxState({
-              accountId: account.id,
-              returnTo
-            }).then(() => setPopupState({ view: "txAdd" }))
+            setPopupState({
+              view: "txAdd",
+              txState: {
+                accountId: account.id,
+                returnTo,
+              },
+            })
           }>
           <AddTransactionIcon /> Transaction
         </button>
@@ -183,16 +182,19 @@ const AccountTxsView = () => {
           <button
             className="button rounded accent flex-row gap-sm"
             onClick={() =>
-              setTxState({
-                amountType: "Inflow",
-                amount:
-                  ccpCategory && ccpCategory.balance >= 0
-                    ? millisToStringValue(ccpCategory.balance)
-                    : undefined,
-                accountId: account.id,
-                isTransfer: true,
-                returnTo
-              }).then(() => setPopupState({ view: "txAdd" }))
+              setPopupState({
+                view: "txAdd",
+                txState: {
+                  amountType: "Inflow",
+                  amount:
+                    ccpCategory && ccpCategory.balance >= 0
+                      ? millisToStringValue(ccpCategory.balance)
+                      : undefined,
+                  accountId: account.id,
+                  isTransfer: true,
+                  returnTo,
+                },
+              })
             }>
             <AddCCPaymentIcon /> Payment
           </button>
@@ -206,16 +208,19 @@ const AccountTxsView = () => {
             className="button rounded accent flex-row gap-sm"
             onClick={() =>
               account.transfer_payee_id &&
-              setTxState({
-                isTransfer: true,
-                amountType: "Outflow",
-                payee: {
-                  id: account.transfer_payee_id,
-                  name: account.name,
-                  transferId: account.id
+              setPopupState({
+                view: "txAdd",
+                txState: {
+                  isTransfer: true,
+                  amountType: "Outflow",
+                  payee: {
+                    id: account.transfer_payee_id,
+                    name: account.name,
+                    transferId: account.id,
+                  },
+                  returnTo,
                 },
-                returnTo
-              }).then(() => setPopupState({ view: "txAdd" }))
+              })
             }>
             <AddTransferIcon /> Payment/transfer
           </button>
@@ -223,11 +228,14 @@ const AccountTxsView = () => {
           <button
             className="button rounded accent flex-row gap-sm"
             onClick={() =>
-              setTxState({
-                accountId: account.id,
-                isTransfer: true,
-                returnTo
-              }).then(() => setPopupState({ view: "txAdd" }))
+              setPopupState({
+                view: "txAdd",
+                txState: {
+                  accountId: account.id,
+                  isTransfer: true,
+                  returnTo,
+                },
+              })
             }>
             <AddTransferIcon aria-label="Add" /> Transfer
           </button>

@@ -7,17 +7,17 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Account } from "ynab";
+import type { Account, CurrencyFormat } from "ynab";
 
-import { useYNABContext } from "~lib/context";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {
   currentAccount?: Account | null;
   accounts?: Account[];
+  currencyFormat?: CurrencyFormat;
   selectAccount: (account: Account | null) => void;
   label?: string;
   placeholder?: string;
@@ -29,16 +29,15 @@ function AccountSelect(
   {
     currentAccount,
     accounts,
+    currencyFormat,
     label,
     placeholder,
     required = true,
     disabled,
-    selectAccount
+    selectAccount,
   }: Props,
   ref: ForwardedRef<HTMLInputElement | null>
 ) {
-  const { selectedBudgetData } = useYNABContext();
-
   const getFilter = useCallback((inputValue?: string) => {
     return (account: Account) =>
       !inputValue || searchWithinString(account.name, inputValue);
@@ -63,16 +62,13 @@ function AccountSelect(
     setHighlightedIndex,
     reset,
     highlightedIndex,
-    selectedItem
+    selectedItem,
   } = useCombobox<Account | null>({
     items: accountList,
-    selectedItem: currentAccount,
+    selectedItem: currentAccount ?? null,
     itemToString(account) {
       if (!account) return "";
-      return `${account.name} (${formatCurrency(
-        account.balance,
-        selectedBudgetData?.currencyFormat
-      )})`;
+      return `${account.name} (${formatCurrency(account.balance, currencyFormat)})`;
     },
     onInputValueChange({ inputValue }) {
       setAccountList(accounts?.filter(getFilter(inputValue)) || []);
@@ -81,7 +77,7 @@ function AccountSelect(
       if (selectedItem) {
         selectAccount(selectedItem);
       }
-    }
+    },
   });
 
   return (
@@ -94,7 +90,7 @@ function AccountSelect(
             ref: (node) => {
               inputRef.current = node;
               ref && (ref instanceof Function ? ref(node) : (ref.current = node));
-            }
+            },
           })}
           placeholder={placeholder}
           className={selectedItem ? "item-selected" : ""}
@@ -151,7 +147,7 @@ function AccountSelect(
                         <li
                           className={clsx("select-dropdown-item", {
                             highlighted: highlightedIndex === itemIndex,
-                            selected: selectedItem?.id === account.id
+                            selected: selectedItem?.id === account.id,
                           })}
                           key={account.id}
                           {...getItemProps({ item: account, index: itemIndex })}>
@@ -159,12 +155,9 @@ function AccountSelect(
                           <span
                             className={clsx("currency", {
                               positive: account.balance > 0,
-                              negative: account.balance < 0
+                              negative: account.balance < 0,
                             })}>
-                            {formatCurrency(
-                              account.balance,
-                              selectedBudgetData?.currencyFormat
-                            )}
+                            {formatCurrency(account.balance, currencyFormat)}
                           </span>
                           )
                         </li>

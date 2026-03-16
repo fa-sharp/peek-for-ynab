@@ -1,22 +1,27 @@
-import { useRef } from "react";
+import { type SetStateAction, useCallback, useEffect, useRef } from "react";
 import { CircleC } from "tabler-icons-react";
 import { TransactionFlagColor } from "ynab";
 
 import { AmountField, IconButton, MemoField } from "~components";
-import { CheckIcon } from "~components/icons/ActionIcons";
+import { CheckIcon as Check } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
-import type { AppSettings, BudgetMainData, CachedBudget } from "~lib/types";
+import { useTxStore } from "~lib/state";
+import type {
+  AppSettings,
+  BudgetMainData,
+  BudgetSettings,
+  CachedBudget,
+} from "~lib/types";
 import useTransaction from "~lib/useTransaction";
 import { flagColorToEmoji, getTodaysDateISO } from "~lib/utils";
-
 import TransactionFormMain from "./TransactionFormMain";
 import TransactionFormMainTransfer from "./TransactionFormMainTransfer";
 import TransactionFormSplit from "./TransactionFormSplit";
 
-/** Form that lets user add a transaction. */
+/** Form that lets the user add a transaction. */
 export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
-  const { settings, txState, setPopupState, setTxState } = useStorageContext();
+  const { settings, budgetSettings } = useStorageContext();
 
   return (
     <section>
@@ -30,11 +35,7 @@ export default function TransactionFormWrapper() {
           budgetMainData={budgetMainData}
           selectedBudgetData={selectedBudgetData}
           settings={settings}
-          resetPopupState={async () => {
-            const { returnTo } = txState || {};
-            await setTxState({});
-            setPopupState(returnTo || { view: "main" });
-          }}
+          budgetSettings={budgetSettings}
         />
       )}
     </section>
@@ -44,19 +45,60 @@ export default function TransactionFormWrapper() {
 interface Props {
   selectedBudgetData?: CachedBudget | null;
   budgetMainData: BudgetMainData;
+  budgetSettings?: BudgetSettings;
   settings?: AppSettings;
-  resetPopupState: () => void;
 }
 
 export function TransactionFormInner({
   budgetMainData,
+  budgetSettings,
   selectedBudgetData,
-  resetPopupState,
-  settings
+  settings,
 }: Props) {
-  const { formState, derivedState, handlers, onSaveTransaction, isSaving } =
-    useTransaction();
+  const { onSaveTransaction, isSaving, onCancelTransaction } = useTransaction();
+
+  const {
+    amount,
+    amountType,
+    accountId,
+    date,
+    isSplit,
+    isTransfer,
+    cleared,
+    flag,
+    memo,
+    errorMessage,
+    dispatch,
+  } = useTxStore((s) => ({
+    amount: s.amount,
+    amountType: s.amountType,
+    accountId: s.accountId,
+    date: s.date,
+    isSplit: s.isSplit,
+    isTransfer: s.isTransfer,
+    memo: s.memo,
+    cleared: s.cleared,
+    flag: s.flag,
+    errorMessage: s.errorMessage,
+    dispatch: s.dispatch,
+  }));
+
+  const setMemo = useCallback(
+    (memo: SetStateAction<string>) => {
+      dispatch({ type: "setMemo", memo });
+    },
+    [dispatch]
+  );
   const memoRef = useRef<HTMLInputElement>(null);
+
+  // Set cash accounts as cleared by default, otherwise use budget settings
+  useEffect(() => {
+    if (budgetMainData.accountsData?.find((a) => a.id === accountId)?.type === "cash") {
+      dispatch({ type: "setCleared", cleared: true });
+    } else if (budgetSettings?.transactions.cleared) {
+      dispatch({ type: "setCleared", cleared: budgetSettings.transactions.cleared });
+    }
+  }, [accountId, budgetMainData, budgetSettings?.transactions.cleared, dispatch]);
 
   if (!budgetMainData) return <div>Loading...</div>;
 
@@ -67,70 +109,58 @@ export function TransactionFormInner({
           Split transaction?
           <IconButton
             role="switch"
-            aria-checked={formState.isSplit}
-            icon={
-              <CheckIcon color={formState.isSplit ? "var(--currency-green)" : "#aaa"} />
-            }
-            onClick={() => handlers.setIsSplit((prev) => !prev)}
+            aria-checked={isSplit}
+            icon={<Check color={isSplit ? "var(--currency-green)" : "#aaa"} />}
+            onClick={() => dispatch({ type: "setIsSplit", isSplit: !isSplit })}
           />
         </label>
         <label className="flex-row">
           Transfer/Payment?
           <IconButton
             role="switch"
-            aria-checked={formState.isTransfer}
-            icon={
-              <CheckIcon
-                color={formState.isTransfer ? "var(--currency-green)" : "#aaa"}
-              />
-            }
-            onClick={() => handlers.setIsTransfer((prev) => !prev)}
+            aria-checked={isTransfer}
+            icon={<Check color={isTransfer ? "var(--currency-green)" : "#aaa"} />}
+            onClick={() => dispatch({ type: "setIsTransfer", isTransfer: !isTransfer })}
           />
         </label>
       </div>
       <AmountField
-        amount={formState.amount}
-        amountType={formState.amountType}
+        amount={amount}
+        amountType={amountType}
         disabled={isSaving}
-        setAmount={handlers.setAmount}
-        setAmountType={handlers.setAmountType}
+        setAmount={(amount) => dispatch({ type: "setAmount", amount })}
+        setAmountType={(amountType) => dispatch({ type: "setAmountType", amountType })}
       />
-      {!formState.isTransfer ? (
+      {!isTransfer ? (
         <TransactionFormMain
           {...{
-            formState,
-            handlers,
+            dispatch,
             budgetMainData,
+            budgetSettings,
             memoRef,
-            isSaving
+            isSaving,
           }}
         />
       ) : (
         <TransactionFormMainTransfer
           {...{
-            formState,
-            handlers,
+            dispatch,
             budgetMainData,
             memoRef,
-            isBudgetToTrackingTransfer: derivedState.isBudgetToTrackingTransfer,
-            totalSubTxsAmount: derivedState.totalSubTxsAmount,
-            isSaving
+            isSaving,
           }}
         />
       )}
       <MemoField
         ref={memoRef}
-        memo={formState.memo}
-        setMemo={handlers.setMemo}
+        memo={memo}
+        setMemo={setMemo}
         disabled={isSaving}
         settings={settings}
       />
-      {formState.isSplit && (
+      {isSplit && (
         <TransactionFormSplit
-          formState={formState}
-          handlers={handlers}
-          leftOverSubTxsAmount={derivedState.leftOverSubTxsAmount}
-          totalSubTxsAmount={derivedState.totalSubTxsAmount}
+          dispatch={dispatch}
           currencyFormat={selectedBudgetData?.currencyFormat}
           isSaving={isSaving}
           budgetMainData={budgetMainData}
@@ -141,15 +171,15 @@ export function TransactionFormInner({
           Cleared:
           <IconButton
             role="switch"
-            aria-checked={formState.cleared}
+            aria-checked={cleared}
             icon={
               <CircleC
                 aria-hidden
-                fill={formState.cleared ? "var(--currency-green)" : "var(--background)"}
-                color={formState.cleared ? "var(--background)" : "gray"}
+                fill={cleared ? "var(--currency-green)" : "var(--background)"}
+                color={cleared ? "var(--background)" : "gray"}
               />
             }
-            onClick={() => handlers.setCleared((prev) => !prev)}
+            onClick={() => dispatch({ type: "setCleared", cleared: !cleared })}
             disabled={isSaving}
           />
         </label>
@@ -157,8 +187,8 @@ export function TransactionFormInner({
           Flag:
           <select
             className="select rounded"
-            value={formState.flag}
-            onChange={(e) => handlers.setFlag(e.target.value)}
+            value={flag}
+            onChange={(e) => dispatch({ type: "setFlag", flag: e.target.value })}
             disabled={isSaving}>
             <option value="">None</option>
             {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
@@ -174,13 +204,13 @@ export function TransactionFormInner({
         <input
           required
           type="date"
-          value={formState.date}
+          value={date}
           max={getTodaysDateISO()}
-          onChange={(e) => handlers.setDate(e.target.value)}
+          onChange={(e) => dispatch({ type: "setDate", date: e.target.value })}
           disabled={isSaving}
         />
       </label>
-      <div className="text-error">{formState.errorMessage}</div>
+      <div className="text-error">{errorMessage}</div>
       <div className="flex-row flex-row-reverse mt-lg">
         <button
           type="submit"
@@ -191,7 +221,7 @@ export function TransactionFormInner({
         <button
           type="button"
           className="button gray rounded flex-1"
-          onClick={resetPopupState}
+          onClick={onCancelTransaction}
           disabled={isSaving}>
           Cancel
         </button>

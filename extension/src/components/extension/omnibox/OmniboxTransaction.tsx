@@ -3,19 +3,19 @@ import { Help, Pencil, Wand } from "tabler-icons-react";
 
 import { CurrencyView, Dialog, Tooltip } from "~components";
 import {
+  getPossibleTransferFields,
+  getPossibleTxFields,
   type ParsedTransferQuery,
   type ParsedTxQuery,
-  getPossibleTransferFields,
-  getPossibleTxFields
 } from "~lib/omnibox";
+import { useTxStore } from "~lib/state";
 import type { BudgetMainData, CachedBudget } from "~lib/types";
-import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
+import type { TransactionFormDispatch } from "~lib/useTransaction";
 import {
   getIgnoredCategoryIdsForTx,
   getTodaysDateISO,
-  stringValueToMillis
+  stringValueToMillis,
 } from "~lib/utils";
-
 import OmniboxTransactionFields from "./OmniboxTransactionFields";
 import OmniboxTransferFields from "./OmniboxTransferFields";
 
@@ -24,22 +24,21 @@ const TX_FIELDS = Object.freeze([
   { idx: 2, prefix: "at", label: "payee" },
   { idx: 3, prefix: "for", label: "category" },
   { idx: 4, prefix: "on", label: "account" },
-  { idx: 5, prefix: "memo", label: "memo" }
+  { idx: 5, prefix: "memo", label: "memo" },
 ]);
 const TRANSFER_FIELDS = Object.freeze([
   { idx: 0, prefix: "", label: "amount" },
   { idx: 2, prefix: "to/from", label: "account" },
   { idx: 3, prefix: "to/from", label: "account" },
   { idx: 4, prefix: "for", label: "category" },
-  { idx: 5, prefix: "memo", label: "memo" }
+  { idx: 5, prefix: "memo", label: "memo" },
 ]);
 
 interface Props {
   parsedQuery: ParsedTxQuery | ParsedTransferQuery;
   budget: CachedBudget;
   budgetMainData: BudgetMainData;
-  formState: TransactionFormState;
-  handlers: TransactionFormHandlers;
+  dispatch: TransactionFormDispatch;
   isSaving: boolean;
   openTxForm: () => void;
   defaultAccountId?: string;
@@ -49,12 +48,22 @@ export default function OmniboxTransaction({
   parsedQuery,
   budget,
   budgetMainData,
-  formState,
-  handlers,
+  dispatch,
   isSaving,
   openTxForm,
-  defaultAccountId
+  defaultAccountId,
 }: Props) {
+  const { amount, amountType, accountId, payee, memo, errorMessage } = useTxStore(
+    (s) => ({
+      amount: s.amount,
+      amountType: s.amountType,
+      accountId: s.accountId,
+      payee: s.payee,
+      memo: s.memo,
+      errorMessage: s.errorMessage,
+    })
+  );
+
   const defaultAccount = useMemo(() => {
     if (!defaultAccountId) return;
     return budgetMainData.accountsData.find((a) => a.id === defaultAccountId);
@@ -72,39 +81,54 @@ export default function OmniboxTransaction({
       : getPossibleTransferFields(parsedQuery, budgetMainData, ignoredCategoryIds);
   }, [budgetMainData, ignoredCategoryIds, parsedQuery]);
 
-  const initialAmount = useRef(formState.amount);
-  const canSubmitImmediately =
-    !!formState.amount && !!formState.payee && !!formState.account;
+  const initialAmount = useRef(amount);
+  const canSubmitImmediately = !!amount && !!payee && !!accountId;
 
-  useEffect(() => handlers.setDate(getTodaysDateISO()), [handlers]);
+  useEffect(() => {
+    dispatch({ type: "setDate", date: getTodaysDateISO() });
+  }, [dispatch]);
   useEffect(() => {
     if (!parsedQuery || !results) return;
-    handlers.setAmount(parsedQuery.amount || initialAmount.current);
-    handlers.setMemo(parsedQuery.memo);
+    dispatch({ type: "setAmount", amount: parsedQuery.amount || initialAmount.current });
+    dispatch({ type: "setMemo", memo: parsedQuery.memo });
     if (parsedQuery.type === "tx" && "payeeResults" in results) {
-      handlers.setIsTransfer(false);
-      handlers.setAmountType(parsedQuery.amountType);
-      handlers.setPayee(results.payeeResults[0] || null);
-      handlers.setCategory(results.categoryResults[0] || null);
-      handlers.setAccount(
-        !parsedQuery.accountQuery && defaultAccount
-          ? defaultAccount
-          : results.accountResults[0] || null
-      );
+      dispatch({ type: "setIsTransfer", isTransfer: false });
+      dispatch({ type: "setAmountType", amountType: parsedQuery.amountType });
+      dispatch({ type: "setPayee", payee: results.payeeResults[0] || null });
+      dispatch({
+        type: "setCategory",
+        categoryId: results.categoryResults[0]?.id || null,
+      });
+      dispatch({
+        type: "setAccount",
+        accountId:
+          !parsedQuery.accountQuery && defaultAccount
+            ? defaultAccount.id
+            : results.accountResults[0]?.id || null,
+      });
     } else if (results && "fromAccountResults" in results) {
-      handlers.setIsTransfer(true);
-      handlers.setAmountType("Outflow");
+      dispatch({ type: "setIsTransfer", isTransfer: true });
+      dispatch({ type: "setAmountType", amountType: "Outflow" });
       if (results.toAccountResults[0] && results.toAccountResults[0].transfer_payee_id)
-        handlers.setPayee({
-          id: results.toAccountResults[0].transfer_payee_id,
-          name: results.toAccountResults[0].name,
-          transferId: results.toAccountResults[0].id
+        dispatch({
+          type: "setPayee",
+          payee: {
+            id: results.toAccountResults[0].transfer_payee_id,
+            name: results.toAccountResults[0].name,
+            transferId: results.toAccountResults[0].id,
+          },
         });
-      else handlers.setPayee(null);
-      handlers.setAccount(results.fromAccountResults[0] || null);
-      handlers.setCategory(results.categoryResults[0] || null);
+      else dispatch({ type: "setPayee", payee: null });
+      dispatch({
+        type: "setAccount",
+        accountId: results.fromAccountResults[0]?.id || null,
+      });
+      dispatch({
+        type: "setCategory",
+        categoryId: results.categoryResults[0]?.id || null,
+      });
     }
-  }, [defaultAccount, handlers, parsedQuery, results]);
+  }, [defaultAccount, dispatch, parsedQuery, results]);
 
   return (
     <>
@@ -133,13 +157,13 @@ export default function OmniboxTransaction({
         {parsedQuery.type === "tx" ? "Add Transaction" : "Add Transfer/Payment"}
       </h2>
       <div className="flex-col">
-        {formState.amount && (
+        {amount && (
           <div className="flex-row gap-sm">
             Amount:
             <CurrencyView
               milliUnits={stringValueToMillis(
-                formState.amount,
-                parsedQuery.type === "tx" ? formState.amountType : "Inflow"
+                amount,
+                parsedQuery.type === "tx" ? (amountType ?? "Outflow") : "Inflow"
               )}
               currencyFormat={budget.currencyFormat}
             />
@@ -147,16 +171,16 @@ export default function OmniboxTransaction({
         )}
         {parsedQuery?.type === "tx" && results && "payeeResults" in results && (
           <OmniboxTransactionFields
-            {...{ formState, handlers, parsedQuery, results, defaultAccount }}
+            {...{ dispatch: dispatch, parsedQuery, results, defaultAccount }}
           />
         )}
         {parsedQuery?.type === "transfer" &&
           results &&
           "fromAccountResults" in results && (
-            <OmniboxTransferFields {...{ formState, handlers, parsedQuery, results }} />
+            <OmniboxTransferFields {...{ dispatch, parsedQuery, results }} />
           )}
-        {formState.memo && <div className="flex-row gap-sm">Memo: {formState.memo}</div>}
-        <div className="text-error">{formState.errorMessage}</div>
+        {memo && <div className="flex-row gap-sm">Memo: {memo}</div>}
+        <div className="text-error">{errorMessage}</div>
         <div className="flex-row mt-lg">
           <button
             type={canSubmitImmediately ? "submit" : "button"}

@@ -1,4 +1,3 @@
-import { browser } from "#imports";
 import { Item } from "@react-stately/collections";
 import { useIsFetching } from "@tanstack/react-query";
 import { type Key, useCallback, useMemo } from "react";
@@ -14,9 +13,10 @@ import {
   Plus,
   Refresh,
   Settings,
-  SwitchHorizontal
+  SwitchHorizontal,
 } from "tabler-icons-react";
 
+import { browser } from "#imports";
 import { BudgetSelect, IconButton, Menu } from "~components";
 import { useAuthContext, useStorageContext, useYNABContext } from "~lib/context";
 
@@ -25,17 +25,9 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { tokenExpired } = useAuthContext();
-  const {
-    settings,
-    tokenRefreshNeeded,
-    shownBudgetIds,
-    editingItems,
-    setEditingItems,
-    popupState,
-    setPopupState,
-    setTxState
-  } = useStorageContext();
+  const { accessToken, authError } = useAuthContext();
+  const { popupState, setPopupState, settings, editingItems, setEditingItems } =
+    useStorageContext();
   const {
     budgetsData,
     accountsLastUpdated,
@@ -43,18 +35,19 @@ export default function PopupNav() {
     categoriesError,
     categoriesLastUpdated,
     refreshCategoriesAndAccounts,
-    isRefreshingBudgets
+    isRefreshingBudgets,
   } = useYNABContext();
+
   const globalIsFetching = useIsFetching();
 
   const shownBudgetsData = useMemo(
-    () => budgetsData?.filter((b) => shownBudgetIds?.includes(b.id)),
-    [budgetsData, shownBudgetIds]
+    () => budgetsData?.filter((b) => settings.budgets?.includes(b.id)),
+    [budgetsData, settings.budgets]
   );
 
   const openBudget = useCallback(() => {
-    window.open(`https://app.ynab.com/${popupState?.budgetId}/budget`, "_blank");
-  }, [popupState?.budgetId]);
+    window.open(`https://app.ynab.com/${popupState.budgetId}/budget`, "_blank");
+  }, [popupState.budgetId]);
 
   const openPopupWindow = useCallback(() => {
     window.open(
@@ -66,18 +59,19 @@ export default function PopupNav() {
   }, []);
 
   const onMenuAction = useCallback(
-    async (key: Key) => {
+    (key: Key) => {
       switch (key) {
         case "addTransaction":
-          await setTxState({});
-          setPopupState({ view: "txAdd" });
+          setPopupState({ view: "txAdd", txState: {} });
           break;
         case "addTransfer":
-          await setTxState({ isTransfer: true, accountId: "none" });
-          setPopupState({ view: "txAdd" });
+          setPopupState({
+            view: "txAdd",
+            txState: { isTransfer: true, accountId: "none" },
+          });
           break;
         case "moveMoney":
-          setPopupState({ view: "move", moveMoneyState: undefined });
+          setPopupState({ view: "move", moveMoneyState: {} });
           break;
         case "editItems":
           setEditingItems(!editingItems);
@@ -89,43 +83,42 @@ export default function PopupNav() {
           browser?.runtime?.openOptionsPage();
           break;
         case "backToMain":
-          await setTxState({});
           setPopupState({
             view: "main",
-            detailState: undefined,
-            moveMoneyState: undefined
           });
           break;
       }
     },
-    [editingItems, openPopupWindow, setEditingItems, setPopupState, setTxState]
+    [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
-  if (tokenRefreshNeeded) return <div>Loading...</div>; // refreshing token
-  if (!tokenRefreshNeeded && tokenExpired) return <div>Authentication error!</div>; // token refresh issue
+  if (!accessToken && authError) return <div>Authentication error: {authError}</div>;
+  if (!accessToken) return <div>Loading...</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
-  if (!shownBudgetsData || !settings || !popupState) return null; // storage not hydrated yet
+  if (!shownBudgetsData) return null; // No budgets to show
 
   return (
     <nav className="flex-row justify-between mb-md">
       <IconButton
         label={
-          categoriesError || accountsError
-            ? "Error getting data from YNAB! Click to retry"
-            : globalIsFetching
-              ? "Status: Refreshing data..."
-              : `Status: Last updated ${new Date(
-                  categoriesLastUpdated < accountsLastUpdated
-                    ? categoriesLastUpdated
-                    : accountsLastUpdated
-                ).toLocaleString()}`
+          authError
+            ? `Authentication error: ${authError}`
+            : categoriesError || accountsError
+              ? "Error getting data from YNAB! Click to retry"
+              : globalIsFetching
+                ? "Status: Refreshing data..."
+                : `Status: Last updated ${new Date(
+                    categoriesLastUpdated < accountsLastUpdated
+                      ? categoriesLastUpdated
+                      : accountsLastUpdated
+                  ).toLocaleString()}`
         }
         icon={
           globalIsFetching ? (
             <Refresh aria-hidden />
-          ) : categoriesError || accountsError ? (
+          ) : authError || categoriesError || accountsError ? (
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates error while fetching data
-          ) : !popupState?.budgetId ||
+          ) : !popupState.budgetId ||
             (isDataFreshForDisplay(categoriesLastUpdated) &&
               isDataFreshForDisplay(accountsLastUpdated)) ? (
             <Check aria-hidden color="var(--success)" />
@@ -136,7 +129,7 @@ export default function PopupNav() {
         onClick={() => refreshCategoriesAndAccounts()}
         disabled={
           Boolean(globalIsFetching) ||
-          !popupState?.budgetId ||
+          !popupState.budgetId ||
           (!categoriesError &&
             !accountsError &&
             isDataFreshForDisplay(categoriesLastUpdated) &&
@@ -149,9 +142,7 @@ export default function PopupNav() {
           shownBudgets={shownBudgetsData}
           selectedBudgetId={popupState.budgetId}
           setSelectedBudgetId={(id) => {
-            setTxState({}).then(() =>
-              setPopupState({ budgetId: id, detailState: undefined })
-            );
+            setPopupState({ view: "main", budgetId: id });
           }}
         />
         <IconButton
@@ -191,17 +182,17 @@ const createMenuItems = (editingItems: boolean, onMainPage: boolean) => [
         {
           key: "addTransaction",
           text: "Add transaction",
-          icon: <Plus aria-hidden size={20} />
+          icon: <Plus aria-hidden size={20} />,
         },
         {
           key: "addTransfer",
           text: "Add transfer/payment",
-          icon: <SwitchHorizontal aria-hidden size={20} />
+          icon: <SwitchHorizontal aria-hidden size={20} />,
         },
         {
           key: "moveMoney",
           text: "Move money",
-          icon: <SwitchHorizontal aria-hidden size={20} />
+          icon: <SwitchHorizontal aria-hidden size={20} />,
         },
         {
           key: "editItems",
@@ -210,20 +201,20 @@ const createMenuItems = (editingItems: boolean, onMainPage: boolean) => [
             <PencilOff aria-hidden size={20} />
           ) : (
             <Pencil aria-hidden size={20} />
-          )
-        }
+          ),
+        },
       ]
     : [
         {
           key: "backToMain",
           text: "Back to main view",
-          icon: <ArrowBack aria-hidden size={20} />
-        }
+          icon: <ArrowBack aria-hidden size={20} />,
+        },
       ]),
   {
     key: "openWindow",
     text: "Open in new window",
-    icon: <BoxMultiple aria-hidden size={20} />
+    icon: <BoxMultiple aria-hidden size={20} />,
   },
-  { key: "openOptions", text: "Settings", icon: <Settings aria-hidden size={20} /> }
+  { key: "openOptions", text: "Settings", icon: <Settings aria-hidden size={20} /> },
 ];

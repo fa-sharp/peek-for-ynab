@@ -1,4 +1,4 @@
-app = "peek-for-ynab-v2"
+app = "peek-for-ynab"
 primary_region = "ewr"
 
 [build]
@@ -22,7 +22,3 @@ memory = "256mb"
 cpu_kind = "shared"
 cpus = 1
 memory_mb = 256
-
-[[statics]]
-guest_path = "/app/dist/client/_astro"
-url_prefix = "/_astro"

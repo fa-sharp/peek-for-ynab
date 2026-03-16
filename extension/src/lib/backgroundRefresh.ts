@@ -6,16 +6,7 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
 } from "~lib/api";
-import {
-  CHROME_LOCAL_STORAGE,
-  CHROME_SESSION_STORAGE,
-  CHROME_SYNC_STORAGE,
-  IS_DEV,
-  ONE_DAY_IN_MILLIS,
-  REFRESH_SIGNAL_KEY,
-  TOKEN_STORAGE,
-  TOKEN_STORAGE_KEY,
-} from "~lib/constants";
+import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
@@ -23,88 +14,44 @@ import {
   updateIconAndTooltip,
 } from "~lib/notifications";
 import { createQueryClient } from "~lib/queryClient";
-import type { BudgetSettings, TokenData } from "~lib/types";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
-
-export const IS_TOKEN_REFRESHING_KEY = "isRefreshing";
-
-export async function refreshToken(): Promise<TokenData | null> {
-  await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, true);
-
-  // check if token exists
-  const tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
-  if (!tokenData) {
-    console.error("Not refreshing - no existing token data found");
-    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
-    await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, false);
-    return null;
-  }
-
-  // refresh token
-  let newTokenData: TokenData | null = null;
-  const refreshUrl = new URL(import.meta.env.PUBLIC_MAIN_URL);
-  refreshUrl.pathname = "/api/auth/refresh";
-  IS_DEV && console.log("Refreshing token!");
-
-  try {
-    const res = await fetch(refreshUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: tokenData.refreshToken }),
-    });
-    if (!res.ok) {
-      if (res.status === 401) await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, null); // clear token if status is unauthorized
-      throw {
-        message: "Error from API while refreshing token",
-        status: res.status,
-        error: await res.text(),
-      };
-    }
-    newTokenData = await res.json();
-    IS_DEV && console.log("Got a new token!");
-    await TOKEN_STORAGE.set(TOKEN_STORAGE_KEY, newTokenData);
-  } catch (err) {
-    console.error("Failed to refresh token:", err);
-  }
-
-  // signal that refresh is complete
-  try {
-    await TOKEN_STORAGE.set(REFRESH_SIGNAL_KEY, false);
-    await CHROME_SESSION_STORAGE.set(IS_TOKEN_REFRESHING_KEY, false);
-  } catch (err) {
-    console.error("Failed to signal refresh completion:", err);
-  }
-
-  return newTokenData;
-}
+import {
+  AuthManager,
+  appSettingsStorage,
+  authTokenStorage,
+  budgetSettingsStorage,
+  currentAlertsStorage,
+  shouldSyncStorage,
+} from "./state";
 
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
-  // Check for existing token. If it's expired, refresh the token
-  let tokenData = await TOKEN_STORAGE.get<TokenData | null>(TOKEN_STORAGE_KEY);
-  if (!tokenData) {
-    IS_DEV && console.log("Background refresh: no existing token data found");
+
+  // Get the access token
+  const authToken = await authTokenStorage.getValue();
+  if (!authToken) {
+    IS_DEV && console.log("Background refresh: no auth token");
     return;
   }
-  if (tokenData.expires < Date.now() + 60 * 1000) {
-    IS_DEV && console.log("Background refresh: Refreshing token...");
-    tokenData = await refreshToken();
-    if (!tokenData) {
-      console.error("Background refresh: couldn't get new token");
-      return;
-    }
+  const tokenResponse = await AuthManager.fetchToken(authToken);
+  if (!tokenResponse.success) {
+    console.warn("Background refresh: failed to get access token:", tokenResponse.error);
+    return;
   }
 
-  const syncEnabled = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-  const storage = syncEnabled ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE;
-  const shownBudgetIds = await storage.get<string[]>("budgets");
-  if (!shownBudgetIds) return;
+  // Get the configured budgets in the relevant storage area
+  const syncEnabled = await shouldSyncStorage.getValue();
+  const storageArea = syncEnabled ? "sync" : "local";
+  const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
+  if (!budgetIds || budgetIds.length === 0) return;
+
+  // Create a query client with a longer default stale time to prevent too many refetches
+  const queryClient = createQueryClient({
+    staleTime: 10 * 60 * 1000,
+  });
 
   IS_DEV && console.log("Background refresh: updating alerts...");
-  const ynabAPI = new api(tokenData.accessToken);
-  const queryClient = createQueryClient({
-    staleTime: 10 * 60 * 1000, // to prevent too many refetches, data is assumed fresh for 10 minutes
-  });
+  const ynabAPI = new api(tokenResponse.accessToken);
   const budgetsData = await queryClient.fetchQuery({
     queryKey: ["budgets"],
     staleTime: ONE_DAY_IN_MILLIS * 7,
@@ -112,14 +59,14 @@ export async function backgroundDataRefresh() {
   });
 
   const alerts: CurrentAlerts = {};
-  const oldAlerts = await CHROME_LOCAL_STORAGE.get<CurrentAlerts>("currentAlerts");
+  const oldAlerts = await currentAlertsStorage.getValue();
   const notificationsEnabled = await checkPermissions(["notifications"]);
 
   // Fetch new data for each budget and update alerts
   // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
   // See https://github.com/TanStack/query/issues/8075
-  for (const budget of budgetsData.filter(({ id }) => shownBudgetIds.includes(id))) {
-    const budgetSettings = await storage.get<BudgetSettings>(`budget-${budget.id}`);
+  for (const budget of budgetsData.filter(({ id }) => budgetIds.includes(id))) {
+    const budgetSettings = await budgetSettingsStorage(budget.id, storageArea).getValue();
     if (!budgetSettings) continue;
 
     let unapprovedTxs: TransactionDetail[] | undefined;
@@ -204,5 +151,5 @@ export async function backgroundDataRefresh() {
   }
 
   updateIconAndTooltip(alerts, budgetsData);
-  await CHROME_LOCAL_STORAGE.set("currentAlerts", alerts);
+  await currentAlertsStorage.setValue(alerts);
 }

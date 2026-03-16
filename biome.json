@@ -4,7 +4,11 @@
   "files": { "ignoreUnknown": false },
   "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 90 },
   "javascript": {
-    "formatter": { "quoteStyle": "double", "trailingCommas": "none" }
+    "formatter": {
+      "quoteStyle": "double",
+      "trailingCommas": "es5",
+      "bracketSameLine": true
+    }
   },
   "html": {
     "formatter": { "enabled": false }
@@ -69,7 +73,9 @@
         "noUnsafeOptionalChaining": "error",
         "noUnusedLabels": "error",
         "noUnusedPrivateClassMembers": "error",
+        "noUnusedFunctionParameters": "warn",
         "noUnusedVariables": "error",
+        "noUnusedImports": "warn",
         "useExhaustiveDependencies": "warn",
         "useIsNan": "error",
         "useJsxKeyInIterable": "error",
@@ -90,7 +96,8 @@
         "useArrayLiterals": "error",
         "useAsConstAssertion": "error",
         "useBlockStatements": "off",
-        "useConst": "error"
+        "useConst": "error",
+        "useImportType": "error"
       },
       "suspicious": {
         "noAsyncPromiseExecutor": "error",

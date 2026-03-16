@@ -3,43 +3,30 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { CategoryView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
-
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
   DetailIcon,
-  PinnedItemIcon
+  PinnedItemIcon,
 } from "../../icons/ActionIcons";
 
 /** View of user's saved categories with balances */
 export default function SavedCategoriesView() {
-  const {
-    removeCategory,
-    settings,
-    editingItems,
-    popupState,
-    setPopupState,
-    setTxState
-  } = useStorageContext();
+  const { toggleCategory, settings, editingItems } = useStorageContext();
   const {
     accountsData,
     selectedBudgetData,
     savedCategoriesData,
     addedTransaction,
-    moved
+    moved,
   } = useYNABContext();
+  const { setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
-  if (
-    !popupState ||
-    !selectedBudgetData ||
-    !savedCategoriesData ||
-    !settings ||
-    savedCategoriesData.length === 0
-  )
+  if (!selectedBudgetData || !savedCategoriesData || savedCategoriesData.length === 0)
     return null;
 
-  const { currencyFormat } = selectedBudgetData;
+  const { id: budgetId, currencyFormat } = selectedBudgetData;
 
   return (
     <Droppable droppableId="savedCategories" isDropDisabled={!editingItems}>
@@ -70,7 +57,7 @@ export default function SavedCategoriesView() {
                     <CategoryView
                       categoryData={category}
                       currencyFormat={currencyFormat}
-                      alerts={currentAlerts?.[selectedBudgetData.id]?.cats[category.id]}
+                      alerts={currentAlerts?.[budgetId]?.cats[category.id]}
                       settings={settings}
                       addedTransaction={addedTransaction}
                       moved={moved}
@@ -78,7 +65,7 @@ export default function SavedCategoriesView() {
                         !editingItems ? null : (
                           <IconButton
                             label="Unpin"
-                            onClick={() => removeCategory(category.id)}
+                            onClick={() => toggleCategory(category.id)}
                             icon={<PinnedItemIcon />}
                           />
                         )
@@ -93,9 +80,10 @@ export default function SavedCategoriesView() {
                                 icon={<AddTransactionIcon />}
                                 label="Add transaction"
                                 onClick={() =>
-                                  setTxState({ categoryId: category.id }).then(() =>
-                                    setPopupState({ view: "txAdd" })
-                                  )
+                                  setPopupState({
+                                    view: "txAdd",
+                                    txState: { categoryId: category.id },
+                                  })
                                 }
                               />
                               <IconButton
@@ -108,8 +96,8 @@ export default function SavedCategoriesView() {
                                     view: "detail",
                                     detailState: {
                                       type: "category",
-                                      id: category.id
-                                    }
+                                      id: category.id,
+                                    },
                                   })
                                 }
                               />
@@ -122,22 +110,21 @@ export default function SavedCategoriesView() {
                               label="Add credit card payment"
                               onClick={() =>
                                 ccAccount.transfer_payee_id &&
-                                setTxState({
-                                  isTransfer: true,
-                                  amount:
-                                    category.balance >= 0
-                                      ? millisToStringValue(
-                                          category.balance,
-                                          currencyFormat
-                                        )
-                                      : undefined,
-                                  amountType: "Inflow",
-                                  accountId: ccAccount.id
-                                }).then(() =>
-                                  setPopupState({
-                                    view: "txAdd"
-                                  })
-                                )
+                                setPopupState({
+                                  view: "txAdd",
+                                  txState: {
+                                    isTransfer: true,
+                                    amount:
+                                      category.balance >= 0
+                                        ? millisToStringValue(
+                                            category.balance,
+                                            currencyFormat
+                                          )
+                                        : undefined,
+                                    amountType: "Inflow",
+                                    accountId: ccAccount.id,
+                                  },
+                                })
                               }
                             />
                           )}

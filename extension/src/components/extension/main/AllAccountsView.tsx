@@ -4,13 +4,7 @@ import type { Account } from "ynab";
 import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
-import type {
-  AppSettings,
-  CachedBudget,
-  DetailViewState,
-  TxAddInitialState
-} from "~lib/types";
-
+import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";
 import {
   AddTransactionIcon,
   CollapseListIcon,
@@ -19,28 +13,20 @@ import {
   ExpandListIcon,
   ExpandListIconBold,
   PinItemIcon,
-  PinnedItemIcon
+  PinnedItemIcon,
 } from "../../icons/ActionIcons";
 
 /** View of all accounts in a budget, grouped by Budget / Tracking */
 export default function AllAccountsView() {
-  const {
-    savedAccounts,
-    saveAccount,
-    setPopupState,
-    setTxState,
-    popupState,
-    editingItems,
-    settings
-  } = useStorageContext();
+  const { pinnedItems, toggleAccount, editingItems, settings, setPopupState } =
+    useStorageContext();
   const { accountsData, selectedBudgetData } = useYNABContext();
   const { currentAlerts } = useNotificationsContext();
 
   const [expanded, setExpanded] = useState(false);
   const controlsId = useId();
 
-  if (!popupState || !selectedBudgetData || !accountsData || !savedAccounts || !settings)
-    return null;
+  if (!selectedBudgetData || !accountsData || !pinnedItems) return null;
 
   return (
     <>
@@ -63,14 +49,13 @@ export default function AllAccountsView() {
               accountType="Budget"
               accountsData={accountsData.filter((a) => a.on_budget)}
               accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-              savedAccounts={savedAccounts[selectedBudgetData.id]}
-              saveAccount={saveAccount}
+              savedAccounts={pinnedItems.accounts}
+              saveAccount={toggleAccount}
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={async (txAddState) => {
-                await setTxState(txAddState);
-                setPopupState({ view: "txAdd" });
+              onAddTx={(txState) => {
+                setPopupState({ view: "txAdd", txState });
               }}
               onOpenDetailView={(detailState) =>
                 setPopupState({ view: "detail", detailState })
@@ -82,14 +67,13 @@ export default function AllAccountsView() {
               accountType="Tracking"
               accountsData={accountsData.filter((a) => !a.on_budget)}
               accountAlerts={currentAlerts?.[selectedBudgetData.id]?.accounts}
-              savedAccounts={savedAccounts[selectedBudgetData.id]}
-              saveAccount={saveAccount}
+              savedAccounts={pinnedItems.accounts}
+              saveAccount={toggleAccount}
               editMode={editingItems}
               budgetData={selectedBudgetData}
               settings={settings}
-              onAddTx={async (txAddState) => {
-                await setTxState(txAddState);
-                setPopupState({ view: "txAdd" });
+              onAddTx={(txState) => {
+                setPopupState({ view: "txAdd", txState });
               }}
               onOpenDetailView={(detailState) =>
                 setPopupState({ view: "detail", detailState })
@@ -113,7 +97,7 @@ function AccountTypeView({
   settings,
   editMode,
   onAddTx,
-  onOpenDetailView
+  onOpenDetailView,
 }: {
   accountType: "Budget" | "Tracking";
   accountsData: Account[];
@@ -123,7 +107,7 @@ function AccountTypeView({
   saveAccount: (accountId: string) => void;
   settings: AppSettings;
   editMode?: boolean;
-  onAddTx: (initialState: TxAddInitialState) => void;
+  onAddTx: (initialState: TxAddState) => void;
   onOpenDetailView: (detailState: DetailViewState) => void;
 }) {
   const [expanded, setExpanded] = useState(false);

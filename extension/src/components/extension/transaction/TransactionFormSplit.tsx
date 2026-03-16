@@ -1,41 +1,46 @@
 import type { CurrencyFormat } from "ynab";
 
 import { CurrencyView, SubTransaction } from "~components";
+import { useTxStore, useTxStoreSubTxTotals } from "~lib/state";
 import type { BudgetMainData } from "~lib/types";
-import type { TransactionFormHandlers, TransactionFormState } from "~lib/useTransaction";
+import type { TransactionFormDispatch } from "~lib/useTransaction";
 
 interface Props {
-  formState: TransactionFormState;
-  handlers: TransactionFormHandlers;
-  totalSubTxsAmount: number;
-  leftOverSubTxsAmount: number;
+  dispatch: TransactionFormDispatch;
   currencyFormat?: CurrencyFormat;
   isSaving: boolean;
   budgetMainData: BudgetMainData;
 }
 
 export default function TransactionFormSplit({
-  formState,
-  handlers,
-  totalSubTxsAmount,
-  leftOverSubTxsAmount,
+  dispatch,
   currencyFormat,
   isSaving,
-  budgetMainData
+  budgetMainData,
 }: Props) {
+  const { isTransfer, subTxs } = useTxStore((s) => ({
+    isTransfer: s.isTransfer,
+    subTxs: s.subTxs,
+  }));
+  const { totalSubTxsAmount, leftOverSubTxsAmount } = useTxStoreSubTxTotals();
+
   return (
     <>
-      {formState.subTxs.map((subTx, idx) => (
+      {subTxs?.map((subTx, idx) => (
         <SubTransaction
           key={idx}
           splitIndex={idx}
           txState={subTx}
           autoFocus={idx > 0}
-          allowTransfer={!formState.isTransfer}
+          allowTransfer={!isTransfer}
           disabled={isSaving}
           budgetMainData={budgetMainData}
           setField={(field, val) =>
-            handlers.setSubTxs((prev) => prev.with(idx, { ...prev[idx], [field]: val }))
+            dispatch({
+              type: "editSubTx",
+              idx,
+              update: (tx) => ({ ...tx, [field]: val }),
+            })
           }
         />
       ))}
@@ -43,14 +48,14 @@ export default function TransactionFormSplit({
         <button
           type="button"
           className="button accent rounded flex-1"
-          onClick={handlers.onAddSubTx}>
+          onClick={() => dispatch({ type: "addSubTx" })}>
           Add split
         </button>
-        {formState.subTxs.length > 1 && (
+        {subTxs && subTxs.length > 1 && (
           <button
             type="button"
             className="button warn rounded flex-1"
-            onClick={handlers.onRemoveSubTx}>
+            onClick={() => dispatch({ type: "removeSubTx" })}>
             Remove split
           </button>
         )}

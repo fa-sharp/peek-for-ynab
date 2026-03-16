@@ -1,20 +1,28 @@
+import { randomUUID } from "node:crypto";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 
 import { accounts, budgets, category_groups, month, payees } from "./ynabApiData";
 
-const BASE_URL = "https://api.ynab.com/v1";
+const API_BASE = `${process.env.PUBLIC_MAIN_URL}/api`;
+const YNAB_BASE = "https://api.ynab.com/v1";
 
-/** A mock YNAB API server for testing. */
+/** A mock API server for testing. */
 export const mockServer = setupServer(
+  http.post(
+    `${API_BASE}/token`,
+    withAuth(() => {
+      return HttpResponse.json({ accessToken: randomUUID() });
+    })
+  ),
   http.get(
-    `${BASE_URL}/budgets`,
+    `${YNAB_BASE}/budgets`,
     withAuth(() => {
       return HttpResponse.json({ data: { budgets } });
     })
   ),
   http.get(
-    `${BASE_URL}/budgets/:budgetId/categories`,
+    `${YNAB_BASE}/budgets/:budgetId/categories`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -25,7 +33,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${BASE_URL}/budgets/:budgetId/months/current`,
+    `${YNAB_BASE}/budgets/:budgetId/months/current`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -35,7 +43,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${BASE_URL}/budgets/:budgetId/accounts`,
+    `${YNAB_BASE}/budgets/:budgetId/accounts`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -46,7 +54,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${BASE_URL}/budgets/:budgetId/payees`,
+    `${YNAB_BASE}/budgets/:budgetId/payees`,
     withAuth(() => {
       return HttpResponse.json({
         data: {

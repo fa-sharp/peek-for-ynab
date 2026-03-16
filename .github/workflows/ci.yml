@@ -75,11 +75,19 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Build
+      - name: Build Astro site
         run: pnpm run build
+
+      - name: Check types
+        run: pnpm run typecheck
+
+      - name: Generate token key for tests
+        id: generate-token-key
+        run: echo "token_key=$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
 
       - name: Test
         run: pnpm run test
         env:
+          TOKEN_KEY: ${{ steps.generate-token-key.outputs.token_key }}
           YNAB_CLIENT_ID: fake-client-id
           YNAB_SECRET: fake-client-secret

@@ -2,9 +2,13 @@ import type {
   Account,
   Category,
   CategoryGroupWithCategories,
-  CurrencyFormat
+  CurrencyFormat,
 } from "ynab";
 
+/**
+ * Persisted token data
+ * @deprecated old auth system, not used anymore
+ */
 export interface TokenData {
   accessToken: string;
   refreshToken: string;
@@ -21,7 +25,10 @@ export interface PopupState {
   moveMoneyState?: MoveMoneyInitialState;
 }
 
+/** Global settings */
 export interface AppSettings {
+  /** List of budget IDs to show */
+  budgets?: string[];
   /** Whether access is allowed to current tab for extra features */
   currentTabAccess: boolean;
   /** The color theme for the extension. @default "auto" */
@@ -75,6 +82,7 @@ export interface BudgetMainData {
   categoriesData: Category[];
   categoryGroupsData: CategoryGroupWithCategories[];
   payeesData: CachedPayee[];
+  currencyFormat?: CurrencyFormat;
 }
 
 /** Budget data cached by the app */
@@ -97,12 +105,12 @@ export interface DetailViewState {
   id: string;
 }
 
-/** Initial state of the add transaction screen */
-export interface TxAddInitialState {
+/** State of the add transaction form */
+export interface TxAddState {
   amount?: string;
   amountType?: "Inflow" | "Outflow";
-  accountId?: string;
-  categoryId?: string;
+  accountId?: string | null;
+  categoryId?: string | null;
   payee?: CachedPayee | { name: string } | null;
   isTransfer?: boolean;
   memo?: string;
@@ -111,10 +119,13 @@ export interface TxAddInitialState {
   subTxs?: Array<SubTxState>;
   cleared?: boolean;
   date?: string;
-  returnTo?: {
-    view: "main" | "detail";
-    detailState?: DetailViewState;
-  };
+  returnTo?:
+    | { view: "main" }
+    | {
+        view: "detail";
+        detailState: DetailViewState;
+      };
+  errorMessage?: string;
 }
 
 /** Split transaction state  */
@@ -132,8 +143,10 @@ export interface MoveMoneyInitialState {
   amount?: string;
   fromCategoryId?: string;
   toCategoryId?: string;
-  returnTo?: {
-    view: "main" | "detail";
-    detailState?: DetailViewState;
-  };
+  returnTo?:
+    | { view: "main" }
+    | {
+        view: "detail";
+        detailState: DetailViewState;
+      };
 }

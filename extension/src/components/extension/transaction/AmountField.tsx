@@ -4,8 +4,8 @@ import { Minus, Plus } from "tabler-icons-react";
 import IconButton from "~components/IconButton";
 
 type Props = {
-  amount: string;
-  amountType: "Inflow" | "Outflow";
+  amount?: string;
+  amountType?: "Inflow" | "Outflow";
   autoFocus?: boolean;
   disabled?: boolean;
   setAmount: (amount: string) => void;

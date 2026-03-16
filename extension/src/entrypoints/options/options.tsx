@@ -6,7 +6,7 @@ import {
   AppProvider,
   useAuthContext,
   useStorageContext,
-  useYNABContext
+  useYNABContext,
 } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 import { checkPermissions, removePermissions, requestPermissions } from "~lib/utils";
@@ -18,9 +18,9 @@ const OptionsWrapper = () => (
 );
 
 export function OptionsView() {
-  const { popupState, settings, syncEnabled, changeSetting } = useStorageContext();
+  const { settings, changeSetting, settingsSynced } = useStorageContext();
   const { budgetsData, refreshBudgets, isRefreshingBudgets } = useYNABContext();
-  const { authLoading, loginWithOAuth, loggedIn, logout } = useAuthContext();
+  const { loginWithOAuth, loggedIn, logout } = useAuthContext();
 
   useSetColorTheme();
 
@@ -29,18 +29,15 @@ export function OptionsView() {
   const {
     enabled: notificationEnabled,
     request: requestNotificationPermission,
-    remove: removeNotificationPermission
+    remove: removeNotificationPermission,
   } = useNotificationPermission();
-
-  // check if auth and storage are hydrated to avoid flashes
-  if (authLoading || !settings || !popupState) return null;
 
   return (
     <section
       style={{
         padding: "0 16px 16px",
         maxWidth: "700px",
-        width: "max-content"
+        width: "max-content",
       }}>
       {!loggedIn ? (
         <>
@@ -67,9 +64,9 @@ export function OptionsView() {
               <input
                 id="sync-enabled"
                 type="checkbox"
-                checked={syncEnabled}
+                checked={settingsSynced}
                 onChange={(e) => {
-                  const confirmMessage = syncEnabled
+                  const confirmMessage = settingsSynced
                     ? "Are you sure? This will reset your settings and pinned items, and stop syncing with your browser profile."
                     : "Are you sure? This will reset your settings and pinned items, and start syncing with your browser profile.";
                   if (confirm(confirmMessage)) changeSetting("sync", e.target.checked);

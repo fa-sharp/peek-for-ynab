@@ -1,32 +1,34 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import type { RefObject } from "react";
 import { beforeEach, expect, test } from "vitest";
 
-import { browser } from "#imports";
 import "vitest-dom/extend-expect";
 
 import TransactionFormMain from "~components/extension/transaction/TransactionFormMain";
 import { useYNABContext } from "~lib/context";
+import { authTokenStorage, txStore } from "~lib/state";
 import useTransaction from "~lib/useTransaction";
-import { validToken } from "~test/mock/userData";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
-import { accounts } from "~test/mock/ynabApiData";
+import { accounts, category_groups } from "~test/mock/ynabApiData";
 
 const checkingAccount = accounts.find((a) => a.name === "Checking")!;
+const readyToAssignCategory = category_groups[0].categories.find(
+  (c) => c.name === "Inflow: Ready to Assign"
+)!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Form has expected keyboard tab order", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(
-    () => ({ ynab: useYNABContext(), transaction: useTransaction() }),
-    { wrapper }
+  const { result } = await act(() =>
+    renderHook(() => ({ ynab: useYNABContext(), transaction: useTransaction() }), {
+      wrapper,
+    })
   );
   await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
 
@@ -35,8 +37,7 @@ test("Form has expected keyboard tab order", async () => {
   render(
     <>
       <TransactionFormMain
-        formState={result.current.transaction.formState}
-        handlers={result.current.transaction.handlers}
+        dispatch={result.current.transaction.dispatch}
         memoRef={memoRef}
         budgetMainData={result.current.ynab.budgetMainData!}
         isSaving={false}
@@ -59,38 +60,38 @@ test("Form has expected keyboard tab order", async () => {
 test("State is successfully updated when filling out the form", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(
-    () => ({ ynab: useYNABContext(), transaction: useTransaction() }),
-    { wrapper }
+  const { result } = await act(() =>
+    renderHook(() => ({ ynab: useYNABContext(), transaction: useTransaction() }), {
+      wrapper,
+    })
   );
   await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
 
   const user = userEvent.setup();
   render(
     <TransactionFormMain
-      formState={result.current.transaction.formState}
-      handlers={result.current.transaction.handlers}
+      dispatch={result.current.transaction.dispatch}
       budgetMainData={result.current.ynab.budgetMainData!}
       isSaving={false}
     />,
     { wrapper }
   );
 
-  expect(result.current.transaction.formState.account).toBeNull();
+  expect(txStore.getState().accountId).toBeUndefined();
 
-  screen.getByRole("combobox", { name: "Category" }).focus();
+  const categoryField = await screen.findByRole("combobox", { name: "Category" });
+  categoryField.focus();
   await user.keyboard("{ArrowDown}{Enter}");
 
-  expect(result.current.transaction.formState).toMatchObject({
-    category: { name: "Inflow: Ready to Assign" },
-    account: null,
+  expect(txStore.getState()).toMatchObject({
+    categoryId: readyToAssignCategory.id,
   });
 
   screen.getByRole("combobox", { name: "Account" }).focus();
   await user.keyboard("{ArrowDown}{Enter}");
 
-  expect(result.current.transaction.formState).toMatchObject({
-    category: { name: "Inflow: Ready to Assign" },
-    account: checkingAccount,
+  expect(txStore.getState()).toMatchObject({
+    categoryId: readyToAssignCategory.id,
+    accountId: checkingAccount.id,
   });
 });

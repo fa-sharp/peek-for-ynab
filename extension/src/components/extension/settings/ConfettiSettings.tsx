@@ -1,4 +1,4 @@
-import { type FormEventHandler, useId, useMemo, useRef, useState } from "react";
+import { type SubmitEventHandler, useId, useMemo, useRef, useState } from "react";
 import { Help, Plus, X } from "tabler-icons-react";
 
 import { CategorySelect, Dialog, IconButton, Tooltip } from "~components";
@@ -39,17 +39,17 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
     value: NonNullable<BudgetSettings["confetti"]>[K]
   ) =>
     setSettings((prev) => {
-      if (!prev) return undefined;
+      if (!prev) return;
       return {
         ...prev,
         confetti: {
           ...(prev.confetti || DEFAULT_BUDGET_SETTINGS.confetti!),
-          [key]: value
-        }
+          [key]: value,
+        },
       };
     });
 
-  const onAddEmoji: FormEventHandler<HTMLFormElement> = (e) => {
+  const onAddEmoji: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setAddingEmoji(false);
     const input = new FormData(e.currentTarget).get("emoji");
@@ -57,7 +57,7 @@ export default function ConfettiSettings({ budget }: { budget: CachedBudget }) {
     if (emoji) {
       changeConfettiSetting("emojis", [
         ...(settings?.confetti?.emojis || []),
-        emoji.toString()
+        emoji.toString(),
       ]);
     }
   };

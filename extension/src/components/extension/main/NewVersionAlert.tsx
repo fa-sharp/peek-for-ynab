@@ -1,4 +1,3 @@
-import React from "react";
 import { ExternalLink, Rocket, X } from "tabler-icons-react";
 
 import IconButton from "~components/IconButton";

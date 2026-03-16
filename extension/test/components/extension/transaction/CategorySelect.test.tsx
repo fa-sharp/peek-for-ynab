@@ -1,13 +1,13 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 import type { Category } from "ynab";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { CategorySelect } from "~components";
 import { useYNABContext } from "~lib/context";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { category_groups } from "~test/mock/ynabApiData";
 
@@ -19,15 +19,13 @@ const shoppingCategory = category_groups
   .categories.find((c) => c.name.includes("Shopping"))!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Mouse behavior works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -41,7 +39,10 @@ test("Mouse behavior works as expected", async () => {
     { wrapper }
   );
 
-  expect(screen.getByRole("listbox"), "No list appears initially").toBeEmptyDOMElement();
+  expect(
+    await screen.findByRole("listbox"),
+    "No list appears initially"
+  ).toBeEmptyDOMElement();
   await user.click(screen.getByRole("combobox"));
   expect(
     screen.getAllByRole("listitem").length,
@@ -61,9 +62,9 @@ test("Mouse behavior works as expected", async () => {
 });
 
 test("Keyboard behavior works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -73,8 +74,7 @@ test("Keyboard behavior works as expected", async () => {
       selectCategory={(c) => (selectedCategory = c)}
       categories={result.current.categoriesData!}
       categoryGroupsData={result.current.categoryGroupsData!}
-    />,
-    { wrapper }
+    />
   );
 
   expect(screen.getByRole("listbox"), "No list appears initially").toBeEmptyDOMElement();
@@ -101,7 +101,7 @@ test("Keyboard behavior works as expected", async () => {
 test("Filtering works as expected", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -116,8 +116,9 @@ test("Filtering works as expected", async () => {
   );
 
   await user.keyboard("{Tab}shopping");
-  expect(screen.getByRole("listbox").children[0]).toHaveTextContent("Non-Monthly");
-  expect(screen.getByRole("listbox").children[1]).toHaveTextContent("Shopping");
+  const categoryList = await screen.findByRole("listbox");
+  expect(categoryList.children[0]).toHaveTextContent("Non-Monthly");
+  expect(categoryList.children[1]).toHaveTextContent("Shopping");
   await user.keyboard("{ArrowDown}{Enter}");
   expect(selectedCategory).toMatchObject(shoppingCategory);
 });
@@ -125,7 +126,7 @@ test("Filtering works as expected", async () => {
 test("Ready to Assign appears as first category", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -138,7 +139,7 @@ test("Ready to Assign appears as first category", async () => {
     { wrapper }
   );
 
-  await user.click(screen.getByLabelText("open", { exact: false }));
+  await user.click(await screen.findByLabelText("open", { exact: false }));
   const categoryList = screen.getByRole("listbox").childNodes;
   expect(categoryList[0]).toHaveTextContent("Inflow: Ready to Assign");
 });
@@ -146,7 +147,7 @@ test("Ready to Assign appears as first category", async () => {
 test("Credit Card Payment categories don't appear", async () => {
   const wrapper = createTestAppWrapper();
 
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() => renderHook(useYNABContext, { wrapper }));
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -159,31 +160,36 @@ test("Credit Card Payment categories don't appear", async () => {
     { wrapper }
   );
 
-  await user.click(screen.getByLabelText("open", { exact: false }));
+  await user.click(await screen.findByLabelText("open", { exact: false }));
   expect(screen.queryByText("Credit Card Payments")).toBeNull();
 });
 
 test("Clear button works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.categoriesData).toBeTruthy());
 
   const user = userEvent.setup();
   let selectedCategory: Category | null = null;
-  render(
+  const { rerender } = render(
     <CategorySelect
       selectCategory={(c) => (selectedCategory = c)}
       categories={result.current.categoriesData!}
       categoryGroupsData={result.current.categoryGroupsData!}
-    />,
-    { wrapper }
+    />
   );
-
-  expect(selectedCategory).toBeNull();
   await user.keyboard("{Tab}{ArrowDown}{Enter}");
   expect(selectedCategory).toMatchObject({ name: "Inflow: Ready to Assign" });
 
+  rerender(
+    <CategorySelect
+      selectCategory={(c) => (selectedCategory = c)}
+      categories={result.current.categoriesData!}
+      categoryGroupsData={result.current.categoryGroupsData!}
+      currentCategory={selectedCategory}
+    />
+  );
   await user.click(screen.getByLabelText("Clear category"));
   expect(selectedCategory).toBeNull();
 });

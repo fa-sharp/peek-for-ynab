@@ -1,19 +1,16 @@
-import { Browser } from "#imports";
 import type { Account, Category, CategoryGroupWithCategories } from "ynab";
 
-import {
-  CHROME_LOCAL_STORAGE,
-  CHROME_SYNC_STORAGE,
-  ONE_DAY_IN_MILLIS
-} from "./constants";
+import type { Browser } from "#imports";
+import { ONE_DAY_IN_MILLIS } from "./constants";
 import { createQueryClient } from "./queryClient";
-import type { AppSettings, CachedBudget, CachedPayee } from "./types";
+import { appSettingsStorage, shouldSyncStorage } from "./state";
+import type { CachedBudget, CachedPayee } from "./types";
 import {
   formatCurrency,
   getIgnoredCategoryIdsForTx,
   parseLocaleNumber,
   searchWithinString,
-  stringValueToMillis
+  stringValueToMillis,
 } from "./utils";
 
 interface CachedBudgetData {
@@ -89,7 +86,7 @@ export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery 
       categoryQuery,
       accountQuery,
       memo,
-      lastParsedIdx: parsedIdx
+      lastParsedIdx: parsedIdx,
     };
   } else if (dataToParse[0] === "transfer") {
     /** [amount, budget, account 1, account 2, category, memo] */
@@ -118,7 +115,7 @@ export function parseTxInput(text: string): ParsedTxQuery | ParsedTransferQuery 
       toAccountQuery: account1Direction === "from" ? account2 : account1,
       categoryQuery: category,
       memo,
-      lastParsedIdx: parsedIdx
+      lastParsedIdx: parsedIdx,
     };
   }
   return null;
@@ -148,7 +145,7 @@ export const getPossibleTxFields = (
       ? data.accountsData
           .filter((a) => searchWithinString(a.name, parsed.accountQuery!.trim()))
           .slice(0, 5)
-      : []
+      : [],
 });
 
 export function getPossibleTxFieldCombinations(
@@ -205,7 +202,7 @@ export const getPossibleTransferFields = (
           .filter((c) => !ignoredCategoryIds?.has(c.id))
           .filter((c) => searchWithinString(c.name, parsed.categoryQuery!.trim()))
           .slice(0, 5)
-      : []
+      : [],
 });
 
 export function getPossibleTransferFieldCombinations(
@@ -225,8 +222,8 @@ export function getPossibleTransferFieldCombinations(
       payee: {
         id: account.transfer_payee_id!,
         name: account.name,
-        transferId: account.id
-      }
+        transferId: account.id,
+      },
     }));
   if (txCombinations.length === 0)
     fromAccountResults.forEach((account) => txCombinations.push({ account }));
@@ -246,10 +243,8 @@ export function getPossibleTransferFieldCombinations(
 
 /** Check if user has enabled permission to use the URL/address bar */
 export async function checkBrowserBarPermission() {
-  const sync = await CHROME_LOCAL_STORAGE.get<boolean>("sync");
-  const settings = await (
-    sync ? CHROME_SYNC_STORAGE : CHROME_LOCAL_STORAGE
-  ).get<AppSettings>("settings");
+  const sync = await shouldSyncStorage.getValue();
+  const settings = await appSettingsStorage(sync ? "sync" : "local").getValue();
   return !!settings?.omnibox;
 }
 
@@ -307,7 +302,7 @@ export function createBrowserBarSuggestions(
           (account ? ` from <match>${escapeXML(account.name)}</match>` : "") +
           (payee ? ` to <match>${escapeXML(payee.name)}</match>` : "") +
           (category ? ` for <match>${escapeXML(category.name)}</match>` : "") +
-          (memo ? ` memo <match>${escapeXML(memo)}</match>` : "")
+          (memo ? ` memo <match>${escapeXML(memo)}</match>` : ""),
   }));
 }
 
@@ -316,7 +311,7 @@ const xmlEscapedChars: Record<string, string> = {
   "'": "&apos;",
   "<": "&lt;",
   ">": "&gt;",
-  "&": "&amp;"
+  "&": "&amp;",
 };
 
 function escapeXML(s: string) {
@@ -342,18 +337,16 @@ export async function getBrowserBarBudgets() {
   if (browserBarCache.budgets) return browserBarCache.budgets;
 
   const queryClient = createQueryClient({
-    staleTime: ONE_DAY_IN_MILLIS * 7
+    staleTime: ONE_DAY_IN_MILLIS * 7,
   });
-  const storage = (await CHROME_LOCAL_STORAGE.get<boolean>("sync"))
-    ? CHROME_SYNC_STORAGE
-    : CHROME_LOCAL_STORAGE;
-  const budgetIdsToShow = await storage.get<string[]>("budgets");
+  const sync = await shouldSyncStorage.getValue();
+  const settings = await appSettingsStorage(sync ? "sync" : "local").getValue();
   const budgets = (
     await queryClient.fetchQuery<CachedBudget[]>({
       queryKey: ["budgets"],
-      queryFn: () => []
+      queryFn: () => [],
     })
-  ).filter((b) => budgetIdsToShow?.includes(b.id));
+  ).filter((b) => settings.budgets?.includes(b.id));
   browserBarCache.budgets = budgets;
   return budgets;
 }
@@ -363,25 +356,25 @@ export async function getBrowserBarDataForBudget(budgetId: string) {
 
   const budgetCache: (typeof browserBarCache)["data"][string] = {};
   const queryClient = createQueryClient({
-    staleTime: ONE_DAY_IN_MILLIS * 7
+    staleTime: ONE_DAY_IN_MILLIS * 7,
   });
   const [{ payees }, { categoryGroups }, { accounts }] = await Promise.all([
     queryClient.fetchQuery<{ payees: CachedPayee[] }>({
       queryKey: ["payees", { budgetId }],
-      queryFn: () => ({ payees: [] })
+      queryFn: () => ({ payees: [] }),
     }),
     queryClient.fetchQuery<{
       categoryGroups: CategoryGroupWithCategories[];
     }>({
       queryKey: ["categoryGroups", { budgetId }],
-      queryFn: () => ({ categoryGroups: [] })
+      queryFn: () => ({ categoryGroups: [] }),
     }),
     queryClient.fetchQuery<{
       accounts: Account[];
     }>({
       queryKey: ["accounts", { budgetId }],
-      queryFn: () => ({ accounts: [] })
-    })
+      queryFn: () => ({ accounts: [] }),
+    }),
   ]);
 
   budgetCache.payeesData = payees;

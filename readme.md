@@ -4,7 +4,7 @@
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
 
-A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peek-for-ynab-v2.fly.dev).
+A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peekforynab.com).
 
 ## Project layout
 
@@ -16,9 +16,10 @@ A browser extension for YNAB that lets users see their category and account bala
     - `styles/` Extension CSS / Sass styles
   - `test/` Unit tests with Vitest
 - `web/` Website and server using Astro and Fastify
-  - `server/` Fastify server (serves Astro as middleware)
+  - `server/` Fastify server (OAuth flow, API routes, and Astro static files)
+    - `routes/` API routes
   - `src/`
-    - `pages/` All website pages and routes (Astro)
+    - `pages/` All website pages (Astro)
 
 ## Building and running locally
 
@@ -30,12 +31,13 @@ Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.c
 
 ### Backend / Web
 
-The server and website is created with [Astro](https://astro.build/). Pages and API routes are located in the `web/src/pages/` folder. You can run the development server via:
+The server and website is created with [Fastify](https://fastify.dev) and [Astro](https://astro.build/). The server is located in the `/web/server` folder, and the web pages are located in the `web/src/pages` folder. You can run the server via:
 
 ```bash
 cd web
 pnpm install
-pnpm dev
+pnpm build
+pnpm start
 ```
 
 ### Extension

@@ -1,5 +1,5 @@
 import { PopupLogin, PopupMain } from "~components";
-import { AppProvider, useAuthContext, useStorageContext } from "~lib/context";
+import { AppProvider, useAuthContext } from "~lib/context";
 import { useSetColorTheme } from "~lib/hooks";
 
 function PopupWrapper() {
@@ -11,13 +11,9 @@ function PopupWrapper() {
 }
 
 export function PopupView() {
-  const { settings, popupState } = useStorageContext();
-  const { loggedIn, authLoading } = useAuthContext();
+  const { loggedIn } = useAuthContext();
 
   useSetColorTheme();
-
-  // check if auth and storage are hydrated to avoid flashes
-  if (authLoading || !settings || !popupState) return null;
 
   return (
     <div
@@ -25,7 +21,7 @@ export function PopupView() {
         padding: "1em",
         minWidth: "260px",
         maxWidth: "360px",
-        minHeight: "50px"
+        minHeight: "50px",
       }}>
       {!loggedIn ? <PopupLogin /> : <PopupMain />}
     </div>

@@ -1,13 +1,13 @@
-import { render, renderHook, waitFor } from "@testing-library/react";
+import { act, render, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import OmniboxTransaction from "~components/extension/omnibox/OmniboxTransaction";
 import { useYNABContext } from "~lib/context";
 import { parseTxInput } from "~lib/omnibox";
+import { authTokenStorage, txStore } from "~lib/state";
 import useTransaction from "~lib/useTransaction";
-import { validToken } from "~test/mock/userData";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts, category_groups, payees } from "~test/mock/ynabApiData";
 
@@ -16,54 +16,57 @@ const groceriesCategory = category_groups[3].categories[0];
 const amexAccount = accounts[3];
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("updates the form state for each field", async () => {
   const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(
-    () => ({ ynab: useYNABContext(), tx: useTransaction() }),
-    { wrapper }
+  const { result: ynab } = await act(() =>
+    renderHook(useYNABContext, {
+      wrapper,
+    })
   );
-  await waitFor(() => expect(result.current.ynab.budgetMainData).toBeTruthy());
+  await waitFor(() => expect(ynab.current.budgetMainData).toBeTruthy());
+
+  const { result: tx } = renderHook(useTransaction, {
+    wrapper,
+  });
+  await waitFor(() => expect(tx.current).toBeTruthy());
 
   const parsedQuery = parseTxInput("add 142.42 at abc for grocer on amex");
 
   const { rerender } = render(
     <OmniboxTransaction
-      budget={result.current.ynab.selectedBudgetData!}
-      budgetMainData={result.current.ynab.budgetMainData!}
-      formState={result.current.tx.formState}
-      handlers={result.current.tx.handlers}
-      isSaving={result.current.tx.isSaving}
+      budget={ynab.current.selectedBudgetData!}
+      budgetMainData={ynab.current.budgetMainData!}
+      dispatch={tx.current.dispatch}
+      isSaving={tx.current.isSaving}
       parsedQuery={parsedQuery!}
       openTxForm={() => undefined}
     />
   );
 
-  expect(result.current.tx.formState.amount).toBe("142.42");
-  expect(result.current.tx.formState.payee).toMatchObject({ id: abcPayee.id });
-  expect(result.current.tx.formState.category).toMatchObject(groceriesCategory);
-  expect(result.current.tx.formState.account).toMatchObject(amexAccount);
+  let txState = txStore.getState();
+  expect(txState.amount).toBe("142.42");
+  expect(txState.payee).toMatchObject({ id: abcPayee.id });
+  expect(txState.categoryId).toEqual(groceriesCategory.id);
+  expect(txState.accountId).toEqual(amexAccount.id);
 
   const newParsedQuery = parseTxInput("add 42.96 on amex memo lorem ipsum");
   rerender(
     <OmniboxTransaction
-      budget={result.current.ynab.selectedBudgetData!}
-      budgetMainData={result.current.ynab.budgetMainData!}
-      formState={result.current.tx.formState}
-      handlers={result.current.tx.handlers}
-      isSaving={result.current.tx.isSaving}
+      budget={ynab.current.selectedBudgetData!}
+      budgetMainData={ynab.current.budgetMainData!}
+      dispatch={tx.current.dispatch}
+      isSaving={tx.current.isSaving}
       parsedQuery={newParsedQuery!}
       openTxForm={() => undefined}
     />
   );
-  expect(result.current.tx.formState.amount).toBe("42.96");
-  expect(result.current.tx.formState.payee).toBeNull();
-  expect(result.current.tx.formState.category).toBeNull();
-  expect(result.current.tx.formState.account).toMatchObject(amexAccount);
-  expect(result.current.tx.formState.memo.trim()).toBe("lorem ipsum");
+  txState = txStore.getState();
+  expect(txState.amount).toBe("42.96");
+  expect(txState.payee).toBeNull();
+  expect(txState.categoryId).toBeNull();
+  expect(txState.accountId).toEqual(amexAccount.id);
+  expect(txState.memo?.trim()).toBe("lorem ipsum");
 });

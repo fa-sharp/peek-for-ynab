@@ -11,11 +11,7 @@ import {
   useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type {
-  Category,
-  CategoryGroupWithCategories,
-  CurrencyFormat,
-} from "ynab";
+import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
 import type { CachedBudget } from "~lib/types";
 import {
@@ -88,7 +84,7 @@ function CategorySelect(
     selectedItem,
   } = useCombobox<Category | null>({
     items: categoryList,
-    selectedItem: currentCategory,
+    selectedItem: currentCategory ?? null,
     itemToString(category) {
       if (!category) return "";
       if (category.name === "Inflow: Ready to Assign") return category.name;
@@ -115,8 +111,7 @@ function CategorySelect(
           {...getInputProps({
             ref: (node) => {
               inputRef.current = node;
-              ref &&
-                (ref instanceof Function ? ref(node) : (ref.current = node));
+              ref && (ref instanceof Function ? ref(node) : (ref.current = node));
             },
           })}
           className={selectedItem ? "item-selected" : ""}
@@ -133,8 +128,7 @@ function CategorySelect(
               reset();
               selectCategory(null);
               setTimeout(() => inputRef.current?.focus(), 50);
-            }}
-          >
+            }}>
             <X aria-hidden />
           </button>
         ) : (
@@ -147,16 +141,14 @@ function CategorySelect(
               openMenu();
               setHighlightedIndex(0);
               inputRef.current?.focus();
-            }}
-          >
+            }}>
             <ChevronDown aria-hidden />
           </button>
         )}
 
         <ul
           className={`select-dropdown-list ${isOpen ? "rounded shadow" : ""}`}
-          {...getMenuProps()}
-        >
+          {...getMenuProps()}>
           {!isOpen ? null : categoryList.length === 0 ? (
             <li className="select-dropdown-item">--Category not found!--</li>
           ) : (
@@ -187,8 +179,7 @@ function CategorySelect(
                           {...getItemProps({
                             item: category,
                             index: itemIndex,
-                          })}
-                        >
+                          })}>
                           {formatCategoryWithBalance(
                             category,
                             budgetData?.currencyFormat,
@@ -205,10 +196,7 @@ function CategorySelect(
   );
 }
 
-function formatCategoryWithBalance(
-  category: Category,
-  currencyFormat?: CurrencyFormat,
-) {
+function formatCategoryWithBalance(category: Category, currencyFormat?: CurrencyFormat) {
   if (category.name === "Inflow: Ready to Assign") return <>{category.name}</>;
 
   return (
@@ -218,8 +206,7 @@ function formatCategoryWithBalance(
         className={clsx("currency", {
           positive: category.balance > 0,
           negative: category.balance < 0,
-        })}
-      >
+        })}>
         {formatCurrency(category.balance, currencyFormat)}
       </span>
       )

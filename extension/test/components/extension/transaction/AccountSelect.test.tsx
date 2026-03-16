@@ -1,13 +1,13 @@
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
 import type { Account } from "ynab";
 import "vitest-dom/extend-expect";
 
-import { browser } from "#imports";
 import { AccountSelect } from "~components";
 import { useYNABContext } from "~lib/context";
-import { validToken } from "~test/mock/userData";
+import { authTokenStorage } from "~lib/state";
+import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { accounts } from "~test/mock/ynabApiData";
 
@@ -15,15 +15,13 @@ const checkingAccount = accounts.find((a) => a.name === "Checking")!;
 const savingsAccount = accounts.find((a) => a.name === "Savings")!;
 
 beforeEach(async () => {
-  await browser.storage.local.set({
-    tokenData: JSON.stringify(validToken),
-  });
+  await authTokenStorage.setValue(mockAuthToken);
 });
 
 test("Mouse behavior works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -32,8 +30,7 @@ test("Mouse behavior works as expected", async () => {
     <AccountSelect
       selectAccount={(a) => (selectedAccount = a)}
       accounts={result.current.accountsData}
-    />,
-    { wrapper }
+    />
   );
 
   expect(screen.getByRole("listbox"), "No list appears initially").toBeEmptyDOMElement();
@@ -56,9 +53,9 @@ test("Mouse behavior works as expected", async () => {
 });
 
 test("Keyboard behavior works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -67,8 +64,7 @@ test("Keyboard behavior works as expected", async () => {
     <AccountSelect
       selectAccount={(a) => (selectedAccount = a)}
       accounts={result.current.accountsData}
-    />,
-    { wrapper }
+    />
   );
 
   expect(screen.getByRole("listbox"), "No list appears initially").toBeEmptyDOMElement();
@@ -94,9 +90,9 @@ test("Keyboard behavior works as expected", async () => {
 });
 
 test("Filtering works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
@@ -105,8 +101,7 @@ test("Filtering works as expected", async () => {
     <AccountSelect
       selectAccount={(c) => (selectedAccount = c)}
       accounts={result.current.accountsData}
-    />,
-    { wrapper }
+    />
   );
 
   await user.keyboard("{Tab}savings");
@@ -117,25 +112,31 @@ test("Filtering works as expected", async () => {
 });
 
 test("Clear button works as expected", async () => {
-  const wrapper = createTestAppWrapper();
-
-  const { result } = renderHook(useYNABContext, { wrapper });
+  const { result } = await act(() =>
+    renderHook(useYNABContext, { wrapper: createTestAppWrapper() })
+  );
   await waitFor(() => expect(result.current.accountsData).toBeTruthy());
 
   const user = userEvent.setup();
   let selectedAccount: Account | null = null;
-  render(
+  const { rerender } = render(
     <AccountSelect
       selectAccount={(c) => (selectedAccount = c)}
       accounts={result.current.accountsData}
-    />,
-    { wrapper }
+    />
   );
 
   expect(selectedAccount).toBeNull();
   await user.keyboard("{Tab}{ArrowDown}{Enter}");
   expect(selectedAccount).toMatchObject(checkingAccount);
 
+  rerender(
+    <AccountSelect
+      selectAccount={(c) => (selectedAccount = c)}
+      currentAccount={selectedAccount}
+      accounts={result.current.accountsData}
+    />
+  );
   await user.click(screen.getByLabelText("Clear account"));
   expect(selectedAccount).toBeNull();
 });

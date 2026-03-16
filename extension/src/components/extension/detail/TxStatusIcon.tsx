@@ -1,4 +1,3 @@
-import React from "react";
 import { CircleC, Lock } from "tabler-icons-react";
 import { TransactionClearedStatus } from "ynab";
 

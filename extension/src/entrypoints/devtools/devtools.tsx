@@ -1,20 +1,18 @@
-import { Storage, type StorageAreaName } from "@plasmohq/storage";
-import { type DehydratedState } from "@tanstack/react-query";
+import type { DehydratedState } from "@tanstack/react-query";
 import { clear, get, keys } from "idb-keyval";
 import JSONFormatter from "json-formatter-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Browser, browser } from "#imports";
-import { BACKGROUND_ALARM_NAME } from "~lib/constants";
-import { StorageProvider, useStorageContext } from "~lib/context/storageContext";
+import { type Browser, browser } from "#imports";
+import { BACKGROUND_ALARM_NAME, STORAGE_KEYS } from "~lib/constants";
+import { AppProvider, useAuthContext } from "~lib/context";
 
 /** Devtools page for inspecting auth state, storage, etc. */
 function Devtools() {
-  const { tokenData, setTokenData, tokenRefreshNeeded, setTokenRefreshNeeded } =
-    useStorageContext();
+  const { accessToken, loggedIn } = useAuthContext();
 
-  const [area, setArea] = useState<StorageAreaName>("local");
-  const [data, setData] = useState<Record<string, string>>({});
+  const [area, setArea] = useState<"local" | "sync">("local");
+  const [data, setData] = useState<Record<string, unknown>>({});
   const [cache, setCache] = useState<DehydratedState["queries"] | undefined>();
   const [permissions, setPermissions] = useState("");
   const [backgroundAlarm, setBackgroundAlarm] = useState<Browser.alarms.Alarm | null>(
@@ -49,12 +47,11 @@ function Devtools() {
       });
     };
 
-    const storage = new Storage({ area });
-    storage.getAll().then(setData);
-    storage.primaryClient.onChanged.addListener(storageListener);
+    browser.storage[area].get().then(setData);
+    browser.storage[area].onChanged.addListener(storageListener);
 
     return () => {
-      storage.primaryClient.onChanged.removeListener(storageListener);
+      browser.storage[area].onChanged.removeListener(storageListener);
     };
   }, [area]);
 
@@ -80,31 +77,21 @@ function Devtools() {
         flexDirection: "column",
         gap: 4,
         padding: 4,
-      }}
-    >
+      }}>
       <h2>Peek for YNAB Devtools</h2>
       <h3>Authentication</h3>
-      {!tokenData ? (
+      {!loggedIn ? (
         <div>No token data</div>
       ) : (
         <>
           <div>
-            Access token: <SensitiveString data={tokenData.accessToken} />
+            Auth token: <b>Stored</b>
           </div>
-          <div>
-            Refresh token: <SensitiveString data={tokenData.refreshToken} />
-          </div>
-          <div>
-            Token expires: {tokenData && new Date(tokenData.expires).toLocaleString()}
-          </div>
-          <div>
-            {!tokenRefreshNeeded ? (
-              <button onClick={() => setTokenRefreshNeeded(true)}>Force refresh</button>
-            ) : (
-              <button disabled>Refreshing...</button>
-            )}
-            <button onClick={() => setTokenData(null)}>Clear token</button>
-          </div>
+          {accessToken && (
+            <div>
+              Access token: <SensitiveString data={accessToken} />
+            </div>
+          )}
         </>
       )}
       <h3>Browser Permissions</h3>
@@ -120,15 +107,16 @@ function Devtools() {
       )}
       <div>
         <button
-          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}
-        >
+          onClick={() => browser.alarms.clearAll().then(() => setBackgroundAlarm(null))}>
           Clear alarm
         </button>
       </div>
       <h3>Browser Storage</h3>
       <div>
         Storage Area:{" "}
-        <select value={area} onChange={(e) => setArea(e.target.value as StorageAreaName)}>
+        <select
+          value={area}
+          onChange={(e) => setArea(e.target.value as "local" | "sync")}>
           <option>local</option>
           <option>sync</option>
         </select>
@@ -139,8 +127,7 @@ function Devtools() {
           display: "flex",
           paddingBottom: 4,
           borderBottom: "solid 2px lightgray",
-        }}
-      >
+        }}>
         <div style={{ width: 110 }}>
           <b>Key</b>
         </div>
@@ -150,37 +137,37 @@ function Devtools() {
       </div>
       {Object.entries(data)
         .sort(([key1], [key2]) => key1.localeCompare(key2))
-        .map(
-          ([key, value]) =>
-            key !== "tokenData" && (
-              <div
-                key={key}
-                style={{
-                  display: "flex",
-                  paddingBlock: 3,
-                  borderBottom: "solid 1px lightgray",
-                }}
-              >
-                <b
-                  style={{
-                    width: 110,
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {key}
-                </b>
-                <div>
-                  {value === undefined || typeof JSON.parse(value) !== "object" ? (
-                    value
-                  ) : (
-                    <FormattedJSON value={JSON.parse(value)} />
-                  )}
-                </div>
-              </div>
-            )
-        )}
+        .filter(([key]) => key !== STORAGE_KEYS.AuthToken)
+        .map(([key, value]) => (
+          <div
+            key={key}
+            style={{
+              display: "flex",
+              paddingBlock: 3,
+              borderBottom: "solid 1px lightgray",
+            }}>
+            <b
+              style={{
+                width: 110,
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}>
+              {key}
+            </b>
+            <div>
+              {value == undefined ? (
+                value
+              ) : typeof value === "object" ? (
+                <FormattedJSON value={value} />
+              ) : typeof value === "string" ? (
+                <FormattedJSON value={JSON.parse(value)} />
+              ) : (
+                value.toString()
+              )}
+            </div>
+          </div>
+        ))}
       <h3>API Cache</h3>
       <div>
         <button onClick={loadCache}>Refresh</button>
@@ -193,9 +180,9 @@ function Devtools() {
 
 function DevtoolsWrapper() {
   return (
-    <StorageProvider>
+    <AppProvider>
       <Devtools />
-    </StorageProvider>
+    </AppProvider>
   );
 }
 

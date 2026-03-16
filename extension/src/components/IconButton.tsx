@@ -1,8 +1,9 @@
 import { clsx } from "clsx";
 import type { ComponentPropsWithoutRef, ReactElement } from "react";
+import React from "react";
 
 /** An icon that functions as a button. Uses HTML <button> element with `aria-label` for accessibility */
-export default function IconButton({
+function IconButton({
   icon,
   label,
   accent,
@@ -34,3 +35,5 @@ export default function IconButton({
     </button>
   );
 }
+
+export default React.memo(IconButton);

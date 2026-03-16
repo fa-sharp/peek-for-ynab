@@ -1,6 +1,4 @@
-# See https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/
-
-name: Website
+name: Backend/Web
 on:
   push:
     branches:
@@ -11,7 +9,7 @@ on:
       - "fly.toml"
 jobs:
   deploy:
-    name: Deploy Astro app
+    name: Deploy server
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:

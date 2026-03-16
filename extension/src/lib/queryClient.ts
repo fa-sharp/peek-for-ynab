@@ -1,11 +1,24 @@
-import { QueryClient, type QueryFilters } from "@tanstack/react-query";
 import {
   experimental_createQueryPersister,
   type PersistedQuery,
-} from "@tanstack/react-query-persist-client";
-import { del, get, set } from "idb-keyval";
+} from "@tanstack/query-persist-client-core";
+import { QueryClient } from "@tanstack/react-query";
+import { del, entries, get, set } from "idb-keyval";
 
 import { ONE_DAY_IN_MILLIS } from "./constants";
+
+export function createQueryClient(options?: { staleTime?: number }) {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: options?.staleTime,
+        retry: 1, // only retry once if there's an error,
+        persister: queryPersister.persisterFn, // persist the query cache to IndexedDB
+        experimental_prefetchInRender: true, // enable React.use() with queries
+      },
+    },
+  });
+}
 
 const CACHED_QUERY_KEYS = new Set([
   "budgets",
@@ -15,7 +28,8 @@ const CACHED_QUERY_KEYS = new Set([
   "import",
 ]);
 
-const queryPersister = experimental_createQueryPersister<PersistedQuery>({
+/** Persist queries to IndexedDB using idb-keyval */
+export const queryPersister = experimental_createQueryPersister<PersistedQuery>({
   prefix: "ynab",
   filters: {
     predicate: ({ queryKey }) =>
@@ -26,19 +40,9 @@ const queryPersister = experimental_createQueryPersister<PersistedQuery>({
     getItem: (key) => get(key),
     setItem: (key, val) => set(key, val),
     removeItem: (key) => del(key),
+    entries: entries,
   },
   serialize: (query) => query,
   deserialize: (query) => query,
   buster: "v2",
 });
-
-export const createQueryClient = (options?: { staleTime?: number }) =>
-  new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: options?.staleTime,
-        retry: 1, // only retry once if there's an error,
-        persister: queryPersister.persisterFn,
-      },
-    },
-  });

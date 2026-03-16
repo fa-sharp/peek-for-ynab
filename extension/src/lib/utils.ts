@@ -1,12 +1,13 @@
 import * as ynab from "ynab";
 
 import { browser } from "#imports";
+import type { CachedPayee } from "./types";
 
 const currencyFormatterCache = new Map<string, (millis: number) => string>();
 
 export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
-  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 },
 ) => {
   const formatterKey = currencyFormat.iso_code + currencyFormat.decimal_digits;
   const cachedFormatter = currencyFormatterCache.get(formatterKey);
@@ -21,7 +22,7 @@ export const getCurrencyFormatter = (
   const newFormatter = (millis: number) => {
     const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
       millis,
-      currencyFormat.decimal_digits
+      currencyFormat.decimal_digits,
     );
     return numberFormat.format(currencyAmount);
   };
@@ -33,20 +34,17 @@ export const getCurrencyFormatter = (
 export const formatCurrency = (
   millis: number,
   /** the budget's `currency_format` property from YNAB */
-  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 },
 ) => getCurrencyFormatter(currencyFormat)(millis);
 
 /** Convert millis to a string value suitable for the HTML number input */
 export const millisToStringValue = (
   millis: number,
-  currencyFormat = { decimal_digits: 2 }
+  currencyFormat = { decimal_digits: 2 },
 ) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
 
 /** Convert a string value (e.g. from HTML number input) to milliUnits */
-export const stringValueToMillis = (
-  value: string,
-  type: "Inflow" | "Outflow"
-) =>
+export const stringValueToMillis = (value: string, type: "Inflow" | "Outflow") =>
   type === "Outflow" ? Math.round(+value * -1000) : Math.round(+value * 1000);
 
 export const isEmptyObject = (objectName: object) => {
@@ -60,17 +58,33 @@ export const isEmptyObject = (objectName: object) => {
 
 export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
   accountsData?.find(
-    (a) =>
-      (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
+    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name,
   );
+
+/**
+ * Determine whether a transaction is transferring from a budget account to a tracking account.
+ * These transactions should have categories.
+ */
+export const isBudgetToTrackingTransfer = (
+  payee?: CachedPayee | {} | null,
+  account?: ynab.Account,
+  allAccounts?: ynab.Account[],
+) => {
+  if (!payee || !("id" in payee) || !payee.transferId) return false;
+  const transferToAccount = allAccounts?.find(
+    (a) => payee && "transferId" in payee && a.id === payee.transferId,
+  );
+  if (!transferToAccount) return false;
+  return !transferToAccount.on_budget && !!account?.on_budget;
+};
 
 /** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
 export const getIgnoredCategoryIdsForTx = (
   data: ynab.CategoryGroupWithCategories[],
-  ignoreRta = false
+  ignoreRta = false,
 ) => {
   const ignoredIds = new Set(
-    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
+    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id)),
   );
   if (!ignoreRta) ignoredIds.delete(data[0]?.categories[0]?.id);
   return ignoredIds;
@@ -118,7 +132,7 @@ export const formatDateMonthAndDay = (date: Date) => {
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (
   value: string,
-  locales = typeof navigator !== "undefined" ? navigator.languages : undefined
+  locales = typeof navigator !== "undefined" ? navigator.languages : undefined,
 ) => {
   const example = Intl.NumberFormat(locales).format(1.1);
   const cleanPattern = new RegExp(`[^0-9${example.charAt(1)}]`, "g");
@@ -191,12 +205,10 @@ export const removePermissions = (permissions: OptionalPermissions[]) =>
         console.error("Error removing permissions:", browser.runtime.lastError);
         resolve(false);
       }
-    })
+    }),
   );
 
-export const flagColorToEmoji = (
-  flagColor: ynab.TransactionFlagColor | string
-) => {
+export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
   if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
   if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";
   if (flagColor === ynab.TransactionFlagColor.Orange) return "🟠";
@@ -211,9 +223,7 @@ export const flagColorToEmoji = (
  * @param timeoutMs - The maximum time to wait for a connection, in milliseconds. Default is 10 seconds.
  * @returns A Promise that resolves when an internet connection is established, or rejects if the timeout is reached.
  */
-export function waitForInternetConnection(
-  timeoutMs: number = 10 * 1000
-): Promise<void> {
+export function waitForInternetConnection(timeoutMs: number = 10 * 1000): Promise<void> {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     if (navigator.onLine) {

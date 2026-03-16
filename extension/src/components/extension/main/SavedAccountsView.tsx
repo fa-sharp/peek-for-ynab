@@ -2,24 +2,18 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 import { AccountView, IconButton, Toolbar } from "~components";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
-
 import { AddTransactionIcon, DetailIcon, PinnedItemIcon } from "../../icons/ActionIcons";
 
 /** View of user's saved accounts with balances */
 export default function SavedAccountsView() {
   const { selectedBudgetData, savedAccountsData, addedTransaction } = useYNABContext();
-  const { removeAccount, setPopupState, popupState, editingItems, settings, setTxState } =
-    useStorageContext();
+  const { toggleAccount, editingItems, settings, setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
 
-  if (
-    !popupState ||
-    !savedAccountsData ||
-    !selectedBudgetData ||
-    !settings ||
-    savedAccountsData.length === 0
-  )
+  if (!savedAccountsData || !selectedBudgetData || savedAccountsData.length === 0)
     return null;
+
+  const { id: budgetId, currencyFormat } = selectedBudgetData;
 
   return (
     <Droppable droppableId="savedAccounts" isDropDisabled={!editingItems}>
@@ -44,15 +38,15 @@ export default function SavedAccountsView() {
                   <AccountView
                     key={account.id}
                     account={account}
-                    alerts={currentAlerts?.[selectedBudgetData.id]?.accounts[account.id]}
-                    currencyFormat={selectedBudgetData?.currencyFormat}
+                    alerts={currentAlerts?.[budgetId]?.accounts[account.id]}
+                    currencyFormat={currencyFormat}
                     settings={settings}
                     addedTransaction={addedTransaction}
                     actionElementsLeft={
                       !editingItems ? null : (
                         <IconButton
                           label="Unpin"
-                          onClick={() => removeAccount(account.id)}
+                          onClick={() => toggleAccount(account.id)}
                           icon={<PinnedItemIcon />}
                         />
                       )
@@ -65,9 +59,10 @@ export default function SavedAccountsView() {
                           icon={<AddTransactionIcon />}
                           label="Add transaction"
                           onClick={() =>
-                            setTxState({ accountId: account.id }).then(() =>
-                              setPopupState({ view: "txAdd" })
-                            )
+                            setPopupState({
+                              view: "txAdd",
+                              txState: { accountId: account.id },
+                            })
                           }
                         />
                         <IconButton
@@ -78,7 +73,7 @@ export default function SavedAccountsView() {
                           onClick={() =>
                             setPopupState({
                               view: "detail",
-                              detailState: { type: "account", id: account.id }
+                              detailState: { type: "account", id: account.id },
                             })
                           }
                         />

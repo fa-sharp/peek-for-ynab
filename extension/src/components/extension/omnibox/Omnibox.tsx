@@ -4,7 +4,6 @@ import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib
 import { parseTxInput } from "~lib/omnibox";
 import useTransaction from "~lib/useTransaction";
 import { searchWithinString } from "~lib/utils";
-
 import OmniboxFiltered from "./OmniboxFiltered";
 import OmniboxTransaction from "./OmniboxTransaction";
 
@@ -12,19 +11,17 @@ export default function Omnibox() {
   const {
     budgetSettings,
     settings,
-    setPopupState,
-    setTxState,
     omniboxInput,
     setOmniboxInput,
     editingItems,
-    saveAccount,
-    saveCategory,
-    savedAccounts,
-    savedCategories
+    pinnedItems,
+    toggleAccount,
+    toggleCategory,
+    setPopupState,
   } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
   const { selectedBudgetData, budgetMainData } = useYNABContext();
-  const { formState, handlers, onSaveTransaction, isSaving } = useTransaction();
+  const { dispatch, onSaveTransaction, isSaving } = useTransaction();
 
   /** Parsed search terms for each transaction field */
   const parsedQuery = useMemo(() => {
@@ -42,11 +39,11 @@ export default function Omnibox() {
       ),
       categories: budgetMainData.categoriesData
         .filter((c) => c.category_group_name !== "Internal Master Category")
-        .filter((c) => searchWithinString(c.name, omniboxInput))
+        .filter((c) => searchWithinString(c.name, omniboxInput)),
     };
   }, [budgetMainData, parsedQuery, omniboxInput]);
 
-  if (!selectedBudgetData || !budgetMainData || !settings) return null;
+  if (!selectedBudgetData || !budgetMainData) return null;
 
   return (
     <form className="flex-col mb-md" onSubmit={onSaveTransaction}>
@@ -66,16 +63,15 @@ export default function Omnibox() {
             filtered,
             settings,
             currentAlerts,
-            openTxForm: async (txAddState) => {
-              await setTxState(txAddState);
-              setPopupState({ view: "txAdd" });
+            openTxForm: (txState) => {
+              setPopupState({ view: "txAdd", txState });
               setOmniboxInput("");
             },
             editingItems,
-            savedAccounts: savedAccounts?.[selectedBudgetData.id],
-            savedCategories: savedCategories?.[selectedBudgetData.id],
+            savedAccounts: pinnedItems?.accounts,
+            savedCategories: pinnedItems?.categories,
             onPinItem: (type, id) =>
-              type === "account" ? saveAccount(id) : saveCategory(id)
+              type === "account" ? toggleAccount(id) : toggleCategory(id),
           }}
         />
       ) : parsedQuery ? (
@@ -83,15 +79,14 @@ export default function Omnibox() {
           {...{
             budget: selectedBudgetData,
             budgetMainData,
-            formState,
-            handlers,
+            dispatch,
             isSaving,
             parsedQuery,
             defaultAccountId: budgetSettings?.transactions.defaultAccountId,
             openTxForm: () => {
               setPopupState({ view: "txAdd" });
               setOmniboxInput("");
-            }
+            },
           }}
         />
       ) : null}
