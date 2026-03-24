@@ -5,11 +5,7 @@ import fastify from "fastify";
 import { Type as T } from "typebox";
 
 import { isApiRequest } from "./lib.ts";
-import astroPlugin from "./plugins/astro.ts";
-import corsPlugin from "./plugins/cors.ts";
-import cryptoPlugin from "./plugins/crypto.ts";
-import helmetPlugin from "./plugins/helmet.ts";
-import oauthPlugin from "./plugins/oauth.ts";
+import { astro, cors, crypto, helmet, oauth } from "./plugins/index.ts";
 
 /** Environment variables */
 export const envSchema = T.Object({
@@ -48,7 +44,7 @@ export async function createServer() {
   });
 
   // OAuth login and callback
-  app.register(oauthPlugin, {
+  app.register(oauth, {
     prefix: "/api/auth/v2",
     baseUrl: app.config.YNAB_BASE_URL,
     clientId: app.config.YNAB_CLIENT_ID,
@@ -56,20 +52,20 @@ export async function createServer() {
   });
 
   // Token encryption
-  app.register(cryptoPlugin, {
+  app.register(crypto, {
     keys: [Buffer.from(app.config.TOKEN_KEY, "hex")],
   });
 
   // Security headers
-  app.register(helmetPlugin);
+  app.register(helmet);
 
   // CORS middleware for API requests
-  app.register(corsPlugin, {
+  app.register(cors, {
     allowedOrigins: app.config.ALLOWED_ORIGINS?.split(","),
   });
 
   // Astro website
-  app.register(astroPlugin, {
+  app.register(astro, {
     rootStaticPath: fileURLToPath(new URL("../dist/client", import.meta.url)),
     ssrHandler: (await import("../dist/server/entry.mjs")).handler,
   });
