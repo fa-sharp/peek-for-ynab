@@ -1,6 +1,5 @@
-import type { Account } from "ynab";
-
 import { RadioButton, RadioButtonGroup } from "~components";
+import type { Account } from "~lib/api/client";
 import type { ParsedTxQuery, ParsedTxResults } from "~lib/omnibox";
 import { useTxStore } from "~lib/state";
 import type { TransactionFormDispatch } from "~lib/useTransaction";

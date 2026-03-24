@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import { ArrowBack, ExternalLink } from "tabler-icons-react";
-import { AccountType } from "ynab";
 
 import { CurrencyView, IconButton, IconSpan, TransactionView } from "~components";
 import {
@@ -113,8 +112,7 @@ const AccountTxsView = () => {
             animationEnabled={settings?.animations}
           />
         </li>
-        {(account.type === AccountType.CreditCard ||
-          account.type === AccountType.LineOfCredit) &&
+        {(account.type === "creditCard" || account.type === "lineOfCredit") &&
           ccpCategory && (
             <li className="balance-display heading-small">
               Payment Category:
@@ -177,8 +175,7 @@ const AccountTxsView = () => {
           }>
           <AddTransactionIcon /> Transaction
         </button>
-        {account.type === AccountType.CreditCard ||
-        account.type === AccountType.LineOfCredit ? (
+        {account.type === "creditCard" || account.type === "lineOfCredit" ? (
           <button
             className="button rounded accent flex-row gap-sm"
             onClick={() =>
@@ -198,12 +195,12 @@ const AccountTxsView = () => {
             }>
             <AddCCPaymentIcon /> Payment
           </button>
-        ) : account.type === AccountType.AutoLoan ||
-          account.type === AccountType.MedicalDebt ||
-          account.type === AccountType.Mortgage ||
-          account.type === AccountType.OtherDebt ||
-          account.type === AccountType.PersonalLoan ||
-          account.type === AccountType.StudentLoan ? (
+        ) : account.type === "autoLoan" ||
+          account.type === "medicalDebt" ||
+          account.type === "mortgage" ||
+          account.type === "otherDebt" ||
+          account.type === "personalLoan" ||
+          account.type === "studentLoan" ? (
           <button
             className="button rounded accent flex-row gap-sm"
             onClick={() =>

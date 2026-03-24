@@ -1,6 +1,5 @@
-import type { Account, Category, CategoryGroupWithCategories } from "ynab";
-
 import type { Browser } from "#imports";
+import type { Account, Category, CategoryGroupWithCategories } from "~lib/api/client";
 import { ONE_DAY_IN_MILLIS } from "./constants";
 import { createQueryClient } from "./queryClient";
 import { appSettingsStorage, shouldSyncStorage } from "./state";

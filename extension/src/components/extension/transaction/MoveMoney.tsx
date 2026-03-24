@@ -1,8 +1,8 @@
 import { type SubmitEventHandler, useCallback, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
-import type { MonthDetail } from "ynab";
 
 import { CategorySelect, CurrencyView, IconButton } from "~components";
+import type { MonthDetail } from "~lib/api/client";
 import { useYNABContext } from "~lib/context";
 import { usePopupState } from "~lib/state";
 import type { BudgetMainData, CachedBudget, PopupState } from "~lib/types";
@@ -43,7 +43,7 @@ export default function MoveMoneyWrapper() {
 interface Props {
   selectedBudgetData: CachedBudget;
   budgetMainData: BudgetMainData;
-  monthData?: MonthDetail;
+  monthData?: MonthDetail | null;
   popupState: PopupState;
   moveMoney: (data: {
     subtractFromCategoryId?: string;

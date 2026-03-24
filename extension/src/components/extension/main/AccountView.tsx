@@ -1,13 +1,13 @@
 import { clsx } from "clsx";
 import type { ReactElement } from "react";
-import type { Account, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconSpan } from "~components";
 import {
   ImportErrorIcon,
   ReconcileAlertIcon,
-  UnapprovedAlertIcon
+  UnapprovedAlertIcon,
 } from "~components/icons/AlertIcons";
+import type { Account, CurrencyFormat, TransactionDetail } from "~lib/api/client";
 import type { AccountAlerts } from "~lib/notifications";
 import type { AppSettings } from "~lib/types";
 import { formatDateMonthAndDay } from "~lib/utils";
@@ -19,7 +19,7 @@ export default function AccountView({
   actionElementsRight,
   alerts,
   settings,
-  addedTransaction
+  addedTransaction,
 }: {
   account: Account;
   currencyFormat?: CurrencyFormat;
@@ -38,7 +38,7 @@ export default function AccountView({
             addedTransaction?.transfer_account_id === id ||
             addedTransaction?.subtransactions.some(
               (sub) => sub.transfer_account_id === id
-            ))
+            )),
       })}>
       <div className="flex-row gap-sm min-w-0">
         {actionElementsLeft}

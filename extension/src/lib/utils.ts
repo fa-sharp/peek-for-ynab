@@ -1,13 +1,16 @@
-import * as ynab from "ynab";
-
 import { browser } from "#imports";
+import type {
+  Account,
+  CategoryGroupWithCategories,
+  TransactionFlagColor,
+} from "./api/client";
 import type { CachedPayee } from "./types";
 
 const currencyFormatterCache = new Map<string, (millis: number) => string>();
 
 export const getCurrencyFormatter = (
   /** the budget's `currency_format` property from YNAB */
-  currencyFormat = { iso_code: "USD", decimal_digits: 2 },
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => {
   const formatterKey = currencyFormat.iso_code + currencyFormat.decimal_digits;
   const cachedFormatter = currencyFormatterCache.get(formatterKey);
@@ -20,9 +23,9 @@ export const getCurrencyFormatter = (
     minimumFractionDigits: currencyFormat.decimal_digits,
   });
   const newFormatter = (millis: number) => {
-    const currencyAmount = ynab.utils.convertMilliUnitsToCurrencyAmount(
+    const currencyAmount = convertMilliUnitsToCurrencyAmount(
       millis,
-      currencyFormat.decimal_digits,
+      currencyFormat.decimal_digits
     );
     return numberFormat.format(currencyAmount);
   };
@@ -34,13 +37,13 @@ export const getCurrencyFormatter = (
 export const formatCurrency = (
   millis: number,
   /** the budget's `currency_format` property from YNAB */
-  currencyFormat = { iso_code: "USD", decimal_digits: 2 },
+  currencyFormat = { iso_code: "USD", decimal_digits: 2 }
 ) => getCurrencyFormatter(currencyFormat)(millis);
 
 /** Convert millis to a string value suitable for the HTML number input */
 export const millisToStringValue = (
   millis: number,
-  currencyFormat = { decimal_digits: 2 },
+  currencyFormat = { decimal_digits: 2 }
 ) => (millis / 1000).toFixed(currencyFormat.decimal_digits ?? 2);
 
 /** Convert a string value (e.g. from HTML number input) to milliUnits */
@@ -56,9 +59,9 @@ export const isEmptyObject = (objectName: object) => {
   return true;
 };
 
-export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
+export const findCCAccount = (accountsData: Account[], name: string) =>
   accountsData?.find(
-    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name,
+    (a) => (a.type === "creditCard" || a.type === "lineOfCredit") && a.name === name
   );
 
 /**
@@ -67,12 +70,12 @@ export const findCCAccount = (accountsData: ynab.Account[], name: string) =>
  */
 export const isBudgetToTrackingTransfer = (
   payee?: CachedPayee | {} | null,
-  account?: ynab.Account,
-  allAccounts?: ynab.Account[],
+  account?: Account,
+  allAccounts?: Account[]
 ) => {
   if (!payee || !("id" in payee) || !payee.transferId) return false;
   const transferToAccount = allAccounts?.find(
-    (a) => payee && "transferId" in payee && a.id === payee.transferId,
+    (a) => payee && "transferId" in payee && a.id === payee.transferId
   );
   if (!transferToAccount) return false;
   return !transferToAccount.on_budget && !!account?.on_budget;
@@ -80,11 +83,11 @@ export const isBudgetToTrackingTransfer = (
 
 /** Ignored category IDs when adding a transaction (Deferred Income, CCP categories) */
 export const getIgnoredCategoryIdsForTx = (
-  data: ynab.CategoryGroupWithCategories[],
-  ignoreRta = false,
+  data: CategoryGroupWithCategories[],
+  ignoreRta = false
 ) => {
   const ignoredIds = new Set(
-    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id)),
+    data.slice(0, 2).flatMap((cg) => cg.categories.map((c) => c.id))
   );
   if (!ignoreRta) ignoredIds.delete(data[0]?.categories[0]?.id);
   return ignoredIds;
@@ -132,7 +135,7 @@ export const formatDateMonthAndDay = (date: Date) => {
 /** Parse decimal number according to user's locale. Shamelessly copied from https://stackoverflow.com/a/45309230 */
 export const parseLocaleNumber = (
   value: string,
-  locales = typeof navigator !== "undefined" ? navigator.languages : undefined,
+  locales = typeof navigator !== "undefined" ? navigator.languages : undefined
 ) => {
   const example = Intl.NumberFormat(locales).format(1.1);
   const cleanPattern = new RegExp(`[^0-9${example.charAt(1)}]`, "g");
@@ -205,17 +208,26 @@ export const removePermissions = (permissions: OptionalPermissions[]) =>
         console.error("Error removing permissions:", browser.runtime.lastError);
         resolve(false);
       }
-    }),
+    })
   );
 
-export const flagColorToEmoji = (flagColor: ynab.TransactionFlagColor | string) => {
-  if (flagColor === ynab.TransactionFlagColor.Blue) return "🔵";
-  if (flagColor === ynab.TransactionFlagColor.Green) return "🟢";
-  if (flagColor === ynab.TransactionFlagColor.Orange) return "🟠";
-  if (flagColor === ynab.TransactionFlagColor.Purple) return "🟣";
-  if (flagColor === ynab.TransactionFlagColor.Red) return "🔴";
-  if (flagColor === ynab.TransactionFlagColor.Yellow) return "🟡";
-  return null;
+export const flagColorToEmoji = (flagColor: TransactionFlagColor | {}) => {
+  switch (flagColor) {
+    case "blue":
+      return "🔵";
+    case "green":
+      return "🟢";
+    case "orange":
+      return "🟠";
+    case "purple":
+      return "🟣";
+    case "red":
+      return "🔴";
+    case "yellow":
+      return "🟡";
+    default:
+      return null;
+  }
 };
 
 /**
@@ -240,4 +252,22 @@ export function waitForInternetConnection(timeoutMs: number = 10 * 1000): Promis
       }, 1000);
     }
   });
+}
+
+export function getCurrentMonthInISOFormat(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}-01`;
+}
+
+export function convertMilliUnitsToCurrencyAmount(
+  milliunits: number,
+  currencyDecimalDigits: number = 2
+): number {
+  let numberToRoundTo = Math.pow(10, 3 - Math.min(3, currencyDecimalDigits));
+  numberToRoundTo = 1 / numberToRoundTo;
+  const rounded = Math.round(milliunits * numberToRoundTo) / numberToRoundTo;
+  const currencyAmount = rounded * (0.1 / Math.pow(10, 2));
+  return Number(currencyAmount.toFixed(currencyDecimalDigits));
 }

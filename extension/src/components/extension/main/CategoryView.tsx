@@ -1,9 +1,9 @@
 import { clsx } from "clsx";
 import type { ReactElement } from "react";
-import type { Category, CurrencyFormat, TransactionDetail } from "ynab";
 
 import { CurrencyView, IconSpan } from "~components";
 import { OverspendingAlertIcon } from "~components/icons/AlertIcons";
+import type { Category, CurrencyFormat, TransactionDetail } from "~lib/api/client";
 import type { CategoryAlerts } from "~lib/notifications";
 import type { AppSettings } from "~lib/types";
 
@@ -15,7 +15,7 @@ export default function CategoryView({
   actionElementsRight,
   actionElementsLeft,
   addedTransaction,
-  moved
+  moved,
 }: {
   categoryData: Category;
   currencyFormat?: CurrencyFormat;
@@ -34,7 +34,7 @@ export default function CategoryView({
           (addedTransaction?.category_id === id ||
             addedTransaction?.subtransactions.some((sub) => sub.category_id === id) ||
             moved?.from?.id === id ||
-            moved?.to?.id === id)
+            moved?.to?.id === id),
       })}>
       <div className="flex-row min-w-0">
         {actionElementsLeft}

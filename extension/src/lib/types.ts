@@ -3,7 +3,7 @@ import type {
   Category,
   CategoryGroupWithCategories,
   CurrencyFormat,
-} from "ynab";
+} from "./api/client";
 
 /**
  * Persisted token data

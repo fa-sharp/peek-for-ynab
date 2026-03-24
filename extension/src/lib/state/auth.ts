@@ -1,10 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { storage } from "#imports";
 import { fetchAccessToken } from "~lib/api";
 import { ONE_MINUTE_IN_MILLIS, STORAGE_KEYS } from "~lib/constants";
 import { useChromeStorage } from "./utils";
+
+/** Shape of the access token stored in memory */
+interface AccessToken {
+  value: string;
+  lastChecked: number;
+}
 
 /** Encrypted auth token stored in local storage */
 export const authTokenStorage = storage.defineItem<string | null>(
@@ -13,18 +19,27 @@ export const authTokenStorage = storage.defineItem<string | null>(
 );
 
 /** Unencrypted access token held in memory */
-const accessTokenStorage = storage.defineItem<{
-  value: string;
-  lastChecked: number;
-} | null>(`session:${STORAGE_KEYS.AccessToken}`, {
-  fallback: null,
-});
-
-/** Access token is valid for at least 5 minutes */
-const TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 5;
+export const accessTokenStorage = storage.defineItem<AccessToken | null>(
+  `session:${STORAGE_KEYS.AccessToken}`,
+  {
+    fallback: null,
+  }
+);
 
 /** Auth utilities */
 export class AuthManager {
+  /** Access token is valid for at least 5 minutes */
+  static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 5;
+
+  /** Whether the in-memory access token is current and can be used */
+  static isAccessTokenCurrent(
+    accessToken?: AccessToken | null
+  ): accessToken is AccessToken {
+    return (
+      !!accessToken && accessToken.lastChecked + AuthManager.TOKEN_STALE_TIME > Date.now()
+    );
+  }
+
   /**
    * Fetch the unencrypted access token from the server, and save it in memory. Will
    * clear the tokens from storage if an unauthorized error is received from the server.
@@ -77,8 +92,10 @@ export const useAuth = () => {
   const [accessToken] = useChromeStorage(accessTokenStorage);
   const [error, setError] = useState("");
 
-  const accessTokenIsStale =
-    !!accessToken && accessToken.lastChecked + TOKEN_STALE_TIME < Date.now();
+  const isAccessTokenCurrent = useMemo(
+    () => AuthManager.isAccessTokenCurrent(accessToken),
+    [accessToken]
+  );
 
   const fetchToken = useCallback(async (authToken: string) => {
     setError("");
@@ -93,8 +110,8 @@ export const useAuth = () => {
 
   // If auth token is present, fetch access token if it's not in memory and/or is stale
   useEffect(() => {
-    if (authToken && (accessToken === null || accessTokenIsStale)) fetchToken(authToken);
-  }, [authToken, accessToken, accessTokenIsStale, fetchToken]);
+    if (authToken && !isAccessTokenCurrent) fetchToken(authToken);
+  }, [authToken, isAccessTokenCurrent, fetchToken]);
 
   return {
     /** Error that ocurred during auth flow */
@@ -104,7 +121,7 @@ export const useAuth = () => {
     /** The current auth token */
     authToken,
     /** The current access token */
-    accessToken: accessToken?.value && !accessTokenIsStale ? accessToken.value : null,
+    accessToken: accessToken?.value && isAccessTokenCurrent ? accessToken.value : null,
     /** Clear the access token and auth token (e.g. on logout) */
     clearToken,
   };

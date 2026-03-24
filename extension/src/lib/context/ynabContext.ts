@@ -7,20 +7,38 @@ import {
   useMemo,
   useState,
 } from "react";
-import * as ynab from "ynab";
 
 import {
-  checkUnapprovedTxsForBudget,
+  accountsQuery,
+  accountTxsQuery,
+  budgetQuery,
+  categoryGroupsQuery,
+  categoryTxsQuery,
+  createTransaction,
+  currentMonthQuery,
   fetchAccountsForBudget,
   fetchBudgets,
   fetchCategoryGroupsForBudget,
+  fetchCurrentMonthForBudget,
   fetchPayeesForBudget,
+  fetchTransactionsForAccount,
+  fetchTransactionsForCategory,
+  fetchUnapprovedTxsForBudget,
+  moveMoneyInBudget,
+  payeesQuery,
+  unapprovedTxsQuery,
 } from "~lib/api";
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
+import type {
+  Account,
+  Category,
+  NewTransaction,
+  TransactionDetail,
+} from "~lib/api/client";
+import { IS_DEV } from "~lib/constants";
 import { useConfetti } from "~lib/hooks";
 import { queryPersister } from "~lib/queryClient";
-import type { BudgetMainData, CachedBudget } from "~lib/types";
-import { findAllEmoji, getNDaysAgoISO } from "~lib/utils";
+import type { BudgetMainData } from "~lib/types";
+import { findAllEmoji } from "~lib/utils";
 import { useAuthContext } from "./authContext";
 import { useStorageContext } from "./storageContext";
 
@@ -35,23 +53,12 @@ export const useYNABProvider = () => {
   } = useStorageContext();
   const { accessToken } = useAuthContext();
 
-  const [ynabAPI, setYnabAPI] = useState<null | ynab.api>(null);
-
-  // Initialize ynabAPI object if authenticated
-  useEffect(() => {
-    if (accessToken) setYnabAPI(new ynab.API(accessToken));
-    else setYnabAPI(null);
-  }, [accessToken]);
-
   const queryClient = useQueryClient();
 
-  // If showing multiple budgets, restore all category and account query cache to avoid rendering flashes
+  // Restore all query cache on load
   useEffect(() => {
-    if (settings.budgets && settings.budgets.length > 1) {
-      queryPersister.restoreQueries(queryClient, { queryKey: ["categoryGroups"] });
-      queryPersister.restoreQueries(queryClient, { queryKey: ["accounts"] });
-    }
-  }, [queryClient, settings.budgets]);
+    queryPersister.restoreQueries(queryClient);
+  }, [queryClient]);
 
   /** Fetch and cache user's budgets. */
   const {
@@ -59,13 +66,9 @@ export const useYNABProvider = () => {
     refetch: refreshBudgets,
     isFetching: isRefreshingBudgets,
   } = useQuery({
-    queryKey: ["budgets"],
-    staleTime: ONE_DAY_IN_MILLIS * 7,
-    enabled: Boolean(ynabAPI),
-    queryFn: async (): Promise<CachedBudget[] | undefined> => {
-      if (!ynabAPI) return;
-      return await fetchBudgets(ynabAPI);
-    },
+    ...budgetQuery,
+    enabled: !!accessToken,
+    queryFn: () => (!accessToken ? null : fetchBudgets(accessToken)),
   });
 
   // If no budgets have been selected by the user, auto-select the most recently modified budget
@@ -90,12 +93,12 @@ export const useYNABProvider = () => {
     error: categoriesError,
     refetch: refetchCategoryGroups,
   } = useQuery({
-    queryKey: ["categoryGroups", { budgetId: popupState.budgetId }],
-    enabled: Boolean(ynabAPI && popupState.budgetId),
+    ...categoryGroupsQuery(popupState.budgetId),
+    enabled: Boolean(accessToken && popupState.budgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI || !popupState.budgetId) return;
+      if (!accessToken || !popupState.budgetId) return null;
       return await fetchCategoryGroupsForBudget(
-        ynabAPI,
+        accessToken,
         popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
@@ -105,12 +108,12 @@ export const useYNABProvider = () => {
 
   const useGetCategoryGroupsForBudget = (budgetId: string) =>
     useQuery({
-      queryKey: ["categoryGroups", { budgetId }],
-      enabled: Boolean(ynabAPI),
+      ...categoryGroupsQuery(budgetId),
+      enabled: Boolean(accessToken),
       queryFn: async ({ queryKey }) => {
-        if (!ynabAPI) return;
+        if (!accessToken) return null;
         return await fetchCategoryGroupsForBudget(
-          ynabAPI,
+          accessToken,
           budgetId,
           queryClient.getQueryState(queryKey)
         );
@@ -127,27 +130,22 @@ export const useYNABProvider = () => {
   /** Select data of only saved categories from `categoriesData` */
   const savedCategoriesData = useMemo(() => {
     if (!categoriesData || !popupState.budgetId) return null;
-    return pinnedItems?.categories.reduce<ynab.Category[]>(
-      (newArray, savedCategoryId) => {
-        const categoryData = categoriesData.find(
-          (category) => category.id === savedCategoryId
-        );
-        if (categoryData) newArray.push(categoryData);
-        return newArray;
-      },
-      []
-    );
+    return pinnedItems?.categories.reduce<Category[]>((newArray, savedCategoryId) => {
+      const categoryData = categoriesData.find(
+        (category) => category.id === savedCategoryId
+      );
+      if (categoryData) newArray.push(categoryData);
+      return newArray;
+    }, []);
   }, [categoriesData, pinnedItems?.categories, popupState.budgetId]);
 
   /** Current month data (Ready to Assign, total activity, etc.) for the selected budget */
   const { data: monthData } = useQuery({
-    queryKey: ["month", { budgetId: popupState.budgetId }],
-    enabled: Boolean(ynabAPI && !!popupState.budgetId && popupState.view === "move"),
+    ...currentMonthQuery(popupState.budgetId),
+    enabled: Boolean(accessToken && !!popupState.budgetId && popupState.view === "move"),
     queryFn: async () => {
-      if (!ynabAPI || !popupState.budgetId) return;
-      const response = await ynabAPI.months.getPlanMonth(popupState.budgetId, "current");
-      const { month } = response.data;
-      IS_DEV && console.log("Fetched month data!", month);
+      if (!accessToken || !popupState.budgetId) return null;
+      const month = await fetchCurrentMonthForBudget(accessToken, popupState.budgetId);
       return month;
     },
   });
@@ -159,12 +157,12 @@ export const useYNABProvider = () => {
     error: accountsError,
     refetch: refetchAccounts,
   } = useQuery({
-    queryKey: ["accounts", { budgetId: popupState.budgetId }],
-    enabled: Boolean(ynabAPI && popupState.budgetId),
+    ...accountsQuery(popupState.budgetId),
+    enabled: Boolean(accessToken && popupState.budgetId),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI || !popupState.budgetId) return;
+      if (!accessToken || !popupState.budgetId) return null;
       return await fetchAccountsForBudget(
-        ynabAPI,
+        accessToken,
         popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
@@ -184,27 +182,26 @@ export const useYNABProvider = () => {
     [queryClient, refetchAccounts, refetchCategoryGroups, popupState.budgetId]
   );
 
-  /** Check for new/unapproved transactions in selected budget (if user wants notifications) */
+  /** Check for new/unapproved transactions in selected budget, if user wants notifications */
   const { data: unapprovedTxs } = useQuery({
-    queryKey: ["unapproved", { budgetId: popupState.budgetId }],
+    ...unapprovedTxsQuery(popupState.budgetId),
     enabled: Boolean(
-      ynabAPI && popupState.budgetId && budgetSettings?.notifications.checkImports
+      accessToken && popupState.budgetId && budgetSettings?.notifications.checkImports
     ),
     queryFn: async () => {
-      if (!ynabAPI || !popupState.budgetId) return;
-      return await checkUnapprovedTxsForBudget(ynabAPI, popupState.budgetId);
+      if (!accessToken || !popupState.budgetId) return null;
+      return await fetchUnapprovedTxsForBudget(accessToken, popupState.budgetId);
     },
   });
 
-  /** Fetch payees for the selected budget */
+  /** Fetch payees for the selected budget if we're on the add transaction page */
   const { data: payeesData, refetch: refetchPayees } = useQuery({
-    queryKey: ["payees", { budgetId: popupState.budgetId }],
-    staleTime: ONE_DAY_IN_MILLIS,
-    enabled: Boolean(ynabAPI && popupState.budgetId),
+    ...payeesQuery(popupState.budgetId),
+    enabled: Boolean(accessToken && popupState.budgetId && popupState.view === "txAdd"),
     queryFn: async ({ queryKey }) => {
-      if (!ynabAPI || !popupState.budgetId) return;
+      if (!accessToken || !popupState.budgetId) return null;
       return await fetchPayeesForBudget(
-        ynabAPI,
+        accessToken,
         popupState.budgetId,
         queryClient.getQueryState(queryKey)
       );
@@ -216,7 +213,7 @@ export const useYNABProvider = () => {
   const savedAccountsData = useMemo(() => {
     if (!accountsData || !popupState.budgetId) return null;
     // For each saved account in the current budget, grab the account data and add to array
-    return pinnedItems?.accounts?.reduce<ynab.Account[]>((newArray, savedAccountId) => {
+    return pinnedItems?.accounts?.reduce<Account[]>((newArray, savedAccountId) => {
       const accountData = accountsData.find((a) => a.id === savedAccountId);
       if (accountData) newArray.push(accountData);
       return newArray;
@@ -238,68 +235,42 @@ export const useYNABProvider = () => {
 
   const useGetAccountTxs = (accountId?: string, sinceDaysAgo?: number) =>
     useQuery({
-      enabled: Boolean(ynabAPI && accountId && popupState.budgetId),
-      queryKey: [
-        "txs",
-        { budgetId: popupState.budgetId, accountId, sinceDaysAgo },
-      ] as const,
-      placeholderData: (prevData, prevQuery) => {
-        if (prevQuery?.queryKey[1].accountId === accountId && prevData) return prevData;
-        return null;
-      },
+      ...accountTxsQuery(popupState.budgetId, accountId, sinceDaysAgo),
+      enabled: Boolean(accessToken && accountId && popupState.budgetId),
       queryFn: async () => {
-        if (!ynabAPI || !accountId || !popupState.budgetId) return null;
-        const response = await ynabAPI.transactions.getTransactionsByAccount(
+        if (!accessToken || !accountId || !popupState.budgetId) return null;
+        return fetchTransactionsForAccount(
+          accessToken,
           popupState.budgetId,
           accountId,
           sinceDaysAgo
-            ? getNDaysAgoISO(sinceDaysAgo)
-            : ynab.utils.getCurrentMonthInISOFormat()
         );
-        const txs = response.data.transactions.sort((a, b) =>
-          a.date <= b.date ? 1 : -1
-        );
-        IS_DEV && console.log("Fetched account transactions!", txs);
-        return txs;
       },
     });
 
   const useGetCategoryTxs = (categoryId?: string, sinceDaysAgo?: number) =>
     useQuery({
-      enabled: Boolean(ynabAPI && categoryId && popupState.budgetId),
-      queryKey: [
-        "txs",
-        { budgetId: popupState.budgetId, categoryId, sinceDaysAgo },
-      ] as const,
-      placeholderData: (prevData, prevQuery) => {
-        if (prevQuery?.queryKey[1].categoryId === categoryId && prevData) return prevData;
-        return null;
-      },
+      ...categoryTxsQuery(popupState.budgetId, categoryId, sinceDaysAgo),
+      enabled: Boolean(accessToken && categoryId && popupState.budgetId),
       queryFn: async () => {
-        if (!ynabAPI || !categoryId || !popupState.budgetId) return null;
-        const response = await ynabAPI.transactions.getTransactionsByCategory(
+        if (!accessToken || !categoryId || !popupState.budgetId) return null;
+        return await fetchTransactionsForCategory(
+          accessToken,
           popupState.budgetId,
           categoryId,
           sinceDaysAgo
-            ? getNDaysAgoISO(sinceDaysAgo)
-            : ynab.utils.getCurrentMonthInISOFormat()
         );
-        const txs = response.data.transactions.sort((a, b) =>
-          a.date <= b.date ? 1 : -1
-        );
-        IS_DEV && console.log("Fetched category transactions!", txs);
-        return txs;
       },
     });
 
   const useGetAccountsForBudget = (budgetId: string) =>
     useQuery({
-      queryKey: ["accounts", { budgetId }],
-      enabled: Boolean(ynabAPI),
+      ...accountsQuery(budgetId),
+      enabled: Boolean(accessToken),
       queryFn: async ({ queryKey }) => {
-        if (!ynabAPI) return;
+        if (!accessToken) return null;
         return await fetchAccountsForBudget(
-          ynabAPI,
+          accessToken,
           budgetId,
           queryClient.getQueryState(queryKey)
         );
@@ -309,86 +280,76 @@ export const useYNABProvider = () => {
 
   const { launchConfetti } = useConfetti();
 
-  const [addedTransaction, setAddedTransaction] = useState<ynab.TransactionDetail | null>(
+  const [addedTransaction, setAddedTransaction] = useState<TransactionDetail | null>(
     null
   );
 
   const addTransaction = useCallback(
-    async (transaction: ynab.NewTransaction) => {
-      if (!ynabAPI || !popupState.budgetId) return;
-      const response = await ynabAPI.transactions.createTransaction(popupState.budgetId, {
-        transaction,
-      });
-      IS_DEV &&
-        console.log("Added transaction!", { transaction, apiResponse: response.data });
+    async (tx: NewTransaction) => {
+      if (!accessToken || !popupState.budgetId) return;
+      const transaction = await createTransaction(accessToken, popupState.budgetId, tx);
+      IS_DEV && console.log("Added transaction!", transaction);
       setTimeout(() => {
         refreshCategoriesAndAccounts();
-        if (!transaction.payee_id) refetchPayees();
+        if (!tx.payee_id) refetchPayees();
       }, 350);
 
-      if (response.data.transaction) {
-        const { transaction } = response.data;
-        setAddedTransaction(transaction);
-        setTimeout(() => setAddedTransaction(null), 4 * 1000);
-        if (
-          budgetSettings?.confetti?.allCategories ||
-          (transaction.category_id &&
-            budgetSettings?.confetti?.categories.includes(transaction.category_id))
-        ) {
-          const emojis = [
-            ...budgetSettings.confetti.emojis,
-            ...findAllEmoji(transaction.category_name || ""),
-          ];
-          launchConfetti(emojis);
-        }
-        transaction?.category_id &&
-          queryClient.invalidateQueries({
-            queryKey: [
-              "txs",
-              {
-                budgetId: popupState.budgetId,
-                categoryId: transaction.category_id,
-              },
-            ],
-          });
-        transaction?.account_id &&
-          queryClient.invalidateQueries({
-            queryKey: [
-              "txs",
-              {
-                budgetId: popupState.budgetId,
-                accountId: transaction.account_id,
-              },
-            ],
-          });
-        transaction?.transfer_account_id &&
-          queryClient.invalidateQueries({
-            queryKey: [
-              "txs",
-              {
-                budgetId: popupState.budgetId,
-                accountId: transaction.transfer_account_id,
-              },
-            ],
-          });
+      setAddedTransaction(transaction);
+      setTimeout(() => setAddedTransaction(null), 4 * 1000);
+      if (
+        budgetSettings?.confetti?.allCategories ||
+        (transaction.category_id &&
+          budgetSettings?.confetti?.categories.includes(transaction.category_id))
+      ) {
+        const emojis = [
+          ...budgetSettings.confetti.emojis,
+          ...findAllEmoji(transaction.category_name || ""),
+        ];
+        launchConfetti(emojis);
       }
+      transaction.category_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: popupState.budgetId,
+              categoryId: transaction.category_id,
+            },
+          ],
+        });
+      transaction.account_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: popupState.budgetId,
+              accountId: transaction.account_id,
+            },
+          ],
+        });
+      transaction.transfer_account_id &&
+        queryClient.invalidateQueries({
+          queryKey: [
+            "txs",
+            {
+              budgetId: popupState.budgetId,
+              accountId: transaction.transfer_account_id,
+            },
+          ],
+        });
     },
     [
-      ynabAPI,
+      accessToken,
       popupState.budgetId,
       refreshCategoriesAndAccounts,
       refetchPayees,
-      budgetSettings?.confetti?.allCategories,
-      budgetSettings?.confetti?.categories,
-      budgetSettings?.confetti?.emojis,
+      budgetSettings?.confetti,
       queryClient,
       launchConfetti,
     ]
   );
 
-  const [moved, setMoved] = useState<{ from?: ynab.Category; to?: ynab.Category } | null>(
-    null
-  );
+  const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
 
   const moveMoney = useCallback(
     async ({
@@ -400,34 +361,23 @@ export const useYNABProvider = () => {
       addToCategoryId?: string;
       amountInMillis: number;
     }) => {
-      if (!ynabAPI || !popupState.budgetId) return;
+      if (!accessToken || !popupState.budgetId) return;
       const fromCategory = categoriesData?.find((c) => c.id === subtractFromCategoryId);
       const toCategory = categoriesData?.find((c) => c.id === addToCategoryId);
-      const [subtractResponse, addResponse] = await Promise.all([
-        fromCategory
-          ? ynabAPI.categories.updateMonthCategory(
-              popupState.budgetId,
-              "current",
-              fromCategory.id,
-              { category: { budgeted: fromCategory.budgeted - amountInMillis } }
-            )
-          : Promise.resolve("No 'from' category"),
+      const [subtractResponse, addResponse] = await moveMoneyInBudget(
+        accessToken,
+        popupState.budgetId,
+        amountInMillis,
+        fromCategory,
         toCategory
-          ? ynabAPI.categories.updateMonthCategory(
-              popupState.budgetId,
-              "current",
-              toCategory.id,
-              { category: { budgeted: toCategory.budgeted + amountInMillis } }
-            )
-          : Promise.resolve("No 'to' category"),
-      ]);
+      );
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
       setTimeout(() => refreshCategoriesAndAccounts(), 350);
 
       setMoved({ from: fromCategory, to: toCategory });
       setTimeout(() => setMoved(null), 4 * 1000);
     },
-    [categoriesData, popupState.budgetId, ynabAPI, refreshCategoriesAndAccounts]
+    [accessToken, popupState.budgetId, categoriesData, refreshCategoriesAndAccounts]
   );
 
   return {

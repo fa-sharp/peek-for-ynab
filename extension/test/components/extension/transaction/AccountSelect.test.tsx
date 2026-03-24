@@ -1,10 +1,11 @@
 import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
-import type { Account } from "ynab";
+
 import "vitest-dom/extend-expect";
 
 import { AccountSelect } from "~components";
+import type { Account } from "~lib/api/client";
 import { useYNABContext } from "~lib/context";
 import { authTokenStorage } from "~lib/state";
 import { mockAuthToken } from "~test/mock/userData";

@@ -1,6 +1,6 @@
 import { type SubmitEventHandler, useCallback, useEffect, useRef, useState } from "react";
-import { TransactionClearedStatus, type TransactionFlagColor } from "ynab";
 
+import type { TransactionFlagColor } from "~lib/api/client";
 import { useStorageContext, useYNABContext } from "./context";
 import { type TxStoreAction, txStore, useTxStore, useTxStoreSubTxTotals } from "./state";
 import {
@@ -153,9 +153,7 @@ export default function useTransaction() {
             (!state.isTransfer || isBudgetToTracking) && !state.isSplit
               ? category?.id
               : undefined,
-          cleared: state.cleared
-            ? TransactionClearedStatus.Cleared
-            : TransactionClearedStatus.Uncleared,
+          cleared: state.cleared ? "cleared" : "uncleared",
           approved: budgetSettings?.transactions.approved,
           memo: state.memo,
           flag_color: state.flag ? (state.flag as TransactionFlagColor) : undefined,

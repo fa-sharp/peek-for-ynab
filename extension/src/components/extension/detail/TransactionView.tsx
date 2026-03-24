@@ -1,16 +1,21 @@
 import { clsx } from "clsx";
 import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
-import * as ynab from "ynab";
 
 import { CurrencyView, IconSpan, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
 import { UnapprovedAlertIcon } from "~components/icons/AlertIcons";
+import type {
+  CurrencyFormat,
+  HybridTransaction,
+  SubTransaction,
+  TransactionDetail,
+} from "~lib/api/client";
 import type { DetailViewState } from "~lib/types";
 
 const dateFormatter = new Intl.DateTimeFormat("default", {
   month: "numeric",
   day: "numeric",
-  timeZone: "UTC"
+  timeZone: "UTC",
 });
 
 export default function TransactionView({
@@ -19,16 +24,16 @@ export default function TransactionView({
   detailRight = "memo",
   detailLeft = "category",
   currencyFormat,
-  highlighted
+  highlighted,
 }: {
-  tx: ynab.TransactionDetail | ynab.HybridTransaction;
+  tx: TransactionDetail | HybridTransaction;
   goToDetailView: (detailState: DetailViewState) => void;
   detailRight?: "memo";
   detailLeft?: "category" | "account";
-  currencyFormat?: ynab.CurrencyFormat;
+  currencyFormat?: CurrencyFormat;
   highlighted?: boolean;
 }) {
-  const date = ynab.utils.convertFromISODateString(tx.date);
+  const date = new Date(tx.date);
   const isSplit = "subtransactions" in tx && tx.subtransactions.length > 0;
 
   return (
@@ -73,7 +78,7 @@ export default function TransactionView({
               onClick={() =>
                 goToDetailView({
                   id: tx.transfer_account_id!,
-                  type: "account"
+                  type: "account",
                 })
               }>
               <AddTransferIcon size={14} />
@@ -104,7 +109,7 @@ export default function TransactionView({
               onClick={() =>
                 goToDetailView({
                   id: tx.account_id,
-                  type: "account"
+                  type: "account",
                 })
               }>
               {tx.account_name}
@@ -137,11 +142,11 @@ export default function TransactionView({
 const SubTransactionView = ({
   subTx,
   goToDetailView,
-  currencyFormat
+  currencyFormat,
 }: {
-  subTx: ynab.SubTransaction;
+  subTx: SubTransaction;
   goToDetailView: (detailState: DetailViewState) => void;
-  currencyFormat?: ynab.CurrencyFormat;
+  currencyFormat?: CurrencyFormat;
 }) => (
   <li className="pt-sm border-t-light">
     <div className="flex-row justify-between">
@@ -153,7 +158,7 @@ const SubTransactionView = ({
             onClick={() =>
               goToDetailView({
                 id: subTx.transfer_account_id!,
-                type: "account"
+                type: "account",
               })
             }>
             <AddTransferIcon size={14} />
@@ -166,7 +171,7 @@ const SubTransactionView = ({
             onClick={() =>
               goToDetailView({
                 id: subTx.category_id!,
-                type: "category"
+                type: "category",
               })
             }>
             {subTx.category_name}
