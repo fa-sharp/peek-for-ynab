@@ -19,7 +19,6 @@
     "@fastify/helmet": "^13.0.2",
     "@fastify/oauth2": "^8.2.0",
     "@fastify/static": "^9.0.0",
-    "@fastify/type-provider-typebox": "^6.1.0",
     "ajv": "^8.18.0",
     "cors": "^2.8.6",
     "fastify": "^5.8.4",
@@ -31,6 +30,7 @@
     "@astrojs/node": "^10.0.3",
     "@astrojs/vercel": "^10.0.2",
     "@biomejs/biome": "2.4.6",
+    "@fastify/type-provider-typebox": "^6.1.0",
     "@iconify-json/tabler": "^1.2.32",
     "@types/cors": "^2.8.19",
     "astro": "^6.0.8",
@@ -51,5 +51,5 @@
       "sharp"
     ]
   },
-  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }
