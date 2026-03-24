@@ -5,7 +5,6 @@ import {
   apiClient,
   type HybridTransaction,
   type NewTransaction,
-  type Transaction,
   type TransactionDetail,
 } from "./client";
 
@@ -125,6 +124,8 @@ export async function createTransaction(
     body: { transaction: tx },
   });
   if (error) throw error;
+
+  IS_DEV && console.log("Added transaction!", data.data.transaction);
   return data.data.transaction as TransactionDetail;
 }
 

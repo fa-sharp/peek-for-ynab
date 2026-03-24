@@ -19,7 +19,6 @@ export type CategoryGroupWithCategories = ApiSchemas["CategoryGroupWithCategorie
 export type CurrencyFormat = NonNullable<ApiSchemas["CurrencyFormat"]>;
 export type MonthDetail = ApiSchemas["MonthDetail"];
 export type Payee = ApiSchemas["Payee"];
-export type Transaction = ApiSchemas["TransactionSummary"];
 export type TransactionClearedStatus = ApiSchemas["TransactionClearedStatus"];
 export type TransactionDetail = ApiSchemas["TransactionDetail"];
 export type TransactionFlagColor = ApiSchemas["TransactionFlagColor"];

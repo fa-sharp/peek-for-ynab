@@ -39,8 +39,7 @@ import { useConfetti } from "~lib/hooks";
 import { queryPersister } from "~lib/queryClient";
 import type { BudgetMainData } from "~lib/types";
 import { findAllEmoji } from "~lib/utils";
-import { useAuthContext } from "./authContext";
-import { useStorageContext } from "./storageContext";
+import { useAuthContext, useStorageContext } from ".";
 
 export const useYNABProvider = () => {
   const {
@@ -170,7 +169,7 @@ export const useYNABProvider = () => {
     select: (data) => data?.accounts,
   });
 
-  const refreshCategoriesAndAccounts = useCallback(
+  const refetchCategoriesAndAccounts = useCallback(
     () =>
       Promise.all([
         refetchCategoryGroups(),
@@ -288,14 +287,15 @@ export const useYNABProvider = () => {
     async (tx: NewTransaction) => {
       if (!accessToken || !popupState.budgetId) return;
       const transaction = await createTransaction(accessToken, popupState.budgetId, tx);
-      IS_DEV && console.log("Added transaction!", transaction);
+
       setTimeout(() => {
-        refreshCategoriesAndAccounts();
+        refetchCategoriesAndAccounts();
         if (!tx.payee_id) refetchPayees();
       }, 350);
 
       setAddedTransaction(transaction);
       setTimeout(() => setAddedTransaction(null), 4 * 1000);
+
       if (
         budgetSettings?.confetti?.allCategories ||
         (transaction.category_id &&
@@ -341,7 +341,7 @@ export const useYNABProvider = () => {
     [
       accessToken,
       popupState.budgetId,
-      refreshCategoriesAndAccounts,
+      refetchCategoriesAndAccounts,
       refetchPayees,
       budgetSettings?.confetti,
       queryClient,
@@ -372,12 +372,12 @@ export const useYNABProvider = () => {
         toCategory
       );
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
-      setTimeout(() => refreshCategoriesAndAccounts(), 350);
+      setTimeout(() => refetchCategoriesAndAccounts(), 350);
 
       setMoved({ from: fromCategory, to: toCategory });
       setTimeout(() => setMoved(null), 4 * 1000);
     },
-    [accessToken, popupState.budgetId, categoriesData, refreshCategoriesAndAccounts]
+    [accessToken, popupState.budgetId, categoriesData, refetchCategoriesAndAccounts]
   );
 
   return {
@@ -412,7 +412,7 @@ export const useYNABProvider = () => {
     /** Fetch user's budgets from API and store/refresh the cache */
     refreshBudgets,
     isRefreshingBudgets,
-    refreshCategoriesAndAccounts,
+    refetchCategoriesAndAccounts,
     /** Get category data for the specific budget */
     useGetCategoryGroupsForBudget,
     /** Get accounts for the specified budget */

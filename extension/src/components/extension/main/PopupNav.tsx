@@ -25,7 +25,7 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { accessToken, authError } = useAuthContext();
+  const { authError } = useAuthContext();
   const { popupState, setPopupState, settings, editingItems, setEditingItems } =
     useStorageContext();
   const {
@@ -34,7 +34,7 @@ export default function PopupNav() {
     accountsError,
     categoriesError,
     categoriesLastUpdated,
-    refreshCategoriesAndAccounts,
+    refetchCategoriesAndAccounts,
     isRefreshingBudgets,
   } = useYNABContext();
 
@@ -92,8 +92,6 @@ export default function PopupNav() {
     [editingItems, openPopupWindow, setEditingItems, setPopupState]
   );
 
-  if (!accessToken && authError) return <div>Authentication error: {authError}</div>;
-  if (!accessToken) return <div>Loading...</div>;
   if (!shownBudgetsData && isRefreshingBudgets) return <div>Loading budgets...</div>; // (re-)fetching budgets
   if (!shownBudgetsData) return null; // No budgets to show
 
@@ -126,7 +124,7 @@ export default function PopupNav() {
             <AlertTriangle aria-hidden color="var(--stale)" /> // indicates data is stale/old
           )
         }
-        onClick={() => refreshCategoriesAndAccounts()}
+        onClick={() => refetchCategoriesAndAccounts()}
         disabled={
           Boolean(globalIsFetching) ||
           !popupState.budgetId ||
