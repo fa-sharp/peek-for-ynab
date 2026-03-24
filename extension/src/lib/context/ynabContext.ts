@@ -194,10 +194,10 @@ export const useYNABProvider = () => {
     },
   });
 
-  /** Fetch payees for the selected budget if we're on the add transaction page */
+  /** Fetch payees for the selected budget */
   const { data: payeesData, refetch: refetchPayees } = useQuery({
     ...payeesQuery(popupState.budgetId),
-    enabled: Boolean(accessToken && popupState.budgetId && popupState.view === "txAdd"),
+    enabled: Boolean(accessToken && popupState.budgetId),
     queryFn: async ({ queryKey }) => {
       if (!accessToken || !popupState.budgetId) return null;
       return await fetchPayeesForBudget(
