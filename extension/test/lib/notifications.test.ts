@@ -10,7 +10,7 @@ import {
   getBudgetAlerts,
   getNumAlertsForBudget,
 } from "~lib/notifications";
-import { accounts, budgets, category_groups } from "~test/mock/ynabApiData";
+import { accounts, plans, category_groups } from "~test/mock/ynabApiData";
 
 test("'getBudgetAlerts' returns expected object", () => {
   expect(
@@ -82,7 +82,7 @@ test("'getNumAlertsForBudget' returns expected number", () => {
 });
 
 test("'createSystemNotification' doesn't create an empty notification", async () => {
-  const budget = budgets[0];
+  const budget = plans[0];
   const notificationText = await createSystemNotification(
     {
       accounts: {},
@@ -101,7 +101,7 @@ test("'createSystemNotification' doesn't create an empty notification", async ()
 });
 
 test("'createSystemNotification' creates expected notification", async () => {
-  const budget = budgets[0];
+  const budget = plans[0];
   const notificationText = await createSystemNotification(
     {
       accounts: {

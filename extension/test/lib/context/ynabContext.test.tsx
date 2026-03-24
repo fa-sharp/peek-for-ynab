@@ -7,7 +7,7 @@ import { authTokenStorage, pinnedItemsStorage, popupStateStorage } from "~lib/st
 import { mockServer } from "~test/mock/msw";
 import { mockAuthToken, savedAccounts, savedCategories } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
-import { budgets } from "~test/mock/ynabApiData";
+import { plans } from "~test/mock/ynabApiData";
 
 test("No data fetched if token is missing", async () => {
   const { result } = await act(() =>
@@ -38,13 +38,13 @@ test("Data fetched with valid token, and first budget auto-selected", async () =
     await popupStateStorage.getValue(),
     "first budget is auto-selected"
   ).toMatchObject({
-    budgetId: budgets[0].id,
+    budgetId: plans[0].id,
   });
 });
 
 test("Saved categories data loaded properly", async () => {
   await authTokenStorage.setValue(mockAuthToken);
-  await pinnedItemsStorage(budgets[0].id, "local").setValue({
+  await pinnedItemsStorage(plans[0].id, "local").setValue({
     categories: savedCategories,
     accounts: [],
   });
@@ -65,7 +65,7 @@ test("Saved categories data loaded properly", async () => {
 
 test("Saved accounts data loaded properly", async () => {
   await authTokenStorage.setValue(mockAuthToken);
-  await pinnedItemsStorage(budgets[0].id, "local").setValue({
+  await pinnedItemsStorage(plans[0].id, "local").setValue({
     categories: [],
     accounts: savedAccounts,
   });

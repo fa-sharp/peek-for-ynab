@@ -6,7 +6,7 @@ import { MoveMoney } from "~components";
 import { authTokenStorage, popupStateStorage } from "~lib/state";
 import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
-import { budgets, category_groups } from "~test/mock/ynabApiData";
+import { plans, category_groups } from "~test/mock/ynabApiData";
 
 const shoppingCategory = category_groups
   .find((cg) => cg.name === "Non-Monthly")!
@@ -19,7 +19,7 @@ beforeEach(async () => {
 test("Sets initial 'to' category as expected", async () => {
   await popupStateStorage.setValue({
     view: "move",
-    budgetId: budgets[0].id,
+    budgetId: plans[0].id,
     moveMoneyState: {
       toCategoryId: shoppingCategory.id,
     },
@@ -36,7 +36,7 @@ test("Sets initial 'to' category as expected", async () => {
 test("Sets initial 'from' category as expected", async () => {
   await popupStateStorage.setValue({
     view: "move",
-    budgetId: budgets[0].id,
+    budgetId: plans[0].id,
     moveMoneyState: {
       fromCategoryId: shoppingCategory.id,
     },
@@ -52,7 +52,7 @@ test("Sets initial 'from' category as expected", async () => {
 test("Shows Ready to Assign when category field is blank", async () => {
   await popupStateStorage.setValue({
     view: "move",
-    budgetId: budgets[0].id,
+    budgetId: plans[0].id,
     moveMoneyState: {
       toCategoryId: shoppingCategory.id,
     },

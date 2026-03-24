@@ -9,30 +9,30 @@ import { useStorageContext } from "~lib/context";
 import { appSettingsStorage, authTokenStorage, popupStateStorage } from "~lib/state";
 import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
-import { budgets } from "~test/mock/ynabApiData";
+import { plans } from "~test/mock/ynabApiData";
 
 beforeEach(async () => {
   await authTokenStorage.setValue(mockAuthToken);
   await appSettingsStorage("local").setValue({
     ...DEFAULT_SETTINGS,
-    budgets: [budgets[0].id, budgets[1].id],
+    budgets: [plans[0].id, plans[1].id],
   });
   await popupStateStorage.setValue({
     view: "main",
-    budgetId: budgets[0].id,
+    budgetId: plans[0].id,
   });
 });
 
 test("Correct budget is selected", async () => {
   const wrapper = createTestAppWrapper();
   await act(async () => render(<PopupNav />, { wrapper }));
-  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
+  await waitFor(() => expect(screen.queryByText(plans[0].name)).toBeTruthy());
 });
 
 test("Can be navigated with keyboard", async () => {
   const wrapper = createTestAppWrapper();
   await act(async () => render(<PopupNav />, { wrapper }));
-  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
+  await waitFor(() => expect(screen.queryByText(plans[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
   await user.keyboard("{Tab}");
@@ -61,7 +61,7 @@ test("Can be navigated with keyboard", async () => {
 test("Selecting a menu item closes the menu", async () => {
   const wrapper = createTestAppWrapper();
   await act(async () => render(<PopupNav />, { wrapper }));
-  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
+  await waitFor(() => expect(screen.queryByText(plans[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
   await user.keyboard("{Tab}{Enter}");
@@ -87,7 +87,7 @@ test("Menu buttons change the popup state as expected", async () => {
       ),
     })
   );
-  await waitFor(() => expect(screen.queryByText(budgets[0].name)).toBeTruthy());
+  await waitFor(() => expect(screen.queryByText(plans[0].name)).toBeTruthy());
 
   const user = userEvent.setup();
   expect(result.current.editingItems).toBeFalsy();

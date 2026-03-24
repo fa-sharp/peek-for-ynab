@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 
-import { accounts, budgets, category_groups, month, payees } from "./ynabApiData";
+import { accounts, category_groups, month, payees, plans } from "./ynabApiData";
 
 const API_BASE = `${process.env.PUBLIC_MAIN_URL}/api`;
 const YNAB_BASE = "https://api.ynab.com/v1";
@@ -16,13 +16,13 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${YNAB_BASE}/budgets`,
+    `${YNAB_BASE}/plans`,
     withAuth(() => {
-      return HttpResponse.json({ data: { budgets } });
+      return HttpResponse.json({ data: { plans } });
     })
   ),
   http.get(
-    `${YNAB_BASE}/budgets/:budgetId/categories`,
+    `${YNAB_BASE}/plans/:planId/categories`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -33,7 +33,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${YNAB_BASE}/budgets/:budgetId/months/current`,
+    `${YNAB_BASE}/plans/:planId/months/current`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -43,7 +43,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${YNAB_BASE}/budgets/:budgetId/accounts`,
+    `${YNAB_BASE}/plans/:planId/accounts`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
@@ -54,7 +54,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${YNAB_BASE}/budgets/:budgetId/payees`,
+    `${YNAB_BASE}/plans/:planId/payees`,
     withAuth(() => {
       return HttpResponse.json({
         data: {

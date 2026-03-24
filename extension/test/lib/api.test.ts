@@ -12,7 +12,7 @@ import { mergeCategoryGroupsDataFromDelta } from "~lib/api/categories";
 import type { Account, Category, Payee } from "~lib/api/client";
 import { formatPayee, mergePayeesDataFromDelta } from "~lib/api/payees";
 import { mockServer } from "~test/mock/msw";
-import { accounts, budgets, category_groups, payees } from "~test/mock/ynabApiData";
+import { accounts, category_groups, payees, plans } from "~test/mock/ynabApiData";
 
 const frequentCategoryGroupIdx = 3;
 const groceriesCategoryIdx = 0;
@@ -203,7 +203,7 @@ test("'fetchCategoryGroups' uses delta request when cache exists", async () => {
       "1500"
     );
   });
-  await fetchCategoryGroupsForBudget("token", budgets[0].id, {
+  await fetchCategoryGroupsForBudget("token", plans[0].id, {
     data: { categoryGroups: category_groups, serverKnowledge: 1500 },
     dataUpdatedAt: Date.now(),
   });
@@ -216,7 +216,7 @@ test("'fetchAccounts' uses delta request when cache exists", async () => {
       "2000"
     );
   });
-  await fetchAccountsForBudget("token", budgets[0].id, {
+  await fetchAccountsForBudget("token", plans[0].id, {
     data: { accounts, serverKnowledge: 2000 },
     dataUpdatedAt: Date.now(),
   });
@@ -229,7 +229,7 @@ test("'fetchPayees' uses delta request when cache exists", async () => {
       "2500"
     );
   });
-  await fetchPayeesForBudget("token", budgets[0].id, {
+  await fetchPayeesForBudget("token", plans[0].id, {
     data: { payees: cachedPayees, serverKnowledge: 2500 },
     dataUpdatedAt: Date.now(),
   });

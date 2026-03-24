@@ -1,6 +1,6 @@
 import type { Account, CategoryGroupWithCategories, Payee } from "~lib/api/client";
 
-export const budgets = [
+export const plans = [
   {
     id: "97b0a016-a8c1-490c-a33c-cc06940d3d80",
     name: "Personal Budget",
