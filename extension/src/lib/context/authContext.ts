@@ -29,8 +29,7 @@ export const useAuthProvider = () => {
         url: authorizeUrl.toString(),
       });
       if (!responseUrl) throw new Error("No response URL received");
-      const url = new URL(responseUrl);
-      const authToken = url.searchParams.get("auth_token");
+      const authToken = new URL(responseUrl).searchParams.get("auth_token");
       if (!authToken) throw new Error("No auth token received");
 
       await fetchToken(authToken);
