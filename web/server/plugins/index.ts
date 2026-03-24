@@ -1,7 +1,7 @@
-import astro from "./astro";
-import cors from "./cors";
-import crypto from "./crypto";
-import helmet from "./helmet";
-import oauth from "./oauth";
+import astro from "./astro.ts";
+import cors from "./cors.ts";
+import crypto from "./crypto.ts";
+import helmet from "./helmet.ts";
+import oauth from "./oauth.ts";
 
 export { astro, cors, crypto, helmet, oauth };
