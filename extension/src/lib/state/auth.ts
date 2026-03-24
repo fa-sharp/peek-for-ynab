@@ -6,12 +6,6 @@ import { fetchAccessToken } from "~lib/api";
 import { ONE_MINUTE_IN_MILLIS, STORAGE_KEYS } from "~lib/constants";
 import { useChromeStorage } from "./utils";
 
-/** Shape of the access token stored in memory */
-interface AccessToken {
-  value: string;
-  lastChecked: number;
-}
-
 /** Encrypted auth token stored in local storage */
 export const authTokenStorage = storage.defineItem<string | null>(
   `local:${STORAGE_KEYS.AuthToken}`,
@@ -26,18 +20,20 @@ export const accessTokenStorage = storage.defineItem<AccessToken | null>(
   }
 );
 
+/** Shape of the access token stored in memory */
+interface AccessToken {
+  value: string;
+  lastChecked: number;
+}
+
 /** Auth utilities */
 export class AuthManager {
-  /** Access token is valid for at least 5 minutes */
-  static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 5;
+  /** Access token should be valid for at least 5 minutes, so we allow 4 minutes of staleness */
+  static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 4;
 
-  /** Whether the in-memory access token is current and can be used */
-  static isAccessTokenCurrent(
-    accessToken?: AccessToken | null
-  ): accessToken is AccessToken {
-    return (
-      !!accessToken && accessToken.lastChecked + AuthManager.TOKEN_STALE_TIME > Date.now()
-    );
+  /** Whether the in-memory access token is stale and should be refreshed from the server */
+  static isAccessTokenStale(accessToken: AccessToken) {
+    return Date.now() - accessToken.lastChecked > AuthManager.TOKEN_STALE_TIME;
   }
 
   /**
@@ -92,8 +88,8 @@ export const useAuth = () => {
   const [accessToken] = useChromeStorage(accessTokenStorage);
   const [error, setError] = useState("");
 
-  const isAccessTokenCurrent = useMemo(
-    () => AuthManager.isAccessTokenCurrent(accessToken),
+  const isAccessTokenStale = useMemo(
+    () => !!accessToken && AuthManager.isAccessTokenStale(accessToken),
     [accessToken]
   );
 
@@ -109,9 +105,10 @@ export const useAuth = () => {
   const clearToken = useCallback(() => AuthManager.clearToken(), []);
 
   // If auth token is present, fetch access token if it's not in memory and/or is stale
+  // `accessToken === null` means the token is not in memory - if it's `undefined`, the storage hasn't hydrated yet
   useEffect(() => {
-    if (authToken && !isAccessTokenCurrent) fetchToken(authToken);
-  }, [authToken, isAccessTokenCurrent, fetchToken]);
+    if (authToken && (accessToken === null || isAccessTokenStale)) fetchToken(authToken);
+  }, [authToken, accessToken, isAccessTokenStale, fetchToken]);
 
   return {
     /** Error that ocurred during auth flow */
@@ -121,7 +118,7 @@ export const useAuth = () => {
     /** The current auth token */
     authToken,
     /** The current access token */
-    accessToken: accessToken?.value && isAccessTokenCurrent ? accessToken.value : null,
+    accessToken: accessToken?.value && !isAccessTokenStale ? accessToken.value : null,
     /** Clear the access token and auth token (e.g. on logout) */
     clearToken,
   };
