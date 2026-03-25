@@ -1,11 +1,11 @@
+import "vitest-dom/extend-expect";
 import { randomUUID } from "crypto";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import { TransactionClearedStatus, type TransactionDetail } from "ynab";
-import "vitest-dom/extend-expect";
 
 import { TransactionView } from "~components";
+import type { TransactionDetail } from "~lib/api/client";
 import type { DetailViewState } from "~lib/types";
 import { getTodaysDateISO } from "~lib/utils";
 import { accounts, category_groups } from "~test/mock/ynabApiData";
@@ -23,7 +23,7 @@ const transaction: TransactionDetail = {
   amount: 200_000,
   memo: "lorem ipsum",
   approved: true,
-  cleared: TransactionClearedStatus.Uncleared,
+  cleared: "uncleared",
   date: getTodaysDateISO(),
   deleted: false,
   subtransactions: [],

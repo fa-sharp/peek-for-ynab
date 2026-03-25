@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
-import type { Account, CategoryGroupWithCategories } from "ynab";
 
 import { CategoryView, IconButton, IconSpan, Toolbar } from "~components";
+import type { Account, CategoryGroupWithCategories } from "~lib/api/client";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { CategoryAlerts } from "~lib/notifications";
 import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";

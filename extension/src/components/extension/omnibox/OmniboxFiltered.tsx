@@ -1,20 +1,15 @@
 import { Fragment } from "react";
-import type { Account, Category } from "ynab";
 
 import { AccountView, CategoryView, IconButton, IconSpan } from "~components";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
   PinItemIcon,
-  PinnedItemIcon
+  PinnedItemIcon,
 } from "~components/icons/ActionIcons";
+import type { Account, Category } from "~lib/api/client";
 import type { CurrentAlerts } from "~lib/notifications";
-import type {
-  AppSettings,
-  BudgetMainData,
-  CachedBudget,
-  TxAddState
-} from "~lib/types";
+import type { AppSettings, BudgetMainData, CachedBudget, TxAddState } from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 interface Props {
@@ -40,7 +35,7 @@ export default function OmniboxFiltered({
   editingItems,
   currentAlerts,
   onPinItem,
-  openTxForm
+  openTxForm,
 }: Props) {
   return (
     <>
@@ -110,7 +105,7 @@ export default function OmniboxFiltered({
                                             )
                                           : undefined,
                                       amountType: "Inflow",
-                                      accountId: ccAccount.id
+                                      accountId: ccAccount.id,
                                     })
                                   }
                                 />

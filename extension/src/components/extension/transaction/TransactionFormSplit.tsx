@@ -1,6 +1,5 @@
-import type { CurrencyFormat } from "ynab";
-
 import { CurrencyView, SubTransaction } from "~components";
+import type { CurrencyFormat } from "~lib/api/client";
 import { useTxStore, useTxStoreSubTxTotals } from "~lib/state";
 import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormDispatch } from "~lib/useTransaction";

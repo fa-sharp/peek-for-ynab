@@ -1,7 +1,7 @@
 import { type RefObject, useCallback, useMemo, useRef } from "react";
-import type { Account, Category } from "ynab";
 
 import { AccountSelect, CategorySelect } from "~components";
+import type { Account, Category } from "~lib/api/client";
 import { useTxStore, useTxStoreSubTxTotals } from "~lib/state";
 import type { BudgetMainData } from "~lib/types";
 import type { TransactionFormDispatch } from "~lib/useTransaction";

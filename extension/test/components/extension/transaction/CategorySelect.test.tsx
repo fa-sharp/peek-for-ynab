@@ -1,7 +1,8 @@
 import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, expect, test } from "vitest";
-import type { Category } from "ynab";
+
+import type { Category } from "~lib/api/client";
 import "vitest-dom/extend-expect";
 
 import { CategorySelect } from "~components";

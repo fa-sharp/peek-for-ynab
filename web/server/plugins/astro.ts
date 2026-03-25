@@ -22,20 +22,9 @@ export default fastifyPlugin<{
   // Astro SSR / API handler with logging
   // TODO this should be removed after auth migration
   app.addHook("onRequest", (req, res, next) => {
-    // Calls cleanup function if Astro doesn't handle the request.
-    // FIXME https://github.com/withastro/astro/pull/15735
-    const nextWithCleanup = (err: unknown) => {
-      for (const sym of Object.getOwnPropertySymbols(req.raw)) {
-        // @ts-ignore
-        const cleanup = req.raw[sym];
-        if (typeof cleanup === "function") cleanup();
-      }
-      next(!err ? undefined : err instanceof Error ? err : new Error(String(err)));
-    };
-
     const locals = isApiRequest(req.url)
       ? { log: req.log.child({ module: "api" }) }
       : undefined;
-    opts.ssrHandler(req.raw, res.raw, nextWithCleanup, locals);
+    opts.ssrHandler(req.raw, res.raw, next, locals);
   });
 });

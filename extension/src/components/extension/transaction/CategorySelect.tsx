@@ -11,8 +11,12 @@ import {
   useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Category, CategoryGroupWithCategories, CurrencyFormat } from "ynab";
 
+import type {
+  Category,
+  CategoryGroupWithCategories,
+  CurrencyFormat,
+} from "~lib/api/client";
 import type { CachedBudget } from "~lib/types";
 import {
   formatCurrency,
@@ -44,7 +48,7 @@ function CategorySelect(
     categoryGroupsData,
     budgetData,
   }: Props,
-  ref: ForwardedRef<HTMLInputElement | null>,
+  ref: ForwardedRef<HTMLInputElement | null>
 ) {
   const ignoredCategoryIds = useMemo(() => {
     if (!categoryGroupsData) return undefined;
@@ -57,7 +61,7 @@ function CategorySelect(
         !ignoredCategoryIds?.has(category.id) &&
         (!inputValue || searchWithinString(category.name, inputValue));
     },
-    [ignoredCategoryIds],
+    [ignoredCategoryIds]
   );
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -68,7 +72,7 @@ function CategorySelect(
     () =>
       categories &&
       setCategoryList(categories.filter(getFilter(inputRef.current?.value))),
-    [categories, getFilter],
+    [categories, getFilter]
   );
 
   const {
@@ -90,7 +94,7 @@ function CategorySelect(
       if (category.name === "Inflow: Ready to Assign") return category.name;
       return `${category.name} (${formatCurrency(
         category.balance,
-        budgetData?.currencyFormat,
+        budgetData?.currencyFormat
       )})`;
     },
     onInputValueChange({ inputValue }) {
@@ -154,7 +158,7 @@ function CategorySelect(
           ) : (
             categoryGroupsData
               ?.filter((group) =>
-                categoryList.find((c) => c.category_group_id === group.id),
+                categoryList.find((c) => c.category_group_id === group.id)
               )
               .map((group) => (
                 <Fragment key={group.id}>
@@ -167,7 +171,7 @@ function CategorySelect(
                     .filter((c) => c.category_group_id === group.id)
                     .map((category) => {
                       const itemIndex = categoryList.findIndex(
-                        (c) => c.id === category.id,
+                        (c) => c.id === category.id
                       );
                       return (
                         <li
@@ -182,7 +186,7 @@ function CategorySelect(
                           })}>
                           {formatCategoryWithBalance(
                             category,
-                            budgetData?.currencyFormat,
+                            budgetData?.currencyFormat
                           )}
                         </li>
                       );

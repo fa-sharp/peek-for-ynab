@@ -1,9 +1,9 @@
 import { type SetStateAction, useCallback, useEffect, useRef } from "react";
 import { CircleC } from "tabler-icons-react";
-import { TransactionFlagColor } from "ynab";
 
 import { AmountField, IconButton, MemoField } from "~components";
 import { CheckIcon as Check } from "~components/icons/ActionIcons";
+import { TransactionFlags } from "~lib/api/client";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { useTxStore } from "~lib/state";
 import type {
@@ -191,7 +191,7 @@ export function TransactionFormInner({
             onChange={(e) => dispatch({ type: "setFlag", flag: e.target.value })}
             disabled={isSaving}>
             <option value="">None</option>
-            {Object.entries(TransactionFlagColor).map(([flagName, flagValue]) => (
+            {Object.entries(TransactionFlags).map(([flagName, flagValue]) => (
               <option key={flagValue} value={flagValue}>
                 {`${flagName} ${flagColorToEmoji(flagValue) || ""}`}
               </option>

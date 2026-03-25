@@ -1,8 +1,8 @@
 import { clsx } from "clsx";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CountUp from "react-countup";
-import type { CurrencyFormat } from "ynab";
 
+import type { CurrencyFormat } from "~lib/api/client";
 import { getCurrencyFormatter } from "~lib/utils";
 
 type Props = {
@@ -18,7 +18,7 @@ function CurrencyView({
   currencyFormat,
   colorsEnabled = false,
   hideBalance = false,
-  animationEnabled = false
+  animationEnabled = false,
 }: Props) {
   const currencyFormatter = useMemo(
     () => getCurrencyFormatter(currencyFormat),
@@ -44,7 +44,7 @@ function CurrencyView({
       clsx("currency", {
         positive: colorsEnabled && milliUnits > 0,
         negative: colorsEnabled && milliUnits < 0,
-        hidden: hideBalance
+        hidden: hideBalance,
       }),
     [colorsEnabled, milliUnits, hideBalance]
   );
@@ -61,7 +61,7 @@ function CurrencyView({
       onStart={() => setIsAnimating(true)}
       onEnd={() => setIsAnimating(false)}
       containerProps={{
-        "aria-busy": isAnimating
+        "aria-busy": isAnimating,
       }}
     />
   );

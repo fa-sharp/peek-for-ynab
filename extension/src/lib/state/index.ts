@@ -1,5 +1,5 @@
 import { currentAlertsStorage, useCurrentAlerts, useVersionAlert } from "./alerts";
-import { AuthManager, authTokenStorage, useAuth } from "./auth";
+import { AuthManager, accessTokenStorage, authTokenStorage, useAuth } from "./auth";
 import { pinnedItemsStorage, usePinnedItems } from "./budgetPinned";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
@@ -15,6 +15,7 @@ import {
 
 export {
   AuthManager,
+  accessTokenStorage,
   appSettingsStorage,
   authTokenStorage,
   budgetSettingsStorage,

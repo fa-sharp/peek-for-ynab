@@ -10,8 +10,8 @@ import {
   useState,
 } from "react";
 import { ChevronDown, X } from "tabler-icons-react";
-import type { Account, CurrencyFormat } from "ynab";
 
+import type { Account, CurrencyFormat } from "~lib/api/client";
 import { formatCurrency, searchWithinString } from "~lib/utils";
 
 interface Props {

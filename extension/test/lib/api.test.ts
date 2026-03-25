@@ -1,20 +1,18 @@
 // @vitest-environment node
 import { randomUUID } from "crypto";
 import { expect, test } from "vitest";
-import { type Account, API, type Category, type Payee } from "ynab";
 
 import {
   fetchAccountsForBudget,
   fetchCategoryGroupsForBudget,
   fetchPayeesForBudget,
-  formatPayee,
-  mergeAccountsDataFromDelta,
-  mergeCategoryGroupsDataFromDelta,
-  mergePayeesDataFromDelta,
-  payeeCollator,
 } from "~lib/api";
+import { mergeAccountsDataFromDelta } from "~lib/api/accounts";
+import { mergeCategoryGroupsDataFromDelta } from "~lib/api/categories";
+import type { Account, Category, Payee } from "~lib/api/client";
+import { formatPayee, mergePayeesDataFromDelta } from "~lib/api/payees";
 import { mockServer } from "~test/mock/msw";
-import { accounts, budgets, category_groups, payees } from "~test/mock/ynabApiData";
+import { accounts, category_groups, payees, plans } from "~test/mock/ynabApiData";
 
 const frequentCategoryGroupIdx = 3;
 const groceriesCategoryIdx = 0;
@@ -56,6 +54,7 @@ test("'mergeCategoryGroupsDataFromDelta' handles new category", () => {
     category_group_id: frequentCategoryGroup.id,
     hidden: false,
     deleted: false,
+    goal_needs_whole_amount: null,
   };
   const deltaResponse = [
     {
@@ -150,9 +149,10 @@ test("'mergeAccountsFromDelta' handles deleted account", () => {
   expect(newData.find((a) => a.id === checkingAccount.id)).toBeUndefined();
 });
 
+const collator = Intl.Collator();
 const cachedPayees = payees
   .map(formatPayee)
-  .sort((a, b) => payeeCollator.compare(a.name, b.name));
+  .sort((a, b) => collator.compare(a.name, b.name));
 const abcPayee = payees.find((p) => p.name === "ABC Stores")!;
 
 test("'mergePayeesFromDelta' handles and sorts new payee", () => {
@@ -203,7 +203,7 @@ test("'fetchCategoryGroups' uses delta request when cache exists", async () => {
       "1500"
     );
   });
-  await fetchCategoryGroupsForBudget(new API("test"), budgets[0].id, {
+  await fetchCategoryGroupsForBudget("token", plans[0].id, {
     data: { categoryGroups: category_groups, serverKnowledge: 1500 },
     dataUpdatedAt: Date.now(),
   });
@@ -216,7 +216,7 @@ test("'fetchAccounts' uses delta request when cache exists", async () => {
       "2000"
     );
   });
-  await fetchAccountsForBudget(new API("test"), budgets[0].id, {
+  await fetchAccountsForBudget("token", plans[0].id, {
     data: { accounts, serverKnowledge: 2000 },
     dataUpdatedAt: Date.now(),
   });
@@ -229,7 +229,7 @@ test("'fetchPayees' uses delta request when cache exists", async () => {
       "2500"
     );
   });
-  await fetchPayeesForBudget(new API("test"), budgets[0].id, {
+  await fetchPayeesForBudget("token", plans[0].id, {
     data: { payees: cachedPayees, serverKnowledge: 2500 },
     dataUpdatedAt: Date.now(),
   });

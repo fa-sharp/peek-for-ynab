@@ -1,7 +1,6 @@
-import type { Account, Category, TransactionDetail } from "ynab";
-
 import { browser } from "#imports";
 import notificationImageUrl from "~/assets/notification.png";
+import type { Account, Category, TransactionDetail } from "~lib/api/client";
 import { IS_DEV, ONE_DAY_IN_MILLIS } from "./constants";
 import type { BudgetNotificationSettings, CachedBudget } from "./types";
 import { formatCurrency, formatDateMonthAndDay, isEmptyObject } from "./utils";
@@ -42,7 +41,7 @@ export interface CategoryAlerts {
 export const getBudgetAlerts = (
   notificationSettings: BudgetNotificationSettings,
   data: {
-    unapprovedTxs?: TransactionDetail[];
+    unapprovedTxs?: TransactionDetail[] | null;
     accounts?: Account[];
     categories?: Category[];
   }

@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
-import type { Account } from "ynab";
 
 import { AccountView, IconButton, IconSpan, Toolbar } from "~components";
+import type { Account } from "~lib/api/client";
 import { useNotificationsContext, useStorageContext, useYNABContext } from "~lib/context";
 import type { AccountAlerts } from "~lib/notifications";
 import type { AppSettings, CachedBudget, DetailViewState, TxAddState } from "~lib/types";

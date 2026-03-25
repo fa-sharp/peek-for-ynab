@@ -26,6 +26,9 @@ export const STORAGE_KEYS = Object.freeze({
 export const ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 export const ONE_MINUTE_IN_MILLIS = 1000 * 60;
 
+/** Use a delta request for categories, accounts, and payees if cached data is fresher than this (8 hours in millis) */
+export const DELTA_REQUEST_TIME = 8 * 60 * 60 * 1000;
+
 export const BACKGROUND_ALARM_NAME = "backgroundRefresh";
 
 export const DEFAULT_POPUP_STATE: PopupState = {

@@ -1,19 +1,20 @@
 import { CircleC, Lock } from "tabler-icons-react";
-import { TransactionClearedStatus } from "ynab";
+
+import type { TransactionClearedStatus } from "~lib/api/client";
 
 type Props = {
   status: TransactionClearedStatus;
 };
 
 const TxStatusIcon = ({ status }: Props) =>
-  status === TransactionClearedStatus.Cleared ? (
+  status === "cleared" ? (
     <CircleC
       size={20}
       fill="var(--currency-green)"
       stroke="var(--background)"
       aria-label="Cleared"
     />
-  ) : status === TransactionClearedStatus.Reconciled ? (
+  ) : status === "reconciled" ? (
     <Lock
       size={20}
       stroke="var(--currency-green)"

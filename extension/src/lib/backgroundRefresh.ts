@@ -1,19 +1,26 @@
-import { type Account, api, type Category, type TransactionDetail } from "ynab";
-
 import {
-  checkUnapprovedTxsForBudget,
+  accountsQuery,
+  budgetQuery,
+  categoryGroupsQuery,
   fetchAccountsForBudget,
   fetchBudgets,
   fetchCategoryGroupsForBudget,
+  fetchUnapprovedTxsForBudget,
 } from "~lib/api";
-import { IS_DEV, ONE_DAY_IN_MILLIS } from "~lib/constants";
+import {
+  type Account,
+  apiClient,
+  type Category,
+  type TransactionDetail,
+} from "~lib/api/client";
+import { IS_DEV } from "~lib/constants";
 import {
   type CurrentAlerts,
   createSystemNotification,
   getBudgetAlerts,
   updateIconAndTooltip,
 } from "~lib/notifications";
-import { createQueryClient } from "~lib/queryClient";
+import { createQueryClient, queryPersister } from "~lib/queryClient";
 import { checkPermissions, isEmptyObject } from "~lib/utils";
 import {
   AuthManager,
@@ -38,6 +45,7 @@ export async function backgroundDataRefresh() {
     console.warn("Background refresh: failed to get access token:", tokenResponse.error);
     return;
   }
+  const { accessToken } = tokenResponse;
 
   // Get the configured budgets in the relevant storage area
   const syncEnabled = await shouldSyncStorage.getValue();
@@ -45,17 +53,16 @@ export async function backgroundDataRefresh() {
   const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
   if (!budgetIds || budgetIds.length === 0) return;
 
-  // Create a query client with a longer default stale time to prevent too many refetches
+  // Create a query client with a longer default stale time, and restore the cache from IndexedDB
   const queryClient = createQueryClient({
     staleTime: 10 * 60 * 1000,
   });
+  await queryPersister.restoreQueries(queryClient);
 
   IS_DEV && console.log("Background refresh: updating alerts...");
-  const ynabAPI = new api(tokenResponse.accessToken);
   const budgetsData = await queryClient.fetchQuery({
-    queryKey: ["budgets"],
-    staleTime: ONE_DAY_IN_MILLIS * 7,
-    queryFn: () => fetchBudgets(ynabAPI),
+    ...budgetQuery,
+    queryFn: () => fetchBudgets(accessToken),
   });
 
   const alerts: CurrentAlerts = {};
@@ -63,8 +70,6 @@ export async function backgroundDataRefresh() {
   const notificationsEnabled = await checkPermissions(["notifications"]);
 
   // Fetch new data for each budget and update alerts
-  // FIXME Two `fetchQuery` calls and setTimeout needed because of React Query persister issues in non-React context
-  // See https://github.com/TanStack/query/issues/8075
   for (const budget of budgetsData.filter(({ id }) => budgetIds.includes(id))) {
     const budgetSettings = await budgetSettingsStorage(budget.id, storageArea).getValue();
     if (!budgetSettings) continue;
@@ -75,58 +80,45 @@ export async function backgroundDataRefresh() {
 
     if (budgetSettings.notifications.checkImports) {
       // call import API, then check for unapproved transactions
-      const queryKey = ["import", { budgetId: budget.id }];
       await queryClient.fetchQuery({
-        queryKey,
-        queryFn: async () =>
-          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids,
-      });
-      await new Promise((r) => setTimeout(r, 100));
-      await queryClient.fetchQuery({
-        queryKey,
+        queryKey: ["import", { budgetId: budget.id }],
         staleTime: 50 * 60 * 1000, // 50 minutes
-        queryFn: async () =>
-          (await ynabAPI.transactions.importTransactions(budget.id)).data.transaction_ids,
+        queryFn: async () => {
+          const { data, error } = await apiClient(accessToken).POST(
+            "/plans/{plan_id}/transactions/import",
+            {
+              params: { path: { plan_id: budget.id } },
+            }
+          );
+          if (error) throw error;
+          return data.data.transaction_ids;
+        },
       });
-      unapprovedTxs = await checkUnapprovedTxsForBudget(ynabAPI, budget.id);
+      unapprovedTxs = await fetchUnapprovedTxsForBudget(accessToken, budget.id);
     }
 
     if (
       budgetSettings.notifications.importError ||
       !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
     ) {
-      const queryKey = ["accounts", { budgetId: budget.id }];
-      await queryClient.fetchQuery({
-        queryKey,
-        queryFn: () =>
-          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey)),
-      });
-      await new Promise((r) => setTimeout(r, 100));
       const { accounts } = await queryClient.fetchQuery({
-        queryKey,
-        queryFn: () =>
-          fetchAccountsForBudget(ynabAPI, budget.id, queryClient.getQueryState(queryKey)),
+        ...accountsQuery(budget.id),
+        queryFn: ({ queryKey }) =>
+          fetchAccountsForBudget(
+            accessToken,
+            budget.id,
+            queryClient.getQueryState(queryKey)
+          ),
       });
       accountsData = accounts;
     }
 
     if (budgetSettings.notifications.overspent) {
-      const queryKey = ["categoryGroups", { budgetId: budget.id }];
-      await queryClient.fetchQuery({
-        queryKey,
-        queryFn: () =>
-          fetchCategoryGroupsForBudget(
-            ynabAPI,
-            budget.id,
-            queryClient.getQueryState(queryKey)
-          ),
-      });
-      await new Promise((r) => setTimeout(r, 100));
       const { categoryGroups } = await queryClient.fetchQuery({
-        queryKey,
-        queryFn: () =>
+        ...categoryGroupsQuery(budget.id),
+        queryFn: ({ queryKey }) =>
           fetchCategoryGroupsForBudget(
-            ynabAPI,
+            accessToken,
             budget.id,
             queryClient.getQueryState(queryKey)
           ),
