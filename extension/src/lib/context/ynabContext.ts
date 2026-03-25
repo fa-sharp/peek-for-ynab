@@ -355,9 +355,7 @@ export const useYNABProvider = () => {
         accessToken,
         popupState.budgetId,
         transaction.id,
-        {
-          approved: true,
-        }
+        { approved: true }
       );
       await refetchTransaction(updatedTx);
     },
