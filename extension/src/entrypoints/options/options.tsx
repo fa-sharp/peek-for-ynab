@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Help, Refresh } from "tabler-icons-react";
 
+import kofiImage from "~/assets/kofi.webp";
 import { BudgetSettings, Dialog, Tooltip } from "~components";
 import {
   AppProvider,
@@ -59,13 +60,7 @@ export function OptionsView() {
             <h1>Peek for YNAB</h1>
             <div style={{ width: "1em" }} />
             <a href="https://ko-fi.com/R5R71WMA9E" target="_blank">
-              {/** biome-ignore lint/performance/noImgElement: ko-fi donate button */}
-              <img
-                height="36"
-                style={{ border: 0, height: 32 }}
-                src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
-                alt="Buy Me a Coffee at ko-fi.com"
-              />
+              <img src={kofiImage} height="32" alt="Buy Me a Coffee" />
             </a>
           </div>
           <div className="flex-col gap-sm">

@@ -84,7 +84,6 @@
         "useYield": "error"
       },
       "performance": {
-        "noImgElement": "warn",
         "noUnwantedPolyfillio": "warn",
         "useGoogleFontPreconnect": "warn"
       },
