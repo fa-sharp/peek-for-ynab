@@ -53,7 +53,7 @@ export default function SubTransaction({
         (!txState.isTransfer ? (
           <PayeeSelect
             ref={payeeRef}
-            initialPayee={txState.payee}
+            currentPayee={txState.payee}
             payees={budgetMainData.payeesData}
             selectPayee={(payee) => setField("payee", payee)}
             required={false}

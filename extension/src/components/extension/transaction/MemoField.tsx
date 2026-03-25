@@ -3,7 +3,7 @@ import { WorldWww } from "tabler-icons-react";
 
 import IconButton from "~components/IconButton";
 import type { AppSettings } from "~lib/types";
-import { executeScriptInCurrentTab, requestPermissions } from "~lib/utils";
+import { executeScriptInCurrentTab } from "~lib/utils";
 
 type Props = {
   disabled?: boolean;
@@ -14,10 +14,9 @@ type Props = {
 
 const MemoField = (
   { memo = "", setMemo, disabled, settings }: Props,
-  ref: ForwardedRef<HTMLInputElement>,
+  ref: ForwardedRef<HTMLInputElement>
 ) => {
   const onCopyURLIntoMemo = async () => {
-    if (!(await requestPermissions(["activeTab", "scripting"]))) return;
     const url = await executeScriptInCurrentTab(() => location.href);
     setMemo((memo) => memo + url);
   };

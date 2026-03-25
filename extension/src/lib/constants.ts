@@ -16,6 +16,7 @@ export const STORAGE_KEYS = Object.freeze({
   CurrentAlerts: "currentAlerts",
   PinnedItems: (budgetId: string) => `budget-${budgetId}:pinned`,
   PopupState: "popupState",
+  SavedPayees: (budgetId: string) => `budget-${budgetId}:payees`,
   ShouldSyncSettings: "sync",
   TxState: "txState",
   /** @deprecated TODO remove after auth migration */

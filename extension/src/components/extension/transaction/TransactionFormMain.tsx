@@ -3,13 +3,22 @@ import { type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 import { AccountSelect, CategorySelect, PayeeSelect } from "~components";
 import type { Account, Category } from "~lib/api/client";
 import { useTxStore } from "~lib/state";
-import type { BudgetMainData, BudgetSettings, CachedPayee } from "~lib/types";
+import type {
+  AppSettings,
+  BudgetMainData,
+  BudgetSettings,
+  CachedPayee,
+} from "~lib/types";
+import useRememberPayee from "~lib/useRememberPayee";
 import type { TransactionFormDispatch } from "~lib/useTransaction";
 
 interface Props {
   dispatch: TransactionFormDispatch;
+  budgetId?: string;
   budgetMainData: BudgetMainData;
   budgetSettings?: BudgetSettings;
+  settings?: AppSettings;
+  settingsSynced: boolean;
   memoRef?: RefObject<HTMLInputElement | null>;
   isSaving: boolean;
 }
@@ -17,14 +26,14 @@ interface Props {
 /** Payee, category, and account fields for a non-transfer transaction */
 export default function TransactionFormMain({
   dispatch,
+  budgetId,
   budgetMainData,
   budgetSettings,
+  settings,
+  settingsSynced,
   memoRef,
   isSaving,
 }: Props) {
-  const categoryRef = useRef<HTMLInputElement>(null);
-  const accountRef = useRef<HTMLInputElement>(null);
-
   const { payee, isSplit, categoryId, accountId } = useTxStore((s) => ({
     payee: s.payee,
     isSplit: s.isSplit,
@@ -37,6 +46,9 @@ export default function TransactionFormMain({
   const account = useMemo(() => {
     return budgetMainData.accountsData.find((a) => a.id === accountId);
   }, [budgetMainData.accountsData, accountId]);
+
+  const categoryRef = useRef<HTMLInputElement>(null);
+  const accountRef = useRef<HTMLInputElement>(null);
 
   const selectPayee = useCallback(
     (selectedPayee: CachedPayee | { name: string }) => {
@@ -71,7 +83,7 @@ export default function TransactionFormMain({
     [dispatch, memoRef]
   );
 
-  // Select default account if no account is selected
+  // If no account is selected, select the default account if there is one
   useEffect(() => {
     if (accountId === undefined && budgetSettings?.transactions.defaultAccountId) {
       const defaultAccount = budgetMainData.accountsData.find(
@@ -86,14 +98,35 @@ export default function TransactionFormMain({
     dispatch,
   ]);
 
+  // Get website host and use saved payees if enabled
+  const { host, isRememberedPayee, canRememberPayee, onToggleRememberPayee } =
+    useRememberPayee(
+      !!settings?.currentTabAccess,
+      budgetId ?? "",
+      budgetMainData,
+      settingsSynced,
+      dispatch,
+      payee
+    );
+
   return (
     <>
       <PayeeSelect
         payees={budgetMainData.payeesData}
-        initialPayee={payee}
+        currentPayee={payee}
         selectPayee={selectPayee}
         disabled={isSaving}
       />
+      {canRememberPayee && (
+        <label className="flex-row">
+          <input
+            type="checkbox"
+            checked={isRememberedPayee}
+            onChange={onToggleRememberPayee}
+          />
+          Remember payee for '{host}'
+        </label>
+      )}
       {!isSplit && (!account || account.on_budget) && (
         <CategorySelect
           ref={categoryRef}

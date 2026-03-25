@@ -145,9 +145,15 @@ export function OptionsView() {
                     className="list"
                     style={{ listStyle: "numeric", paddingLeft: "2em" }}>
                     <li>
-                      Automatically copy the selected amount into the transaction form.
+                      Remember the payee for the URL you're on when entering transactions.
                     </li>
-                    <li>Copy the current URL into the memo field of the transaction.</li>
+                    <li>
+                      Automatically copy the amount/total you've selected on the webpage
+                      into the transaction form.
+                    </li>
+                    <li>
+                      Quickly copy the current URL into the memo field of the transaction.
+                    </li>
                   </ol>
                 </Dialog>
               </Tooltip>
@@ -177,16 +183,11 @@ export function OptionsView() {
                 type="checkbox"
                 checked={notificationEnabled}
                 onChange={async (e) => {
-                  if (e.target.checked) {
-                    requestNotificationPermission();
-                  } else {
-                    removeNotificationPermission();
-                  }
+                  if (e.target.checked) requestNotificationPermission();
+                  else removeNotificationPermission();
                 }}
               />
-              <label htmlFor="notification-permission">
-                Enable system notifications (⚠️ Experimental ⚠️)
-              </label>
+              <label htmlFor="notification-permission">Enable system notifications</label>
               <Tooltip
                 label="More info"
                 icon={<Help size={18} aria-hidden />}
