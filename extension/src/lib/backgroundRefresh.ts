@@ -44,11 +44,15 @@ export async function backgroundDataRefresh() {
     return;
   }
 
-  const selectedBudgetSettings: { [budgetId: string]: BudgetSettings } = {};
-  for (const budgetId of budgetIds) {
-    const budgetSettings = await budgetSettingsStorage(budgetId, storageArea).getValue();
-    selectedBudgetSettings[budgetId] = budgetSettings;
-  }
+  const selectedBudgetSettings: { [budgetId: string]: BudgetSettings } =
+    Object.fromEntries(
+      await Promise.all(
+        budgetIds.map(async (budgetId) => [
+          budgetId,
+          await budgetSettingsStorage(budgetId, storageArea).getValue(),
+        ])
+      )
+    );
 
   // Skip background refresh if no notifications are enabled
   if (
