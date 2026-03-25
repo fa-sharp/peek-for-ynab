@@ -118,7 +118,7 @@ export default function TransactionFormMain({
         disabled={isSaving}
       />
       {canRememberPayee && (
-        <label className="flex-row gap-sn">
+        <label className="flex-row">
           <input
             type="checkbox"
             checked={isRememberedPayee}
