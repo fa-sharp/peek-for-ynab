@@ -25,9 +25,9 @@ const isDataFreshForDisplay = (lastUpdated: number) => lastUpdated + 240_000 > D
 
 /** Navigation at the top of the extension popup. Allows user to switch budgets, access settings, etc. */
 export default function PopupNav() {
-  const { authError } = useAuthContext();
   const { popupState, setPopupState, settings, editingItems, setEditingItems } =
     useStorageContext();
+  const { fetchingToken, authError } = useAuthContext();
   const {
     budgetsData,
     accountsLastUpdated,
@@ -38,7 +38,8 @@ export default function PopupNav() {
     isRefreshingBudgets,
   } = useYNABContext();
 
-  const globalIsFetching = useIsFetching();
+  const globalIsQueryFetching = useIsFetching();
+  const globalIsFetching = globalIsQueryFetching || fetchingToken;
 
   const shownBudgetsData = useMemo(
     () => budgetsData?.filter((b) => settings.budgets?.includes(b.id)),

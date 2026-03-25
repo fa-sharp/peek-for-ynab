@@ -16,9 +16,6 @@ export default defineConfig({
   },
   vite: () => ({
     envPrefix: "PUBLIC_",
-    build: {
-      commonjsOptions: { transformMixedEsModules: true }, // needed for packages that use `require()`
-    },
     plugins: [
       {
         name: "react-devtools",

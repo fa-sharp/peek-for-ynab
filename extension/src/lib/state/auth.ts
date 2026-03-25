@@ -60,7 +60,7 @@ export class AuthManager {
     } catch (err: unknown) {
       return {
         success: false,
-        error: err instanceof Error ? err.message : "Unknown error",
+        error: err instanceof Error ? err.message : String(err),
       } as const;
     }
   }
@@ -86,6 +86,7 @@ export const useAuth = () => {
     initialValue: initialAuthToken,
   });
   const [accessToken] = useChromeStorage(accessTokenStorage);
+  const [fetchingToken, setFetchingToken] = useState(false);
   const [error, setError] = useState("");
 
   const isAccessTokenStale = useMemo(
@@ -95,11 +96,13 @@ export const useAuth = () => {
 
   const fetchToken = useCallback(async (authToken: string) => {
     setError("");
+    setFetchingToken(true);
     const { success, error } = await AuthManager.fetchToken(authToken);
     if (!success) {
       console.warn("failed to get access token:", error);
       setError(error);
     }
+    setFetchingToken(false);
   }, []);
 
   const clearToken = useCallback(() => AuthManager.clearToken(), []);
@@ -115,9 +118,11 @@ export const useAuth = () => {
     error,
     /** Fetch and save the access token in memory */
     fetchToken,
+    /** Whether the access token is being fetched */
+    fetchingToken,
     /** The current auth token */
     authToken,
-    /** The current access token */
+    /** The current, valid access token */
     accessToken: accessToken?.value && !isAccessTokenStale ? accessToken.value : null,
     /** Clear the access token and auth token (e.g. on logout) */
     clearToken,

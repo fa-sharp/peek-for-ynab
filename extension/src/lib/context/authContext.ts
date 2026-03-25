@@ -9,7 +9,14 @@ export const useAuthProvider = () => {
   const queryClient = useQueryClient();
 
   /** Get auth state */
-  const { error: authError, authToken, clearToken, fetchToken, accessToken } = useAuth();
+  const {
+    error: authError,
+    authToken,
+    clearToken,
+    fetchToken,
+    fetchingToken,
+    accessToken,
+  } = useAuth();
 
   /** Authenticate the YNAB user through OAuth */
   const loginWithOAuth = useCallback(async () => {
@@ -62,6 +69,7 @@ export const useAuthProvider = () => {
     loginWithOAuth,
     logout,
     loggedIn: !!authToken,
+    fetchingToken,
     accessToken,
     authError,
   };
