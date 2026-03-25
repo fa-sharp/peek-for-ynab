@@ -57,23 +57,26 @@ export default function TransactionView({
     <div className={clsx("tx-display", { highlighted })}>
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
-          {!tx.approved && (
-            <IconButton
-              label="Unapproved. Click to approve"
-              onClick={approveTransaction}
-              icon={
-                isApproving ? (
-                  <ApprovingIcon />
-                ) : tx.matched_transaction_id ? (
-                  <UnapprovedMatchAlertIcon />
-                ) : (
-                  <UnapprovedAlertIcon />
-                )
-              }
-              spin={isApproving}
-              disabled={isApproving}
-            />
-          )}
+          {!tx.approved &&
+            (tx.category_name !== "Uncategorized" ? (
+              <IconButton
+                label="Unapproved. Click to approve"
+                onClick={approveTransaction}
+                icon={
+                  isApproving ? (
+                    <ApprovingIcon />
+                  ) : tx.matched_transaction_id ? (
+                    <UnapprovedMatchAlertIcon />
+                  ) : (
+                    <UnapprovedAlertIcon />
+                  )
+                }
+                spin={isApproving}
+                disabled={isApproving}
+              />
+            ) : (
+              <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon />} />
+            ))}
           {tx.flag_color && (
             <IconSpan
               label={tx.flag_name ? `Flag: ${tx.flag_name}` : `${tx.flag_color} flag`}
@@ -120,12 +123,13 @@ export default function TransactionView({
           )}
           {detailLeft === "category" &&
             (!isSplit ? (
-              tx.category_id &&
               tx.category_name && (
                 <button
                   className="button small accent rounded"
+                  disabled={!tx.category_id}
                   onClick={() =>
-                    goToDetailView({ id: tx.category_id!, type: "category" })
+                    tx.category_id &&
+                    goToDetailView({ id: tx.category_id, type: "category" })
                   }>
                   {tx.category_name}
                 </button>
