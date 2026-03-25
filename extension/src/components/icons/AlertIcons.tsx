@@ -15,11 +15,11 @@ export const ReconcileAlertIcon = () => (
 );
 
 export const UnapprovedAlertIcon = (props?: IconProps) => (
-  <Circle aria-hidden fill="#2ea1be" stroke="transparent" size={16} {...props} />
+  <Circle aria-hidden fill="#2ea1be" stroke="transparent" size={18} {...props} />
 );
 
 export const LoadingIcon = () => (
-  <Loader2 aria-hidden fill="transparent" stroke="#2ea1be" size={16} />
+  <Loader2 aria-hidden fill="transparent" stroke="#2ea1be" size={18} />
 );
 
 export const ImportErrorIcon = () => (
