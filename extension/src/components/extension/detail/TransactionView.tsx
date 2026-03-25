@@ -58,7 +58,7 @@ export default function TransactionView({
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
           {!tx.approved &&
-            (tx.category_name !== "Uncategorized" ? (
+            (tx.transfer_account_id || tx.category_name !== "Uncategorized" ? (
               <IconButton
                 label="Unapproved. Click to approve"
                 onClick={approveTransaction}
