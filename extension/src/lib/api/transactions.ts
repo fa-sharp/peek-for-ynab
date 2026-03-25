@@ -59,10 +59,7 @@ export async function fetchUnapprovedTxsForBudget(token: string, budgetId: strin
   const { data, error } = await apiClient(token).GET("/plans/{plan_id}/transactions", {
     params: {
       path: { plan_id: budgetId },
-      query: {
-        since_date: getNDaysAgoISO(14), // fetch unapproved transactions from up to 2 weeks ago
-        type: "unapproved",
-      },
+      query: { since_date: getNDaysAgoISO(14), type: "unapproved" }, // fetch unapproved transactions from up to 2 weeks ago
     },
   });
   if (error) throw error;
@@ -82,9 +79,7 @@ export async function fetchTransactionsForAccount(
     {
       params: {
         path: { plan_id: budgetId, account_id: accountId },
-        query: {
-          since_date: getNDaysAgoISO(sinceDaysAgo ?? 30),
-        },
+        query: { since_date: getNDaysAgoISO(sinceDaysAgo ?? 30) },
       },
     }
   );
@@ -106,9 +101,7 @@ export async function fetchTransactionsForCategory(
     {
       params: {
         path: { plan_id: budgetId, category_id: categoryId },
-        query: {
-          since_date: getNDaysAgoISO(sinceDaysAgo ?? 30),
-        },
+        query: { since_date: getNDaysAgoISO(sinceDaysAgo ?? 30) },
       },
     }
   );
@@ -145,9 +138,7 @@ export async function updateTransaction(
   const { data, error } = await apiClient(token).PUT(
     "/plans/{plan_id}/transactions/{transaction_id}",
     {
-      params: {
-        path: { plan_id: budgetId, transaction_id: transactionId },
-      },
+      params: { path: { plan_id: budgetId, transaction_id: transactionId } },
       //@ts-expect-error incorrect type
       body: { transaction },
     }
