@@ -76,7 +76,7 @@ export interface BudgetConfettiSettings {
   emojis: string[];
 }
 
-/** Map of URLs to saved payee ID */
+/** Map of URL hosts to saved payee ID */
 export interface SavedPayees {
   [url: string]: string | undefined;
 }

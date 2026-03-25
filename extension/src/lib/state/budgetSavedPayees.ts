@@ -8,9 +8,7 @@ import { useChromeStorage } from "./utils";
 function savedPayeesStorage(budgetId: string, area: "local" | "sync") {
   return storage.defineItem<SavedPayees>(
     `${area}:${STORAGE_KEYS.SavedPayees(budgetId)}`,
-    {
-      fallback: {},
-    }
+    { fallback: {} }
   );
 }
 
@@ -33,9 +31,7 @@ export const useSavedPayees = (budgetId: string, sync: boolean) => {
   );
 
   const getSavedPayeeForUrl = useCallback(
-    (url: string) => {
-      return savedPayees?.[url];
-    },
+    (url: string) => savedPayees?.[url],
     [savedPayees]
   );
 
