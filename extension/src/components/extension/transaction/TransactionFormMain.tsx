@@ -1,16 +1,16 @@
-import { type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { AccountSelect, CategorySelect, PayeeSelect } from "~components";
 import type { Account, Category } from "~lib/api/client";
-import { useSavedPayees, useTxStore } from "~lib/state";
+import { useTxStore } from "~lib/state";
 import type {
   AppSettings,
   BudgetMainData,
   BudgetSettings,
   CachedPayee,
 } from "~lib/types";
+import useRememberPayee from "~lib/useRememberPayee";
 import type { TransactionFormDispatch } from "~lib/useTransaction";
-import { executeScriptInCurrentTab } from "~lib/utils";
 
 interface Props {
   dispatch: TransactionFormDispatch;
@@ -83,7 +83,7 @@ export default function TransactionFormMain({
     [dispatch, memoRef]
   );
 
-  // If no account is selected, select the default account if available
+  // If no account is selected, select the default account if there is one
   useEffect(() => {
     if (accountId === undefined && budgetSettings?.transactions.defaultAccountId) {
       const defaultAccount = budgetMainData.accountsData.find(
@@ -98,45 +98,16 @@ export default function TransactionFormMain({
     dispatch,
   ]);
 
-  const { savePayeeForUrl, forgetPayeeForUrl, getSavedPayeeForUrl } = useSavedPayees(
-    budgetId ?? "",
-    settingsSynced
-  );
-  const [host, setHost] = useState<string | null>(null);
-  const isRememberedPayee = useMemo(
-    () => !!host && !!payee && "id" in payee && getSavedPayeeForUrl(host) === payee.id,
-    [host, payee, getSavedPayeeForUrl]
-  );
-
-  /** Toggle whether to remember the payee for the current website host */
-  const onToggleRememberPayee = useCallback(() => {
-    if (!host || !payee || !("id" in payee)) return;
-    if (isRememberedPayee) forgetPayeeForUrl(host);
-    else savePayeeForUrl(payee.id, host);
-  }, [host, payee, isRememberedPayee, savePayeeForUrl, forgetPayeeForUrl]);
-
-  // Get current tab's URL host if permission is granted
-  useEffect(() => {
-    if (!settings?.currentTabAccess) return;
-    executeScriptInCurrentTab(() => location.host)
-      .then((host) => {
-        const strippedHost = host.replace(/^www\./, "");
-        setHost(strippedHost);
-      })
-      .catch((err) => {
-        console.warn("Failed to get current tab host:", err);
-      });
-  }, [settings?.currentTabAccess]);
-
-  // If no payee is selected, select remembered payee if available
-  useEffect(() => {
-    if (payee !== undefined || !host) return;
-    const payeeId = getSavedPayeeForUrl(host);
-    if (payeeId) {
-      const savedPayee = budgetMainData.payeesData.find((p) => p.id === payeeId);
-      if (savedPayee) dispatch({ type: "setPayee", payee: savedPayee });
-    }
-  }, [payee, host, getSavedPayeeForUrl, dispatch, budgetMainData]);
+  // Get website host and use saved payees if enabled
+  const { host, isRememberedPayee, canRememberPayee, onToggleRememberPayee } =
+    useRememberPayee(
+      !!settings?.currentTabAccess,
+      budgetId ?? "",
+      budgetMainData,
+      settingsSynced,
+      dispatch,
+      payee
+    );
 
   return (
     <>
@@ -146,7 +117,7 @@ export default function TransactionFormMain({
         selectPayee={selectPayee}
         disabled={isSaving}
       />
-      {payee && "id" in payee && host && (
+      {canRememberPayee && (
         <label className="flex-row gap-sn">
           <input
             type="checkbox"
