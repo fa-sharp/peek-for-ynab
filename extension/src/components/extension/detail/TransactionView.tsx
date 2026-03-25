@@ -1,9 +1,10 @@
 import { clsx } from "clsx";
+import { useCallback, useState } from "react";
 import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
 
-import { CurrencyView, IconSpan, TxStatusIcon } from "~components";
+import { CurrencyView, IconButton, IconSpan, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
-import { UnapprovedAlertIcon } from "~components/icons/AlertIcons";
+import { LoadingIcon, UnapprovedAlertIcon } from "~components/icons/AlertIcons";
 import type {
   CurrencyFormat,
   HybridTransaction,
@@ -21,6 +22,7 @@ const dateFormatter = new Intl.DateTimeFormat("default", {
 export default function TransactionView({
   tx,
   goToDetailView,
+  approve,
   detailRight = "memo",
   detailLeft = "category",
   currencyFormat,
@@ -28,6 +30,7 @@ export default function TransactionView({
 }: {
   tx: TransactionDetail | HybridTransaction;
   goToDetailView: (detailState: DetailViewState) => void;
+  approve: (tx: TransactionDetail | HybridTransaction) => Promise<void>;
   detailRight?: "memo";
   detailLeft?: "category" | "account";
   currencyFormat?: CurrencyFormat;
@@ -36,11 +39,29 @@ export default function TransactionView({
   const date = new Date(tx.date);
   const isSplit = "subtransactions" in tx && tx.subtransactions.length > 0;
 
+  const [isApproving, setIsApproving] = useState(false);
+  const approveTransaction = useCallback(async () => {
+    setIsApproving(true);
+    try {
+      await approve(tx);
+    } finally {
+      setIsApproving(false);
+    }
+  }, [tx, approve]);
+
   return (
     <div className={clsx("tx-display", { highlighted })}>
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
-          {!tx.approved && <IconSpan label="Unapproved" icon={<UnapprovedAlertIcon />} />}
+          {!tx.approved && (
+            <IconButton
+              label="Unapproved. Click to approve"
+              onClick={approveTransaction}
+              icon={isApproving ? <LoadingIcon /> : <UnapprovedAlertIcon />}
+              spin={isApproving}
+              disabled={isApproving}
+            />
+          )}
           {tx.flag_color && (
             <IconSpan
               label={tx.flag_name ? `Flag: ${tx.flag_name}` : `${tx.flag_color} flag`}

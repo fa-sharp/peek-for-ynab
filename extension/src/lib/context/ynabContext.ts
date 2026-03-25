@@ -31,9 +31,11 @@ import {
 import type {
   Account,
   Category,
+  HybridTransaction,
   NewTransaction,
   TransactionDetail,
 } from "~lib/api/client";
+import { updateTransaction } from "~lib/api/transactions";
 import { IS_DEV } from "~lib/constants";
 import { useConfetti } from "~lib/hooks";
 import { queryPersister } from "~lib/queryClient";
@@ -175,7 +177,7 @@ export const useYNABProvider = () => {
         refetchCategoryGroups(),
         refetchAccounts(),
         queryClient.invalidateQueries({
-          queryKey: ["month", { budgetId: popupState.budgetId }],
+          queryKey: currentMonthQuery(popupState.budgetId).queryKey,
         }),
       ]),
     [queryClient, refetchAccounts, refetchCategoryGroups, popupState.budgetId]
@@ -262,6 +264,32 @@ export const useYNABProvider = () => {
       },
     });
 
+  const refetchTransaction = useCallback(
+    (transaction: TransactionDetail) => {
+      return Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: unapprovedTxsQuery(popupState.budgetId).queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: accountTxsQuery(popupState.budgetId, transaction.account_id).queryKey,
+        }),
+        transaction.category_id &&
+          queryClient.invalidateQueries({
+            queryKey: categoryTxsQuery(popupState.budgetId, transaction.category_id)
+              .queryKey,
+          }),
+        transaction.transfer_account_id &&
+          queryClient.invalidateQueries({
+            queryKey: accountTxsQuery(
+              popupState.budgetId,
+              transaction.transfer_account_id
+            ).queryKey,
+          }),
+      ]);
+    },
+    [queryClient, popupState.budgetId]
+  );
+
   const useGetAccountsForBudget = (budgetId: string) =>
     useQuery({
       ...accountsQuery(budgetId),
@@ -291,6 +319,7 @@ export const useYNABProvider = () => {
       setTimeout(() => {
         refetchCategoriesAndAccounts();
         if (!tx.payee_id) refetchPayees();
+        refetchTransaction(transaction);
       }, 350);
 
       setAddedTransaction(transaction);
@@ -307,46 +336,32 @@ export const useYNABProvider = () => {
         ];
         launchConfetti(emojis);
       }
-      transaction.category_id &&
-        queryClient.invalidateQueries({
-          queryKey: [
-            "txs",
-            {
-              budgetId: popupState.budgetId,
-              categoryId: transaction.category_id,
-            },
-          ],
-        });
-      transaction.account_id &&
-        queryClient.invalidateQueries({
-          queryKey: [
-            "txs",
-            {
-              budgetId: popupState.budgetId,
-              accountId: transaction.account_id,
-            },
-          ],
-        });
-      transaction.transfer_account_id &&
-        queryClient.invalidateQueries({
-          queryKey: [
-            "txs",
-            {
-              budgetId: popupState.budgetId,
-              accountId: transaction.transfer_account_id,
-            },
-          ],
-        });
     },
     [
       accessToken,
       popupState.budgetId,
       refetchCategoriesAndAccounts,
+      refetchTransaction,
       refetchPayees,
       budgetSettings?.confetti,
-      queryClient,
       launchConfetti,
     ]
+  );
+
+  const approveTransaction = useCallback(
+    async (transaction: TransactionDetail | HybridTransaction) => {
+      if (!accessToken || !popupState.budgetId) return;
+      const updatedTx = await updateTransaction(
+        accessToken,
+        popupState.budgetId,
+        transaction.id,
+        {
+          approved: true,
+        }
+      );
+      await refetchTransaction(updatedTx);
+    },
+    [accessToken, popupState.budgetId, refetchTransaction]
   );
 
   const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
@@ -419,6 +434,8 @@ export const useYNABProvider = () => {
     useGetAccountsForBudget,
     /** Add a new transaction to the current budget */
     addTransaction,
+    /** Approve a transaction in the current budget */
+    approveTransaction,
     /** The recently added transaction. Can be used to trigger animations/effects. */
     addedTransaction,
     useGetAccountTxs,
