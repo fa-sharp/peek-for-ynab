@@ -161,10 +161,14 @@ export const findAllEmoji = (s: string): string[] => {
 
 /**
  * Executes the given function in the context of the user's active browser tab.
+ * Checks for the 'activeTab' and 'scripting' permissions before executing.
  * @returns a Promise with the result of the given function
  * @throws any errors that arise, including browser permission errors.
  */
 export const executeScriptInCurrentTab = async <T>(func: () => T) => {
+  const granted = await checkPermissions(["activeTab", "scripting"]);
+  if (!granted) throw new Error("Permission denied to execute script in current tab.");
+
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
   if (!tab.id) throw new Error("Couldn't identify open tab.");
   const [{ result }] = await browser.scripting.executeScript({

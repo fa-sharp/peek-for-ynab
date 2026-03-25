@@ -2,12 +2,8 @@ import { useCallback, useMemo } from "react";
 
 import { storage } from "#imports";
 import { STORAGE_KEYS } from "~lib/constants";
+import type { SavedPayees } from "~lib/types";
 import { useChromeStorage } from "./utils";
-
-/** Map of URLs to payee IDs */
-interface SavedPayees {
-  [url: string]: string[];
-}
 
 function savedPayeesStorage(budgetId: string, area: "local" | "sync") {
   return storage.defineItem<SavedPayees>(
@@ -18,6 +14,7 @@ function savedPayeesStorage(budgetId: string, area: "local" | "sync") {
   );
 }
 
+/** Managed saved payees in storage */
 export const useSavedPayees = (budgetId: string, sync: boolean) => {
   const savedPayeesStore = useMemo(
     () => savedPayeesStorage(budgetId, sync ? "sync" : "local"),
@@ -29,17 +26,24 @@ export const useSavedPayees = (budgetId: string, sync: boolean) => {
     (payeeId: string, url: string) => {
       setSavedPayees((payees) => ({
         ...payees,
-        [url]: [...(payees?.[url] ?? []), payeeId],
+        [url]: payeeId,
       }));
     },
     [setSavedPayees]
   );
 
+  const getSavedPayeeForUrl = useCallback(
+    (url: string) => {
+      return savedPayees?.[url];
+    },
+    [savedPayees]
+  );
+
   const forgetPayeeForUrl = useCallback(
-    (payeeId: string, url: string) => {
+    (url: string) => {
       setSavedPayees((payees) => ({
         ...payees,
-        [url]: (payees?.[url] ?? []).filter((id) => id !== payeeId),
+        [url]: undefined,
       }));
     },
     [setSavedPayees]
@@ -47,6 +51,7 @@ export const useSavedPayees = (budgetId: string, sync: boolean) => {
 
   return {
     savedPayees,
+    getSavedPayeeForUrl,
     savePayeeForUrl,
     forgetPayeeForUrl,
   };

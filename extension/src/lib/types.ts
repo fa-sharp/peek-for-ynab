@@ -76,6 +76,11 @@ export interface BudgetConfettiSettings {
   emojis: string[];
 }
 
+/** Map of URLs to saved payee ID */
+export interface SavedPayees {
+  [url: string]: string | undefined;
+}
+
 /** Payees, category groups, categories, and accounts */
 export interface BudgetMainData {
   accountsData: Account[];

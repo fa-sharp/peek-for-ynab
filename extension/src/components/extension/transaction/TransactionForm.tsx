@@ -21,7 +21,7 @@ import TransactionFormSplit from "./TransactionFormSplit";
 /** Form that lets the user add a transaction. */
 export default function TransactionFormWrapper() {
   const { selectedBudgetData, budgetMainData } = useYNABContext();
-  const { settings, budgetSettings } = useStorageContext();
+  const { settings, settingsSynced, budgetSettings } = useStorageContext();
 
   return (
     <section>
@@ -33,9 +33,10 @@ export default function TransactionFormWrapper() {
       ) : (
         <TransactionFormInner
           budgetMainData={budgetMainData}
+          budgetSettings={budgetSettings}
           selectedBudgetData={selectedBudgetData}
           settings={settings}
-          budgetSettings={budgetSettings}
+          settingsSynced={settingsSynced}
         />
       )}
     </section>
@@ -47,6 +48,7 @@ interface Props {
   budgetMainData: BudgetMainData;
   budgetSettings?: BudgetSettings;
   settings?: AppSettings;
+  settingsSynced: boolean;
 }
 
 export function TransactionFormInner({
@@ -54,6 +56,7 @@ export function TransactionFormInner({
   budgetSettings,
   selectedBudgetData,
   settings,
+  settingsSynced,
 }: Props) {
   const { onSaveTransaction, isSaving, onCancelTransaction } = useTransaction();
 
@@ -135,8 +138,11 @@ export function TransactionFormInner({
         <TransactionFormMain
           {...{
             dispatch,
+            budgetId: selectedBudgetData?.id,
             budgetMainData,
             budgetSettings,
+            settings,
+            settingsSynced,
             memoRef,
             isSaving,
           }}

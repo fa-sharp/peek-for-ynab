@@ -4,7 +4,6 @@ import type { TransactionFlagColor } from "~lib/api/client";
 import { useStorageContext, useYNABContext } from "./context";
 import { type TxStoreAction, txStore, useTxStore, useTxStoreSubTxTotals } from "./state";
 import {
-  checkPermissions,
   executeScriptInCurrentTab,
   isBudgetToTrackingTransfer,
   parseLocaleNumber,
@@ -208,18 +207,15 @@ const useParseAmountFromUserSelection = (
 ) => {
   useEffect(() => {
     if (!enabled) return;
-    checkPermissions(["activeTab", "scripting"]).then((granted) => {
-      if (!granted) return;
-      executeScriptInCurrentTab(() => getSelection()?.toString())
-        .then((selection) => {
-          if (!selection) return;
-          const parsedNumber = parseLocaleNumber(selection);
-          if (!isNaN(parsedNumber))
-            dispatch({ type: "setAmount", amount: parsedNumber.toString() });
-        })
-        .catch((err) => {
-          console.error("Error getting user's selection: ", err);
-        });
-    });
+    executeScriptInCurrentTab(() => getSelection()?.toString())
+      .then((selection) => {
+        if (!selection) return;
+        const parsedNumber = parseLocaleNumber(selection);
+        if (!isNaN(parsedNumber))
+          dispatch({ type: "setAmount", amount: parsedNumber.toString() });
+      })
+      .catch((err) => {
+        console.error("Error getting user's selection: ", err);
+      });
   }, [enabled, dispatch]);
 };

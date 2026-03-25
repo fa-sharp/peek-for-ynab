@@ -41,6 +41,7 @@ test("Form has expected keyboard tab order", async () => {
         memoRef={memoRef}
         budgetMainData={result.current.ynab.budgetMainData!}
         isSaving={false}
+        settingsSynced={false}
       />
       <input ref={memoRef} />
     </>,
@@ -73,6 +74,7 @@ test("State is successfully updated when filling out the form", async () => {
       dispatch={result.current.transaction.dispatch}
       budgetMainData={result.current.ynab.budgetMainData!}
       isSaving={false}
+      settingsSynced={false}
     />,
     { wrapper }
   );
