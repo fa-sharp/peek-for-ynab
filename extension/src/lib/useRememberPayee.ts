@@ -56,7 +56,7 @@ export default function useRememberPayee(
     savePayeeForUrl,
   ]);
 
-  // If no payee is selected, select the remembered payee for the current website host if there is one
+  // If no payee is selected, auto-select the remembered payee for the current website host if there is one
   useEffect(() => {
     if (currentPayee !== undefined || !host) return;
     const payeeId = getSavedPayeeForUrl(host);
