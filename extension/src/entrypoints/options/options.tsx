@@ -183,16 +183,11 @@ export function OptionsView() {
                 type="checkbox"
                 checked={notificationEnabled}
                 onChange={async (e) => {
-                  if (e.target.checked) {
-                    requestNotificationPermission();
-                  } else {
-                    removeNotificationPermission();
-                  }
+                  if (e.target.checked) requestNotificationPermission();
+                  else removeNotificationPermission();
                 }}
               />
-              <label htmlFor="notification-permission">
-                Enable system notifications (⚠️ Experimental ⚠️)
-              </label>
+              <label htmlFor="notification-permission">Enable system notifications</label>
               <Tooltip
                 label="More info"
                 icon={<Help size={18} aria-hidden />}
