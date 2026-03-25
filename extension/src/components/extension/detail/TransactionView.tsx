@@ -123,7 +123,8 @@ export default function TransactionView({
           )}
           {detailLeft === "category" &&
             (!isSplit ? (
-              tx.category_name && (
+              tx.category_name &&
+              (!tx.transfer_account_id || tx.category_name !== "Uncategorized") && (
                 <button
                   className="button small accent rounded"
                   disabled={!tx.category_id}
