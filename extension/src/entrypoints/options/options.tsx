@@ -145,9 +145,15 @@ export function OptionsView() {
                     className="list"
                     style={{ listStyle: "numeric", paddingLeft: "2em" }}>
                     <li>
-                      Automatically copy the selected amount into the transaction form.
+                      Remember the payee for the URL you're on when entering transactions.
                     </li>
-                    <li>Copy the current URL into the memo field of the transaction.</li>
+                    <li>
+                      Automatically copy the amount/total you've selected on the webpage
+                      into the transaction form.
+                    </li>
+                    <li>
+                      Quickly copy the current URL into the memo field of the transaction.
+                    </li>
                   </ol>
                 </Dialog>
               </Tooltip>
