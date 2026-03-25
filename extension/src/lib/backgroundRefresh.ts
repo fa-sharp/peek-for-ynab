@@ -30,9 +30,42 @@ import {
   currentAlertsStorage,
   shouldSyncStorage,
 } from "./state";
+import type { BudgetSettings } from "./types";
 
 export async function backgroundDataRefresh() {
   IS_DEV && console.log("Background refresh: Starting...");
+
+  // Get the configured budgets and their settings
+  const syncEnabled = await shouldSyncStorage.getValue();
+  const storageArea = syncEnabled ? "sync" : "local";
+  const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
+  if (!budgetIds || budgetIds.length === 0) {
+    IS_DEV && console.log("Background refresh: No budgets configured");
+    return;
+  }
+
+  const selectedBudgetSettings: { [budgetId: string]: BudgetSettings } = {};
+  for (const budgetId of budgetIds) {
+    const budgetSettings = await budgetSettingsStorage(budgetId, storageArea).getValue();
+    selectedBudgetSettings[budgetId] = budgetSettings;
+  }
+
+  // Skip background refresh if no notifications are enabled
+  if (
+    isEmptyObject(selectedBudgetSettings) ||
+    Object.values(selectedBudgetSettings).every(
+      (settings) =>
+        [
+          settings.notifications.overspent,
+          settings.notifications.checkImports,
+          settings.notifications.importError,
+        ].every((enabled) => enabled === false) &&
+        isEmptyObject(settings.notifications.reconcileAlerts)
+    )
+  ) {
+    IS_DEV && console.log("Background refresh: No notifications enabled");
+    return;
+  }
 
   // Get the access token
   const authToken = await authTokenStorage.getValue();
@@ -47,19 +80,13 @@ export async function backgroundDataRefresh() {
   }
   const { accessToken } = tokenResponse;
 
-  // Get the configured budgets in the relevant storage area
-  const syncEnabled = await shouldSyncStorage.getValue();
-  const storageArea = syncEnabled ? "sync" : "local";
-  const { budgets: budgetIds } = await appSettingsStorage(storageArea).getValue();
-  if (!budgetIds || budgetIds.length === 0) return;
-
   // Create a query client with a longer default stale time, and restore the cache from IndexedDB
   const queryClient = createQueryClient({
     staleTime: 10 * 60 * 1000,
   });
   await queryPersister.restoreQueries(queryClient);
 
-  IS_DEV && console.log("Background refresh: updating alerts...");
+  IS_DEV && console.log("Background refresh: fetching data and updating alerts...");
   const budgetsData = await queryClient.fetchQuery({
     ...budgetQuery,
     queryFn: () => fetchBudgets(accessToken),
@@ -71,7 +98,7 @@ export async function backgroundDataRefresh() {
 
   // Fetch new data for each budget and update alerts
   for (const budget of budgetsData.filter(({ id }) => budgetIds.includes(id))) {
-    const budgetSettings = await budgetSettingsStorage(budget.id, storageArea).getValue();
+    const budgetSettings = selectedBudgetSettings[budget.id];
     if (!budgetSettings) continue;
 
     let unapprovedTxs: TransactionDetail[] | undefined;
