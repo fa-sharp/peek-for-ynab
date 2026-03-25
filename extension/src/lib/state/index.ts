@@ -1,6 +1,7 @@
 import { currentAlertsStorage, useCurrentAlerts, useVersionAlert } from "./alerts";
 import { AuthManager, accessTokenStorage, authTokenStorage, useAuth } from "./auth";
 import { pinnedItemsStorage, usePinnedItems } from "./budgetPinned";
+import { useSavedPayees } from "./budgetSavedPayees";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
 import { appSettingsStorage, shouldSyncStorage, useAppSettings } from "./settings";
@@ -33,6 +34,7 @@ export {
   useCurrentAlerts,
   usePinnedItems,
   usePopupState,
+  useSavedPayees,
   useTokenData,
   useTxStore,
   useTxStoreSubTxTotals,
