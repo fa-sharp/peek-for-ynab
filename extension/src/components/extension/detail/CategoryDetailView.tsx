@@ -8,8 +8,13 @@ import { useAppSettings } from "~lib/state";
 
 const CategoryTxsView = () => {
   const { popupState, setPopupState } = useStorageContext();
-  const { useGetCategoryTxs, categoriesData, selectedBudgetData, addedTransaction } =
-    useYNABContext();
+  const {
+    useGetCategoryTxs,
+    categoriesData,
+    selectedBudgetData,
+    approveTransaction,
+    addedTransaction,
+  } = useYNABContext();
   const { settings } = useAppSettings();
 
   const category = useMemo(
@@ -117,6 +122,7 @@ const CategoryTxsView = () => {
             <li key={tx.id}>
               <TransactionView
                 tx={tx}
+                approve={approveTransaction}
                 goToDetailView={(detailState) =>
                   setPopupState({ view: "detail", detailState })
                 }

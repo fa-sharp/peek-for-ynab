@@ -37,6 +37,7 @@ test("Shows transaction details correctly", async () => {
   render(
     <TransactionView
       tx={transaction}
+      approve={() => Promise.resolve()}
       detailLeft="category"
       detailRight="memo"
       goToDetailView={(state) => (detailState = state)}
