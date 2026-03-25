@@ -2,6 +2,7 @@ import type { UseQueryOptions } from "@tanstack/react-query";
 
 import { IS_DEV } from "~lib/constants";
 import {
+  type ApiSchemas,
   apiClient,
   type HybridTransaction,
   type NewTransaction,
@@ -9,7 +10,7 @@ import {
 } from "./client";
 
 export const unapprovedTxsQuery = (budgetId: string) => ({
-  queryKey: ["unapproved", { budgetId }],
+  queryKey: ["unapproved", { budgetId }] as const,
 });
 
 export const accountTxsQuery = (
@@ -18,7 +19,10 @@ export const accountTxsQuery = (
   sinceDaysAgo?: number
 ) =>
   ({
-    queryKey: ["txs", { budgetId: budgetId, accountId, sinceDaysAgo }],
+    queryKey: [
+      "txs",
+      { budgetId: budgetId, accountId, ...(sinceDaysAgo && { sinceDaysAgo }) },
+    ],
     placeholderData: (prevData, prevQuery) => {
       if (prevQuery?.queryKey[1].accountId === accountId && prevData) return prevData; // avoid flashes
       return null;
@@ -36,7 +40,10 @@ export const categoryTxsQuery = (
   sinceDaysAgo?: number
 ) =>
   ({
-    queryKey: ["txs", { budgetId: budgetId, categoryId, sinceDaysAgo }],
+    queryKey: [
+      "txs",
+      { budgetId: budgetId, categoryId, ...(sinceDaysAgo && { sinceDaysAgo }) },
+    ],
     placeholderData: (prevData, prevQuery) => {
       if (prevQuery?.queryKey[1].categoryId === categoryId && prevData) return prevData; // avoid flashes
       return null;
@@ -52,10 +59,7 @@ export async function fetchUnapprovedTxsForBudget(token: string, budgetId: strin
   const { data, error } = await apiClient(token).GET("/plans/{plan_id}/transactions", {
     params: {
       path: { plan_id: budgetId },
-      query: {
-        since_date: getNDaysAgoISO(14), // fetch unapproved transactions from up to 2 weeks ago
-        type: "unapproved",
-      },
+      query: { since_date: getNDaysAgoISO(14), type: "unapproved" }, // fetch unapproved transactions from up to 2 weeks ago
     },
   });
   if (error) throw error;
@@ -75,9 +79,7 @@ export async function fetchTransactionsForAccount(
     {
       params: {
         path: { plan_id: budgetId, account_id: accountId },
-        query: {
-          since_date: getNDaysAgoISO(sinceDaysAgo ?? 30),
-        },
+        query: { since_date: getNDaysAgoISO(sinceDaysAgo ?? 30) },
       },
     }
   );
@@ -99,9 +101,7 @@ export async function fetchTransactionsForCategory(
     {
       params: {
         path: { plan_id: budgetId, category_id: categoryId },
-        query: {
-          since_date: getNDaysAgoISO(sinceDaysAgo ?? 30),
-        },
+        query: { since_date: getNDaysAgoISO(sinceDaysAgo ?? 30) },
       },
     }
   );
@@ -115,17 +115,37 @@ export async function fetchTransactionsForCategory(
 export async function createTransaction(
   token: string,
   budgetId: string,
-  tx: NewTransaction
+  transaction: NewTransaction
 ) {
   const { data, error } = await apiClient(token).POST("/plans/{plan_id}/transactions", {
     params: {
       path: { plan_id: budgetId },
     },
-    body: { transaction: tx },
+    body: { transaction },
   });
   if (error) throw error;
 
   IS_DEV && console.log("Added transaction!", data.data.transaction);
+  return data.data.transaction as TransactionDetail;
+}
+
+export async function updateTransaction(
+  token: string,
+  budgetId: string,
+  transactionId: string,
+  transaction: ApiSchemas["SaveTransactionWithOptionalFields"]
+) {
+  const { data, error } = await apiClient(token).PUT(
+    "/plans/{plan_id}/transactions/{transaction_id}",
+    {
+      params: { path: { plan_id: budgetId, transaction_id: transactionId } },
+      //@ts-expect-error incorrect type
+      body: { transaction },
+    }
+  );
+  if (error) throw error;
+
+  IS_DEV && console.log("Updated transaction!", data.data.transaction);
   return data.data.transaction as TransactionDetail;
 }
 

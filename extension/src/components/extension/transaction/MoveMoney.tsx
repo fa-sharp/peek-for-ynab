@@ -1,8 +1,8 @@
-import { type SubmitEventHandler, useCallback, useRef, useState } from "react";
+import { type SubmitEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { SwitchVertical } from "tabler-icons-react";
 
 import { CategorySelect, CurrencyView, IconButton } from "~components";
-import type { MonthDetail } from "~lib/api/client";
+import type { Category, MonthDetail } from "~lib/api/client";
 import { useYNABContext } from "~lib/context";
 import { usePopupState } from "~lib/state";
 import type { BudgetMainData, CachedBudget, PopupState } from "~lib/types";
@@ -62,22 +62,26 @@ export function MoveMoneyInner({
   resetPopupState,
 }: Props) {
   const [amount, setAmount] = useState(popupState.moveMoneyState?.amount || "");
-  const [fromCategory, setFromCategory] = useState(() => {
-    if (!popupState.moveMoneyState?.fromCategoryId) return null;
-    return (
+
+  const [fromCategory, setFromCategory] = useState<Category | null>(null);
+  useEffect(() => {
+    if (!popupState.moveMoneyState?.fromCategoryId) return;
+    setFromCategory(
       budgetMainData.categoriesData.find(
         (c) => c.id === popupState.moveMoneyState?.fromCategoryId
       ) || null
     );
-  });
-  const [toCategory, setToCategory] = useState(() => {
-    if (!popupState.moveMoneyState?.toCategoryId) return null;
-    return (
+  }, [popupState.moveMoneyState, budgetMainData.categoriesData]);
+
+  const [toCategory, setToCategory] = useState<Category | null>(null);
+  useEffect(() => {
+    if (!popupState.moveMoneyState?.toCategoryId) return;
+    setToCategory(
       budgetMainData.categoriesData.find(
         (c) => c.id === popupState.moveMoneyState?.toCategoryId
       ) || null
     );
-  });
+  }, [popupState.moveMoneyState, budgetMainData.categoriesData]);
 
   const amountRef = useRef<HTMLInputElement>(null);
   const fromCategoryRef = useRef<HTMLInputElement>(null);
