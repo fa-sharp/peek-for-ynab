@@ -1,9 +1,13 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import { Icon } from "astro-icon/components";
+
+import { Image } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
 
 import "../../../extension/src/styles/global.css";
 import "../../../extension/src/styles/main.scss";
+
+import kofiImage from '@assets/kofi.png'
 
 interface Props {
   title?: string;
@@ -13,6 +17,7 @@ const { title } = Astro.props;
 const pathname = Astro.routePattern;
 ---
 
+<!-- Detect and apply preferred color theme -->
 <script is:inline src="/scripts/theme.js"></script>
 
 <html lang="en">
@@ -67,7 +72,12 @@ const pathname = Astro.routePattern;
             </ul>
         </nav>
         <main class="mainContent">
-            <h1>Peek for YNAB</h1>
+            <div class="mainTitle">
+                <h1>Peek for YNAB</h1>
+                <a id="kofi-button" href="https://ko-fi.com/R5R71WMA9E" target="_blank">
+                    <Image src={kofiImage} layout="constrained" height={40} alt="Buy Me a Coffee" />
+                </a>
+            </div>
             <slot />
         </main>
         <footer>
@@ -137,6 +147,26 @@ const pathname = Astro.routePattern;
         max-width: 80ch;
         margin-inline: auto;
     }
+
+    .mainTitle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5em;
+
+        h1 {
+            margin: 0;
+        }
+    }
+
+    #kofi-button {
+        opacity: 0.8;
+        transition: opacity 300ms
+    }
+    #kofi-button:hover {
+        opacity: 1;
+    }
+
 
     footer {
         margin-top: 2.5rem;
