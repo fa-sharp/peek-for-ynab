@@ -4,7 +4,11 @@ import { ArrowsSplit2, Flag3 } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, IconSpan, TxStatusIcon } from "~components";
 import { AddTransferIcon } from "~components/icons/ActionIcons";
-import { LoadingIcon, UnapprovedAlertIcon } from "~components/icons/AlertIcons";
+import {
+  ApprovingIcon,
+  UnapprovedAlertIcon,
+  UnapprovedMatchAlertIcon,
+} from "~components/icons/AlertIcons";
 import type {
   CurrencyFormat,
   HybridTransaction,
@@ -57,7 +61,15 @@ export default function TransactionView({
             <IconButton
               label="Unapproved. Click to approve"
               onClick={approveTransaction}
-              icon={isApproving ? <LoadingIcon /> : <UnapprovedAlertIcon />}
+              icon={
+                isApproving ? (
+                  <ApprovingIcon />
+                ) : tx.matched_transaction_id ? (
+                  <UnapprovedMatchAlertIcon />
+                ) : (
+                  <UnapprovedAlertIcon />
+                )
+              }
               spin={isApproving}
               disabled={isApproving}
             />
