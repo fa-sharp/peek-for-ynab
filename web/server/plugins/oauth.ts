@@ -93,7 +93,7 @@ export default fastifyPlugin<{
         expires: token.expires_at.getTime(),
       });
       const finalRedirectUrl = new URL(redirectUri);
-      finalRedirectUrl.searchParams.set("auth_token", encryptedToken);
+      finalRedirectUrl.hash = `auth_token=${encryptedToken}`;
 
       return reply.redirect(finalRedirectUrl.toString());
     },
