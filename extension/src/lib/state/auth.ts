@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { clear as idbClear } from "idb-keyval";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { storage } from "#imports";
@@ -47,6 +48,7 @@ export class AuthManager {
         if (error.status === 401) {
           console.warn("token endpoint returned unauthorized status, logging out...");
           await this.clearToken();
+          await idbClear(); // Clear API cache
         }
         return { success: false, error: error.message } as const;
       } else {
