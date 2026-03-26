@@ -50,10 +50,14 @@ export const useAuthProvider = () => {
     if (!authToken) return;
 
     // Revoke OAuth token
-    fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
-      method: "POST",
-      headers: { Authorization: authToken },
-    });
+    try {
+      await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
+        method: "POST",
+        headers: { Authorization: authToken },
+      });
+    } catch (error) {
+      console.error("Failed to revoke token:", error);
+    }
     // Clear encrypted token
     await clearToken();
     // Clear API cache
