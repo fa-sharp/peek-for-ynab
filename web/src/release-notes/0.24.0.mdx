@@ -1,0 +1,30 @@
+---
+date: 2026-03-27
+---
+- **Approve transactions**: In the account views, you can now approve transactions you recognize by clicking directly on the unapproved icon. If the transaction needs to be categorized/edited, you can open the account in YNAB directly by clicking on the link at the top of the extension next to the account name.
+- **Remember payees for websites**: If you've enabled current tab access in the settings, the extension can optionally remember and pre-fill the payee for the specific website you're on when entering transactions.
+- **Backend/auth updates** (a.k.a. why you needed to login again): The OAuth exchange and refresh flows have been completely moved to the server, and the access and refresh tokens are now stored encrypted in the browser extension (more details in the [GitHub PR](https://github.com/fa-sharp/peek-for-ynab/pull/185)). This adds a modest layer of security to those sensitive tokens, e.g. in case some random spyware starts snooping around your computer.
+- **Security updates**: The extension has been moved to a [new framework](https://wxt.dev/) as the old one hadn't received updates in a while. Many libraries/dependencies updated to latest versions.
+
+
+import { Image } from "astro:assets";
+
+import ApproveTx from "@assets/screenshots/approve-tx.gif";
+import RememberPayee from "@assets/screenshots/remember-payee.png";
+
+<div class="flex-row">
+    <Image
+    src={ApproveTx}
+    alt="Approving transaction in the detail view"
+    class="screenshot"
+    layout="constrained"
+    height={100}
+    />
+    <Image 
+    src={RememberPayee} 
+    alt="Remember a payee for a website host/URL" 
+    class="screenshot"
+    layout="constrained"
+    height={100}
+    />
+</div>
