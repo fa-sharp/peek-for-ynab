@@ -5,7 +5,7 @@ import fastify from "fastify";
 import { Type as T } from "typebox";
 
 import { isApiRequest } from "./lib.ts";
-import { astro, cors, crypto, helmet, oauth } from "./plugins/index.ts";
+import { astro, cors, crypto, helmet, oauth, rateLimit } from "./plugins/index.ts";
 
 /** Environment variables */
 export const envSchema = T.Object({
@@ -14,6 +14,7 @@ export const envSchema = T.Object({
   YNAB_CLIENT_ID: T.String(),
   YNAB_SECRET: T.String(),
   YNAB_BASE_URL: T.String({ default: "https://app.ynab.com" }),
+  REDIS_URL: T.Optional(T.String()),
 });
 
 /**
@@ -30,6 +31,7 @@ export async function createServer() {
       ignoreTrailingSlash: true,
     },
     logger: {
+      level: process.env.LOG_LEVEL ?? "info",
       transport:
         process.env.NODE_ENV === "development" ? { target: "pino-pretty" } : undefined,
     },
@@ -42,6 +44,9 @@ export async function createServer() {
     },
     schema: envSchema,
   });
+
+  // Setup rate limit
+  await app.register(rateLimit, { redisUrl: app.config.REDIS_URL });
 
   // OAuth login and callback
   app.register(oauth, {

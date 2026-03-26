@@ -66,4 +66,38 @@ describe("API: /token routes", () => {
 
     await app.close();
   });
+
+  it("should rate limit >60 requests in 1 minute", async () => {
+    const app = await createServer();
+    await app.ready();
+
+    const remoteAddress = "10.0.0.1";
+    const token = "fake-token";
+
+    for (let i = 0; i < 60; i++) {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/token",
+        remoteAddress,
+        headers: {
+          Authorization: token,
+        },
+      });
+      assert.equal(response.statusCode, 401);
+    }
+
+    for (let i = 0; i < 4; i++) {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/token",
+        remoteAddress,
+        headers: {
+          Authorization: token,
+        },
+      });
+      assert.equal(response.statusCode, 429);
+    }
+
+    await app.close();
+  });
 });

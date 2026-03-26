@@ -28,11 +28,19 @@ export default fastifyPlugin<{
     verifierCookieName: "peek-oauth-verifier",
   });
 
+  /** Name of the cookie used to store the final redirect URL after OAuth login */
   const REDIRECT_COOKIE_NAME = "peek-oauth-redirect";
 
+  // OAuth login redirect route
   app.withTypeProvider<TypeBoxTypeProvider>().route({
     method: "GET",
     url: `${opts.prefix}/login`,
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: "1 minute",
+      },
+    },
     schema: {
       querystring: T.Object({
         redirect_uri: T.String({
@@ -42,7 +50,6 @@ export default fastifyPlugin<{
     },
     handler: async (req, reply) => {
       const authUrl = new URL(await app.oauth.generateAuthorizationUri(req, reply));
-      // Store the final redirect URL in a temporary cookie
       reply.setCookie(REDIRECT_COOKIE_NAME, req.query.redirect_uri, {
         path: opts.prefix,
         secure: true,
@@ -52,29 +59,43 @@ export default fastifyPlugin<{
     },
   });
 
-  app.get(`${opts.prefix}/callback`, async (req, reply) => {
-    const { token } = await app.oauth.getAccessTokenFromAuthorizationCodeFlow(req, reply);
-    if (!token.refresh_token) {
-      req.log.warn("No refresh token received from OAuth callback");
-      return reply.status(500).send({ message: "Internal server error" });
-    }
+  // OAuth login callback route
+  app.route({
+    method: "GET",
+    url: `${opts.prefix}/callback`,
+    config: {
+      rateLimit: {
+        max: 5,
+        timeWindow: "1 minute",
+      },
+    },
+    handler: async (req, reply) => {
+      const { token } = await app.oauth.getAccessTokenFromAuthorizationCodeFlow(
+        req,
+        reply
+      );
+      if (!token.refresh_token) {
+        req.log.warn("No refresh token received from OAuth callback");
+        return reply.status(500).send({ message: "Internal server error" });
+      }
 
-    // Get the final redirect URL from the temporary cookie
-    const redirectUri = req.cookies[REDIRECT_COOKIE_NAME];
-    reply.clearCookie(REDIRECT_COOKIE_NAME, { path: opts.prefix });
-    if (!redirectUri) {
-      return reply.status(400).send({ message: "Missing final redirect URL" });
-    }
+      // Get the final redirect URL from the temporary cookie
+      const redirectUri = req.cookies[REDIRECT_COOKIE_NAME];
+      reply.clearCookie(REDIRECT_COOKIE_NAME, { path: opts.prefix });
+      if (!redirectUri) {
+        return reply.status(400).send({ message: "Missing final redirect URL" });
+      }
 
-    // Encrypt the access and refresh tokens into an opaque token string and add it to the redirect URL
-    const encryptedToken = app.crypto.encryptTokenData({
-      accessToken: token.access_token,
-      refreshToken: token.refresh_token,
-      expires: token.expires_at.getTime(),
-    });
-    const finalRedirectUrl = new URL(redirectUri);
-    finalRedirectUrl.searchParams.set("auth_token", encryptedToken);
+      // Encrypt the access and refresh tokens into an opaque token string and add it to the redirect URL
+      const encryptedToken = app.crypto.encryptTokenData({
+        accessToken: token.access_token,
+        refreshToken: token.refresh_token,
+        expires: token.expires_at.getTime(),
+      });
+      const finalRedirectUrl = new URL(redirectUri);
+      finalRedirectUrl.searchParams.set("auth_token", encryptedToken);
 
-    return reply.redirect(finalRedirectUrl.toString());
+      return reply.redirect(finalRedirectUrl.toString());
+    },
   });
 });

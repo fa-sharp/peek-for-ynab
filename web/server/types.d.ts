@@ -1,6 +1,8 @@
 import type { OAuth2Namespace } from "@fastify/oauth2";
+import type Redis from "ioredis";
 import type { Static } from "typebox";
 
+import type { TokenData } from "./lib";
 import type { CryptoService } from "./plugins/crypto";
 
 // Augment the types on the server and request
@@ -12,6 +14,8 @@ declare module "fastify" {
     oauth: OAuth2Namespace;
     /** Crypto utils */
     crypto: CryptoService;
+    /** Redis client */
+    redis?: Redis;
   }
 
   interface FastifyRequest {
