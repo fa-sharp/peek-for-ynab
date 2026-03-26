@@ -9,7 +9,7 @@ export default fastifyPlugin<{
   clientId: string;
   clientSecret: string;
   baseUrl: string;
-  allowedLoginRedirects: string[];
+  allowedLoginRedirects?: string[];
 }>(async (app, opts) => {
   app.register(fastifyOauth, {
     name: "oauth",
@@ -44,7 +44,9 @@ export default fastifyPlugin<{
     },
     schema: {
       querystring: T.Object({
-        redirect_uri: T.Enum(opts.allowedLoginRedirects),
+        redirect_uri: opts.allowedLoginRedirects
+          ? T.Enum(opts.allowedLoginRedirects)
+          : T.String(),
       }),
     },
     handler: async (req, reply) => {
@@ -78,13 +80,16 @@ export default fastifyPlugin<{
         return reply.status(500).send({ message: "Internal server error" });
       }
 
-      // Get the final redirect URL from the temporary cookie
+      // Get and verify the final redirect URL from the temporary cookie
       const redirectUri = req.cookies[REDIRECT_COOKIE_NAME];
       reply.clearCookie(REDIRECT_COOKIE_NAME, { path: opts.prefix });
       if (!redirectUri) {
         return reply.status(400).send({ message: "Missing redirect URL" });
       }
-      if (!opts.allowedLoginRedirects.includes(redirectUri)) {
+      if (
+        opts.allowedLoginRedirects &&
+        !opts.allowedLoginRedirects.includes(redirectUri)
+      ) {
         return reply.status(401).send({ message: "Disallowed redirect URL" });
       }
 
