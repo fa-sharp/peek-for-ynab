@@ -20,7 +20,14 @@ export const UnapprovedAlertIcon = (props?: IconProps) => (
 );
 
 export const UnapprovedMatchAlertIcon = (props?: IconProps) => (
-  <Link aria-hidden fill="#2ea1be" stroke="transparent" size={18} {...props} />
+  <Link
+    aria-hidden
+    fill="transparent"
+    stroke="#2ea1be"
+    strokeWidth={2.5}
+    size={18}
+    {...props}
+  />
 );
 
 export const ApprovingIcon = () => (
