@@ -9,6 +9,7 @@ export default fastifyPlugin<{
   clientId: string;
   clientSecret: string;
   baseUrl: string;
+  allowedLoginRedirects: string[];
 }>(async (app, opts) => {
   app.register(fastifyOauth, {
     name: "oauth",
@@ -43,19 +44,17 @@ export default fastifyPlugin<{
     },
     schema: {
       querystring: T.Object({
-        redirect_uri: T.String({
-          description: "The final URL to redirect to after OAuth login",
-        }),
+        redirect_uri: T.Enum(opts.allowedLoginRedirects),
       }),
     },
     handler: async (req, reply) => {
-      const authUrl = new URL(await app.oauth.generateAuthorizationUri(req, reply));
+      const authUrl = await app.oauth.generateAuthorizationUri(req, reply);
       reply.setCookie(REDIRECT_COOKIE_NAME, req.query.redirect_uri, {
         path: opts.prefix,
         secure: true,
         httpOnly: true,
       });
-      return reply.redirect(authUrl.toString());
+      return reply.redirect(authUrl);
     },
   });
 
@@ -83,7 +82,10 @@ export default fastifyPlugin<{
       const redirectUri = req.cookies[REDIRECT_COOKIE_NAME];
       reply.clearCookie(REDIRECT_COOKIE_NAME, { path: opts.prefix });
       if (!redirectUri) {
-        return reply.status(400).send({ message: "Missing final redirect URL" });
+        return reply.status(400).send({ message: "Missing redirect URL" });
+      }
+      if (!opts.allowedLoginRedirects.includes(redirectUri)) {
+        return reply.status(401).send({ message: "Disallowed redirect URL" });
       }
 
       // Encrypt the access and refresh tokens into an opaque token string and add it to the redirect URL

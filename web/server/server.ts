@@ -10,6 +10,7 @@ import { astro, cors, crypto, helmet, oauth, rateLimit } from "./plugins/index.t
 /** Environment variables */
 export const envSchema = T.Object({
   ALLOWED_ORIGINS: T.Optional(T.String({ description: "Comma-separated list" })),
+  ALLOWED_LOGIN_REDIRECTS: T.String({ description: "Comma-separated list" }),
   TOKEN_KEY: T.String({ minLength: 64, maxLength: 64, pattern: "^[a-fA-F0-9]+$" }),
   YNAB_CLIENT_ID: T.String(),
   YNAB_SECRET: T.String(),
@@ -51,6 +52,7 @@ export async function createServer() {
   // OAuth login and callback
   app.register(oauth, {
     prefix: "/api/auth/v2",
+    allowedLoginRedirects: app.config.ALLOWED_LOGIN_REDIRECTS.split(","),
     baseUrl: app.config.YNAB_BASE_URL,
     clientId: app.config.YNAB_CLIENT_ID,
     clientSecret: app.config.YNAB_SECRET,
