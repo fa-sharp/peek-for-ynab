@@ -24,6 +24,17 @@ export default fastifyPlugin<{ redisUrl?: string }>(async (app, opts) => {
     nameSpace: "peek:ratelimit:",
     redis,
   });
+  app.setNotFoundHandler(
+    {
+      preHandler: app.rateLimit({
+        max: 100,
+        timeWindow: "1 minute",
+      }),
+    },
+    function (_, reply) {
+      reply.code(404).send({ message: "Not found" });
+    }
+  );
 
   app.addHook("onClose", async () => {
     redis?.removeAllListeners();
