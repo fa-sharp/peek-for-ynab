@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "start": "NODE_ENV=development node server/index.ts",
+    "start": "NODE_ENV=development node --watch server/index.ts",
     "test": "LOG_LEVEL=warn node --test",
     "astro": "astro",
     "lint": "biome lint",

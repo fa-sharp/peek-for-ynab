@@ -19,7 +19,7 @@ export default fastifyPlugin<{ redisUrl?: string }>(async (app, opts) => {
   });
 
   // Setup rate limiting
-  app.register(fastifyRateLimit, {
+  await app.register(fastifyRateLimit, {
     global: false, // must be applied individually per route
     nameSpace: "peek:ratelimit:",
     redis,
