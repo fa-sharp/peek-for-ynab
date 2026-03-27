@@ -24,6 +24,8 @@ export default fastifyPlugin<{ redisUrl?: string }>(async (app, opts) => {
     nameSpace: "peek:ratelimit:",
     redis,
   });
+
+  // Rate limit the 404 handler
   app.setNotFoundHandler(
     {
       preHandler: app.rateLimit({
