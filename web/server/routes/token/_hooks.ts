@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 
-/** Hook for the token API routes */
+/** Hooks for the token API routes */
 export default async function (app: FastifyInstance) {
   app.decorateRequest("token", null);
 
