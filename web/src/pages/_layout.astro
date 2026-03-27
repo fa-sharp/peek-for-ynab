@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import { Icon } from "astro-icon/components";
 
 import "../../../extension/src/styles/global.css";
@@ -27,7 +26,6 @@ const pathname = Astro.routePattern;
 		<meta name="generator" content={Astro.generator} />
 		<title>{title ? `${title} | Peek for YNAB` : 'Peek for YNAB'}</title>
 	</head>
-	<ClientRouter />
 	<body>
     	<div class="pageContent">
         <nav>
@@ -87,6 +85,11 @@ const pathname = Astro.routePattern;
 </html>
 
 <style is:global>
+    @media (prefers-reduced-motion: no-preference) {
+        @view-transition {
+            navigation: auto;
+        }
+    }
     body {
         font-size: 0.9rem;
         padding: 1rem;

@@ -1,4 +1,3 @@
-document.addEventListener("astro:after-swap", detectAndApplyTheme);
 detectAndApplyTheme();
 
 /** Detects the user's preferred color theme and applies it to the document. */

@@ -29,9 +29,14 @@ export default defineConfig({
       })
     : vercel(),
 
-  // Allow cross-origin requests from Chrome extensions in development
-  // TODO: remove everything below after auth migration
   security: {
+    csp: {
+      styleDirective: { resources: ["'self'", "https://fonts.googleapis.com"] },
+      directives: ["font-src 'self' https://fonts.gstatic.com"],
+    },
+
+    // Allow cross-origin requests from Chrome extensions in development
+    // TODO: remove everything below after auth migration
     checkOrigin: false,
     allowedDomains:
       process.env.NODE_ENV === "development"

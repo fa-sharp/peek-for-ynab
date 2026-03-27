@@ -36,7 +36,7 @@ export const useAuthProvider = () => {
         url: authorizeUrl.toString(),
       });
       if (!responseUrl) throw new Error("No response URL received");
-      const authToken = new URL(responseUrl).searchParams.get("auth_token");
+      const authToken = new URL(responseUrl).hash.split("=")[1];
       if (!authToken) throw new Error("No auth token received");
 
       await fetchToken(authToken);
@@ -50,10 +50,14 @@ export const useAuthProvider = () => {
     if (!authToken) return;
 
     // Revoke OAuth token
-    fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
-      method: "POST",
-      headers: { Authorization: authToken },
-    });
+    try {
+      await fetch(`${import.meta.env.PUBLIC_MAIN_URL}/api/token/logout`, {
+        method: "POST",
+        headers: { Authorization: authToken },
+      });
+    } catch (error) {
+      console.error("Failed to revoke token:", error);
+    }
     // Clear encrypted token
     await clearToken();
     // Clear API cache
