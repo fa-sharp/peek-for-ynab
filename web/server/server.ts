@@ -5,15 +5,20 @@ import fastify from "fastify";
 import { Type as T } from "typebox";
 
 import { isApiRequest } from "./lib.ts";
-import { astro, cors, crypto, helmet, oauth } from "./plugins/index.ts";
+import { astro, cors, crypto, helmet, oauth, rateLimit } from "./plugins/index.ts";
 
 /** Environment variables */
 export const envSchema = T.Object({
   ALLOWED_ORIGINS: T.Optional(T.String({ description: "Comma-separated list" })),
+  ALLOWED_LOGIN_REDIRECTS: T.Optional(T.String({ description: "Comma-separated list" })),
   TOKEN_KEY: T.String({ minLength: 64, maxLength: 64, pattern: "^[a-fA-F0-9]+$" }),
+  TOKEN_KEY_OLD: T.Optional(
+    T.String({ minLength: 64, maxLength: 64, pattern: "^[a-fA-F0-9]+$" })
+  ),
   YNAB_CLIENT_ID: T.String(),
   YNAB_SECRET: T.String(),
   YNAB_BASE_URL: T.String({ default: "https://app.ynab.com" }),
+  REDIS_URL: T.Optional(T.String()),
 });
 
 /**
@@ -30,6 +35,7 @@ export async function createServer() {
       ignoreTrailingSlash: true,
     },
     logger: {
+      level: process.env.LOG_LEVEL ?? "info",
       transport:
         process.env.NODE_ENV === "development" ? { target: "pino-pretty" } : undefined,
     },
@@ -43,9 +49,13 @@ export async function createServer() {
     schema: envSchema,
   });
 
+  // Setup rate limit
+  await app.register(rateLimit, { redisUrl: app.config.REDIS_URL });
+
   // OAuth login and callback
   app.register(oauth, {
     prefix: "/api/auth/v2",
+    allowedLoginRedirects: app.config.ALLOWED_LOGIN_REDIRECTS?.split(","),
     baseUrl: app.config.YNAB_BASE_URL,
     clientId: app.config.YNAB_CLIENT_ID,
     clientSecret: app.config.YNAB_SECRET,
@@ -53,7 +63,10 @@ export async function createServer() {
 
   // Token encryption
   app.register(crypto, {
-    keys: [Buffer.from(app.config.TOKEN_KEY, "hex")],
+    keys: [
+      Buffer.from(app.config.TOKEN_KEY, "hex"),
+      ...(app.config.TOKEN_KEY_OLD ? [Buffer.from(app.config.TOKEN_KEY_OLD, "hex")] : []),
+    ],
   });
 
   // Security headers
