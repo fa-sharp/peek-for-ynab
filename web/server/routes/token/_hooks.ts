@@ -4,17 +4,8 @@ import type { FastifyInstance } from "fastify";
 export default async function (app: FastifyInstance) {
   app.decorateRequest("token", null);
 
-  // Rate limit
-  app.addHook(
-    "onRequest",
-    app.rateLimit({
-      max: 60,
-      timeWindow: "1 minute",
-    })
-  );
-
-  // Decrypt the token from the Authorization header
-  app.addHook("onRequest", async (req, reply) => {
+  // Decrypt the token from the Authorization header and attach it to the request
+  app.addHook("preParsing", async (req, reply) => {
     const authToken = req.headers["authorization"];
     if (!authToken) {
       return reply.status(401).send({ message: "Unauthorized" });

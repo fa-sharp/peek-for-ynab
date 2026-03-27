@@ -31,6 +31,7 @@ export default fastifyPlugin<{ redisUrl?: string }>(async (app, opts) => {
       preHandler: app.rateLimit({
         max: 100,
         timeWindow: "1 minute",
+        groupId: "notfound",
       }),
     },
     function (_, reply) {
