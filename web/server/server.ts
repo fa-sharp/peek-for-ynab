@@ -12,6 +12,7 @@ export const envSchema = T.Object({
   ALLOWED_ORIGINS: T.Optional(T.String({ description: "Comma-separated list" })),
   ALLOWED_LOGIN_REDIRECTS: T.Optional(T.String({ description: "Comma-separated list" })),
   TOKEN_KEY: T.String({ minLength: 64, maxLength: 64, pattern: "^[a-fA-F0-9]+$" }),
+  TOKEN_KEY_OLD: T.String({ minLength: 64, maxLength: 64, pattern: "^[a-fA-F0-9]+$" }),
   YNAB_CLIENT_ID: T.String(),
   YNAB_SECRET: T.String(),
   YNAB_BASE_URL: T.String({ default: "https://app.ynab.com" }),
@@ -60,7 +61,10 @@ export async function createServer() {
 
   // Token encryption
   app.register(crypto, {
-    keys: [Buffer.from(app.config.TOKEN_KEY, "hex")],
+    keys: [
+      Buffer.from(app.config.TOKEN_KEY, "hex"),
+      Buffer.from(app.config.TOKEN_KEY_OLD, "hex"),
+    ],
   });
 
   // Security headers
