@@ -67,12 +67,15 @@ export default function Omnibox() {
               setPopupState({ view: "txAdd", txState });
               setOmniboxInput("");
             },
+            openDetailView: (detailState) => {
+              setPopupState({ view: "detail", detailState });
+              setOmniboxInput("");
+            },
             editingItems,
             savedAccounts: pinnedItems?.accounts,
             savedCategories: pinnedItems?.categories,
             onPinItem: (type, id) =>
               type === "account" ? toggleAccount(id) : toggleCategory(id),
-            setPopupState,
           }}
         />
       ) : parsedQuery ? (

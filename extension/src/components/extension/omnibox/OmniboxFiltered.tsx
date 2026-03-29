@@ -10,7 +10,13 @@ import {
 } from "~components/icons/ActionIcons";
 import type { Account, Category } from "~lib/api/client";
 import type { CurrentAlerts } from "~lib/notifications";
-import type { AppSettings, BudgetMainData, CachedBudget, TxAddState } from "~lib/types";
+import type {
+  AppSettings,
+  BudgetMainData,
+  CachedBudget,
+  DetailViewState,
+  TxAddState,
+} from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 interface Props {
@@ -20,14 +26,11 @@ interface Props {
   settings: AppSettings;
   currentAlerts?: CurrentAlerts;
   openTxForm: (txState: TxAddState) => void;
+  openDetailView: (detailState: DetailViewState) => void;
   savedCategories?: string[];
   savedAccounts?: string[];
   editingItems?: boolean;
   onPinItem: (type: "account" | "category", id: string) => void;
-  setPopupState: (state: {
-    view: "detail";
-    detailState: { type: "account" | "category"; id: string };
-  }) => void;
 }
 
 export default function OmniboxFiltered({
@@ -41,7 +44,7 @@ export default function OmniboxFiltered({
   currentAlerts,
   onPinItem,
   openTxForm,
-  setPopupState,
+  openDetailView,
 }: Props) {
   return (
     <>
@@ -87,13 +90,17 @@ export default function OmniboxFiltered({
                             }
                             actionElementsRight={
                               !ccAccount ? (
-                                <Toolbar className="list flex-row gap-sm" aria-label="actions">
+                                <Toolbar
+                                  className="list flex-row gap-sm"
+                                  aria-label="actions">
                                   <IconButton
                                     rounded
                                     accent
                                     icon={<AddTransactionIcon />}
                                     label="Add transaction"
-                                    onClick={() => openTxForm({ categoryId: category.id })}
+                                    onClick={() =>
+                                      openTxForm({ categoryId: category.id })
+                                    }
                                   />
                                   <IconButton
                                     accent
@@ -101,12 +108,9 @@ export default function OmniboxFiltered({
                                     icon={<DetailIcon />}
                                     label="Details/Activity"
                                     onClick={() =>
-                                      setPopupState({
-                                        view: "detail",
-                                        detailState: {
-                                          type: "category",
-                                          id: category.id,
-                                        },
+                                      openDetailView({
+                                        type: "category",
+                                        id: category.id,
                                       })
                                     }
                                   />
@@ -183,9 +187,9 @@ export default function OmniboxFiltered({
                         icon={<DetailIcon />}
                         label="Details/Activity"
                         onClick={() =>
-                          setPopupState({
-                            view: "detail",
-                            detailState: { type: "account", id: account.id },
+                          openDetailView({
+                            type: "account",
+                            id: account.id,
                           })
                         }
                       />
