@@ -72,6 +72,7 @@ export default function Omnibox() {
             savedCategories: pinnedItems?.categories,
             onPinItem: (type, id) =>
               type === "account" ? toggleAccount(id) : toggleCategory(id),
+            setPopupState,
           }}
         />
       ) : parsedQuery ? (

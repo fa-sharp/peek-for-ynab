@@ -1,9 +1,10 @@
 import { Fragment } from "react";
 
-import { AccountView, CategoryView, IconButton, IconSpan } from "~components";
+import { AccountView, CategoryView, IconButton, IconSpan, Toolbar } from "~components";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  DetailIcon,
   PinItemIcon,
   PinnedItemIcon,
 } from "~components/icons/ActionIcons";
@@ -23,6 +24,10 @@ interface Props {
   savedAccounts?: string[];
   editingItems?: boolean;
   onPinItem: (type: "account" | "category", id: string) => void;
+  setPopupState: (state: {
+    view: "detail";
+    detailState: { type: "account" | "category"; id: string };
+  }) => void;
 }
 
 export default function OmniboxFiltered({
@@ -36,6 +41,7 @@ export default function OmniboxFiltered({
   currentAlerts,
   onPinItem,
   openTxForm,
+  setPopupState,
 }: Props) {
   return (
     <>
@@ -81,13 +87,30 @@ export default function OmniboxFiltered({
                             }
                             actionElementsRight={
                               !ccAccount ? (
-                                <IconButton
-                                  rounded
-                                  accent
-                                  icon={<AddTransactionIcon />}
-                                  label="Add transaction"
-                                  onClick={() => openTxForm({ categoryId: category.id })}
-                                />
+                                <Toolbar className="list flex-row gap-sm" aria-label="actions">
+                                  <IconButton
+                                    rounded
+                                    accent
+                                    icon={<AddTransactionIcon />}
+                                    label="Add transaction"
+                                    onClick={() => openTxForm({ categoryId: category.id })}
+                                  />
+                                  <IconButton
+                                    accent
+                                    rounded
+                                    icon={<DetailIcon />}
+                                    label="Details/Activity"
+                                    onClick={() =>
+                                      setPopupState({
+                                        view: "detail",
+                                        detailState: {
+                                          type: "category",
+                                          id: category.id,
+                                        },
+                                      })
+                                    }
+                                  />
+                                </Toolbar>
                               ) : (
                                 <IconButton
                                   rounded
@@ -146,13 +169,27 @@ export default function OmniboxFiltered({
                     )
                   }
                   actionElementsRight={
-                    <IconButton
-                      rounded
-                      accent
-                      icon={<AddTransactionIcon />}
-                      label="Add transaction"
-                      onClick={() => openTxForm({ accountId: account.id })}
-                    />
+                    <Toolbar className="list flex-row gap-sm" aria-label="actions">
+                      <IconButton
+                        rounded
+                        accent
+                        icon={<AddTransactionIcon />}
+                        label="Add transaction"
+                        onClick={() => openTxForm({ accountId: account.id })}
+                      />
+                      <IconButton
+                        accent
+                        rounded
+                        icon={<DetailIcon />}
+                        label="Details/Activity"
+                        onClick={() =>
+                          setPopupState({
+                            view: "detail",
+                            detailState: { type: "account", id: account.id },
+                          })
+                        }
+                      />
+                    </Toolbar>
                   }
                 />
               </li>
