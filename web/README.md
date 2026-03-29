@@ -1,11 +1,11 @@
 # Peek for YNAB: Backend server and website
 
-To preview the Astro website locally, run:
+To preview the Astro static website locally, run:
 ```sh
 pnpm dev
 ```
 
-To run the server locally, set up the environment variables in `.env` and then run:
+To run the Fastify server locally, set up the environment variables in `.env` and then run:
 
 ```sh
 pnpm build
@@ -23,7 +23,7 @@ pnpm start
 
 Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-Any static assets, like images, can be placed in the `public/` directory.
+Any static assets that should be served directly can be placed in the `public/` directory.
 
 ## Astro Commands
 

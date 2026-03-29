@@ -71,7 +71,7 @@ cd web
 pnpm build
 ```
 
-The Astro backend and website will be built as an Express-compatible middleware to the `web/dist/` folder. You can then run the Fastify server via:
+The Astro website will be built into a static site in the `web/dist/` folder. You can then run the Fastify server via:
 
 ```bash
 pnpm start

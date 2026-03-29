@@ -1,14 +1,8 @@
 import fastifyStatic from "@fastify/static";
 import fastifyPlugin from "fastify-plugin";
 
-import { isApiRequest } from "../lib.ts";
-
-/** Serves the Astro website */
-export default fastifyPlugin<{
-  rootStaticPath: string;
-  ssrHandler: (...args: unknown[]) => void | Promise<void>;
-}>(async (app, opts) => {
-  // Serve Astro static files
+/** Serves the Astro website static files */
+export default fastifyPlugin<{ rootStaticPath: string }>(async (app, opts) => {
   app.register(fastifyStatic, {
     root: opts.rootStaticPath,
     cacheControl: false,
@@ -17,14 +11,5 @@ export default fastifyPlugin<{
         res.setHeader("cache-control", "public, max-age=31536000, immutable");
       }
     },
-  });
-
-  // Astro SSR / API handler with logging
-  // TODO this should be removed after auth migration
-  app.addHook("onRequest", (req, res, next) => {
-    const locals = isApiRequest(req.url)
-      ? { log: req.log.child({ module: "api" }) }
-      : undefined;
-    opts.ssrHandler(req.raw, res.raw, next, locals);
   });
 });
