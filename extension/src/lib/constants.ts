@@ -19,8 +19,6 @@ export const STORAGE_KEYS = Object.freeze({
   SavedPayees: (budgetId: string) => `budget-${budgetId}:payees`,
   ShouldSyncSettings: "sync",
   TxState: "txState",
-  /** @deprecated TODO remove after auth migration */
-  OldToken: "tokenData",
   VersionAlert: "versionAlert",
 });
 
