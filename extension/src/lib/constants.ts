@@ -1,8 +1,8 @@
 import type { AppSettings, BudgetSettings, PopupState } from "./types";
 
 /** Update these 2 variables to alert the user for a major new update/version */
-export const LATEST_VERSION_ALERT_NUM = 4;
-export const LATEST_VERSION_ALERT_TEXT = "New: Detail views!";
+export const LATEST_VERSION_ALERT_NUM = 5;
+export const LATEST_VERSION_ALERT_TEXT = "New: Approve transactions!";
 
 export const IS_DEV = import.meta.env.DEV && !import.meta.env.VITEST;
 export const IS_PRODUCTION = import.meta.env.PROD;

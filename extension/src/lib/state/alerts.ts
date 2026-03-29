@@ -17,6 +17,7 @@ export const currentAlertsStorage = storage.defineItem<CurrentAlerts>(
 export const versionAlertStorage = storage.defineItem<number>(
   `sync:${STORAGE_KEYS.VersionAlert}`,
   {
+    init: () => LATEST_VERSION_ALERT_NUM,
     fallback: LATEST_VERSION_ALERT_NUM,
     version: 2,
     migrations: {
