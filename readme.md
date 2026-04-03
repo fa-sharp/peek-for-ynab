@@ -3,6 +3,7 @@
 [![CI status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/ci.yml)
 [![Website deployment status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/website.yml)
 [![Web Store submission status](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml/badge.svg)](https://github.com/fa-sharp/peek-for-ynab/actions/workflows/submit.yml)
+[![Chrome Web Store rating](https://img.shields.io/chrome-web-store/stars/oakibhlecegcmjcjppmjkiaeedoljbmk?label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/peek-for-ynab/oakibhlecegcmjcjppmjkiaeedoljbmk)
 
 A browser extension for YNAB that lets users see their category and account balances at a glance, quickly add transactions, setup customizable notifications, and more. See full feature list and installation links on the [extension website](https://peekforynab.com).
 
