@@ -5,16 +5,6 @@ import type {
   CurrencyFormat,
 } from "./api/client";
 
-/**
- * Persisted token data
- * @deprecated old auth system, not used anymore
- */
-export interface TokenData {
-  accessToken: string;
-  refreshToken: string;
-  expires: number;
-}
-
 /** Current popup state */
 export interface PopupState {
   /** Current page/view */

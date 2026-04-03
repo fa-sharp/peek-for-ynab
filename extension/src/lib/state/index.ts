@@ -5,7 +5,6 @@ import { useSavedPayees } from "./budgetSavedPayees";
 import { budgetSettingsStorage, useBudgetSettings } from "./budgetSettings";
 import { popupStateStorage, usePopupState } from "./popupState";
 import { appSettingsStorage, shouldSyncStorage, useAppSettings } from "./settings";
-import { tokenDataStorage, useTokenData } from "./token";
 import {
   type TxStore,
   type TxStoreAction,
@@ -26,7 +25,6 @@ export {
   shouldSyncStorage,
   type TxStore,
   type TxStoreAction,
-  tokenDataStorage,
   txStore,
   useAppSettings,
   useAuth,
@@ -35,7 +33,6 @@ export {
   usePinnedItems,
   usePopupState,
   useSavedPayees,
-  useTokenData,
   useTxStore,
   useTxStoreSubTxTotals,
   useVersionAlert,
