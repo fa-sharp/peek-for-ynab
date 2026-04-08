@@ -1,4 +1,6 @@
 import { resolve } from "node:path";
+import babel from "@rolldown/plugin-babel";
+import { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "wxt";
 
 // See https://wxt.dev/api/config.html
@@ -7,16 +9,12 @@ export default defineConfig({
   outDir: "build",
   imports: false, // disable auto-imports
   targetBrowsers: ["chrome", "firefox"],
-  react: {
-    vite: {
-      babel: {
-        plugins: ["babel-plugin-react-compiler"],
-      },
-    },
-  },
   vite: () => ({
     envPrefix: "PUBLIC_",
     plugins: [
+      babel({
+        presets: [reactCompilerPreset()],
+      }),
       {
         name: "react-devtools",
         apply: "serve",
