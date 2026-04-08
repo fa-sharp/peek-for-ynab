@@ -14,7 +14,6 @@ afterEach(async () => {
 });
 afterAll(() => {
   mockServer.close();
-  mockServer.dispose();
 });
 
 // FIXME ignore act warning for now: https://github.com/testing-library/react-testing-library/pull/1214
