@@ -1,15 +1,22 @@
 import { Fragment } from "react";
 
-import { AccountView, CategoryView, IconButton, IconSpan } from "~components";
+import { AccountView, CategoryView, IconButton, IconSpan, Toolbar } from "~components";
 import {
   AddCCPaymentIcon,
   AddTransactionIcon,
+  DetailIcon,
   PinItemIcon,
   PinnedItemIcon,
 } from "~components/icons/ActionIcons";
 import type { Account, Category } from "~lib/api/client";
 import type { CurrentAlerts } from "~lib/notifications";
-import type { AppSettings, BudgetMainData, CachedBudget, TxAddState } from "~lib/types";
+import type {
+  AppSettings,
+  BudgetMainData,
+  CachedBudget,
+  DetailViewState,
+  TxAddState,
+} from "~lib/types";
 import { findCCAccount, millisToStringValue } from "~lib/utils";
 
 interface Props {
@@ -19,6 +26,7 @@ interface Props {
   settings: AppSettings;
   currentAlerts?: CurrentAlerts;
   openTxForm: (txState: TxAddState) => void;
+  openDetailView: (detailState: DetailViewState) => void;
   savedCategories?: string[];
   savedAccounts?: string[];
   editingItems?: boolean;
@@ -36,6 +44,7 @@ export default function OmniboxFiltered({
   currentAlerts,
   onPinItem,
   openTxForm,
+  openDetailView,
 }: Props) {
   return (
     <>
@@ -81,13 +90,31 @@ export default function OmniboxFiltered({
                             }
                             actionElementsRight={
                               !ccAccount ? (
-                                <IconButton
-                                  rounded
-                                  accent
-                                  icon={<AddTransactionIcon />}
-                                  label="Add transaction"
-                                  onClick={() => openTxForm({ categoryId: category.id })}
-                                />
+                                <Toolbar
+                                  className="list flex-row gap-sm"
+                                  aria-label="actions">
+                                  <IconButton
+                                    rounded
+                                    accent
+                                    icon={<AddTransactionIcon />}
+                                    label="Add transaction"
+                                    onClick={() =>
+                                      openTxForm({ categoryId: category.id })
+                                    }
+                                  />
+                                  <IconButton
+                                    accent
+                                    rounded
+                                    icon={<DetailIcon />}
+                                    label="Details/Activity"
+                                    onClick={() =>
+                                      openDetailView({
+                                        type: "category",
+                                        id: category.id,
+                                      })
+                                    }
+                                  />
+                                </Toolbar>
                               ) : (
                                 <IconButton
                                   rounded
@@ -146,13 +173,27 @@ export default function OmniboxFiltered({
                     )
                   }
                   actionElementsRight={
-                    <IconButton
-                      rounded
-                      accent
-                      icon={<AddTransactionIcon />}
-                      label="Add transaction"
-                      onClick={() => openTxForm({ accountId: account.id })}
-                    />
+                    <Toolbar className="list flex-row gap-sm" aria-label="actions">
+                      <IconButton
+                        rounded
+                        accent
+                        icon={<AddTransactionIcon />}
+                        label="Add transaction"
+                        onClick={() => openTxForm({ accountId: account.id })}
+                      />
+                      <IconButton
+                        accent
+                        rounded
+                        icon={<DetailIcon />}
+                        label="Details/Activity"
+                        onClick={() =>
+                          openDetailView({
+                            type: "account",
+                            id: account.id,
+                          })
+                        }
+                      />
+                    </Toolbar>
                   }
                 />
               </li>
