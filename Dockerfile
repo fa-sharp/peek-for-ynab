@@ -20,8 +20,9 @@ FROM base AS builder
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
-# Build Astro app (copy shared styles from extension)
+# Build Astro app (copy shared fonts and styles from extension)
 COPY --link web .
+COPY --link extension/src/assets/fonts /app/extension/src/assets/fonts
 COPY --link extension/src/styles /app/extension/src/styles
 RUN --mount=type=cache,id=astro,target=/app/web/node_modules/.astro \
     pnpm run build
