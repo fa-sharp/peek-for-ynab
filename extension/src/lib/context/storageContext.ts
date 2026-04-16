@@ -6,7 +6,6 @@ import {
   useBudgetSettings,
   usePinnedItems,
   usePopupState,
-  useTokenData,
 } from "~lib/state";
 import type { AppSettings } from "~lib/types";
 
@@ -19,9 +18,6 @@ export const useStorageProvider = () => {
   const [omniboxInput, setOmniboxInput] = useState("");
 
   // PERSISTED STATE
-
-  /** @deprecated The old token, will clear itself on upgrade */
-  const _tokenState = useTokenData();
 
   /** Current popup view state. Persisted locally. */
   const [popupState, setPopupState] = usePopupState();
