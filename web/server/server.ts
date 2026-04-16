@@ -43,9 +43,7 @@ export async function createServer() {
 
   // Parse and verify config / env variables
   await app.register(fastifyEnv, {
-    dotenv: process.env.NODE_ENV !== "production" && {
-      quiet: true,
-    },
+    dotenv: process.env.NODE_ENV !== "production",
     schema: envSchema,
   });
 
@@ -79,8 +77,7 @@ export async function createServer() {
 
   // Astro website
   app.register(astro, {
-    rootStaticPath: fileURLToPath(new URL("../dist/client", import.meta.url)),
-    ssrHandler: (await import("../dist/server/entry.mjs")).handler,
+    rootStaticPath: fileURLToPath(new URL("../dist", import.meta.url)),
   });
 
   // API routes

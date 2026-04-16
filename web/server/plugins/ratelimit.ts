@@ -31,11 +31,10 @@ export default fastifyPlugin<{ redisUrl?: string }>(async (app, opts) => {
       preHandler: app.rateLimit({
         max: 100,
         timeWindow: "1 minute",
-        groupId: "notfound",
       }),
     },
     function (_, reply) {
-      reply.code(404).send({ message: "Not found" });
+      reply.code(404).sendFile("404.html");
     }
   );
 
