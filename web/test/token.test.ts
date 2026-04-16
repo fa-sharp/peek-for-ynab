@@ -10,7 +10,6 @@ before(() => {
 
 after(() => {
   mockOauthServer.close();
-  mockOauthServer.dispose();
 });
 
 describe("API: /token routes", () => {

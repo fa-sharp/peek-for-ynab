@@ -43,9 +43,7 @@ export async function createServer() {
 
   // Parse and verify config / env variables
   await app.register(fastifyEnv, {
-    dotenv: process.env.NODE_ENV !== "production" && {
-      quiet: true,
-    },
+    dotenv: process.env.NODE_ENV !== "production",
     schema: envSchema,
   });
 
