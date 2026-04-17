@@ -5,6 +5,7 @@ import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { storage } from "#imports";
 import { fetchAccessToken } from "~lib/api";
 import { ONE_MINUTE_IN_MILLIS, STORAGE_KEYS } from "~lib/constants";
+import { sendMessage } from "~lib/messaging";
 import { useChromeStorage } from "./utils";
 
 /** Encrypted auth token stored in local storage */
@@ -30,7 +31,10 @@ interface AccessToken {
 /** Auth utilities */
 export class AuthManager {
   /** Access token should be valid for at least 5 minutes, so we allow 4 minutes of staleness */
-  static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 4;
+  private static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 4;
+
+  private static fetchTokenInFlight: ReturnType<typeof AuthManager.doFetchToken> | null =
+    null;
 
   /** Whether the in-memory access token is stale and should be refreshed from the server */
   static isAccessTokenStale(accessToken: AccessToken) {
@@ -40,8 +44,24 @@ export class AuthManager {
   /**
    * Fetch the unencrypted access token from the server, and save it in memory. Will
    * clear the tokens from storage if an unauthorized error is received from the server.
+   * Deduplicates concurrent calls so only one HTTP request is in-flight at a time.
    */
-  static async fetchToken(authToken: string) {
+  static fetchToken(authToken: string) {
+    if (!this.fetchTokenInFlight) {
+      this.fetchTokenInFlight = this.doFetchToken(authToken).finally(() => {
+        this.fetchTokenInFlight = null;
+      });
+    }
+    return this.fetchTokenInFlight;
+  }
+
+  private static async doFetchToken(authToken: string): Promise<
+    | { success: true; accessToken: string }
+    | {
+        success: false;
+        error: string;
+      }
+  > {
     try {
       const { data, error } = await fetchAccessToken(authToken);
       if (error) {
@@ -99,10 +119,10 @@ export const useAuth = () => {
   const fetchToken = useCallback(async (authToken: string) => {
     setError("");
     setFetchingToken(true);
-    const { success, error } = await AuthManager.fetchToken(authToken);
-    if (!success) {
-      console.warn("failed to get access token:", error);
-      setError(error);
+    const result = await sendMessage("fetchToken", { authToken });
+    if (!result.success) {
+      console.warn("failed to get access token:", result.error);
+      setError(result.error);
     }
     setFetchingToken(false);
   }, []);
