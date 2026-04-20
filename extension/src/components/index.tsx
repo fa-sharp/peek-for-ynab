@@ -1,6 +1,5 @@
+import CountUp from "./CountUp";
 import CurrencyView from "./CurrencyView";
-import IconButton from "./IconButton";
-import IconSpan from "./IconSpan";
 import AccountDetailView from "./extension/detail/AccountDetailView";
 import CategoryDetailView from "./extension/detail/CategoryDetailView";
 import TransactionView from "./extension/detail/TransactionView";
@@ -27,6 +26,8 @@ import MoveMoney from "./extension/transaction/MoveMoney";
 import PayeeSelect from "./extension/transaction/PayeeSelect";
 import SubTransaction from "./extension/transaction/SubTransaction";
 import TransactionForm from "./extension/transaction/TransactionForm";
+import IconButton from "./IconButton";
+import IconSpan from "./IconSpan";
 import Dialog from "./react-aria/Dialog";
 import Menu from "./react-aria/Menu";
 import { RadioButton, RadioButtonGroup } from "./react-aria/RadioButton";
@@ -38,20 +39,21 @@ export {
   AccountSelect,
   AccountView,
   AllAccountsView,
+  AllCategoriesView,
   AmountField,
   BudgetSelect,
   BudgetSettings,
-  AllCategoriesView,
   CategoryDetailView,
   CategorySelect,
   CategoryView,
+  CountUp,
   CurrencyView,
   Dialog,
   IconButton,
   IconSpan,
   MemoField,
-  MoveMoney,
   Menu,
+  MoveMoney,
   NewVersionAlert,
   NotificationsView,
   Omnibox,
@@ -68,5 +70,5 @@ export {
   Tooltip,
   TransactionForm,
   TransactionView,
-  TxStatusIcon
+  TxStatusIcon,
 };

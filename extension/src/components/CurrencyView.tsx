@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CountUp from "react-countup";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { CountUp } from "~components";
 import type { CurrencyFormat } from "~lib/api/client";
 import { getCurrencyFormatter } from "~lib/utils";
 
@@ -36,7 +36,6 @@ function CurrencyView({
     currValueRef.current = milliUnits;
   }, [milliUnits]);
 
-  const [isAnimating, setIsAnimating] = useState(false);
   const hasValueChanged = prevValueRef.current !== milliUnits;
 
   const className = useMemo(
@@ -58,11 +57,6 @@ function CurrencyView({
       end={milliUnits}
       duration={1.2}
       formattingFn={formatValue}
-      onStart={() => setIsAnimating(true)}
-      onEnd={() => setIsAnimating(false)}
-      containerProps={{
-        "aria-busy": isAnimating,
-      }}
     />
   );
 }
