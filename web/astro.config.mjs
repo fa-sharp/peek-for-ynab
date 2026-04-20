@@ -11,9 +11,6 @@ export default defineConfig({
     responsiveStyles: true,
   },
   security: {
-    csp: {
-      styleDirective: { resources: ["'self'", "https://fonts.googleapis.com"] },
-      directives: ["font-src 'self' https://fonts.gstatic.com"],
-    },
+    csp: true,
   },
 });

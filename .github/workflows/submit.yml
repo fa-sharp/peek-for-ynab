@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           package-manager-cache: false
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
 
       - name: Package into zip artifact
         env:
