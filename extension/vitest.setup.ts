@@ -1,12 +1,33 @@
+import { randomUUID } from "node:crypto";
 import { cleanup } from "@testing-library/react";
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
-import { fakeBrowser } from "wxt/testing/fake-browser";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { fakeBrowser } from "wxt/testing";
 
 import { browser } from "#imports";
 import { mockServer } from "~test/mock/msw";
 
 // Test lifecycle
 beforeAll(() => mockServer.listen({ onUnhandledRequest: "error" }));
+beforeEach(() => {
+  // Mock messages to background thread
+  (fakeBrowser as typeof browser).runtime.onMessage.addListener((msg) => {
+    switch (msg.type) {
+      // Mock fetching & setting of access token
+      case "fetchToken": {
+        const accessToken = randomUUID();
+        browser.storage.session.set({
+          accessToken: { lastChecked: Date.now(), value: accessToken },
+        });
+        return {
+          res: { success: true, accessToken },
+        };
+      }
+      default: {
+        throw new Error(`Unrecognized message type ${msg.type}`);
+      }
+    }
+  });
+});
 afterEach(async () => {
   mockServer.resetHandlers();
   fakeBrowser.reset();

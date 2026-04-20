@@ -1,6 +1,7 @@
 import { type Browser, browser, defineBackground } from "#imports";
 import { backgroundDataRefresh } from "~lib/backgroundRefresh";
 import { BACKGROUND_ALARM_NAME, IS_DEV } from "~lib/constants";
+import { onMessage } from "~lib/messaging";
 import {
   checkBrowserBarPermission,
   createBrowserBarSuggestions,
@@ -10,10 +11,13 @@ import {
   getPossibleTxFieldCombinations,
   parseTxInput,
 } from "~lib/omnibox";
-import { popupStateStorage, txStore } from "~lib/state";
+import { AuthManager, popupStateStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
+  // Handle token fetch requests from popup — runs here so the HTTP request survives popup close
+  onMessage("fetchToken", ({ data: { authToken } }) => AuthManager.fetchToken(authToken));
+
   // Setup periodic background refresh
   browser.alarms.onAlarm.addListener(async (alarm: Browser.alarms.Alarm) => {
     if (alarm.name === BACKGROUND_ALARM_NAME) {
