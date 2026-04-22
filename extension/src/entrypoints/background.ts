@@ -15,7 +15,7 @@ import { AuthManager, popupStateStorage, txStore } from "~lib/state";
 import { searchWithinString, waitForInternetConnection } from "~lib/utils";
 
 export default defineBackground(() => {
-  // Handle token fetch requests from popup — runs here so the HTTP request survives popup close
+  // Handle token fetch requests from popup
   onMessage("fetchToken", ({ data: { authToken } }) => AuthManager.fetchToken(authToken));
 
   // Setup periodic background refresh

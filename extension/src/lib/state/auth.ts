@@ -30,8 +30,8 @@ interface AccessToken {
 
 /** Auth utilities */
 export class AuthManager {
-  /** Access token should be valid for at least 5 minutes, so we allow 4 minutes of staleness */
-  private static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 4;
+  /** Access token should be valid for at least 20 minutes, so we allow 19 minutes of staleness */
+  private static readonly TOKEN_STALE_TIME = ONE_MINUTE_IN_MILLIS * 19;
 
   private static fetchTokenInFlight: ReturnType<typeof AuthManager.doFetchToken> | null =
     null;
@@ -43,10 +43,15 @@ export class AuthManager {
 
   /**
    * Fetch the unencrypted access token from the server, and save it in memory. Will
-   * clear the tokens from storage if an unauthorized error is received from the server.
-   * Deduplicates concurrent calls so only one HTTP request is in-flight at a time.
+   * return the cached token if it's still fresh. Will clear tokens from storage if an
+   * unauthorized error is received from the server. Deduplicates concurrent calls so
+   * only one HTTP request is in-flight at a time.
    */
-  static fetchToken(authToken: string) {
+  static async fetchToken(authToken: string) {
+    const currentToken = await accessTokenStorage.getValue();
+    if (currentToken && !this.isAccessTokenStale(currentToken)) {
+      return { success: true, accessToken: currentToken.value } as const;
+    }
     if (!this.fetchTokenInFlight) {
       this.fetchTokenInFlight = this.doFetchToken(authToken).finally(() => {
         this.fetchTokenInFlight = null;
