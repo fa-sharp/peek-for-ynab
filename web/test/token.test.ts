@@ -48,7 +48,7 @@ describe("API: /token routes", () => {
     const currentAuthToken = app.crypto.encryptTokenData({
       accessToken: "current-access",
       refreshToken: "current-refresh",
-      expires: Date.now() + 10 * 60 * 1000, // active for 10 minutes
+      expires: Date.now() + 30 * 60 * 1000, // active for 30 minutes
     });
 
     const response = await app.inject({

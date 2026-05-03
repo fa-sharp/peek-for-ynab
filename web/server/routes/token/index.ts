@@ -4,8 +4,8 @@ import { convertToken } from "../../lib.ts";
 
 /** Token API routes for the browser extension */
 export default async function tokenRoutes(app: FastifyInstance) {
-  /** Grace period for soon-expiring token (5 minutes) */
-  const EXPIRE_GRACE_MILLIS = 5 * 60 * 1000;
+  /** Minimum time the access token should be fresh (20 minutes) */
+  const TOKEN_FRESH_MILLIS = 20 * 60 * 1000;
 
   app.route({
     method: "POST",
@@ -14,8 +14,8 @@ export default async function tokenRoutes(app: FastifyInstance) {
     handler: async (req, reply) => {
       if (!req.token) throw new Error("Expected token on request");
 
-      // If expired, refresh the token and return the updated access token along with the encrypted auth token.
-      if (req.token.expires < Date.now() + EXPIRE_GRACE_MILLIS) {
+      // If not fresh, refresh the token and return the updated access token along with the encrypted auth token.
+      if (req.token.expires < Date.now() + TOKEN_FRESH_MILLIS) {
         try {
           req.log.info("Refreshing token");
           const { token } = await app.oauth.getNewAccessTokenUsingRefreshToken(
