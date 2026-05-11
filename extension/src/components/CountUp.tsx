@@ -27,22 +27,18 @@ export default function CountUp({
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    let countup: CountUpInit | undefined;
-    async function startCountUp() {
-      countup = new CountUpInit(containerRef.current!, endRef.current, {
-        startVal: startRef.current,
-        duration: durationRef.current,
-        onStartCallback: () => setIsAnimating(true),
-        onCompleteCallback: () => setIsAnimating(false),
-        formattingFn: formattingFnRef.current,
-      });
-      if (!countup.error) {
-        countup.start();
-      } else {
-        console.error(countup.error);
-      }
+    const countup = new CountUpInit(containerRef.current!, endRef.current, {
+      startVal: startRef.current,
+      duration: durationRef.current,
+      onStartCallback: () => setIsAnimating(true),
+      onCompleteCallback: () => setIsAnimating(false),
+      formattingFn: formattingFnRef.current,
+    });
+    if (!countup.error) {
+      countup.start();
+    } else {
+      console.error(countup.error);
     }
-    startCountUp();
 
     return () => {
       countup?.onDestroy();
