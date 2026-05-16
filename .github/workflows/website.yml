@@ -1,4 +1,4 @@
-name: Backend/Web
+name: "Backend"
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ on:
       - "fly.toml"
 jobs:
   deploy:
-    name: Deploy server
+    name: Deploy
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:

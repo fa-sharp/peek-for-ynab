@@ -1,4 +1,4 @@
-name: "Web Store Submission"
+name: "Publish"
 on:
   workflow_dispatch:
   push:
@@ -14,12 +14,13 @@ defaults:
 
 jobs:
   submit:
+    name: Submit to Web Stores
     runs-on: macos-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         with:
           run_install: false
           package_json_file: extension/package.json

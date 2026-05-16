@@ -5,7 +5,7 @@
   "version": "0.25.4",
   "description": "Check on your YNAB category and account balances, and quickly add transactions.",
   "author": "fa-sharp",
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "packageManager": "pnpm@11.1.2+sha512.415a1cc25974731e75455c1468371be74c5aa5fb7621b50d4056d222451609f11412f23fd602e6169f1e060466641f798597e1be961a10688836a67b16569499",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
@@ -68,21 +68,11 @@
     "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.9.0",
     "msw": "^2.14.5",
+    "sass-embedded": "^1.99.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.11",
     "vitest": "^4.1.5",
     "vitest-dom": "^0.1.1",
     "wxt": "^0.20.25"
-  },
-  "pnpm": {
-    "ignoredOptionalDependencies": [
-      "@parcel/watcher"
-    ],
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "msw",
-      "sharp",
-      "spawn-sync"
-    ]
   }
 }
