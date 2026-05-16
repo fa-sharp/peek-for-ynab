@@ -9,7 +9,7 @@ ENV NODE_ENV=production
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-COPY --link web/package.json web/pnpm-lock.yaml ./
+COPY --link web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
 RUN corepack enable
 RUN corepack prepare --activate
 
