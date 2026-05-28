@@ -18,10 +18,6 @@ export default function MoveMoneyWrapper() {
       <div className="heading-big">
         <div role="heading">Move money</div>
       </div>
-      <div className="mt-lg mb-lg">
-        ⚠️ Money moves made here will not show up in the &ldquo;Recent Moves&rdquo; section
-        in YNAB.
-      </div>
       {!budgetMainData || !selectedBudgetData || !popupState ? (
         <div>Loading...</div>
       ) : (
@@ -53,7 +49,7 @@ interface Props {
   resetPopupState: () => void;
 }
 
-export function MoveMoneyInner({
+function MoveMoneyInner({
   selectedBudgetData,
   budgetMainData,
   monthData,
