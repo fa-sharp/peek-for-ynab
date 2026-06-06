@@ -28,7 +28,7 @@
     "typebox": "^1.1.39"
   },
   "devDependencies": {
-    "@astrojs/mdx": "^5.0.4",
+    "@astrojs/mdx": "^6.0.2",
     "@biomejs/biome": "2.4.16",
     "@fastify/type-provider-typebox": "^6.1.0",
     "@iconify-json/tabler": "^1.2.35",
