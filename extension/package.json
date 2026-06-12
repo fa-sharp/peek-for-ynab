@@ -26,7 +26,7 @@
     "@react-aria/menu": "^3.22.1",
     "@react-aria/overlays": "^3.32.1",
     "@react-aria/radio": "^3.13.1",
-    "@react-aria/toolbar": "3.0.0-beta.25",
+    "@react-aria/toolbar": "3.0.0-beta.26",
     "@react-aria/utils": "^3.34.1",
     "@react-aria/visually-hidden": "^3.9.1",
     "@react-stately/collections": "^3.13.1",
