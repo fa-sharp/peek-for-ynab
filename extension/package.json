@@ -16,7 +16,8 @@
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint src/ test/",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "gen:api": "pnpx openapi-typescript https://api.ynab.com/papi/open_api_spec.yaml -o ./src/lib/api/client/types.d.ts"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
