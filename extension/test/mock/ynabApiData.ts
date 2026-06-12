@@ -124,6 +124,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Internal Master Category",
     hidden: false,
     deleted: false,
+    internal: true,
     categories: [
       {
         id: "73a1163a-f350-4eca-bb83-70f7f4381839",
@@ -137,6 +138,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: true,
       },
       {
         id: "fd01ea25-415d-4793-a1c5-ea5d9b434b58",
@@ -150,6 +152,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: true,
       },
     ],
   },
@@ -158,6 +161,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Credit Card Payments",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "929d67dc-28fd-4041-8075-1422e23160c5",
@@ -184,6 +188,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_overall_left: null,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: false,
       },
     ],
   },
@@ -192,6 +197,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Bills",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "f7aba0bb-cdd3-4e49-a54b-1ba6cea73fcb",
@@ -207,6 +213,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -224,6 +231,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -241,6 +249,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -258,6 +267,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -274,6 +284,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence: 1,
         goal_cadence_frequency: 1,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -284,6 +295,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Frequent",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "de6859dd-20ef-49db-85ce-762a58bb92b6",
@@ -299,6 +311,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence: 2,
         goal_cadence_frequency: 1,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -315,6 +328,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_day: 6,
         goal_cadence: 2,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_cadence_frequency: 1,
         goal_target: 0,
         deleted: false,
@@ -331,6 +345,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "NEED",
         goal_day: 6,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_cadence: 2,
         goal_cadence_frequency: 1,
         goal_target: 0,
@@ -343,6 +358,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Non-Monthly",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "19138540-fde1-416a-8172-60e875914fbd",
@@ -355,6 +371,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         balance: 50000,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -369,6 +386,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -383,6 +401,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -400,6 +419,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         goal_target_month: "2022-12-10",
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -409,6 +429,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Goals",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "bae8b51d-9e15-4bd7-8118-cfc47b9119c8",
@@ -422,6 +443,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -435,6 +457,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         balance: 200000,
         goal_type: "TB",
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -450,6 +473,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -459,6 +483,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Quality of Life",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "d9658cb2-c7d3-4561-b87a-472404d5b36b",
@@ -474,6 +499,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -491,6 +517,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -507,6 +534,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -516,6 +544,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Hidden Categories",
     hidden: false,
     deleted: false,
+    internal: true,
     categories: [],
   },
 ];

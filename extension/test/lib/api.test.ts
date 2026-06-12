@@ -9,7 +9,12 @@ import {
 } from "~lib/api";
 import { mergeAccountsDataFromDelta } from "~lib/api/accounts";
 import { mergeCategoryGroupsDataFromDelta } from "~lib/api/categories";
-import type { Account, Category, Payee } from "~lib/api/client";
+import type {
+  Account,
+  Category,
+  CategoryGroupWithCategories,
+  Payee,
+} from "~lib/api/client";
 import { formatPayee, mergePayeesDataFromDelta } from "~lib/api/payees";
 import { mockServer } from "~test/mock/msw";
 import { accounts, category_groups, payees, plans } from "~test/mock/ynabApiData";
@@ -18,16 +23,17 @@ const frequentCategoryGroupIdx = 3;
 const groceriesCategoryIdx = 0;
 const groceriesCategory =
   category_groups[frequentCategoryGroupIdx].categories[groceriesCategoryIdx];
-const frequentCategoryGroup = {
+const frequentCategoryGroup: CategoryGroupWithCategories = {
   id: category_groups[3].id,
   name: category_groups[3].name,
   hidden: category_groups[3].hidden,
   deleted: category_groups[3].deleted,
+  internal: category_groups[3].internal,
   categories: [],
 };
 
 test("'mergeCategoryGroupsDataFromDelta' handles updated category balance", () => {
-  const deltaResponse = [
+  const deltaResponse: CategoryGroupWithCategories[] = [
     {
       ...frequentCategoryGroup,
       categories: [{ ...groceriesCategory, balance: 50_000 }],
@@ -54,6 +60,7 @@ test("'mergeCategoryGroupsDataFromDelta' handles new category", () => {
     category_group_id: frequentCategoryGroup.id,
     hidden: false,
     deleted: false,
+    internal: false,
     goal_needs_whole_amount: null,
   };
   const deltaResponse = [
