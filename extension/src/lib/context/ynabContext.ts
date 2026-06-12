@@ -398,11 +398,20 @@ export const useYNABProvider = () => {
       );
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
       setTimeout(() => refetchCategoriesAndAccounts(), 350);
+      queryClient.invalidateQueries({
+        queryKey: moneyMovesQuery(popupState.budgetId).queryKey,
+      });
 
       setMoved({ from: fromCategory, to: toCategory });
       setTimeout(() => setMoved(null), 4 * 1000);
     },
-    [accessToken, popupState.budgetId, categoriesData, refetchCategoriesAndAccounts]
+    [
+      accessToken,
+      popupState.budgetId,
+      categoriesData,
+      queryClient,
+      refetchCategoriesAndAccounts,
+    ]
   );
 
   return {

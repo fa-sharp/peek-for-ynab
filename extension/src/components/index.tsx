@@ -2,6 +2,7 @@ import CountUp from "./CountUp";
 import CurrencyView from "./CurrencyView";
 import AccountDetailView from "./extension/detail/AccountDetailView";
 import CategoryDetailView from "./extension/detail/CategoryDetailView";
+import MoneyMoveView from "./extension/detail/MoneyMoveView";
 import TransactionView from "./extension/detail/TransactionView";
 import TxStatusIcon from "./extension/detail/TxStatusIcon";
 import AccountView from "./extension/main/AccountView";
@@ -53,6 +54,7 @@ export {
   IconSpan,
   MemoField,
   Menu,
+  MoneyMoveView,
   MoveMoney,
   NewVersionAlert,
   NotificationsView,

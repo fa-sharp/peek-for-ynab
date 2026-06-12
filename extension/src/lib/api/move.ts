@@ -1,3 +1,4 @@
+import { IS_DEV } from "~lib/constants";
 import { apiClient, type Category } from "./client";
 
 export async function moveMoneyInBudget(
@@ -42,5 +43,9 @@ export async function fetchMoneyMovesForBudget(token: string, budgetId: string) 
   );
   if (error) throw error;
 
+  data.data.money_movements.sort((a, b) =>
+    !a.moved_at || !b.moved_at ? 0 : a.moved_at <= b.moved_at ? 1 : -1
+  );
+  IS_DEV && console.log("Fetched money moves!", data.data.money_movements);
   return data.data.money_movements;
 }

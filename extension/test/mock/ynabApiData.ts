@@ -1,4 +1,9 @@
-import type { Account, CategoryGroupWithCategories, Payee } from "~lib/api/client";
+import type {
+  Account,
+  CategoryGroupWithCategories,
+  MoneyMovement,
+  Payee,
+} from "~lib/api/client";
 
 export const plans = [
   {
@@ -558,6 +563,36 @@ export const month = {
   deleted: false,
   categories: [],
 };
+
+export const money_movements: MoneyMovement[] = [
+  {
+    id: "a93f96eb-65f1-4118-aa74-67c9971e5877",
+    month: "2024-01-01",
+    moved_at: "2024-01-15T12:00:00Z",
+    from_category_id: "de6859dd-20ef-49db-85ce-762a58bb92b6",
+    to_category_id: "19138540-fde1-416a-8172-60e875914fbd",
+    amount: 25_000,
+    note: "Cover shopping",
+  },
+  {
+    id: "748c3ece-323e-4775-8881-807d422c50e0",
+    month: "2024-01-01",
+    moved_at: "2024-01-16T12:00:00Z",
+    from_category_id: null,
+    to_category_id: "19138540-fde1-416a-8172-60e875914fbd",
+    amount: 15_000,
+    note: null,
+  },
+  {
+    id: "6f076b66-445d-4bd7-9bbd-0a26e695fedb",
+    month: "2024-01-01",
+    moved_at: "2024-01-17T12:00:00Z",
+    from_category_id: "4854168f-c898-4b5c-8e19-18a76c6cc436",
+    to_category_id: "36ead0b7-a541-4342-9a6f-1f5240cb7eeb",
+    amount: 10_000,
+    note: "Unrelated move",
+  },
+];
 
 export const payees: Payee[] = [
   {

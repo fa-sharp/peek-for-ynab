@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
-import { CurrencyView, IconButton, TransactionView } from "~components";
+import { CurrencyView, IconButton, MoneyMoveView, TransactionView } from "~components";
 import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { useAppSettings } from "~lib/state";
@@ -14,6 +14,7 @@ const CategoryTxsView = () => {
     selectedBudgetData,
     approveTransaction,
     addedTransaction,
+    useGetMoneyMoves,
   } = useYNABContext();
   const { settings } = useAppSettings();
 
@@ -22,6 +23,16 @@ const CategoryTxsView = () => {
     [categoriesData, popupState.detailState?.id]
   );
   const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
+  const { data: moneyMoves } = useGetMoneyMoves();
+
+  const categoryMoneyMoves = useMemo(
+    () =>
+      moneyMoves?.filter(
+        (move) =>
+          move.from_category_id === category?.id || move.to_category_id === category?.id
+      ),
+    [category?.id, moneyMoves]
+  );
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
@@ -113,6 +124,28 @@ const CategoryTxsView = () => {
           <AddTransferIcon /> Move Money
         </button>
       </div>
+      <h3 className="heading-medium mb-sm">Money Moves</h3>
+      {!categoryMoneyMoves ? (
+        <div>Loading money moves...</div>
+      ) : categoryMoneyMoves.length === 0 ? (
+        <div>No money moves this month</div>
+      ) : (
+        <ul className="list flex-col gap-sm mb-lg">
+          {categoryMoneyMoves.map((moneyMove) => (
+            <li key={moneyMove.id}>
+              <MoneyMoveView
+                moneyMove={moneyMove}
+                categoryId={category.id}
+                categories={categoriesData || []}
+                goToDetailView={(detailState) =>
+                  setPopupState({ view: "detail", detailState })
+                }
+                currencyFormat={selectedBudgetData.currencyFormat}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
       <h3 className="heading-medium mb-sm">Activity</h3>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
