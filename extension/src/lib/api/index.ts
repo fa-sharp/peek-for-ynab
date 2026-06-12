@@ -3,7 +3,7 @@ import { accountsQuery, fetchAccountsForBudget } from "./accounts";
 import { budgetQuery, fetchBudgets } from "./budgets";
 import { categoryGroupsQuery, fetchCategoryGroupsForBudget } from "./categories";
 import { currentMonthQuery, fetchCurrentMonthForBudget } from "./month";
-import { moveMoneyInBudget } from "./move";
+import { fetchMoneyMovesForBudget, moneyMovesQuery, moveMoneyInBudget } from "./move";
 import { fetchPayeesForBudget, payeesQuery } from "./payees";
 import {
   accountTxsQuery,
@@ -28,10 +28,12 @@ export {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
   fetchCurrentMonthForBudget,
+  fetchMoneyMovesForBudget,
   fetchPayeesForBudget,
   fetchTransactionsForAccount,
   fetchTransactionsForCategory,
   fetchUnapprovedTxsForBudget,
+  moneyMovesQuery,
   moveMoneyInBudget,
   payeesQuery,
   unapprovedTxsQuery,

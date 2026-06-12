@@ -20,10 +20,12 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
   fetchCurrentMonthForBudget,
+  fetchMoneyMovesForBudget,
   fetchPayeesForBudget,
   fetchTransactionsForAccount,
   fetchTransactionsForCategory,
   fetchUnapprovedTxsForBudget,
+  moneyMovesQuery,
   moveMoneyInBudget,
   payeesQuery,
   unapprovedTxsQuery,
@@ -362,6 +364,16 @@ export const useYNABProvider = () => {
     [accessToken, popupState.budgetId, refetchTransaction]
   );
 
+  const useGetMoneyMoves = () =>
+    useQuery({
+      ...moneyMovesQuery(popupState.budgetId),
+      enabled: Boolean(accessToken && popupState.budgetId),
+      queryFn: async () => {
+        if (!accessToken || !popupState.budgetId) return null;
+        return await fetchMoneyMovesForBudget(accessToken, popupState.budgetId);
+      },
+    });
+
   const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
 
   const moveMoney = useCallback(
@@ -438,6 +450,7 @@ export const useYNABProvider = () => {
     addedTransaction,
     useGetAccountTxs,
     useGetCategoryTxs,
+    useGetMoneyMoves,
     /** Move money in the current budget */
     moveMoney,
     /** The recently moved category/categories. Can be used to trigger animations/effects. */

@@ -28,3 +28,19 @@ export async function moveMoneyInBudget(
       : Promise.resolve("No 'to' category"),
   ]);
 }
+
+export const moneyMovesQuery = (budgetId: string) => ({
+  queryKey: ["moneyMoves", { budgetId }],
+});
+
+export async function fetchMoneyMovesForBudget(token: string, budgetId: string) {
+  const { data, error } = await apiClient(token).GET(
+    "/plans/{plan_id}/months/{month}/money_movements",
+    {
+      params: { path: { plan_id: budgetId, month: "current" } },
+    }
+  );
+  if (error) throw error;
+
+  return data.data.money_movements;
+}
