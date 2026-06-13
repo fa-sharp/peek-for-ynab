@@ -379,7 +379,10 @@ export const useYNABProvider = () => {
       select: (data) => data?.moneyMoves,
     });
 
-  const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
+  const [movedTransaction, setMovedTransaction] = useState<{
+    from?: Category;
+    to?: Category;
+  } | null>(null);
 
   const moveMoney = useCallback(
     async ({
@@ -407,8 +410,8 @@ export const useYNABProvider = () => {
         queryKey: moneyMovesQuery(popupState.budgetId).queryKey,
       });
 
-      setMoved({ from: fromCategory, to: toCategory });
-      setTimeout(() => setMoved(null), 4 * 1000);
+      setMovedTransaction({ from: fromCategory, to: toCategory });
+      setTimeout(() => setMovedTransaction(null), 4 * 1000);
     },
     [
       accessToken,
@@ -468,7 +471,7 @@ export const useYNABProvider = () => {
     /** Move money in the current budget */
     moveMoney,
     /** The recently moved category/categories. Can be used to trigger animations/effects. */
-    moved,
+    movedTransaction,
   };
 };
 

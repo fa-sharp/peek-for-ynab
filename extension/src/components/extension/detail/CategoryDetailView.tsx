@@ -14,7 +14,7 @@ const CategoryTxsView = () => {
     selectedBudgetData,
     approveTransaction,
     addedTransaction,
-    moved: movedTransaction,
+    movedTransaction,
     useGetMoneyMoves,
   } = useYNABContext();
   const { settings } = useAppSettings();
