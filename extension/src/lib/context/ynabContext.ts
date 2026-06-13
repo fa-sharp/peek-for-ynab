@@ -20,10 +20,12 @@ import {
   fetchBudgets,
   fetchCategoryGroupsForBudget,
   fetchCurrentMonthForBudget,
+  fetchMoneyMovesForBudget,
   fetchPayeesForBudget,
   fetchTransactionsForAccount,
   fetchTransactionsForCategory,
   fetchUnapprovedTxsForBudget,
+  moneyMovesQuery,
   moveMoneyInBudget,
   payeesQuery,
   unapprovedTxsQuery,
@@ -362,7 +364,25 @@ export const useYNABProvider = () => {
     [accessToken, popupState.budgetId, refetchTransaction]
   );
 
-  const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
+  const useGetMoneyMoves = () =>
+    useQuery({
+      ...moneyMovesQuery(popupState.budgetId),
+      enabled: Boolean(accessToken && popupState.budgetId),
+      queryFn: async ({ queryKey }) => {
+        if (!accessToken || !popupState.budgetId) return null;
+        return await fetchMoneyMovesForBudget(
+          accessToken,
+          popupState.budgetId,
+          queryClient.getQueryState(queryKey)
+        );
+      },
+      select: (data) => data?.moneyMoves,
+    });
+
+  const [movedTransaction, setMovedTransaction] = useState<{
+    from?: Category;
+    to?: Category;
+  } | null>(null);
 
   const moveMoney = useCallback(
     async ({
@@ -386,11 +406,20 @@ export const useYNABProvider = () => {
       );
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
       setTimeout(() => refetchCategoriesAndAccounts(), 350);
+      queryClient.invalidateQueries({
+        queryKey: moneyMovesQuery(popupState.budgetId).queryKey,
+      });
 
-      setMoved({ from: fromCategory, to: toCategory });
-      setTimeout(() => setMoved(null), 4 * 1000);
+      setMovedTransaction({ from: fromCategory, to: toCategory });
+      setTimeout(() => setMovedTransaction(null), 4 * 1000);
     },
-    [accessToken, popupState.budgetId, categoriesData, refetchCategoriesAndAccounts]
+    [
+      accessToken,
+      popupState.budgetId,
+      categoriesData,
+      queryClient,
+      refetchCategoriesAndAccounts,
+    ]
   );
 
   return {
@@ -438,10 +467,11 @@ export const useYNABProvider = () => {
     addedTransaction,
     useGetAccountTxs,
     useGetCategoryTxs,
+    useGetMoneyMoves,
     /** Move money in the current budget */
     moveMoney,
     /** The recently moved category/categories. Can be used to trigger animations/effects. */
-    moved,
+    movedTransaction,
   };
 };
 

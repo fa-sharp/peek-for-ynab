@@ -261,6 +261,8 @@ const AccountActivityView = ({ accountId }: { accountId: string }) => {
       <h3 className="heading-medium mb-sm">Transactions</h3>
       {!accountTxs || !selectedBudgetData ? (
         <div>Loading transactions...</div>
+      ) : accountTxs.length === 0 ? (
+        <div>No recent transactions</div>
       ) : (
         <ul className="list flex-col gap-sm">
           {accountTxs.map((tx) => (

@@ -2,7 +2,14 @@ import { randomUUID } from "node:crypto";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
 
-import { accounts, category_groups, month, payees, plans } from "./ynabApiData";
+import {
+  accounts,
+  category_groups,
+  money_movements,
+  month,
+  payees,
+  plans,
+} from "./ynabApiData";
 
 const API_BASE = `${process.env.PUBLIC_MAIN_URL}/api`;
 const YNAB_BASE = "https://api.ynab.com/v1";
@@ -38,6 +45,26 @@ export const mockServer = setupServer(
       return HttpResponse.json({
         data: {
           month,
+        },
+      });
+    })
+  ),
+  http.get(
+    `${YNAB_BASE}/plans/:planId/months/current/money_movements`,
+    withAuth(() => {
+      return HttpResponse.json({
+        data: {
+          money_movements,
+        },
+      });
+    })
+  ),
+  http.get(
+    `${YNAB_BASE}/plans/:planId/categories/:categoryId/transactions`,
+    withAuth(() => {
+      return HttpResponse.json({
+        data: {
+          transactions: [],
         },
       });
     })

@@ -1,5 +1,5 @@
 import { DELTA_REQUEST_TIME, IS_DEV } from "~lib/constants";
-import { type ApiSchemas, apiClient } from "./client";
+import { apiClient, type CategoryGroupWithCategories } from "./client";
 
 export const categoryGroupsQuery = (budgetId: string) => ({
   queryKey: ["categoryGroups", { budgetId }],
@@ -12,14 +12,13 @@ export async function fetchCategoryGroupsForBudget(
   cache?: {
     data?: {
       serverKnowledge: number;
-      categoryGroups: ApiSchemas["CategoryGroupWithCategories"][];
+      categoryGroups: CategoryGroupWithCategories[];
     };
     dataUpdatedAt: number;
   }
 ) {
   const usingDeltaRequest =
     !!cache?.data && cache.dataUpdatedAt > Date.now() - DELTA_REQUEST_TIME;
-
   const { data: response, error } = await apiClient(token).GET(
     "/plans/{plan_id}/categories",
     {
@@ -35,7 +34,7 @@ export async function fetchCategoryGroupsForBudget(
   );
   if (error) throw error;
 
-  let categoryGroups: ApiSchemas["CategoryGroupWithCategories"][];
+  let categoryGroups: CategoryGroupWithCategories[];
   if (usingDeltaRequest && cache.data) {
     categoryGroups = mergeCategoryGroupsDataFromDelta(
       cache.data.categoryGroups,
@@ -60,8 +59,8 @@ export async function fetchCategoryGroupsForBudget(
 }
 
 export function mergeCategoryGroupsDataFromDelta(
-  existingData: ApiSchemas["CategoryGroupWithCategories"][],
-  deltaResponse: ApiSchemas["CategoryGroupWithCategories"][]
+  existingData: CategoryGroupWithCategories[],
+  deltaResponse: CategoryGroupWithCategories[]
 ) {
   let categoryGroups = structuredClone(existingData);
   for (const categoryGroupDelta of deltaResponse) {
