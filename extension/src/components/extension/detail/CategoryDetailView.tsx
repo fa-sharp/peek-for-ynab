@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
 import { CurrencyView, IconButton, MoneyMoveView, TransactionView } from "~components";
@@ -18,6 +18,7 @@ const CategoryTxsView = () => {
     useGetMoneyMoves,
   } = useYNABContext();
   const { settings } = useAppSettings();
+  const [showAllMoneyMoves, setShowAllMoneyMoves] = useState(false);
 
   const category = useMemo(
     () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
@@ -32,6 +33,11 @@ const CategoryTxsView = () => {
         move.from_category_id === category?.id || move.to_category_id === category?.id
     );
   }, [category?.id, moneyMoves]);
+
+  const visibleMoneyMoves = useMemo(() => {
+    if (!categoryMoneyMoves) return null;
+    return showAllMoneyMoves ? categoryMoneyMoves : categoryMoneyMoves.slice(0, 4);
+  }, [categoryMoneyMoves, showAllMoneyMoves]);
 
   const animateBalances = useMemo(() => {
     return (
@@ -136,22 +142,35 @@ const CategoryTxsView = () => {
         <div>Loading money moves...</div>
       ) : categoryMoneyMoves.length === 0 ? (
         <div>No money moves this month</div>
+      ) : visibleMoneyMoves ? (
+        <>
+          <ul className="list flex-col gap-sm">
+            {visibleMoneyMoves.map((moneyMove) => (
+              <li key={moneyMove.id}>
+                <MoneyMoveView
+                  moneyMove={moneyMove}
+                  categoryId={category.id}
+                  categories={categoriesData || []}
+                  goToDetailView={(detailState) =>
+                    setPopupState({ view: "detail", detailState })
+                  }
+                  currencyFormat={selectedBudgetData.currencyFormat}
+                />
+              </li>
+            ))}
+          </ul>
+          {!showAllMoneyMoves && categoryMoneyMoves.length > 4 && (
+            <div className="flex-row font-small mb-md">
+              <button
+                className="button gray rounded"
+                onClick={() => setShowAllMoneyMoves(true)}>
+                Show more
+              </button>
+            </div>
+          )}
+        </>
       ) : (
-        <ul className="list flex-col gap-sm mb-lg">
-          {categoryMoneyMoves.map((moneyMove) => (
-            <li key={moneyMove.id}>
-              <MoneyMoveView
-                moneyMove={moneyMove}
-                categoryId={category.id}
-                categories={categoriesData || []}
-                goToDetailView={(detailState) =>
-                  setPopupState({ view: "detail", detailState })
-                }
-                currencyFormat={selectedBudgetData.currencyFormat}
-              />
-            </li>
-          ))}
-        </ul>
+        <div>Loading money moves...</div>
       )}
       <h3 className="heading-medium mb-sm">Activity</h3>
       {!categoryTxs ? (

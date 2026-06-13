@@ -40,6 +40,11 @@ li:last-child > .balance-display {
   }
 }
 
+// No border for last transaction display within a list
+li:last-child > .tx-display {
+  border-bottom-color: transparent;
+}
+
 // Button with textual label
 .button {
   cursor: pointer;
