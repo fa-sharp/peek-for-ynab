@@ -14,6 +14,7 @@ const CategoryTxsView = () => {
     selectedBudgetData,
     approveTransaction,
     addedTransaction,
+    moved: movedTransaction,
     useGetMoneyMoves,
   } = useYNABContext();
   const { settings } = useAppSettings();
@@ -25,14 +26,20 @@ const CategoryTxsView = () => {
   const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
   const { data: moneyMoves } = useGetMoneyMoves();
 
-  const categoryMoneyMoves = useMemo(
-    () =>
-      moneyMoves?.filter(
-        (move) =>
-          move.from_category_id === category?.id || move.to_category_id === category?.id
-      ),
-    [category?.id, moneyMoves]
-  );
+  const categoryMoneyMoves = useMemo(() => {
+    return moneyMoves?.filter(
+      (move) =>
+        move.from_category_id === category?.id || move.to_category_id === category?.id
+    );
+  }, [category?.id, moneyMoves]);
+
+  const animateBalances = useMemo(() => {
+    return (
+      !!addedTransaction ||
+      movedTransaction?.from?.id === category?.id ||
+      movedTransaction?.to?.id === category?.id
+    );
+  }, [addedTransaction, movedTransaction, category?.id]);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
@@ -53,7 +60,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -62,7 +69,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance - category.activity - category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -71,7 +78,7 @@ const CategoryTxsView = () => {
             milliUnits={category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -80,7 +87,7 @@ const CategoryTxsView = () => {
             milliUnits={category.activity}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
       </ul>
@@ -149,6 +156,8 @@ const CategoryTxsView = () => {
       <h3 className="heading-medium mb-sm">Activity</h3>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
+      ) : categoryTxs.length === 0 ? (
+        <div>No recent transactions</div>
       ) : (
         <ul className="list flex-col gap-sm">
           {categoryTxs.map((tx) => (

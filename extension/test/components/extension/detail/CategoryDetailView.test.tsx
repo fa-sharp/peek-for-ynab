@@ -4,15 +4,17 @@ import { beforeEach, expect, test } from "vitest";
 import "vitest-dom/extend-expect";
 
 import { CategoryDetailView } from "~components";
-import { authTokenStorage, appSettingsStorage, popupStateStorage } from "~lib/state";
 import { DEFAULT_SETTINGS } from "~lib/constants";
+import { appSettingsStorage, authTokenStorage, popupStateStorage } from "~lib/state";
 import { mockAuthToken } from "~test/mock/userData";
 import { createTestAppWrapper } from "~test/mock/wrapper";
 import { category_groups, plans } from "~test/mock/ynabApiData";
 
 const categories = category_groups.flatMap((categoryGroup) => categoryGroup.categories);
 const groceryCategory = categories.find((category) => category.name === "Groceries")!;
-const shoppingCategory = categories.find((category) => category.name.includes("Shopping"))!;
+const shoppingCategory = categories.find((category) =>
+  category.name.includes("Shopping")
+)!;
 
 beforeEach(async () => {
   await authTokenStorage.setValue(mockAuthToken);

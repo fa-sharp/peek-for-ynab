@@ -1,5 +1,3 @@
-import { ArrowLeft, ArrowRight } from "tabler-icons-react";
-
 import { CurrencyView } from "~components";
 import type { Category, CurrencyFormat, MoneyMovement } from "~lib/api/client";
 import type { DetailViewState } from "~lib/types";
@@ -33,11 +31,6 @@ export default function MoneyMoveView({
       <div className="flex-row justify-between gap-lg">
         <div className="flex-row min-w-0">
           {date && <span>{dateFormatter.format(new Date(date))}</span>}
-          {direction === "to" ? (
-            <ArrowLeft aria-label="To" size={14} />
-          ) : (
-            <ArrowRight aria-label="From" size={14} />
-          )}
           <CategoryButton
             category={direction === "to" ? toCategory : fromCategory}
             goToDetailView={goToDetailView}
