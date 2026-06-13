@@ -172,7 +172,7 @@ const CategoryTxsView = () => {
       ) : (
         <div>Loading money moves...</div>
       )}
-      <h3 className="heading-medium mb-sm">Activity</h3>
+      <h3 className="heading-medium mt-md mb-sm">Activity</h3>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
       ) : categoryTxs.length === 0 ? (

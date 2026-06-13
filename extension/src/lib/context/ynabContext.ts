@@ -368,10 +368,15 @@ export const useYNABProvider = () => {
     useQuery({
       ...moneyMovesQuery(popupState.budgetId),
       enabled: Boolean(accessToken && popupState.budgetId),
-      queryFn: async () => {
+      queryFn: async ({ queryKey }) => {
         if (!accessToken || !popupState.budgetId) return null;
-        return await fetchMoneyMovesForBudget(accessToken, popupState.budgetId);
+        return await fetchMoneyMovesForBudget(
+          accessToken,
+          popupState.budgetId,
+          queryClient.getQueryState(queryKey)
+        );
       },
+      select: (data) => data?.moneyMoves,
     });
 
   const [moved, setMoved] = useState<{ from?: Category; to?: Category } | null>(null);
