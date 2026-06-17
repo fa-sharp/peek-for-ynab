@@ -38,7 +38,7 @@
     "@tanstack/query-persist-client-core": "^5.101.0",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/react-query-devtools": "^5.101.0",
-    "@tanstack/react-virtual": "^3.14.2",
+    "@tanstack/react-virtual": "^3.14.3",
     "@webext-core/messaging": "^3.0.2",
     "clsx": "^2.1.1",
     "countup.js": "^2.10.0",
@@ -67,12 +67,12 @@
     "@wxt-dev/module-react": "^1.2.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "fake-indexeddb": "^6.2.5",
-    "happy-dom": "^20.10.2",
+    "happy-dom": "^20.10.4",
     "msw": "^2.14.6",
     "sass-embedded": "^1.100.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
-    "vitest": "^4.1.8",
+    "vitest": "^4.1.9",
     "vitest-dom": "^0.1.1",
     "wxt": "^0.20.26"
   }
