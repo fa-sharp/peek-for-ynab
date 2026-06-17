@@ -29,6 +29,7 @@ import {
   moveMoneyInBudget,
   payeesQuery,
   unapprovedTxsQuery,
+  updateTransaction,
 } from "~lib/api";
 import type {
   Account,
@@ -37,12 +38,11 @@ import type {
   NewTransaction,
   TransactionDetail,
 } from "~lib/api/client";
-import { updateTransaction } from "~lib/api/transactions";
 import { IS_DEV } from "~lib/constants";
 import { useConfetti } from "~lib/hooks";
 import { queryPersister } from "~lib/queryClient";
 import type { BudgetMainData } from "~lib/types";
-import { findAllEmoji } from "~lib/utils";
+import { findAllEmoji, getFirstDayOfMonthISO } from "~lib/utils";
 import { useAuthContext, useStorageContext } from ".";
 
 export const useYNABProvider = () => {
@@ -364,20 +364,23 @@ export const useYNABProvider = () => {
     [accessToken, popupState.budgetId, refetchTransaction]
   );
 
-  const useGetMoneyMoves = () =>
-    useQuery({
-      ...moneyMovesQuery(popupState.budgetId),
+  const useGetMoneyMoves = () => {
+    const month = getFirstDayOfMonthISO();
+    return useQuery({
+      ...moneyMovesQuery(popupState.budgetId, month),
       enabled: Boolean(accessToken && popupState.budgetId),
       queryFn: async ({ queryKey }) => {
         if (!accessToken || !popupState.budgetId) return null;
         return await fetchMoneyMovesForBudget(
           accessToken,
           popupState.budgetId,
+          month,
           queryClient.getQueryState(queryKey)
         );
       },
       select: (data) => data?.moneyMoves,
     });
+  };
 
   const [movedTransaction, setMovedTransaction] = useState<{
     from?: Category;
@@ -405,6 +408,7 @@ export const useYNABProvider = () => {
         toCategory
       );
       IS_DEV && console.log("Moved money!", { subtractResponse, addResponse });
+
       setTimeout(() => refetchCategoriesAndAccounts(), 350);
       queryClient.invalidateQueries({
         queryKey: moneyMovesQuery(popupState.budgetId).queryKey,

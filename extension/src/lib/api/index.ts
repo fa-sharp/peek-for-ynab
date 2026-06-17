@@ -13,6 +13,7 @@ import {
   fetchTransactionsForCategory,
   fetchUnapprovedTxsForBudget,
   unapprovedTxsQuery,
+  updateTransaction,
 } from "./transactions";
 
 export {
@@ -37,4 +38,5 @@ export {
   moveMoneyInBudget,
   payeesQuery,
   unapprovedTxsQuery,
+  updateTransaction,
 };

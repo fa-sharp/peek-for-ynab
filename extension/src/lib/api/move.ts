@@ -30,13 +30,14 @@ export async function moveMoneyInBudget(
   ]);
 }
 
-export const moneyMovesQuery = (budgetId: string) => ({
-  queryKey: ["moneyMoves", { budgetId }],
+export const moneyMovesQuery = (budgetId: string, month?: string) => ({
+  queryKey: ["moneyMoves", { budgetId, ...(month && { month }) }],
 });
 
 export async function fetchMoneyMovesForBudget(
   token: string,
   budgetId: string,
+  month: string,
   cache?: {
     data?: {
       serverKnowledge: number;
@@ -51,8 +52,8 @@ export async function fetchMoneyMovesForBudget(
     "/plans/{plan_id}/months/{month}/money_movements",
     {
       params: {
-        path: { plan_id: budgetId, month: "current" },
-        //@ts-expect-error `last_knowledge_of_server` query missing in API definition
+        path: { plan_id: budgetId, month: month || "current" },
+        // @ts-expect-error `last_knowledge_of_server` query missing in API definition
         query: {
           last_knowledge_of_server: usingDeltaRequest
             ? cache.data?.serverKnowledge

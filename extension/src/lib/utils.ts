@@ -97,13 +97,20 @@ export const getIgnoredCategoryIdsForTx = (
 export const searchWithinString = (str: string, query: string) =>
   str.toLocaleLowerCase().includes(query.toLocaleLowerCase());
 
-/**
- * Get today's date (user's local timezone) in ISO format (i.e. for `input[type=date]` element)
- */
+/** Get today's date (user's local timezone) in ISO format */
 export const getTodaysDateISO = () => {
   const date = new Date();
   date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return date.toISOString().substring(0, 10);
+};
+
+/** Get the date of the first day of the current month in ISO format */
+export const getFirstDayOfMonthISO = () => {
+  const date = new Date();
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const tzOffset = firstDay.getTimezoneOffset() * 60 * 1000;
+  const adjustedDate = new Date(firstDay.getTime() - tzOffset);
+  return adjustedDate.toISOString().substring(0, 10);
 };
 
 export const getNDaysAgoISO = (days: number) => {
