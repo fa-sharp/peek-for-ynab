@@ -26,6 +26,7 @@ const CACHED_QUERY_KEYS = new Set([
   "categoryGroups",
   "accounts",
   "import",
+  "moneyMoves",
 ]);
 
 /** Persist queries to IndexedDB using idb-keyval */

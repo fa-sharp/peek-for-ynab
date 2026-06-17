@@ -1,4 +1,9 @@
-import type { Account, CategoryGroupWithCategories, Payee } from "~lib/api/client";
+import type {
+  Account,
+  CategoryGroupWithCategories,
+  MoneyMovement,
+  Payee,
+} from "~lib/api/client";
 
 export const plans = [
   {
@@ -124,6 +129,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Internal Master Category",
     hidden: false,
     deleted: false,
+    internal: true,
     categories: [
       {
         id: "73a1163a-f350-4eca-bb83-70f7f4381839",
@@ -137,6 +143,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: true,
       },
       {
         id: "fd01ea25-415d-4793-a1c5-ea5d9b434b58",
@@ -150,6 +157,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: true,
       },
     ],
   },
@@ -158,6 +166,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Credit Card Payments",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "929d67dc-28fd-4041-8075-1422e23160c5",
@@ -184,6 +193,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_overall_left: null,
         deleted: false,
         goal_needs_whole_amount: null,
+        internal: false,
       },
     ],
   },
@@ -192,6 +202,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Bills",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "f7aba0bb-cdd3-4e49-a54b-1ba6cea73fcb",
@@ -207,6 +218,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -224,6 +236,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -241,6 +254,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -258,6 +272,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -274,6 +289,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence: 1,
         goal_cadence_frequency: 1,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -284,6 +300,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Frequent",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "de6859dd-20ef-49db-85ce-762a58bb92b6",
@@ -299,6 +316,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence: 2,
         goal_cadence_frequency: 1,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -315,6 +333,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_day: 6,
         goal_cadence: 2,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_cadence_frequency: 1,
         goal_target: 0,
         deleted: false,
@@ -331,6 +350,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "NEED",
         goal_day: 6,
         goal_needs_whole_amount: null,
+        internal: false,
         goal_cadence: 2,
         goal_cadence_frequency: 1,
         goal_target: 0,
@@ -343,6 +363,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Non-Monthly",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "19138540-fde1-416a-8172-60e875914fbd",
@@ -355,6 +376,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         balance: 50000,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -369,6 +391,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -383,6 +406,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -400,6 +424,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_target: 0,
         goal_target_month: "2022-12-10",
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -409,6 +434,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Goals",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "bae8b51d-9e15-4bd7-8118-cfc47b9119c8",
@@ -422,6 +448,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -435,6 +462,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         balance: 200000,
         goal_type: "TB",
         goal_needs_whole_amount: null,
+        internal: false,
         goal_target: 0,
         deleted: false,
       },
@@ -450,6 +478,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_type: "TB",
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -459,6 +488,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Quality of Life",
     hidden: false,
     deleted: false,
+    internal: false,
     categories: [
       {
         id: "d9658cb2-c7d3-4561-b87a-472404d5b36b",
@@ -474,6 +504,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -491,6 +522,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
       {
@@ -507,6 +539,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
         goal_cadence_frequency: 1,
         goal_target: 0,
         goal_needs_whole_amount: null,
+        internal: false,
         deleted: false,
       },
     ],
@@ -516,6 +549,7 @@ export const category_groups: CategoryGroupWithCategories[] = [
     name: "Hidden Categories",
     hidden: false,
     deleted: false,
+    internal: true,
     categories: [],
   },
 ];
@@ -529,6 +563,36 @@ export const month = {
   deleted: false,
   categories: [],
 };
+
+export const money_movements: MoneyMovement[] = [
+  {
+    id: "a93f96eb-65f1-4118-aa74-67c9971e5877",
+    month: "2024-01-01",
+    moved_at: "2024-01-15T12:00:00Z",
+    from_category_id: "de6859dd-20ef-49db-85ce-762a58bb92b6",
+    to_category_id: "19138540-fde1-416a-8172-60e875914fbd",
+    amount: 25_000,
+    note: "Cover shopping",
+  },
+  {
+    id: "748c3ece-323e-4775-8881-807d422c50e0",
+    month: "2024-01-01",
+    moved_at: "2024-01-16T12:00:00Z",
+    from_category_id: null,
+    to_category_id: "19138540-fde1-416a-8172-60e875914fbd",
+    amount: 15_000,
+    note: null,
+  },
+  {
+    id: "6f076b66-445d-4bd7-9bbd-0a26e695fedb",
+    month: "2024-01-01",
+    moved_at: "2024-01-17T12:00:00Z",
+    from_category_id: "4854168f-c898-4b5c-8e19-18a76c6cc436",
+    to_category_id: "36ead0b7-a541-4342-9a6f-1f5240cb7eeb",
+    amount: 10_000,
+    note: "Unrelated move",
+  },
+];
 
 export const payees: Payee[] = [
   {

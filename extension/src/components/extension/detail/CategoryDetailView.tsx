@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ArrowBack } from "tabler-icons-react";
 
-import { CurrencyView, IconButton, TransactionView } from "~components";
+import { CurrencyView, IconButton, MoneyMoveView, TransactionView } from "~components";
 import { AddTransactionIcon, AddTransferIcon } from "~components/icons/ActionIcons";
 import { useStorageContext, useYNABContext } from "~lib/context";
 import { useAppSettings } from "~lib/state";
@@ -14,14 +14,38 @@ const CategoryTxsView = () => {
     selectedBudgetData,
     approveTransaction,
     addedTransaction,
+    movedTransaction,
+    useGetMoneyMoves,
   } = useYNABContext();
   const { settings } = useAppSettings();
+  const [showAllMoneyMoves, setShowAllMoneyMoves] = useState(false);
 
   const category = useMemo(
     () => categoriesData?.find((c) => c.id === popupState.detailState?.id),
     [categoriesData, popupState.detailState?.id]
   );
   const { data: categoryTxs } = useGetCategoryTxs(popupState.detailState?.id, 30);
+  const { data: moneyMoves } = useGetMoneyMoves();
+
+  const categoryMoneyMoves = useMemo(() => {
+    return moneyMoves?.filter(
+      (move) =>
+        move.from_category_id === category?.id || move.to_category_id === category?.id
+    );
+  }, [category?.id, moneyMoves]);
+
+  const visibleMoneyMoves = useMemo(() => {
+    if (!categoryMoneyMoves) return null;
+    return showAllMoneyMoves ? categoryMoneyMoves : categoryMoneyMoves.slice(0, 4);
+  }, [categoryMoneyMoves, showAllMoneyMoves]);
+
+  const animateBalances = useMemo(() => {
+    return (
+      !!addedTransaction ||
+      movedTransaction?.from?.id === category?.id ||
+      movedTransaction?.to?.id === category?.id
+    );
+  }, [addedTransaction, movedTransaction, category?.id]);
 
   if (!category || !selectedBudgetData) return <div>Loading...</div>;
 
@@ -42,7 +66,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -51,7 +75,7 @@ const CategoryTxsView = () => {
             milliUnits={category.balance - category.activity - category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -60,7 +84,7 @@ const CategoryTxsView = () => {
             milliUnits={category.budgeted}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
         <li className="balance-display">
@@ -69,7 +93,7 @@ const CategoryTxsView = () => {
             milliUnits={category.activity}
             currencyFormat={selectedBudgetData.currencyFormat}
             colorsEnabled
-            animationEnabled={settings?.animations}
+            animationEnabled={settings?.animations && animateBalances}
           />
         </li>
       </ul>
@@ -113,9 +137,46 @@ const CategoryTxsView = () => {
           <AddTransferIcon /> Move Money
         </button>
       </div>
-      <h3 className="heading-medium mb-sm">Activity</h3>
+      <h3 className="heading-medium mb-sm">Money Moves</h3>
+      {!categoryMoneyMoves ? (
+        <div>Loading money moves...</div>
+      ) : categoryMoneyMoves.length === 0 ? (
+        <div>No money moves this month</div>
+      ) : visibleMoneyMoves ? (
+        <>
+          <ul className="list flex-col gap-sm">
+            {visibleMoneyMoves.map((moneyMove) => (
+              <li key={moneyMove.id}>
+                <MoneyMoveView
+                  moneyMove={moneyMove}
+                  categoryId={category.id}
+                  categories={categoriesData || []}
+                  goToDetailView={(detailState) =>
+                    setPopupState({ view: "detail", detailState })
+                  }
+                  currencyFormat={selectedBudgetData.currencyFormat}
+                />
+              </li>
+            ))}
+          </ul>
+          {!showAllMoneyMoves && categoryMoneyMoves.length > 4 && (
+            <div className="flex-row font-small mb-md">
+              <button
+                className="button gray rounded"
+                onClick={() => setShowAllMoneyMoves(true)}>
+                Show more
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div>Loading money moves...</div>
+      )}
+      <h3 className="heading-medium mt-md mb-sm">Activity</h3>
       {!categoryTxs ? (
         <div>Loading transactions...</div>
+      ) : categoryTxs.length === 0 ? (
+        <div>No recent transactions</div>
       ) : (
         <ul className="list flex-col gap-sm">
           {categoryTxs.map((tx) => (

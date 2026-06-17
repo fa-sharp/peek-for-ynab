@@ -18,7 +18,7 @@ export default function SavedCategoriesView() {
     selectedBudgetData,
     savedCategoriesData,
     addedTransaction,
-    moved,
+    movedTransaction,
   } = useYNABContext();
   const { setPopupState } = useStorageContext();
   const { currentAlerts } = useNotificationsContext();
@@ -60,7 +60,7 @@ export default function SavedCategoriesView() {
                       alerts={currentAlerts?.[budgetId]?.cats[category.id]}
                       settings={settings}
                       addedTransaction={addedTransaction}
-                      moved={moved}
+                      moved={movedTransaction}
                       actionElementsLeft={
                         !editingItems ? null : (
                           <IconButton

@@ -253,7 +253,11 @@ export interface paths {
          */
         get: operations["getPayees"];
         put?: never;
-        post?: never;
+        /**
+         * Create a payee
+         * @description Creates a new payee
+         */
+        post: operations["createPayee"];
         delete?: never;
         options?: never;
         head?: never;
@@ -472,7 +476,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all transactions
+         * Get transactions
          * @description Returns plan transactions, excluding any pending transactions
          */
         get: operations["getTransactions"];
@@ -548,7 +552,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all account transactions
+         * Get account transactions
          * @description Returns all transactions for a specified account, excluding any pending transactions
          */
         get: operations["getTransactionsByAccount"];
@@ -568,7 +572,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all category transactions
+         * Get category transactions
          * @description Returns all transactions for a specified category, excluding any pending transactions
          */
         get: operations["getTransactionsByCategory"];
@@ -588,7 +592,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all payee transactions
+         * Get payee transactions
          * @description Returns all transactions for a specified payee, excluding any pending transactions
          */
         get: operations["getTransactionsByPayee"];
@@ -608,7 +612,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get all plan month transactions
+         * Get plan month transactions
          * @description Returns all transactions for a specified month, excluding any pending transactions
          */
         get: operations["getTransactionsByMonth"];
@@ -750,16 +754,16 @@ export interface components {
             };
         };
         PlanDetail: components["schemas"]["PlanSummary"] & {
-            accounts?: components["schemas"]["Account"][];
+            accounts?: components["schemas"]["AccountBase"][];
             payees?: components["schemas"]["Payee"][];
             payee_locations?: components["schemas"]["PayeeLocation"][];
             category_groups?: components["schemas"]["CategoryGroup"][];
-            categories?: components["schemas"]["Category"][];
-            months?: components["schemas"]["MonthDetail"][];
-            transactions?: components["schemas"]["TransactionSummary"][];
-            subtransactions?: components["schemas"]["SubTransaction"][];
-            scheduled_transactions?: components["schemas"]["ScheduledTransactionSummary"][];
-            scheduled_subtransactions?: components["schemas"]["ScheduledSubTransaction"][];
+            categories?: components["schemas"]["CategoryBase"][];
+            months?: components["schemas"]["MonthDetailBase"][];
+            transactions?: components["schemas"]["TransactionSummaryBase"][];
+            subtransactions?: components["schemas"]["SubTransactionBase"][];
+            scheduled_transactions?: components["schemas"]["ScheduledTransactionSummaryBase"][];
+            scheduled_subtransactions?: components["schemas"]["ScheduledSubTransactionBase"][];
         };
         PlanSettingsResponse: {
             data: {
@@ -785,7 +789,7 @@ export interface components {
                 account: components["schemas"]["Account"];
             };
         };
-        Account: {
+        AccountBase: {
             /** Format: uuid */
             id: string;
             name: string;
@@ -835,13 +839,36 @@ export interface components {
             /** @description Whether or not the account has been deleted.  Deleted accounts will only be included in delta requests. */
             deleted: boolean;
         };
+        Account: components["schemas"]["AccountBase"] & {
+            /** @description The current available balance of the account formatted in the plan's currency format */
+            balance_formatted?: string;
+            /**
+             * Format: double
+             * @description The current available balance of the account as a decimal currency amount
+             */
+            balance_currency?: number;
+            /** @description The current cleared balance of the account formatted in the plan's currency format */
+            cleared_balance_formatted?: string;
+            /**
+             * Format: double
+             * @description The current cleared balance of the account as a decimal currency amount
+             */
+            cleared_balance_currency?: number;
+            /** @description The current uncleared balance of the account formatted in the plan's currency format */
+            uncleared_balance_formatted?: string;
+            /**
+             * Format: double
+             * @description The current uncleared balance of the account as a decimal currency amount
+             */
+            uncleared_balance_currency?: number;
+        };
         PostAccountWrapper: {
             account: components["schemas"]["SaveAccount"];
         };
         SaveAccount: {
             /** @description The name of the account */
             name: string;
-            type: components["schemas"]["AccountType"];
+            type: components["schemas"]["SaveAccountType"];
             /**
              * Format: int64
              * @description The current balance of the account in milliunits format
@@ -851,6 +878,11 @@ export interface components {
         LoanAccountPeriodicValue: {
             [key: string]: number;
         } | null;
+        /**
+         * @description The type of account to create or update
+         * @enum {string}
+         */
+        SaveAccountType: "checking" | "savings" | "cash" | "creditCard" | "otherAsset" | "otherLiability";
         /**
          * @description The type of account
          * @enum {string}
@@ -881,10 +913,12 @@ export interface components {
             name: string;
             /** @description Whether or not the category group is hidden */
             hidden: boolean;
+            /** @description Whether or not the category group is internal */
+            internal: boolean;
             /** @description Whether or not the category group has been deleted.  Deleted category groups will only be included in delta requests. */
             deleted: boolean;
         };
-        Category: {
+        CategoryBase: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -893,6 +927,8 @@ export interface components {
             name: string;
             /** @description Whether or not the category is hidden */
             hidden: boolean;
+            /** @description Whether or not the category is internal */
+            internal: boolean;
             /**
              * Format: uuid
              * @description DEPRECATED: No longer used.  Value will always be null.
@@ -991,6 +1027,57 @@ export interface components {
             goal_snoozed_at?: string | null;
             /** @description Whether or not the category has been deleted.  Deleted categories will only be included in delta requests. */
             deleted: boolean;
+        };
+        Category: components["schemas"]["CategoryBase"] & {
+            /** @description Available balance of the category formatted in the plan's currency format */
+            balance_formatted?: string;
+            /**
+             * Format: double
+             * @description Available balance of the category as a decimal currency amount
+             */
+            balance_currency?: number;
+            /** @description Activity of the category formatted in the plan's currency format */
+            activity_formatted?: string;
+            /**
+             * Format: double
+             * @description Activity of the category as a decimal currency amount
+             */
+            activity_currency?: number;
+            /** @description Assigned (budgeted) amount of the category formatted in the plan's currency format */
+            budgeted_formatted?: string;
+            /**
+             * Format: double
+             * @description Assigned (budgeted) amount of the category as a decimal currency amount
+             */
+            budgeted_currency?: number;
+            /** @description The goal target amount formatted in the plan's currency format */
+            goal_target_formatted?: string | null;
+            /**
+             * Format: double
+             * @description The goal target amount as a decimal currency amount
+             */
+            goal_target_currency?: number | null;
+            /** @description The goal underfunded amount formatted in the plan's currency format */
+            goal_under_funded_formatted?: string | null;
+            /**
+             * Format: double
+             * @description The goal underfunded amount as a decimal currency amount
+             */
+            goal_under_funded_currency?: number | null;
+            /** @description The total amount funded towards the goal formatted in the plan's currency format */
+            goal_overall_funded_formatted?: string | null;
+            /**
+             * Format: double
+             * @description The total amount funded towards the goal as a decimal currency amount
+             */
+            goal_overall_funded_currency?: number | null;
+            /** @description The amount of funding still needed to complete the goal formatted in the plan's currency format */
+            goal_overall_left_formatted?: string | null;
+            /**
+             * Format: double
+             * @description The amount of funding still needed to complete the goal as a decimal currency amount
+             */
+            goal_overall_left_currency?: number | null;
         };
         SaveCategoryResponse: {
             data: {
@@ -1186,7 +1273,7 @@ export interface components {
                 server_knowledge: number;
             };
         };
-        TransactionSummary: {
+        TransactionSummaryBase: {
             id: string;
             /**
              * Format: date
@@ -1233,6 +1320,15 @@ export interface components {
             /** @description Whether or not the transaction has been deleted.  Deleted transactions will only be included in delta requests. */
             deleted: boolean;
         };
+        TransactionSummary: components["schemas"]["TransactionSummaryBase"] & {
+            /** @description The transaction amount formatted in the plan's currency format */
+            amount_formatted?: string;
+            /**
+             * Format: double
+             * @description The transaction amount as a decimal currency amount
+             */
+            amount_currency?: number;
+        };
         TransactionDetail: components["schemas"]["TransactionSummary"] & {
             account_name: string;
             payee_name?: string | null;
@@ -1254,11 +1350,18 @@ export interface components {
             /** @description The name of the category.  If a split transaction, this will be 'Split'. */
             category_name?: string;
         };
+        PostPayeeWrapper: {
+            payee: components["schemas"]["PostPayee"];
+        };
+        PostPayee: {
+            /** @description The name of the payee. */
+            name: string;
+        };
         PatchPayeeWrapper: {
             payee: components["schemas"]["SavePayee"];
         };
         SavePayee: {
-            /** @description The name of the payee. The name must be a maximum of 500 characters. */
+            /** @description The name of the payee. */
             name?: string;
         };
         PostCategoryGroupWrapper: {
@@ -1280,11 +1383,14 @@ export interface components {
         SaveCategory: {
             name?: string | null;
             note?: string | null;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description The id of the category group to which this category belongs.  An internal category group may not be specified.
+             */
             category_group_id?: string;
             /**
              * Format: int64
-             * @description The goal target amount in milliunits format.  If value is specified and goal has not already been configured for category, a monthly 'Needed for Spending' goal will be created for the category with this target amount.
+             * @description The goal target amount in milliunits format.  If value is specified and goal has not already been configured for category, a monthly goal will be created for the category with this target amount.  If goal_type is not specified, it will default to 'NEED' or 'MF' for Credit Card Payment categories.
              */
             goal_target?: number | null;
             /**
@@ -1292,6 +1398,8 @@ export interface components {
              * @description The goal target date in ISO format (e.g. 2016-12-01).
              */
             goal_target_date?: string | null;
+            /** @description Whether the goal requires the full target amount each period. Only supported for 'NEED' goals. When true, the goal is configured as 'Set aside another...'. When false, the goal is configured as 'Refill up to...'. */
+            goal_needs_whole_amount?: boolean | null;
         };
         ExistingCategory: components["schemas"]["SaveCategory"] & Record<string, never>;
         NewCategory: components["schemas"]["SaveCategory"] & unknown;
@@ -1324,7 +1432,7 @@ export interface components {
         BulkTransactions: {
             transactions: components["schemas"]["SaveTransactionWithOptionalFields"][];
         };
-        SubTransaction: {
+        SubTransactionBase: {
             id: string;
             transaction_id: string;
             /**
@@ -1348,6 +1456,15 @@ export interface components {
             transfer_transaction_id?: string | null;
             /** @description Whether or not the subtransaction has been deleted.  Deleted subtransactions will only be included in delta requests. */
             deleted: boolean;
+        };
+        SubTransaction: components["schemas"]["SubTransactionBase"] & {
+            /** @description The subtransaction amount formatted in the plan's currency format */
+            amount_formatted?: string;
+            /**
+             * Format: double
+             * @description The subtransaction amount as a decimal currency amount
+             */
+            amount_currency?: number;
         };
         ScheduledTransactionsResponse: {
             data: {
@@ -1399,7 +1516,7 @@ export interface components {
             flag_color?: components["schemas"]["TransactionFlagColor"];
             frequency?: components["schemas"]["ScheduledTransactionFrequency"];
         };
-        ScheduledTransactionSummary: {
+        ScheduledTransactionSummaryBase: {
             /** Format: uuid */
             id: string;
             /**
@@ -1436,6 +1553,15 @@ export interface components {
             /** @description Whether or not the scheduled transaction has been deleted.  Deleted scheduled transactions will only be included in delta requests. */
             deleted: boolean;
         };
+        ScheduledTransactionSummary: components["schemas"]["ScheduledTransactionSummaryBase"] & {
+            /** @description The scheduled transaction amount formatted in the plan's currency format */
+            amount_formatted?: string;
+            /**
+             * Format: double
+             * @description The scheduled transaction amount as a decimal currency amount
+             */
+            amount_currency?: number;
+        };
         ScheduledTransactionDetail: components["schemas"]["ScheduledTransactionSummary"] & {
             account_name: string;
             payee_name?: string | null;
@@ -1444,7 +1570,7 @@ export interface components {
             /** @description If a split scheduled transaction, the subtransactions. */
             subtransactions: components["schemas"]["ScheduledSubTransaction"][];
         };
-        ScheduledSubTransaction: {
+        ScheduledSubTransactionBase: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -1469,6 +1595,15 @@ export interface components {
             /** @description Whether or not the scheduled subtransaction has been deleted. Deleted scheduled subtransactions will only be included in delta requests. */
             deleted: boolean;
         };
+        ScheduledSubTransaction: components["schemas"]["ScheduledSubTransactionBase"] & {
+            /** @description The scheduled subtransaction amount formatted in the plan's currency format */
+            amount_formatted?: string;
+            /**
+             * Format: double
+             * @description The scheduled subtransaction amount as a decimal currency amount
+             */
+            amount_currency?: number;
+        };
         MonthSummariesResponse: {
             data: {
                 months: components["schemas"]["MonthSummary"][];
@@ -1484,7 +1619,7 @@ export interface components {
                 month: components["schemas"]["MonthDetail"];
             };
         };
-        MonthSummary: {
+        MonthSummaryBase: {
             /** Format: date */
             month: string;
             note?: string | null;
@@ -1515,6 +1650,40 @@ export interface components {
             age_of_money?: number | null;
             /** @description Whether or not the month has been deleted.  Deleted months will only be included in delta requests. */
             deleted: boolean;
+        };
+        MonthSummary: components["schemas"]["MonthSummaryBase"] & {
+            /** @description The total income formatted in the plan's currency format */
+            income_formatted?: string;
+            /**
+             * Format: double
+             * @description The total income as a decimal currency amount
+             */
+            income_currency?: number;
+            /** @description The total amount assigned formatted in the plan's currency format */
+            budgeted_formatted?: string;
+            /**
+             * Format: double
+             * @description The total amount assigned as a decimal currency amount
+             */
+            budgeted_currency?: number;
+            /** @description The total activity amount formatted in the plan's currency format */
+            activity_formatted?: string;
+            /**
+             * Format: double
+             * @description The total activity amount as a decimal currency amount
+             */
+            activity_currency?: number;
+            /** @description The available amount for 'Ready to Assign' formatted in the plan's currency format */
+            to_be_budgeted_formatted?: string;
+            /**
+             * Format: double
+             * @description The available amount for 'Ready to Assign' as a decimal currency amount
+             */
+            to_be_budgeted_currency?: number;
+        };
+        MonthDetailBase: components["schemas"]["MonthSummaryBase"] & {
+            /** @description The plan month categories.  Amounts (budgeted, activity, balance, etc.) are specific to the {month} parameter specified. */
+            categories: components["schemas"]["CategoryBase"][];
         };
         MonthDetail: components["schemas"]["MonthSummary"] & {
             /** @description The plan month categories.  Amounts (budgeted, activity, balance, etc.) are specific to the {month} parameter specified. */
@@ -1547,7 +1716,7 @@ export interface components {
                 server_knowledge: number;
             };
         };
-        MoneyMovement: {
+        MoneyMovementBase: {
             /** Format: uuid */
             id: string;
             /**
@@ -1586,6 +1755,15 @@ export interface components {
              * @description The amount of the money movement in milliunits format
              */
             amount: number;
+        };
+        MoneyMovement: components["schemas"]["MoneyMovementBase"] & {
+            /** @description The money movement amount formatted in the plan's currency format */
+            amount_formatted?: string;
+            /**
+             * Format: double
+             * @description The money movement amount as a decimal currency amount
+             */
+            amount_currency?: number;
         };
         MoneyMovementGroupsResponse: {
             data: {
@@ -2184,6 +2362,43 @@ export interface operations {
             };
         };
     };
+    createPayee: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The id of the plan. "last-used" can be used to specify the last used plan and "default" can be used if default plan selection is enabled (see: https://api.ynab.com/#oauth-default-plan). */
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description The payee to create */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostPayeeWrapper"];
+            };
+        };
+        responses: {
+            /** @description The payee was successfully created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavePayeeResponse"];
+                };
+            };
+            /** @description The request could not be understood due to malformed syntax or validation error(s) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getPayeeById: {
         parameters: {
             query?: never;
@@ -2561,8 +2776,10 @@ export interface operations {
     getTransactions: {
         parameters: {
             query?: {
-                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). Defaults to one year ago when not specified. */
                 since_date?: string;
+                /** @description If specified, only transactions on or before this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                until_date?: string;
                 /** @description If specified, only transactions of the specified type will be included. "uncategorized" and "unapproved" are currently supported. */
                 type?: "uncategorized" | "unapproved";
                 /** @description The starting server knowledge.  If provided, only entities that have changed since `last_knowledge_of_server` will be included. */
@@ -2840,8 +3057,10 @@ export interface operations {
     getTransactionsByAccount: {
         parameters: {
             query?: {
-                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). Defaults to one year ago when not specified. */
                 since_date?: string;
+                /** @description If specified, only transactions on or before this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                until_date?: string;
                 /** @description If specified, only transactions of the specified type will be included. "uncategorized" and "unapproved" are currently supported. */
                 type?: "uncategorized" | "unapproved";
                 /** @description The starting server knowledge.  If provided, only entities that have changed since `last_knowledge_of_server` will be included. */
@@ -2881,8 +3100,10 @@ export interface operations {
     getTransactionsByCategory: {
         parameters: {
             query?: {
-                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). Defaults to one year ago when not specified. */
                 since_date?: string;
+                /** @description If specified, only transactions on or before this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                until_date?: string;
                 /** @description If specified, only transactions of the specified type will be included. "uncategorized" and "unapproved" are currently supported. */
                 type?: "uncategorized" | "unapproved";
                 /** @description The starting server knowledge.  If provided, only entities that have changed since `last_knowledge_of_server` will be included. */
@@ -2922,8 +3143,10 @@ export interface operations {
     getTransactionsByPayee: {
         parameters: {
             query?: {
-                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). Defaults to one year ago when not specified. */
                 since_date?: string;
+                /** @description If specified, only transactions on or before this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                until_date?: string;
                 /** @description If specified, only transactions of the specified type will be included. "uncategorized" and "unapproved" are currently supported. */
                 type?: "uncategorized" | "unapproved";
                 /** @description The starting server knowledge.  If provided, only entities that have changed since `last_knowledge_of_server` will be included. */
@@ -2965,6 +3188,8 @@ export interface operations {
             query?: {
                 /** @description If specified, only transactions on or after this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
                 since_date?: string;
+                /** @description If specified, only transactions on or before this date will be included.  The date should be ISO formatted (e.g. 2016-12-30). */
+                until_date?: string;
                 /** @description If specified, only transactions of the specified type will be included. "uncategorized" and "unapproved" are currently supported. */
                 type?: "uncategorized" | "unapproved";
                 /** @description The starting server knowledge.  If provided, only entities that have changed since `last_knowledge_of_server` will be included. */
