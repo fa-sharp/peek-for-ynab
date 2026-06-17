@@ -50,7 +50,7 @@ export const mockServer = setupServer(
     })
   ),
   http.get(
-    `${YNAB_BASE}/plans/:planId/months/current/money_movements`,
+    `${YNAB_BASE}/plans/:planId/months/:month/money_movements`,
     withAuth(() => {
       return HttpResponse.json({
         data: {
