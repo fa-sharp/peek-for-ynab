@@ -11,7 +11,7 @@ use crate::state::AppState;
 pub fn oauth_routes() -> axum::Router<AppState> {
     axum::Router::new()
         .route("/login", axum::routing::get(login_route))
-        .route("/callback", axum::routing::post(callback_route))
+        .route("/callback", axum::routing::get(callback_route))
 }
 
 const OAUTH_COOKIE_NAME: &'static str = "peek-oauth-login";

@@ -2,6 +2,7 @@ use std::net::{IpAddr, Ipv4Addr};
 
 use anyhow::Context;
 use axum_plugin::AdHocPlugin;
+use reqwest::Url;
 use serde::Deserialize;
 use serde_with::{StringWithSeparator, formats::CommaSeparator};
 
@@ -26,10 +27,10 @@ pub struct AppConfig {
     #[serde(default = "default_ynab_url")]
     pub ynab_base_url: String,
 
-    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, String>>")]
-    pub allowed_origins: Option<Vec<String>>,
-    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, reqwest::Url>>")]
-    pub allowed_login_redirects: Option<Vec<reqwest::Url>>,
+    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, Url>>")]
+    pub allowed_origins: Option<Vec<Url>>,
+    #[serde_as(as = "Option<StringWithSeparator::<CommaSeparator, Url>>")]
+    pub allowed_login_redirects: Option<Vec<Url>>,
 }
 fn default_host() -> IpAddr {
     IpAddr::V4(Ipv4Addr::LOCALHOST)
