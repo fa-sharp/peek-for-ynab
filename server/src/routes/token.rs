@@ -23,6 +23,7 @@ async fn get_token_route(
                     .crypto
                     .encrypt_token(&new_token)
                     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
                 Ok(Json(AccessTokenResponse {
                     access_token: new_token.access_token,
                     auth_token: Some(auth_token),
@@ -30,6 +31,7 @@ async fn get_token_route(
             }
             Err(err) => {
                 tracing::warn!("Error refreshing token: {err}");
+
                 Err(StatusCode::UNAUTHORIZED)
             }
         }
