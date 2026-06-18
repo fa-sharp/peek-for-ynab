@@ -1,15 +1,36 @@
 name: "Backend"
 on:
   push:
-    branches:
-      - main
     paths:
+      - "server/**"
       - "web/**"
       - "Dockerfile"
       - "fly.toml"
+env:
+  RUST_VERSION: "1.96"
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          rust-src-dir: server
+      - name: cargo check
+        run: cargo check --locked
+      - name: cargo build
+        run: cargo build --locked
+
   deploy:
     name: Deploy
+    if: github.ref == 'refs/heads/main'
+    needs: build
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:
