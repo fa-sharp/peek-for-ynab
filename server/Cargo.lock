@@ -1242,7 +1242,6 @@ dependencies = [
  "base64",
  "dotenvy",
  "figment",
- "hex",
  "oauth2",
  "oauth2-reqwest",
  "reqwest",

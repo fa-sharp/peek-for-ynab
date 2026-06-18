@@ -7,7 +7,7 @@ description = "Peek for YNAB backend server"
 [dependencies]
 aes-gcm = { version = "0.10.3", features = ["std"] }
 anyhow = "1.0.102"
-axum = { version = "0.8.9", features = ["json", "query"] }
+axum = "0.8.9"
 axum-extra = {
   version = "0.12.6",
   features = ["cookie-key-expansion", "cookie-private"]
@@ -19,7 +19,6 @@ axum-plugin = {
 base64 = "0.22.1"
 dotenvy = "0.15.7"
 figment = { version = "0.10.19", features = ["env"] }
-hex = "0.4.3"
 oauth2 = { version = "5.0.0", default-features = false }
 oauth2-reqwest = "0.1.0-alpha.3"
 reqwest = {
@@ -41,7 +40,7 @@ serde_with = {
 tokio = {
   version = "1.52.3",
   default-features = false,
-  features = ["macros", "net", "rt", "rt-multi-thread", "signal"]
+  features = ["net", "rt", "rt-multi-thread", "signal"]
 }
 tower-http = { version = "0.7.0", features = ["cors", "fs"] }
 tracing = "0.1.44"
