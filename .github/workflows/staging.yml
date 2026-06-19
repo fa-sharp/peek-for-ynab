@@ -28,3 +28,4 @@ jobs:
             PEEK_YNAB_SECRET=${{ secrets.STAGING_YNAB_SECRET }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_REGION: ewr
