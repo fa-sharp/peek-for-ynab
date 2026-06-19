@@ -10,27 +10,31 @@ async fn main() -> anyhow::Result<()> {
     #[cfg(debug_assertions)]
     dotenvy::dotenv().ok();
 
+    // Initialize logging with info level
+    let (filter_layer, filter_handle) =
+        tracing_subscriber::reload::Layer::new(tracing_subscriber::EnvFilter::new("info"));
+    if cfg!(debug_assertions) {
+        tracing_subscriber::registry()
+            .with(filter_layer)
+            .with(tracing_subscriber::fmt::layer())
+            .init();
+    } else {
+        tracing_subscriber::registry()
+            .with(filter_layer)
+            .with(tracing_subscriber::fmt::layer().json().flatten_event(true))
+            .init();
+    }
+
     // Build server
     let app = create_app().await?;
     let config = &app.state().config;
 
-    // Configure logging output (use JSON logs in release mode)
+    // Reconfigure log level from parsed config
     let level_filter = LevelFilter::from_str(&config.log_level)?;
     let env_filter = tracing_subscriber::EnvFilter::builder()
         .with_default_directive(level_filter.into())
         .from_env_lossy();
-    if cfg!(debug_assertions) {
-        tracing_subscriber::fmt()
-            .with_env_filter(env_filter)
-            .with_max_level(level_filter)
-            .init();
-    } else {
-        tracing_subscriber::registry()
-            .with(env_filter)
-            .with(level_filter)
-            .with(tracing_subscriber::fmt::layer().json().flatten_event(true))
-            .init();
-    }
+    filter_handle.reload(env_filter)?;
 
     // Start listening for requests
     let addr = SocketAddr::new(config.host, config.port);
