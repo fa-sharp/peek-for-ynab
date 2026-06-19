@@ -18,9 +18,8 @@ async fn main() -> anyhow::Result<()> {
     let config = &app.state().config;
 
     // Set log level from config
-    let level_filter = LevelFilter::from_str(&config.log_level)?;
     let env_filter = EnvFilter::builder()
-        .with_default_directive(level_filter.into())
+        .with_default_directive(LevelFilter::from_str(&config.log_level)?.into())
         .from_env_lossy();
     log_filter_handle.reload(env_filter)?;
 

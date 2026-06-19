@@ -19,6 +19,7 @@ pub async fn create_app(
         .register(plugins::oauth::plugin()) // OAuth routes
         .register(routes::plugin()) // API routes
         .register(plugins::cors::plugin()) // CORS handling
+        .register(plugins::logging::plugin()) // Request logs
         .register(plugins::web::plugin()) // Astro static website
         .register(plugins::security::plugin()) // Request timeout, body limit, etc.
         .init()
