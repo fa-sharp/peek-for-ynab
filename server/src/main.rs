@@ -2,7 +2,7 @@ use std::{net::SocketAddr, str::FromStr};
 
 use peek_server::create_app;
 use tracing::level_filters::LevelFilter;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{EnvFilter, Registry, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -10,31 +10,19 @@ async fn main() -> anyhow::Result<()> {
     #[cfg(debug_assertions)]
     dotenvy::dotenv().ok();
 
-    // Initialize logging with info level
-    let (filter_layer, filter_handle) =
-        tracing_subscriber::reload::Layer::new(tracing_subscriber::EnvFilter::new("info"));
-    if cfg!(debug_assertions) {
-        tracing_subscriber::registry()
-            .with(filter_layer)
-            .with(tracing_subscriber::fmt::layer())
-            .init();
-    } else {
-        tracing_subscriber::registry()
-            .with(filter_layer)
-            .with(tracing_subscriber::fmt::layer().json().flatten_event(true))
-            .init();
-    }
+    // Initialize logging
+    let (log_filter_handle, _log_guard) = init_logging();
 
     // Build server
     let app = create_app(None).await?;
     let config = &app.state().config;
 
-    // Reconfigure log level from parsed config
+    // Set log level from config
     let level_filter = LevelFilter::from_str(&config.log_level)?;
-    let env_filter = tracing_subscriber::EnvFilter::builder()
+    let env_filter = EnvFilter::builder()
         .with_default_directive(level_filter.into())
         .from_env_lossy();
-    filter_handle.reload(env_filter)?;
+    log_filter_handle.reload(env_filter)?;
 
     // Start listening for requests
     let addr = SocketAddr::new(config.host, config.port);
@@ -45,6 +33,34 @@ async fn main() -> anyhow::Result<()> {
         .await?;
 
     Ok(())
+}
+
+fn init_logging() -> (
+    tracing_subscriber::reload::Handle<EnvFilter, Registry>,
+    tracing_appender::non_blocking::WorkerGuard,
+) {
+    let (writer, guard) = tracing_appender::non_blocking(std::io::stdout()); // Non-blocking writer for stdout
+    let (filter_layer, filter_handle) =
+        tracing_subscriber::reload::Layer::new(EnvFilter::new("info")); // Log level filter
+
+    if cfg!(debug_assertions) {
+        tracing_subscriber::registry()
+            .with(filter_layer)
+            .with(tracing_subscriber::fmt::layer().with_writer(writer))
+            .init();
+    } else {
+        let json_layer = tracing_subscriber::fmt::layer()
+            .json()
+            .flatten_event(true)
+            .with_current_span(true)
+            .with_writer(writer);
+        tracing_subscriber::registry()
+            .with(filter_layer)
+            .with(json_layer)
+            .init();
+    }
+
+    (filter_handle, guard)
 }
 
 /// Shutdown signal: listens for Ctrl-C, SIGINT, SIGTERM signals
