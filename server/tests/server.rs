@@ -6,7 +6,8 @@ use peek_server::create_app;
 async fn should_start() {
     let app = create_app().await.unwrap();
     let server = TestServer::new(app.router());
-    assert!(server.is_running());
+    let response = server.get("/api/health").await;
+    assert!(response.status_code().is_success());
 }
 
 #[tokio::test]
@@ -18,6 +19,9 @@ async fn serves_static_website() {
         let response = server.get(path).await;
         assert_eq!(response.status_code(), StatusCode::OK, "GET {path}");
         assert_eq!(response.content_type(), "text/html");
+        for header in [header::STRICT_TRANSPORT_SECURITY, header::X_FRAME_OPTIONS] {
+            assert!(response.maybe_header(header).is_some())
+        }
     }
 }
 
@@ -34,6 +38,7 @@ async fn api_cors_headers() {
         .and_then(|origins| origins.first().map(|o| o.as_str()));
     let request_origin = allowed_origin.unwrap_or("http://random");
 
+    // Proper CORS origin header
     for path in ["/api/token", "/api/token/logout"] {
         let response = server
             .post(path)
@@ -45,6 +50,7 @@ async fn api_cors_headers() {
         );
     }
 
+    // No CORS headers for static pages
     for path in ["/", "/help/"] {
         let response = server
             .get(path)
@@ -55,4 +61,18 @@ async fn api_cors_headers() {
             None
         );
     }
+}
+
+#[tokio::test]
+async fn body_limit() {
+    let app = create_app().await.unwrap();
+    let server = TestServer::new(app.router());
+
+    let big_body = vec![0u8; 6 * 1024];
+    let response = server
+        .post("/api/token")
+        .add_header(header::CONTENT_LENGTH, big_body.len())
+        .bytes(big_body.into())
+        .await;
+    assert_eq!(response.status_code(), StatusCode::PAYLOAD_TOO_LARGE);
 }
