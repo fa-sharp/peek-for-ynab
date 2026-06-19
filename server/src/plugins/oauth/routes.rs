@@ -2,9 +2,13 @@ use axum::{
     extract::{Query, State},
     response::{IntoResponse, Redirect},
 };
-use axum_extra::extract::{PrivateCookieJar, cookie::Cookie};
+use axum_extra::extract::{
+    PrivateCookieJar,
+    cookie::{Cookie, SameSite},
+};
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
+use subtle::ConstantTimeEq;
 
 use crate::state::AppState;
 
@@ -14,7 +18,7 @@ pub fn oauth_routes() -> axum::Router<AppState> {
         .route("/callback", axum::routing::get(callback_route))
 }
 
-const OAUTH_COOKIE_NAME: &'static str = "peek-oauth-login";
+const OAUTH_COOKIE_NAME: &str = "peek-oauth-login";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct OauthLoginData {
@@ -57,6 +61,7 @@ async fn login_route(
         .path(super::OAUTH_ROUTE_PREFIX)
         .http_only(true)
         .secure(true)
+        .same_site(SameSite::Lax)
         .expires(None); // Session expiration
     let cookie_jar = cookies.add(cookie);
 
@@ -80,18 +85,18 @@ async fn callback_route(
         .ok_or(StatusCode::BAD_REQUEST)?;
     let cookie_jar =
         cookies.remove(Cookie::build(OAUTH_COOKIE_NAME).path(super::OAUTH_ROUTE_PREFIX));
-    let login_data: OauthLoginData =
+    let login: OauthLoginData =
         serde_json::from_str(oauth_cookie.value()).map_err(|_| StatusCode::BAD_REQUEST)?;
 
     // Verify state parameter
-    if query.state != login_data.state {
+    if query.state.as_bytes().ct_ne(login.state.as_bytes()).into() {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
     // Exchange code for token
     match state
         .oauth
-        .exchange_code(query.code, login_data.pkce_verifier)
+        .exchange_code(query.code, login.pkce_verifier)
         .await
     {
         Ok(token_data) => {
@@ -99,7 +104,7 @@ async fn callback_route(
                 .crypto
                 .encrypt_token(&token_data)
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-            let mut redirect_url = login_data.redirect_uri;
+            let mut redirect_url = login.redirect_uri;
             redirect_url.set_fragment(Some(&format!("auth_token={auth_token}")));
 
             Ok((cookie_jar, Redirect::to(redirect_url.as_str())))

@@ -197,6 +197,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "axum-helmet"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4233d7fef77c993a0251c2e4610cc6e4e02c01bbd669f8f323ec9e8376d947c7"
+dependencies = [
+ "helmet-core",
+ "http",
+ "pin-project-lite",
+ "tower",
+ "tower-service",
+]
+
+[[package]]
 name = "axum-plugin"
 version = "0.2.0"
 source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=9f72278b3c#9f72278b3c8ae57897ac04af54a6643bb9e5a25c"
@@ -804,6 +817,12 @@ dependencies = [
  "opaque-debug",
  "polyval",
 ]
+
+[[package]]
+name = "helmet-core"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a865b9c8b67316ab132710af828252e764cdf2195bbcd72a23b96127150d9de"
 
 [[package]]
 name = "hex"
@@ -1432,6 +1451,7 @@ dependencies = [
  "anyhow",
  "axum",
  "axum-extra",
+ "axum-helmet",
  "axum-plugin",
  "axum-test",
  "base64",
@@ -1443,7 +1463,9 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+ "subtle",
  "tokio",
+ "tower",
  "tower-http 0.7.0",
  "tracing",
  "tracing-subscriber",

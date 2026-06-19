@@ -18,6 +18,7 @@ pub async fn create_app() -> anyhow::Result<InitializedApp<AppState>> {
         .register(routes::plugin()) // API routes
         .register(plugins::cors::plugin()) // CORS handling
         .register(plugins::web::plugin()) // Astro static website
+        .register(plugins::security::plugin()) // Request timeout, body limit, etc.
         .init()
         .await?;
 

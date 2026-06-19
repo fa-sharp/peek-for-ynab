@@ -3,6 +3,7 @@ name = "peek-server"
 version = "0.1.0"
 edition = "2024"
 description = "Peek for YNAB backend server"
+publish = false
 
 [dependencies]
 aes-gcm = { version = "0.10.3", features = ["std"] }
@@ -12,6 +13,7 @@ axum-extra = {
   version = "0.12.6",
   features = ["cookie-key-expansion", "cookie-private"]
 }
+axum-helmet = "1.0.2"
 axum-plugin = {
   git = "https://git.fasharp.io/fa-sharp/axum-plugin",
   rev = "9f72278b3c"
@@ -33,12 +35,17 @@ serde_with = {
   default-features = false,
   features = ["alloc", "hex", "macros"]
 }
+subtle = { version = "2.6.1", default-features = false, features = ["std"] }
 tokio = {
   version = "1.52.3",
   default-features = false,
   features = ["net", "rt", "rt-multi-thread", "signal"]
 }
-tower-http = { version = "0.7.0", features = ["cors", "fs"] }
+tower = { version = "0.5", default-features = false }
+tower-http = {
+  version = "0.7.0",
+  features = ["cors", "fs", "limit", "timeout"]
+}
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 

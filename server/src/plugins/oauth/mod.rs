@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::Context;
 use axum_plugin::AdHocPlugin;
 use oauth2::{ClientId, EndpointNotSet, EndpointSet, basic::BasicClient};
@@ -36,6 +38,7 @@ pub fn plugin() -> AdHocPlugin<AppState> {
 
             let reqwest_client = reqwest::ClientBuilder::new()
                 .redirect(reqwest::redirect::Policy::none())
+                .timeout(Duration::from_secs(10))
                 .build()
                 .context("reqwest client failed to build")?;
             let http_client = ReqwestClient::from(reqwest_client);
