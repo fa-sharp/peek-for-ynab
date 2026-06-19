@@ -1,7 +1,7 @@
 use axum::{Json, extract::State, http::StatusCode};
 use serde::Serialize;
 
-use crate::{guard::TokenGuard, state::AppState, util::now_millis};
+use crate::{guard::TokenGuard, state::AppState, util::now_secs};
 
 pub fn routes() -> axum::Router<AppState> {
     axum::Router::new()
@@ -10,13 +10,13 @@ pub fn routes() -> axum::Router<AppState> {
 }
 
 /** Minimum time the access token should be fresh (20 minutes) */
-const TOKEN_FRESH_MILLIS: u64 = 20 * 60 * 1000;
+const TOKEN_FRESH_SECONDS: u64 = 20 * 60;
 
 async fn get_token_route(
     TokenGuard(token): TokenGuard,
     State(state): State<AppState>,
 ) -> Result<Json<AccessTokenResponse>, StatusCode> {
-    if token.expires < now_millis() + TOKEN_FRESH_MILLIS {
+    if token.expires < (now_secs() + TOKEN_FRESH_SECONDS) * 1000 {
         match state.oauth.refresh(token.refresh_token).await {
             Ok(new_token) => {
                 let auth_token = state

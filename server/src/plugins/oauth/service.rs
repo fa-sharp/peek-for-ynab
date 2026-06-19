@@ -3,7 +3,7 @@ use std::time::Duration;
 use oauth2::{RefreshToken, TokenResponse};
 use oauth2_reqwest::ReqwestClient;
 
-use crate::{types::TokenData, util::now_millis};
+use crate::{types::TokenData, util::now_secs};
 
 pub struct OauthService {
     client: super::OauthClient,
@@ -77,11 +77,8 @@ fn extract_token_data(
         .ok_or_else(|| anyhow::anyhow!("missing refresh token"))?
         .secret()
         .to_owned();
-    let expires = now_millis()
-        + response
-            .expires_in()
-            .unwrap_or_else(|| Duration::from_hours(2))
-            .as_millis() as u64;
+    const DEFAULT_EXPIRY: Duration = Duration::from_hours(2);
+    let expires = (now_secs() + response.expires_in().unwrap_or(DEFAULT_EXPIRY).as_secs()) * 1000;
 
     Ok(TokenData {
         expires,
