@@ -4,15 +4,17 @@ use crate::state::AppState;
 
 mod config;
 mod guard;
-mod plugins;
+pub mod plugins;
 mod routes;
 mod state;
-mod types;
-mod util;
+pub mod types;
+pub mod util;
 
-pub async fn create_app() -> anyhow::Result<InitializedApp<AppState>> {
+pub async fn create_app(
+    additional_config: Option<Vec<(String, String)>>,
+) -> anyhow::Result<InitializedApp<AppState>> {
     let app = App::new()
-        .register(config::plugin()) // Extract configuration and add to state
+        .register(config::plugin(additional_config.unwrap_or_default())) // Extract configuration and add to state
         .register(plugins::crypto::plugin()) // Encryption and decryption of tokens
         .register(plugins::oauth::plugin()) // OAuth routes
         .register(routes::plugin()) // API routes

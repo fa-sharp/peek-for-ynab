@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
     }
 
     // Build server
-    let app = create_app().await?;
+    let app = create_app(None).await?;
     let config = &app.state().config;
 
     // Reconfigure log level from parsed config

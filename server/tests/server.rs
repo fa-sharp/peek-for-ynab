@@ -4,7 +4,7 @@ use peek_server::create_app;
 
 #[tokio::test]
 async fn should_start() {
-    let app = create_app().await.unwrap();
+    let app = create_app(None).await.unwrap();
     let server = TestServer::new(app.router());
     let response = server.get("/api/health").await;
     assert!(response.status_code().is_success());
@@ -12,7 +12,7 @@ async fn should_start() {
 
 #[tokio::test]
 async fn serves_static_website() {
-    let app = create_app().await.unwrap();
+    let app = create_app(None).await.unwrap();
     let server = TestServer::new(app.router());
 
     for path in ["/", "/help/", "/releases/", "/privacy/"] {
@@ -27,7 +27,7 @@ async fn serves_static_website() {
 
 #[tokio::test]
 async fn api_cors_headers() {
-    let app = create_app().await.unwrap();
+    let app = create_app(None).await.unwrap();
     let server = TestServer::new(app.router());
 
     let allowed_origin = app
@@ -65,7 +65,7 @@ async fn api_cors_headers() {
 
 #[tokio::test]
 async fn body_limit() {
-    let app = create_app().await.unwrap();
+    let app = create_app(None).await.unwrap();
     let server = TestServer::new(app.router());
 
     let big_body = vec![0u8; 6 * 1024];

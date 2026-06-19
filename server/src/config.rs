@@ -49,20 +49,24 @@ fn default_ynab_url() -> String {
 }
 
 /// Plugin that reads and validates configuration, and adds it to server state
-pub fn plugin() -> AdHocPlugin<AppState> {
+pub fn plugin(additional_config: Vec<(String, String)>) -> AdHocPlugin<AppState> {
     AdHocPlugin::named("Config").on_init(async |mut state| {
-        let config = extract_config()?;
+        let config = extract_config(additional_config)?;
         state.insert(config);
         Ok(state)
     })
 }
 
 /// Extract the configuration from env variables prefixed with `PEEK_`.
-fn extract_config() -> anyhow::Result<AppConfig> {
-    let config = figment::Figment::new()
-        .merge(figment::providers::Env::prefixed("PEEK_"))
-        .extract::<AppConfig>()
-        .context("Failed to extract valid configuration")?;
+fn extract_config(
+    additional: impl IntoIterator<Item = (String, String)>,
+) -> anyhow::Result<AppConfig> {
+    let mut config = figment::Figment::new().merge(figment::providers::Env::prefixed("PEEK_"));
+    for (k, v) in additional {
+        config = config.merge((k, v));
+    }
 
-    Ok(config)
+    Ok(config
+        .extract::<AppConfig>()
+        .context("Failed to extract valid configuration")?)
 }

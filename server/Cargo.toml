@@ -51,3 +51,4 @@ tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 
 [dev-dependencies]
 axum-test = "20.1.0"
+httpmock = { version = "0.8.3", default-features = false }
