@@ -29,6 +29,9 @@ jobs:
           cache-dependency-path: web/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
 
+      - name: Check Astro site
+        run: pnpm run check
+
       - name: Build Astro site
         run: pnpm run build
 
