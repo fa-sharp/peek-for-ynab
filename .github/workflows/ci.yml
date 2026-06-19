@@ -3,7 +3,7 @@ on:
   push:
 
 env:
-  NODE_VERSION: 22.22
+  NODE_VERSION: "22.23"
 
 jobs:
   test:
