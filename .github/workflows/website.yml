@@ -32,7 +32,7 @@ jobs:
         run: pnpm run build
 
       - name: Save website build
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact
         with:
           name: web-dist
           path: web/dist
@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Download website build
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact
         with:
           name: web-dist
           path: web/dist
