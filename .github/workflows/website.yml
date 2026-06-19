@@ -9,28 +9,76 @@ on:
 env:
   RUST_VERSION: "1.96"
 jobs:
-  build:
-    name: Build
+  website:
+    name: Build website
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v5
+        with:
+          run_install: false
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build Astro site
+        run: pnpm run build
+
+      - name: Save website build
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-dist
+          path: web/dist
+
+  server:
+    name: Test server
+    needs: website
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: server
     steps:
       - uses: actions/checkout@v6
+      - name: Download website build
+        uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: web/dist
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
           rust-src-dir: server
+
       - name: cargo check
         run: cargo check --locked
+
       - name: cargo build
         run: cargo build --locked
+
+      - name: Generate token key for tests
+        id: generate-token-key
+        run: echo "token_key=$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
+
+      - name: cargo test
+        run: cargo test --locked
+        env:
+          PEEK_TOKEN_KEY: ${{ steps.generate-token-key.outputs.token_key }}
+          PEEK_YNAB_CLIENT_ID: fake-client-id
+          PEEK_YNAB_SECRET: fake-client-secret
+          PEEK_ALLOWED_ORIGINS: chrome-extension://fake-extension-id
 
   deploy:
     name: Deploy
     if: github.ref == 'refs/heads/main'
-    needs: build
+    needs: server
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:

@@ -10,7 +10,7 @@ use crate::state::AppState;
 pub fn plugin() -> AdHocPlugin<AppState> {
     AdHocPlugin::named("Website").on_setup(|router, _state| {
         let static_files =
-            ServeDir::new("../web/dist").fallback(ServeFile::new("../web/dist/404.html"));
+            ServeDir::new("../web/dist").not_found_service(ServeFile::new("../web/dist/404.html"));
         let static_router =
             axum::Router::new()
                 .fallback_service(static_files)

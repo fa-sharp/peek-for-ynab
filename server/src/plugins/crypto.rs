@@ -99,4 +99,23 @@ mod tests {
         let decrypted = crypto.decrypt_token(&encrypted).unwrap();
         assert_eq!(token, decrypted);
     }
+
+    #[test]
+    fn should_reject_invalid_key() {
+        let invalid_key = Aes256Gcm::generate_key(&mut OsRng);
+        let invalid_crypto = CryptoService::new(Aes256Gcm::new(&invalid_key));
+
+        let valid_key = Aes256Gcm::generate_key(&mut OsRng);
+        let valid_crypto = CryptoService::new(Aes256Gcm::new(&valid_key));
+
+        let token = TokenData {
+            access_token: "access".into(),
+            refresh_token: "refresh".into(),
+            expires: 0,
+        };
+
+        let invalid_encrypted = invalid_crypto.encrypt_token(&token).unwrap();
+        let decrypt_result = valid_crypto.decrypt_token(&invalid_encrypted);
+        assert!(decrypt_result.is_err());
+    }
 }
