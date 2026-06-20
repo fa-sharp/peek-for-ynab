@@ -56,7 +56,8 @@ async fn login_route(
         pkce_verifier: pkce_verifier.into_secret(),
         redirect_uri: query.redirect_uri,
     };
-    let cookie_str = serde_json::to_string(&login_data).expect("should serialize");
+    let cookie_str =
+        serde_json::to_string(&login_data).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let cookie = Cookie::build((OAUTH_COOKIE_NAME, cookie_str))
         .path(super::OAUTH_ROUTE_PREFIX)
         .http_only(true)
@@ -100,6 +101,7 @@ async fn callback_route(
         .await
     {
         Ok(token_data) => {
+            tracing::info!("OAuth login successful");
             let auth_token = state
                 .crypto
                 .encrypt_token(&token_data)

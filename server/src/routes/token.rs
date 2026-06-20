@@ -17,6 +17,7 @@ async fn get_token_route(
     State(state): State<AppState>,
 ) -> Result<Json<AccessTokenResponse>, StatusCode> {
     if token.expires < (now_secs() + TOKEN_FRESH_SECONDS) * 1000 {
+        tracing::info!("Refreshing token");
         match state.oauth.refresh(token.refresh_token).await {
             Ok(new_token) => {
                 let auth_token = state
