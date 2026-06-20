@@ -51,7 +51,7 @@ fn init_logging() -> (
         let json_layer = tracing_subscriber::fmt::layer()
             .json()
             .flatten_event(true)
-            .with_current_span(true)
+            .with_current_span(false)
             .with_writer(writer);
         tracing_subscriber::registry()
             .with(filter_layer)
