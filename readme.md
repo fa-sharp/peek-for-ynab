@@ -16,34 +16,40 @@ A browser extension for YNAB that lets users see their category and account bala
     - `lib/` Library and utility functions
     - `styles/` Extension CSS / Sass styles
   - `test/` Unit tests with Vitest
-- `web/` Website and server using Astro and Fastify
-  - `server/` Fastify server (OAuth flow, API routes, and Astro static files)
-    - `routes/` API routes
+- `server/` Backend server using Rust and Axum
+- `web/` Static website using Astro
   - `src/`
     - `pages/` All website pages (Astro)
 
 ## Building and running locally
 
-You must have Node.js (>= 22) and pnpm installed before proceeding.
+You must have Rust (>= 1.96), Node.js (>= 22), and pnpm installed before proceeding.
 
 ### Environment variables
 
-Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.com/settings/developer). Then, in both the `extension/` and `web/` directories, copy the `.env.example` file to `.env` and fill in the values.
+Set up an OAuth application in your YNAB [Developer Settings](https://app.ynab.com/settings/developer). Then, in both the `extension/` and `server/` directories, copy the `.env.example` file to `.env` and fill in the values.
 
-### Backend / Web
+### Web
 
-The server and website is created with [Fastify](https://fastify.dev) and [Astro](https://astro.build/). The server is located in the `/web/server` folder, and the web pages are located in the `web/src/pages` folder. You can run the server via:
+The static website is built with [Astro](https://astro.build/).
 
 ```bash
 cd web
 pnpm install
 pnpm build
-pnpm start
+```
+
+### Server
+The backend server uses Rust and [axum](https://docs.rs/axum).
+
+```bash
+cd server
+cargo run
 ```
 
 ### Extension
 
-This extension is developed using the [WXT framework](https://wxt.dev/). To run the extension's development server, make sure the Astro server (see above) is running and then run:
+This extension is developed using the [WXT framework](https://wxt.dev/). To run the extension's development server, make sure the server (see above) is running and then run:
 
 ```bash
 cd extension
@@ -65,15 +71,16 @@ pnpm build
 
 The extension will be built to the `extension/build/chrome-mv3` folder. This can be loaded into Chrome by navigating to `chrome://extensions/` and clicking "Load unpacked".
 
-### Backend / Web
+### Server / Web
 
 ```bash
 cd web
 pnpm build
 ```
 
-The Astro website will be built into a static site in the `web/dist/` folder. You can then run the Fastify server via:
+The Astro website will be built into a static site in the `web/dist/` folder. You can then build the backend server via:
 
 ```bash
-pnpm start
+cd server
+cargo build --release
 ```

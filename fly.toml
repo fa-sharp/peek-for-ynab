@@ -5,9 +5,9 @@ primary_region = "ewr"
 dockerfile = "Dockerfile"
 
 [env]
-PORT = "8080"
-REQUEST_ID_HEADER = "Fly-Request-Id"
-TRUST_PROXY = "true"
+PEEK_PORT = "8080"
+PEEK_LOG_LEVEL = "info"
+PEEK_REQUEST_ID_HEADER = "Fly-Request-Id"
 
 [http_service]
 internal_port = 8080

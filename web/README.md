@@ -1,23 +1,21 @@
-# Peek for YNAB: Backend server and website
+# Peek for YNAB: Website
 
 To preview the Astro static website locally, run:
 ```sh
 pnpm dev
 ```
 
-To run the Fastify server locally, set up the environment variables in `.env` and then run:
-
+To build the Astro site:
 ```sh
 pnpm build
-pnpm start
 ```
 
 ## Project Structure
 
 ```text
-├── server/ - Fastify server with OAuth handling and API
-├── src/ - Astro static website 
-│   └── pages/
+├── public/ - Static assets
+├── src/ 
+│   └── pages/ - Web pages
 └── package.json
 ```
 

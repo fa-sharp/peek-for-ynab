@@ -1,0 +1,36 @@
+name: Staging
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "server/**"
+      - "web/**"
+      - "Dockerfile"
+      - "fly.toml"
+
+jobs:
+  staging_app:
+    name: Deploy
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-${{ github.event.number }} # Only run one deployment at a time per PR.
+    environment:
+      name: pr-${{ github.event.number }}
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      FLY_APP_NAME: peek-for-ynab-pr-${{ github.event.number }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Deploy staging to Fly
+        id: deploy
+        uses: superfly/fly-pr-review-apps@1.6.0
+        with:
+          name: ${{ env.FLY_APP_NAME }}
+          secrets: |
+            PEEK_SERVER_URL=https://${{ env.FLY_APP_NAME }}.fly.dev
+            PEEK_TOKEN_KEY=${{ secrets.STAGING_TOKEN_KEY }}
+            PEEK_YNAB_CLIENT_ID=${{ secrets.STAGING_YNAB_CLIENT_ID }}
+            PEEK_YNAB_SECRET=${{ secrets.STAGING_YNAB_SECRET }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_REGION: ewr

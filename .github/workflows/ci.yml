@@ -3,7 +3,7 @@ on:
   push:
 
 env:
-  NODE_VERSION: 22.22
+  NODE_VERSION: "22.23"
 
 jobs:
   test:
@@ -53,41 +53,3 @@ jobs:
 
       - name: Build
         run: pnpm run build
-
-  website:
-    runs-on: macos-latest
-    defaults:
-      run:
-        working-directory: web
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v5
-        with:
-          run_install: false
-          package_json_file: web/package.json
-      - uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: web/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Build Astro site
-        run: pnpm run build
-
-      - name: Check types
-        run: pnpm run typecheck
-
-      - name: Generate token key for tests
-        id: generate-token-key
-        run: echo "token_key=$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
-
-      - name: Test
-        run: pnpm run test
-        env:
-          TOKEN_KEY: ${{ steps.generate-token-key.outputs.token_key }}
-          YNAB_CLIENT_ID: fake-client-id
-          YNAB_SECRET: fake-client-secret
