@@ -18,30 +18,30 @@ pub fn plugin() -> AdHocPlugin<AppState> {
             return Ok(router);
         }
 
-        const LEVEL: Level = Level::INFO;
-        let request_id_header = Box::leak(Box::new(
-            HeaderName::from_str(&state.config.request_id_header)
-                .context("invalid request ID header")?,
-        ));
+        const LOG_LEVEL: Level = Level::INFO;
+        let request_id_header = HeaderName::from_str(&state.config.request_id_header)
+            .context("invalid request ID header")?;
 
         let trace_layer = TraceLayer::new_for_http()
-            .make_span_with(|req: &Request| {
-                tracing::info_span!(
-                    "request",
-                    method = %req.method(),
-                    uri = %req.uri(),
-                    id = req.headers().get(&*request_id_header).and_then(|id| id.to_str().ok()),
-                )
+            .make_span_with({
+                let id_header = request_id_header.clone();
+                move |req: &Request| {
+                    tracing::span!(LOG_LEVEL, "request",
+                        method = %req.method(),
+                        uri = %req.uri(),
+                        id = req.headers().get(&id_header).and_then(|id| id.to_str().ok()),
+                    )
+                }
             })
-            .on_request(DefaultOnRequest::new().level(LEVEL))
-            .on_response(DefaultOnResponse::new().level(LEVEL));
+            .on_request(DefaultOnRequest::new().level(LOG_LEVEL))
+            .on_response(DefaultOnResponse::new().level(LOG_LEVEL));
         let logging_service = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(
                 request_id_header.clone(),
                 MakeRequestUuid::default(),
             ))
             .layer(trace_layer)
-            .layer(PropagateRequestIdLayer::new(request_id_header.clone()));
+            .layer(PropagateRequestIdLayer::new(request_id_header));
 
         Ok(router.layer(logging_service))
     })
