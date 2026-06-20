@@ -34,7 +34,7 @@ pub fn plugin() -> AdHocPlugin<AppState> {
                 )
             })
             .on_request(DefaultOnRequest::new().level(LEVEL))
-            .on_response(DefaultOnResponse::new().level(LEVEL).include_headers(true));
+            .on_response(DefaultOnResponse::new().level(LEVEL));
         let logging_service = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(
                 request_id_header.clone(),
