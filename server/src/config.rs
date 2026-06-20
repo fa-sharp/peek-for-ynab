@@ -19,6 +19,8 @@ pub struct AppConfig {
     pub log_level: String,
     #[serde(default = "default_server_url")]
     pub server_url: String,
+    #[serde(default = "default_req_id_header")]
+    pub request_id_header: String,
 
     #[serde_as(as = "serde_with::hex::Hex")]
     pub token_key: [u8; 32],
@@ -43,6 +45,9 @@ fn default_log_level() -> String {
 }
 fn default_server_url() -> String {
     "http://localhost:8080".to_string()
+}
+fn default_req_id_header() -> String {
+    "x-request-id".to_string()
 }
 fn default_ynab_url() -> String {
     "https://app.ynab.com".to_string()
