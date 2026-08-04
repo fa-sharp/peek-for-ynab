@@ -10,7 +10,8 @@ import { mockServer } from "~test/mock/msw";
 beforeAll(() => mockServer.listen({ onUnhandledRequest: "error" }));
 beforeEach(() => {
   // Mock messages to background thread
-  (fakeBrowser as typeof browser).runtime.onMessage.addListener((msg) => {
+  // biome-ignore lint/suspicious/noExplicitAny: no types for message object
+  fakeBrowser.runtime.onMessage.addListener((msg: any) => {
     switch (msg.type) {
       // Mock fetching & setting of access token
       case "fetchToken": {
