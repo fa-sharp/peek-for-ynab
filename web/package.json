@@ -12,12 +12,12 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/mdx": "^7.0.5",
+    "@astrojs/mdx": "^7.0.8",
     "@iconify-json/tabler": "^1.2.38",
-    "astro": "^7.1.6",
-    "astro-icon": "^1.1.5",
-    "sass-embedded": "^1.100.0",
-    "sharp": "^0.35.3",
+    "astro": "^7.2.9",
+    "astro-icon": "^1.2.0",
+    "sass-embedded": "^1.103.1",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee"
