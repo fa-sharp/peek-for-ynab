@@ -39,12 +39,15 @@ jobs:
         run: pnpm wxt submit --chrome-zip build/*-chrome.zip
         ## --firefox-zip build/*-firefox.zip --firefox-sources-zip build/*-sources.zip
         env:
-          CHROME_PUBLISH_TARGET: "default"
-          CHROME_SKIP_SUBMIT_REVIEW: "false"
+          CHROME_API_VERSION: "v2"
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ secrets.CHROME_SERVICE_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_KEY }}
+          CHROME_SKIP_REVIEW: "false"
+          CHROME_CANCEL_PENDING: "true"
+          CHROME_DEPLOY_PERCENTAGE: "100"
+          CHROME_PUBLISH_TYPE: "DEFAULT_PUBLISH"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
