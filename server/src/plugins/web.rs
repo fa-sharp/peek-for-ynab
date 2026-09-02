@@ -2,13 +2,12 @@ use axum::{
     extract::Request,
     http::{HeaderValue, header},
 };
-use axum_plugin::AdHocPlugin;
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::state::AppState;
+use crate::Plugin;
 
-pub fn plugin() -> AdHocPlugin<AppState> {
-    AdHocPlugin::named("Website").on_setup(|router, _state| {
+pub fn plugin() -> Plugin {
+    Plugin::named("Website").local_setup(|_app| {
         let static_files =
             ServeDir::new("../web/dist").not_found_service(ServeFile::new("../web/dist/404.html"));
         let security_headers = axum_helmet::Helmet::new()
@@ -19,6 +18,7 @@ pub fn plugin() -> AdHocPlugin<AppState> {
             .add(axum_helmet::XContentTypeOptions::nosniff())
             .add(axum_helmet::XFrameOptions::same_origin())
             .into_layer()?;
+
         let static_router = axum::Router::new()
             .fallback_service(static_files)
             .layer(security_headers)
@@ -37,6 +37,6 @@ pub fn plugin() -> AdHocPlugin<AppState> {
                 },
             ));
 
-        Ok(router.merge(static_router))
+        Ok(static_router)
     })
 }

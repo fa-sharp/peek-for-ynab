@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
-import { fakeBrowser } from "wxt/testing";
+import { fakeBrowser } from "wxt/testing/fake-browser";
 
 import { browser } from "#imports";
 import { mockServer } from "~test/mock/msw";
@@ -10,24 +10,30 @@ import { mockServer } from "~test/mock/msw";
 beforeAll(() => mockServer.listen({ onUnhandledRequest: "error" }));
 beforeEach(() => {
   // Mock messages to background thread
-  // biome-ignore lint/suspicious/noExplicitAny: no types for message object
-  fakeBrowser.runtime.onMessage.addListener((msg: any) => {
-    switch (msg.type) {
-      // Mock fetching & setting of access token
-      case "fetchToken": {
-        const accessToken = randomUUID();
-        browser.storage.session.set({
-          accessToken: { lastChecked: Date.now(), value: accessToken },
-        });
-        return {
-          res: { success: true, accessToken },
-        };
-      }
-      default: {
-        throw new Error(`Unrecognized message type ${msg.type}`);
+  fakeBrowser.runtime.onMessage.addListener(
+    // biome-ignore lint/suspicious/noExplicitAny: no types for message object
+    (msg: any, _sender, sendResponse) => {
+      switch (msg.type) {
+        // Mock fetching & setting of access token
+        case "fetchToken": {
+          const accessToken = randomUUID();
+          browser.storage.session.set({
+            accessToken: { lastChecked: Date.now(), value: accessToken },
+          });
+          sendResponse({
+            res: {
+              success: true,
+              accessToken,
+            },
+          });
+          return true;
+        }
+        default: {
+          throw new Error(`Unrecognized message type ${msg.type}`);
+        }
       }
     }
-  });
+  );
 });
 afterEach(async () => {
   mockServer.resetHandlers();

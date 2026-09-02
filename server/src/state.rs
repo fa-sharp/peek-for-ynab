@@ -16,7 +16,7 @@ pub struct AppState(Arc<AppStateInner>);
 
 #[derive(AppState)]
 pub struct AppStateInner {
-    pub config: AppConfig,
+    pub config: Arc<AppConfig>,
     pub crypto: CryptoService,
     pub oauth: OauthService,
     pub cookie_key: axum_extra::extract::cookie::Key,

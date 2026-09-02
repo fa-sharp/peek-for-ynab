@@ -40,6 +40,7 @@ pnpm build
 ```
 
 ### Server
+
 The backend server uses Rust and [axum](https://docs.rs/axum).
 
 ```bash
@@ -57,8 +58,7 @@ pnpm install
 pnpm dev
 ```
 
-A development browser should open automatically and load the extension.
-
+The dev extension will be built to the `extension/build/chrome-mv3-dev` folder. You can load the extension into Chrome by navigating to `chrome://extensions/` and clicking "Load unpacked".
 
 ## Building for production
 
