@@ -50,12 +50,15 @@ async fn login_route(
     }
 
     // Generate authorization URL along with CSRF/state paramater and PKCE
-    let (authorize_url, csrf_token, pkce_verifier) = state.oauth.authorize_url();
+    let (authorize_url, state_param, pkce_verifier) = state
+        .oauth
+        .authorize_url()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     // Create a temporary secure cookie to hold OAuth login values
     let login_data = OauthLoginData {
-        state: csrf_token.into_secret(),
-        pkce_verifier: pkce_verifier.into_secret(),
+        state: state_param,
+        pkce_verifier: pkce_verifier,
         redirect_uri: query.redirect_uri,
     };
     let cookie_str =
