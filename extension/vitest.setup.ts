@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
-import { fakeBrowser } from "wxt/testing";
+import { fakeBrowser } from "wxt/testing/fake-browser";
 
 import { browser } from "#imports";
 import { mockServer } from "~test/mock/msw";
