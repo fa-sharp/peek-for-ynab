@@ -1,8 +1,10 @@
 import { DELTA_REQUEST_TIME, IS_DEV } from "~lib/constants";
+import { getFirstDayOfMonthISO } from "~lib/utils";
 import { type ApiSchemas, apiClient } from "./client";
 
 export const accountsQuery = (budgetId: string) => ({
-  queryKey: ["accounts", { budgetId }],
+  // month in query key ensures we refresh at the beginning of the month
+  queryKey: ["accounts", { budgetId, month: getFirstDayOfMonthISO() }],
 });
 
 /** Fetch accounts for this budget from the YNAB API */
