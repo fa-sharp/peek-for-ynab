@@ -253,20 +253,21 @@ dependencies = [
 
 [[package]]
 name = "axum-plugin"
-version = "0.2.0"
-source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=9f72278b3c#9f72278b3c8ae57897ac04af54a6643bb9e5a25c"
+version = "0.3.0"
+source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=d5f9ec2bc8#d5f9ec2bc8284faa6d83b3e3046c90d8b1bfc317"
 dependencies = [
  "anyhow",
  "axum",
  "axum-plugin-macros",
  "futures",
+ "tower",
  "type-map",
 ]
 
 [[package]]
 name = "axum-plugin-macros"
 version = "0.1.0"
-source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=9f72278b3c#9f72278b3c8ae57897ac04af54a6643bb9e5a25c"
+source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=d5f9ec2bc8#d5f9ec2bc8284faa6d83b3e3046c90d8b1bfc317"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1748,7 +1749,7 @@ dependencies = [
 
 [[package]]
 name = "peek-server"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "aes-gcm",
  "anyhow",

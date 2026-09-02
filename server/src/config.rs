@@ -1,12 +1,9 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use anyhow::Context;
-use axum_plugin::AdHocPlugin;
 use reqwest::Url;
 use serde::Deserialize;
 use serde_with::{StringWithSeparator, formats::CommaSeparator};
-
-use crate::state::AppState;
 
 #[serde_with::serde_as]
 #[derive(Debug, Clone, Deserialize)]
@@ -53,17 +50,8 @@ fn default_ynab_url() -> String {
     "https://app.ynab.com".to_string()
 }
 
-/// Plugin that reads and validates configuration, and adds it to server state
-pub fn plugin(additional_config: Vec<(String, String)>) -> AdHocPlugin<AppState> {
-    AdHocPlugin::named("Config").on_init(async |mut state| {
-        let config = extract_config(additional_config)?;
-        state.insert(config);
-        Ok(state)
-    })
-}
-
 /// Extract the configuration from env variables prefixed with `PEEK_`.
-fn extract_config(
+pub fn extract_config(
     additional: impl IntoIterator<Item = (String, String)>,
 ) -> anyhow::Result<AppConfig> {
     let mut config = figment::Figment::new().merge(figment::providers::Env::prefixed("PEEK_"));

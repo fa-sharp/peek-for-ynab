@@ -1,11 +1,11 @@
 use std::time::Duration;
 
 use anyhow::Context;
-use axum_plugin::AdHocPlugin;
+use axum::Extension;
 use oauth2::{ClientId, EndpointNotSet, EndpointSet, basic::BasicClient};
 use oauth2_reqwest::ReqwestClient;
 
-use crate::{config::AppConfig, state::AppState};
+use crate::Plugin;
 
 mod routes;
 mod service;
@@ -15,19 +15,17 @@ pub use service::OauthService;
 pub type OauthClient =
     BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointSet, EndpointSet>;
 
-const OAUTH_ROUTE_PREFIX: &str = "/api/auth/v2";
-
-pub fn plugin() -> AdHocPlugin<AppState> {
-    AdHocPlugin::named("OAuth")
-        .on_init(async |mut state| {
-            let config = state.get::<AppConfig>().context("no config found")?;
+pub fn plugin(prefix: &'static str) -> Plugin {
+    Plugin::named("OAuth")
+        .on_init(async move |mut app| {
+            let config = app.config();
 
             let cookie_key = axum_extra::extract::cookie::Key::derive_from(&config.token_key);
 
             let auth_url = format!("{}/oauth/authorize", config.ynab_base_url);
             let token_url = format!("{}/oauth/token", config.ynab_base_url);
             let revoke_url = format!("{}/oauth/revoke", config.ynab_base_url);
-            let redirect_url = format!("{}{OAUTH_ROUTE_PREFIX}/callback", config.server_url);
+            let redirect_url = format!("{}{prefix}/callback", config.server_url);
             let oauth_client: OauthClient =
                 BasicClient::new(ClientId::new(config.ynab_client_id.clone()))
                     .set_client_secret(oauth2::ClientSecret::new(config.ynab_secret.clone()))
@@ -43,9 +41,17 @@ pub fn plugin() -> AdHocPlugin<AppState> {
                 .context("reqwest client failed to build")?;
             let http_client = ReqwestClient::from(reqwest_client);
 
-            state.insert(cookie_key);
-            state.insert(service::OauthService::new(oauth_client, http_client));
-            Ok(state)
+            app.insert(cookie_key)?;
+            app.insert(service::OauthService::new(oauth_client, http_client))?;
+
+            Ok(app)
         })
-        .on_setup(|router, _state| Ok(router.nest(OAUTH_ROUTE_PREFIX, routes::oauth_routes())))
+        .local_setup(move |_app| {
+            let router = routes::oauth_routes().layer(Extension(RoutePrefix(prefix)));
+
+            Ok(router)
+        })
 }
+
+#[derive(Clone)]
+struct RoutePrefix(&'static str);
