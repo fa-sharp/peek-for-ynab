@@ -14,7 +14,6 @@ export function createQueryClient(options?: { staleTime?: number }) {
         staleTime: options?.staleTime,
         retry: 1, // only retry once if there's an error,
         persister: queryPersister.persisterFn, // persist the query cache to IndexedDB
-        experimental_prefetchInRender: true, // enable React.use() with queries
       },
     },
   });

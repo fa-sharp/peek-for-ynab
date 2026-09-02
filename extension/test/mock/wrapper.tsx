@@ -9,10 +9,7 @@ import YNABProvider from "~lib/context/ynabProvider";
 export const createTestAppWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: false,
-        experimental_prefetchInRender: true,
-      },
+      queries: { retry: false },
     },
   });
   return function wrapper({ children }: { children: ReactNode }) {

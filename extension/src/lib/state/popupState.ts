@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { use, useCallback } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { storage } from "#imports";
 import { DEFAULT_POPUP_STATE, STORAGE_KEYS } from "~lib/constants";
@@ -25,16 +25,15 @@ export const popupStateStorage = storage.defineItem<PopupState>(
 
 export const usePopupState = () => {
   // `React.use` allows us to fetch the initial popup state on render
-  const popupStateQuery = useQuery({
+  const popupStateQuery = useSuspenseQuery({
     queryKey: [STORAGE_KEYS.PopupState],
     queryFn: popupStateStorage.getValue,
     staleTime: Infinity,
   });
-  const initialPopupState = use(popupStateQuery.promise);
 
   // We can now render with synchronous access to the initial popup state
   const [popupState, _setPopupState] = useChromeStorage(popupStateStorage, {
-    initialValue: initialPopupState,
+    initialValue: popupStateQuery.data,
   });
 
   const setPopupState = useCallback(

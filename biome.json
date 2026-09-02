@@ -43,7 +43,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "preset": "none",
       "complexity": {
         "noAdjacentSpacesInRegex": "error",
         "noArguments": "error",
@@ -75,7 +75,7 @@
         "noUnusedPrivateClassMembers": "error",
         "noUnusedFunctionParameters": "warn",
         "noUnusedVariables": "error",
-        "noUnusedImports": "warn",
+        "noUnusedImports": { "level": "warn", "fix": "safe" },
         "useExhaustiveDependencies": "warn",
         "useIsNan": "error",
         "useJsxKeyInIterable": "error",

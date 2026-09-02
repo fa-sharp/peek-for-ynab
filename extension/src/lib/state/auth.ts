@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { clear as idbClear } from "idb-keyval";
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { storage } from "#imports";
 import { fetchAccessToken } from "~lib/api";
@@ -102,15 +102,14 @@ export class AuthManager {
 /** React hook to get and manage the auth state */
 export const useAuth = () => {
   // get auth token on render to eliminate loading state
-  const authTokenQuery = useQuery({
+  const authTokenQuery = useSuspenseQuery({
     queryKey: [STORAGE_KEYS.AuthToken],
     queryFn: authTokenStorage.getValue,
     staleTime: Infinity,
   });
-  const initialAuthToken = use(authTokenQuery.promise);
 
   const [authToken] = useChromeStorage(authTokenStorage, {
-    initialValue: initialAuthToken,
+    initialValue: authTokenQuery.data,
   });
   const [accessToken] = useChromeStorage(accessTokenStorage);
   const [fetchingToken, setFetchingToken] = useState(false);
