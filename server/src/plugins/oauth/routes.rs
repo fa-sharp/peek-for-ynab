@@ -1,4 +1,5 @@
 use axum::{
+    Extension,
     extract::{Query, State},
     response::{IntoResponse, Redirect},
 };
@@ -10,7 +11,7 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use subtle::ConstantTimeEq;
 
-use crate::state::AppState;
+use crate::{plugins::oauth::RoutePrefix, state::AppState};
 
 pub fn oauth_routes() -> axum::Router<AppState> {
     axum::Router::new()
@@ -35,6 +36,7 @@ struct OauthLoginQuery {
 async fn login_route(
     Query(query): Query<OauthLoginQuery>,
     State(state): State<AppState>,
+    Extension(RoutePrefix(prefix)): Extension<RoutePrefix>,
     cookies: PrivateCookieJar,
 ) -> Result<impl IntoResponse, StatusCode> {
     // Verify redirect URI is allowed
@@ -48,18 +50,21 @@ async fn login_route(
     }
 
     // Generate authorization URL along with CSRF/state paramater and PKCE
-    let (authorize_url, csrf_token, pkce_verifier) = state.oauth.authorize_url();
+    let (authorize_url, state_param, pkce_verifier) = state
+        .oauth
+        .authorize_url()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     // Create a temporary secure cookie to hold OAuth login values
     let login_data = OauthLoginData {
-        state: csrf_token.into_secret(),
-        pkce_verifier: pkce_verifier.into_secret(),
+        state: state_param,
+        pkce_verifier: pkce_verifier,
         redirect_uri: query.redirect_uri,
     };
     let cookie_str =
         serde_json::to_string(&login_data).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let cookie = Cookie::build((OAUTH_COOKIE_NAME, cookie_str))
-        .path(super::OAUTH_ROUTE_PREFIX)
+        .path(prefix)
         .http_only(true)
         .secure(true)
         .same_site(SameSite::Lax)
@@ -78,14 +83,14 @@ struct OauthCallbackQuery {
 async fn callback_route(
     Query(query): Query<OauthCallbackQuery>,
     State(state): State<AppState>,
+    Extension(RoutePrefix(prefix)): Extension<RoutePrefix>,
     cookies: PrivateCookieJar,
 ) -> Result<impl IntoResponse, StatusCode> {
     // Read OAuth login data from the temporary cookie, and delete the cookie
     let oauth_cookie = cookies
         .get(OAUTH_COOKIE_NAME)
         .ok_or(StatusCode::BAD_REQUEST)?;
-    let cookie_jar =
-        cookies.remove(Cookie::build(OAUTH_COOKIE_NAME).path(super::OAUTH_ROUTE_PREFIX));
+    let cookie_jar = cookies.remove(Cookie::build(OAUTH_COOKIE_NAME).path(prefix));
     let login: OauthLoginData =
         serde_json::from_str(oauth_cookie.value()).map_err(|_| StatusCode::BAD_REQUEST)?;
 

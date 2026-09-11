@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use anyhow::Context;
 use axum::{extract::Request, http::HeaderName};
-use axum_plugin::AdHocPlugin;
 use tower::ServiceBuilder;
 use tower_http::{
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
@@ -10,16 +9,16 @@ use tower_http::{
 };
 use tracing::{Level, level_filters::LevelFilter};
 
-use crate::state::AppState;
+use crate::Plugin;
 
-pub fn plugin() -> AdHocPlugin<AppState> {
-    AdHocPlugin::named("Request logs").on_setup(|router, state: &AppState| {
-        if LevelFilter::from_str(&state.config.log_level)? > LevelFilter::INFO {
+pub fn plugin() -> Plugin {
+    Plugin::named("Request logs").global_setup(|app, router| {
+        if LevelFilter::from_str(&app.config().log_level)? > LevelFilter::INFO {
             return Ok(router);
         }
 
         const LOG_LEVEL: Level = Level::INFO;
-        let request_id_header = HeaderName::from_str(&state.config.request_id_header)
+        let request_id_header = HeaderName::from_str(&app.config().request_id_header)
             .context("invalid request ID header")?;
 
         let trace_layer = TraceLayer::new_for_http()
@@ -35,6 +34,7 @@ pub fn plugin() -> AdHocPlugin<AppState> {
             })
             .on_request(DefaultOnRequest::new().level(LOG_LEVEL))
             .on_response(DefaultOnResponse::new().level(LOG_LEVEL));
+
         let logging_service = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(
                 request_id_header.clone(),

@@ -5,18 +5,17 @@ use aes_gcm::{
     aead::{AeadCore, AeadInPlace, OsRng},
 };
 use anyhow::Context;
-use axum_plugin::AdHocPlugin;
 use base64::Engine;
 
-use crate::{config::AppConfig, state::AppState, types::TokenData};
+use crate::{Plugin, types::TokenData};
 
-pub fn plugin() -> AdHocPlugin<AppState> {
-    AdHocPlugin::named("Crypto").on_init(async |mut state| {
-        let config = state.get::<AppConfig>().context("no config found")?;
-        let cipher = Aes256Gcm::new_from_slice(&config.token_key).context("invalid token key")?;
+pub fn plugin() -> Plugin {
+    Plugin::named("Crypto").on_init(async |mut app| {
+        let cipher =
+            Aes256Gcm::new_from_slice(&app.config().token_key).context("invalid token key")?;
 
-        state.insert(CryptoService::new(cipher));
-        Ok(state)
+        app.insert(CryptoService::new(cipher))?;
+        Ok(app)
     })
 }
 

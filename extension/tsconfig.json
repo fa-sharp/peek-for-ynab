@@ -5,6 +5,7 @@
     "strict": true,
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
-    "isolatedModules": true
-  }
+    "isolatedModules": true,
+    "noUncheckedIndexedAccess": false,
+  },
 }

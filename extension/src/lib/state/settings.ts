@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { use, useCallback, useMemo } from "react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 
 import { storage } from "#imports";
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from "~lib/constants";
@@ -34,12 +34,11 @@ export const shouldSyncStorage = storage.defineItem<boolean>(
 
 export const useAppSettings = () => {
   // Fetch the sync setting on render to avoid loading state
-  const syncQuery = useQuery({
+  const { data: shouldSync, refetch: refetchSyncQuery } = useSuspenseQuery({
     queryKey: [STORAGE_KEYS.ShouldSyncSettings],
     queryFn: shouldSyncStorage.getValue,
     staleTime: Infinity,
   });
-  const shouldSync = use(syncQuery.promise);
 
   const settingsStore = useMemo(
     () => appSettingsStorage(shouldSync ? "sync" : "local"),
@@ -54,13 +53,13 @@ export const useAppSettings = () => {
     ) => {
       if (key === "sync") {
         await shouldSyncStorage.setValue(newValue as boolean);
-        await syncQuery.refetch();
+        await refetchSyncQuery();
         return;
       } else {
         return setSettings((prev) => (prev ? { ...prev, [key]: newValue } : prev));
       }
     },
-    [syncQuery, setSettings]
+    [refetchSyncQuery, setSettings]
   );
 
   const toggleShowBudget = useCallback(

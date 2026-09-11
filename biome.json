@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.11/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": { "ignoreUnknown": false },
   "formatter": { "enabled": true, "indentStyle": "space", "lineWidth": 90 },
@@ -43,7 +43,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "preset": "none",
       "complexity": {
         "noAdjacentSpacesInRegex": "error",
         "noArguments": "error",
@@ -75,7 +75,7 @@
         "noUnusedPrivateClassMembers": "error",
         "noUnusedFunctionParameters": "warn",
         "noUnusedVariables": "error",
-        "noUnusedImports": "warn",
+        "noUnusedImports": { "level": "warn", "fix": "safe" },
         "useExhaustiveDependencies": "warn",
         "useIsNan": "error",
         "useJsxKeyInIterable": "error",

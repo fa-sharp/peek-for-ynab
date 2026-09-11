@@ -1,8 +1,10 @@
 import { DELTA_REQUEST_TIME, IS_DEV } from "~lib/constants";
+import { getFirstDayOfMonthISO } from "~lib/utils";
 import { apiClient, type CategoryGroupWithCategories } from "./client";
 
 export const categoryGroupsQuery = (budgetId: string) => ({
-  queryKey: ["categoryGroups", { budgetId }],
+  // month in query key ensures we refresh at the beginning of the month
+  queryKey: ["categoryGroups", { budgetId, month: getFirstDayOfMonthISO() }],
 });
 
 /** Fetch category groups for this budget from the YNAB API */
