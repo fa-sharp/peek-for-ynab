@@ -20,7 +20,8 @@
     "gen:api": "pnpx openapi-typescript https://api.ynab.com/papi/open_api_spec.yaml -o ./src/lib/api/client/types.d.ts"
   },
   "dependencies": {
-    "@hello-pangea/dnd": "^18.0.1",
+    "@dnd-kit/abstract": "^0.5.0",
+    "@dnd-kit/react": "^0.5.0",
     "@react-aria/button": "^3.15.1",
     "@react-aria/dialog": "^3.6.1",
     "@react-aria/focus": "^3.22.1",

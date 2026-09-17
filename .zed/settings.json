@@ -11,6 +11,7 @@
       }
     },
     "CSS": { "formatter": { "language_server": { "name": "biome" } } },
+    "SCSS": { "tab_size": 2 },
     "HTML": { "formatter": { "language_server": { "name": "biome" } } },
     "JSON": { "formatter": { "language_server": { "name": "biome" } } },
     "JSONC": { "formatter": { "language_server": { "name": "biome" } } },

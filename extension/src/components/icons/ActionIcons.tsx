@@ -3,11 +3,12 @@ import {
   ChevronDown,
   ChevronUp,
   CreditCard,
+  GripHorizontal,
   type IconProps,
   List,
   Pinned,
   Plus,
-  SwitchHorizontal
+  SwitchHorizontal,
 } from "tabler-icons-react";
 
 export const PinnedItemIcon = () => (
@@ -21,6 +22,9 @@ export const PinnedItemIcon = () => (
 );
 export const PinItemIcon = () => (
   <Pinned aria-hidden size={18} color="var(--action)" strokeWidth={1} />
+);
+export const DragItemIcon = () => (
+  <GripHorizontal aria-hidden size={18} color="var(--action)" strokeWidth={1} />
 );
 export const AddTransactionIcon = (props?: IconProps) => (
   <Plus aria-hidden size={18} color="var(--action)" strokeWidth={1} {...props} />
