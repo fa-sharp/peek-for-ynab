@@ -14,7 +14,7 @@
     "@astrojs/check": "^0.9.10",
     "@astrojs/mdx": "^7.0.8",
     "@iconify-json/tabler": "^1.2.38",
-    "astro": "^7.2.9",
+    "astro": "^7.3.3",
     "astro-icon": "^1.2.0",
     "sass-embedded": "^1.103.1",
     "sharp": "^0.35.4",
