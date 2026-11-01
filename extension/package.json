@@ -40,7 +40,7 @@
     "@tanstack/react-query": "^5.102.8",
     "@tanstack/react-query-devtools": "^5.102.8",
     "@tanstack/react-virtual": "^3.14.10",
-    "@webext-core/messaging": "^3.0.3",
+    "@webext-core/messaging": "^4.0.1",
     "clsx": "^2.1.1",
     "countup.js": "^2.10.1",
     "downshift": "^9.4.0",
@@ -51,7 +51,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tabler-icons-react": "1.55.0",
-    "use-local-storage-state": "^19.5.0",
+    "use-local-storage-state": "^20.0.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
@@ -68,12 +68,12 @@
     "@wxt-dev/module-react": "^1.2.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "fake-indexeddb": "^6.2.5",
-    "happy-dom": "^20.12.0",
-    "msw": "^2.15.0",
+    "happy-dom": "^21.0.4",
+    "msw": "^3.0.3",
     "sass-embedded": "^1.103.1",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11",
+    "vitest": "^5.0.5",
     "vitest-dom": "^0.1.1",
     "wxt": "^0.21.4"
   }
