@@ -23,7 +23,7 @@ A browser extension for YNAB that lets users see their category and account bala
 
 ## Building and running locally
 
-You must have Rust (>= 1.96), Node.js (>= 22), and pnpm installed before proceeding.
+You must have Rust (>= 1.96), Node.js (>= 24), and pnpm installed before proceeding.
 
 ### Environment variables
 

@@ -38,8 +38,8 @@ impl CryptoService {
             .encrypt_in_place_detached(&nonce, b"", &mut buffer)
             .context("encrypt token")?;
         let token = [
-            BASE64.encode(&tag),
-            BASE64.encode(&nonce),
+            BASE64.encode(tag),
+            BASE64.encode(nonce),
             BASE64.encode(&buffer),
         ]
         .join(".");
@@ -71,7 +71,7 @@ impl CryptoService {
 
         let mut buffer = BASE64.decode(&rest[1..]).context("invalid token")?;
         self.cipher
-            .decrypt_in_place_detached(&nonce, b"", &mut buffer, &tag)
+            .decrypt_in_place_detached(nonce, b"", &mut buffer, tag)
             .context("decrypt token")?;
         let data: TokenData = serde_json::from_slice(&buffer).context("deserialize token")?;
 

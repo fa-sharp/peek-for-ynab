@@ -38,7 +38,7 @@ pub fn plugin() -> Plugin {
         let logging_service = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(
                 request_id_header.clone(),
-                MakeRequestUuid::default(),
+                MakeRequestUuid,
             ))
             .layer(trace_layer)
             .layer(PropagateRequestIdLayer::new(request_id_header));
