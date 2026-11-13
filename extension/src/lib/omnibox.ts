@@ -341,7 +341,7 @@ export async function getBrowserBarBudgets() {
   const sync = await shouldSyncStorage.getValue();
   const settings = await appSettingsStorage(sync ? "sync" : "local").getValue();
   const budgets = (
-    await queryClient.fetchQuery<CachedBudget[]>({
+    await queryClient.query<CachedBudget[]>({
       queryKey: ["budgets"],
       queryFn: () => [],
     })
@@ -358,17 +358,17 @@ export async function getBrowserBarDataForBudget(budgetId: string) {
     staleTime: ONE_DAY_IN_MILLIS * 7,
   });
   const [{ payees }, { categoryGroups }, { accounts }] = await Promise.all([
-    queryClient.fetchQuery<{ payees: CachedPayee[] }>({
+    queryClient.query<{ payees: CachedPayee[] }>({
       queryKey: ["payees", { budgetId }],
       queryFn: () => ({ payees: [] }),
     }),
-    queryClient.fetchQuery<{
+    queryClient.query<{
       categoryGroups: CategoryGroupWithCategories[];
     }>({
       queryKey: ["categoryGroups", { budgetId }],
       queryFn: () => ({ categoryGroups: [] }),
     }),
-    queryClient.fetchQuery<{
+    queryClient.query<{
       accounts: Account[];
     }>({
       queryKey: ["accounts", { budgetId }],

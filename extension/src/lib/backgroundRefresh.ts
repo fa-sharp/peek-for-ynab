@@ -86,7 +86,7 @@ export async function backgroundDataRefresh() {
   await queryPersister.restoreQueries(queryClient);
 
   IS_DEV && console.log("Background refresh: fetching data and updating alerts...");
-  const budgetsData = await queryClient.fetchQuery({
+  const budgetsData = await queryClient.query({
     ...budgetQuery,
     queryFn: () => fetchBudgets(accessToken),
   });
@@ -112,7 +112,7 @@ export async function backgroundDataRefresh() {
       budgetSettings.notifications.importError ||
       !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
     ) {
-      const { accounts } = await queryClient.fetchQuery({
+      const { accounts } = await queryClient.query({
         ...accountsQuery(budget.id),
         queryFn: ({ queryKey }) =>
           fetchAccountsForBudget(
@@ -125,7 +125,7 @@ export async function backgroundDataRefresh() {
     }
 
     if (budgetSettings.notifications.overspent) {
-      const { categoryGroups } = await queryClient.fetchQuery({
+      const { categoryGroups } = await queryClient.query({
         ...categoryGroupsQuery(budget.id),
         queryFn: ({ queryKey }) =>
           fetchCategoryGroupsForBudget(
