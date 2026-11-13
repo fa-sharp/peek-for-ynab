@@ -7,12 +7,7 @@ import {
   fetchCategoryGroupsForBudget,
   fetchUnapprovedTxsForBudget,
 } from "~lib/api";
-import {
-  type Account,
-  apiClient,
-  type Category,
-  type TransactionDetail,
-} from "~lib/api/client";
+import type { Account, Category, TransactionDetail } from "~lib/api/client";
 import { IS_DEV } from "~lib/constants";
 import {
   type CurrentAlerts,
@@ -91,7 +86,7 @@ export async function backgroundDataRefresh() {
   await queryPersister.restoreQueries(queryClient);
 
   IS_DEV && console.log("Background refresh: fetching data and updating alerts...");
-  const budgetsData = await queryClient.fetchQuery({
+  const budgetsData = await queryClient.query({
     ...budgetQuery,
     queryFn: () => fetchBudgets(accessToken),
   });
@@ -110,21 +105,6 @@ export async function backgroundDataRefresh() {
     let categoriesData: Category[] | undefined;
 
     if (budgetSettings.notifications.checkImports) {
-      // call import API, then check for unapproved transactions
-      await queryClient.fetchQuery({
-        queryKey: ["import", { budgetId: budget.id }],
-        staleTime: 50 * 60 * 1000, // 50 minutes
-        queryFn: async () => {
-          const { data, error } = await apiClient(accessToken).POST(
-            "/plans/{plan_id}/transactions/import",
-            {
-              params: { path: { plan_id: budget.id } },
-            }
-          );
-          if (error) throw error;
-          return data.data.transaction_ids;
-        },
-      });
       unapprovedTxs = await fetchUnapprovedTxsForBudget(accessToken, budget.id);
     }
 
@@ -132,7 +112,7 @@ export async function backgroundDataRefresh() {
       budgetSettings.notifications.importError ||
       !isEmptyObject(budgetSettings.notifications.reconcileAlerts)
     ) {
-      const { accounts } = await queryClient.fetchQuery({
+      const { accounts } = await queryClient.query({
         ...accountsQuery(budget.id),
         queryFn: ({ queryKey }) =>
           fetchAccountsForBudget(
@@ -145,7 +125,7 @@ export async function backgroundDataRefresh() {
     }
 
     if (budgetSettings.notifications.overspent) {
-      const { categoryGroups } = await queryClient.fetchQuery({
+      const { categoryGroups } = await queryClient.query({
         ...categoryGroupsQuery(budget.id),
         queryFn: ({ queryKey }) =>
           fetchCategoryGroupsForBudget(
