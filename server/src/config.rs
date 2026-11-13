@@ -59,7 +59,7 @@ pub fn extract_config(
         config = config.merge((k, v));
     }
 
-    Ok(config
+    config
         .extract::<AppConfig>()
-        .context("Failed to extract valid configuration")?)
+        .context("Failed to extract valid configuration")
 }

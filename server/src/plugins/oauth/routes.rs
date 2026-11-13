@@ -58,7 +58,7 @@ async fn login_route(
     // Create a temporary secure cookie to hold OAuth login values
     let login_data = OauthLoginData {
         state: state_param,
-        pkce_verifier: pkce_verifier,
+        pkce_verifier,
         redirect_uri: query.redirect_uri,
     };
     let cookie_str =
