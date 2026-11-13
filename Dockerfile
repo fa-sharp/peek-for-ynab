@@ -1,10 +1,10 @@
-ARG NODE_VERSION=22
-ARG NODE_MINOR_VERSION=23
-ARG DEBIAN_VERSION=bookworm
+ARG NODE_VERSION=24.22
+ARG DEBIAN_VERSION=trixie
 ARG RUST_VERSION=1.96
+ARG DISTROLESS_TAG=sha256:cb87acc574abe719b6e5c547384defa2f7b1f24af9605d3f618cf852495d8be2
 
 ### BUILD WEBSITE ###
-FROM node:${NODE_VERSION}.${NODE_MINOR_VERSION}-slim AS build-web
+FROM node:${NODE_VERSION}-${DEBIAN_VERSION}-slim AS build-web
 
 WORKDIR /app/web
 ENV NODE_ENV=production
@@ -45,7 +45,7 @@ RUN --mount=type=cache,id=rust_target,target=/app/target \
 
 
 ### RUN SERVER ###
-FROM gcr.io/distroless/cc-debian12:nonroot AS run
+FROM gcr.io/distroless/cc-debian13@${DISTROLESS_TAG} AS run
 
 # Copy server binary
 COPY --from=build-server --chown=nonroot /app/run-server /app/server/run-server
