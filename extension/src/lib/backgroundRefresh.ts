@@ -7,12 +7,7 @@ import {
   fetchCategoryGroupsForBudget,
   fetchUnapprovedTxsForBudget,
 } from "~lib/api";
-import {
-  type Account,
-  apiClient,
-  type Category,
-  type TransactionDetail,
-} from "~lib/api/client";
+import type { Account, Category, TransactionDetail } from "~lib/api/client";
 import { IS_DEV } from "~lib/constants";
 import {
   type CurrentAlerts,
@@ -110,21 +105,6 @@ export async function backgroundDataRefresh() {
     let categoriesData: Category[] | undefined;
 
     if (budgetSettings.notifications.checkImports) {
-      // call import API, then check for unapproved transactions
-      await queryClient.fetchQuery({
-        queryKey: ["import", { budgetId: budget.id }],
-        staleTime: 50 * 60 * 1000, // 50 minutes
-        queryFn: async () => {
-          const { data, error } = await apiClient(accessToken).POST(
-            "/plans/{plan_id}/transactions/import",
-            {
-              params: { path: { plan_id: budget.id } },
-            }
-          );
-          if (error) throw error;
-          return data.data.transaction_ids;
-        },
-      });
       unapprovedTxs = await fetchUnapprovedTxsForBudget(accessToken, budget.id);
     }
 
