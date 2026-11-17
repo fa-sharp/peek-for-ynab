@@ -255,7 +255,8 @@ dependencies = [
 [[package]]
 name = "axum-plugin"
 version = "0.3.0"
-source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=d5f9ec2bc8#d5f9ec2bc8284faa6d83b3e3046c90d8b1bfc317"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d454e4a3435f1b59bf645cdcc4045b6903e8f13775ecfb68020870b81a74cd6"
 dependencies = [
  "anyhow",
  "axum",
@@ -268,7 +269,8 @@ dependencies = [
 [[package]]
 name = "axum-plugin-macros"
 version = "0.1.0"
-source = "git+https://git.fasharp.io/fa-sharp/axum-plugin?rev=d5f9ec2bc8#d5f9ec2bc8284faa6d83b3e3046c90d8b1bfc317"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ce0edf01bab3ecd72a67ce5f8ca274daa218eae31f52a2653ab373d590741e2"
 dependencies = [
  "proc-macro2",
  "quote",
