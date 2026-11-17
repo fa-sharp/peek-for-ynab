@@ -507,7 +507,8 @@ export interface paths {
         put?: never;
         /**
          * Import transactions
-         * @description Imports available transactions on all linked accounts for the given plan.  Linked accounts allow transactions to be imported directly from a specified financial institution and this endpoint initiates that import.  Sending a request to this endpoint is the equivalent of clicking "Import" on each account in the web application or tapping the "New Transactions" banner in the mobile applications.  The response for this endpoint contains the transaction ids that have been imported.
+         * @deprecated
+         * @description DEPRECATED: This endpoint is no longer needed because YNAB now automatically imports transactions on linked accounts.  Requests are still accepted for backwards compatibility but no import is performed and the response will always contain an empty list of transaction ids.
          */
         post: operations["importTransactions"];
         delete?: never;
@@ -754,7 +755,7 @@ export interface components {
             };
         };
         PlanDetail: components["schemas"]["PlanSummary"] & {
-            accounts?: components["schemas"]["AccountBase"][];
+            accounts?: components["schemas"]["Account"][];
             payees?: components["schemas"]["Payee"][];
             payee_locations?: components["schemas"]["PayeeLocation"][];
             category_groups?: components["schemas"]["CategoryGroup"][];
@@ -762,8 +763,8 @@ export interface components {
             months?: components["schemas"]["MonthDetailBase"][];
             transactions?: components["schemas"]["TransactionSummaryBase"][];
             subtransactions?: components["schemas"]["SubTransactionBase"][];
-            scheduled_transactions?: components["schemas"]["ScheduledTransactionSummaryBase"][];
-            scheduled_subtransactions?: components["schemas"]["ScheduledSubTransactionBase"][];
+            scheduled_transactions?: components["schemas"]["ScheduledTransactionDetail"][];
+            scheduled_subtransactions?: components["schemas"]["ScheduledSubTransaction"][];
         };
         PlanSettingsResponse: {
             data: {
@@ -1224,7 +1225,7 @@ export interface components {
             /** @description Whether or not the transaction is approved.  If not supplied, transaction will be unapproved by default. */
             approved?: boolean;
             flag_color?: components["schemas"]["TransactionFlagColor"];
-            /** @description An array of subtransactions to configure a transaction as a split. Updating `subtransactions` on an existing split transaction is not supported. */
+            /** @description An array of subtransactions to configure a transaction as a split. Updating `subtransactions` on an existing split transaction is not supported and will return an error.  Splits are not allowed on tracking accounts or on transfers between on-budget accounts; a transfer to a tracking account can be a split. */
             subtransactions?: components["schemas"]["SaveSubTransaction"][];
         };
         SaveSubTransaction: {
@@ -1390,16 +1391,21 @@ export interface components {
             category_group_id?: string;
             /**
              * Format: int64
-             * @description The goal target amount in milliunits format.  If value is specified and goal has not already been configured for category, a monthly goal will be created for the category with this target amount.  If goal_type is not specified, it will default to 'NEED' or 'MF' for Credit Card Payment categories.
+             * @description The goal target amount in milliunits format.  If value is specified and goal has not already been configured for category, a monthly goal will be created for the category with this target amount.  If goal_type is not specified, it will default to 'NEED', or to 'MF' for Credit Card Payment categories and 'DEBT' for categories paired to a loan account. Must not be negative. When updating a category, passing null removes any existing target. Passing 0 does too, except for a Credit Card Payment category's 'TBD' (Pay Off Balance by Date) target, where 0 is a valid amount because the card's balance sets it. Use null to remove that target.
              */
             goal_target?: number | null;
             /**
              * Format: date
-             * @description The goal target date in ISO format (e.g. 2016-12-01).
+             * @description The goal target date in ISO format (e.g. 2016-12-01). Not supported for categories paired to a loan account. When combined with a goal_frequency of 'monthly' or 'yearly', this is the date the recurring target is next due. Required for yearly targets, so it cannot be removed from one.
              */
             goal_target_date?: string | null;
-            /** @description Whether the goal requires the full target amount each period. Only supported for 'NEED' goals. When true, the goal is configured as 'Set aside another...'. When false, the goal is configured as 'Refill up to...'. */
+            /** @description Whether the goal requires the full target amount each period. Only supported for 'NEED' goals, and not supported for Credit Card Payment categories or categories paired to a loan account. When true, the goal is configured as 'Set aside another...'. When false, the goal is configured as 'Refill up to...'. */
             goal_needs_whole_amount?: boolean | null;
+            /**
+             * @description When specified, configures a recurring 'NEED' target of goal_target that repeats at this frequency, replacing any existing target. Requires goal_target. 'yearly' also requires goal_target_date, the date the target is next due. 'monthly' accepts an optional goal_target_date, and 'weekly' cannot be combined with goal_target_date. Not supported for Credit Card Payment categories or categories paired to a loan account. Omit to leave an existing target's cadence unchanged.
+             * @enum {string}
+             */
+            goal_frequency?: "monthly" | "weekly" | "yearly";
         };
         ExistingCategory: components["schemas"]["SaveCategory"] & Record<string, never>;
         NewCategory: components["schemas"]["SaveCategory"] & unknown;
@@ -2887,7 +2893,7 @@ export interface operations {
         };
         responses: {
             /** @description The transactions were successfully updated */
-            209: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2918,17 +2924,8 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The request was successful but there were no transactions to import */
+            /** @description The request was successful.  No transactions are imported. */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TransactionsImportResponse"];
-                };
-            };
-            /** @description One or more transactions were imported successfully */
-            201: {
                 headers: {
                     [name: string]: unknown;
                 };

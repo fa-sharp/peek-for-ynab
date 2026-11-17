@@ -24,7 +24,6 @@ const CACHED_QUERY_KEYS = new Set([
   "payees",
   "categoryGroups",
   "accounts",
-  "import",
   "moneyMoves",
 ]);
 
